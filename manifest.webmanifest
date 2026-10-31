@@ -1,0 +1,15 @@
+{
+  "name": "Farmers Quest",
+  "short_name": "Farmers Quest",
+  "description": "Grow soil, catch water and raise a living permaculture farm.",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "fullscreen",
+  "orientation": "any",
+  "background_color": "#1e2e1d",
+  "theme_color": "#2b4a2a",
+  "icons": [
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ]
+}
