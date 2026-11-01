@@ -1,5 +1,5 @@
 // Farmers Quest service worker: stores every file on the device so the game runs offline.
-const CACHE = 'farmersquest-v31';
+const CACHE = 'farmersquest-v34';
 const FILES = ['./', './index.html', './manifest.webmanifest', './icon-192.png', './icon-512.png', './apple-touch-icon.png'];
 async function tell(msg) { const cs = await self.clients.matchAll({ includeUncontrolled: true }); for (const c of cs) c.postMessage(msg); }
 self.addEventListener('install', (e) => {

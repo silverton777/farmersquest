@@ -2259,7 +2259,11 @@ function buildFarmer(R, look) {
       const ring = (a, r, y) => [Math.cos(a) * r, y, Math.sin(a) * r];
       m.tri(top, ring(a1, 0.6, 1.0), ring(a0, 0.6, 1.0), col);
       m.quad(ring(a0, 0.6, 1.0), ring(a1, 0.6, 1.0), ring(a1, 0.95, 0.72), ring(a0, 0.95, 0.72), col);
-      m.quad(ring(a0, 0.95, 0.72), ring(a0, 0.6, 1.0), ring(a1, 0.6, 1.0), ring(a1, 0.95, 0.72), shade(col, 0.6));
+      // the underside: its own surface 2.5 cm under the fabric, so the two never fight over the same spot
+      const dn = 0.025, under = shade(col, 0.72);
+      m.tri([0, 1.12 - dn, 0], ring(a0, 0.6, 1.0 - dn), ring(a1, 0.6, 1.0 - dn), under);
+      m.quad(ring(a0, 0.95, 0.72 - dn), ring(a0, 0.6, 1.0 - dn), ring(a1, 0.6, 1.0 - dn), ring(a1, 0.95, 0.72 - dn), under);
+      m.quad(ring(a0, 0.95, 0.72), ring(a0, 0.95, 0.72 - dn), ring(a1, 0.95, 0.72 - dn), ring(a1, 0.95, 0.72), shade(col, 0.85));
     }
     if (U.dots) for (let i = 0; i < 14; i++) { const a = i * 2.4, r = 0.35 + (i % 3) * 0.2, y = r < 0.6 ? 1.12 - r * 0.2 + 0.015 : 1.0 - (r - 0.6) * 0.8 + 0.015; m.ell(Math.cos(a) * r, y, Math.sin(a) * r, 0.07, 0.015, 0.07, U.dots, { lat: 2, lon: 6 }); }
     m.ell(0, 1.14, 0, 0.04, 0.05, 0.04, U.tip || [200, 200, 205], { lat: 3, lon: 6 });
@@ -14713,7 +14717,7 @@ function interiorFrame(F0, room) {
 
 'use strict';
 // ============================================================================ profiles + saves (each profile has its own farm save)
-const FQ_VERSION = '1.1.3';
+const FQ_VERSION = '1.1.4';
 const LOOKS = [
   { shirt: [214, 74, 64], hair: [120, 76, 40] }, { shirt: [70, 130, 200], hair: [236, 206, 120] }, { shirt: [240, 170, 60], hair: [80, 50, 30] },
   { shirt: [120, 170, 90], hair: [40, 30, 28] }, { shirt: [170, 100, 190], hair: [200, 110, 60] }, { shirt: [60, 160, 160], hair: [150, 100, 60] },
@@ -15747,10 +15751,11 @@ const UI = {
   },
   menu() {
     const F = G.F, P = this.open({ title: 'Menu', icon: '⚙️' });
-    P.body.innerHTML = `<div class="row"><span class="ic">🎥</span><span class="tx">View<small>See the farm through your own eyes, or from above</small></span><div class="mseg" id="mView"><button data-v="third" class="${FPV.on ? '' : 'on'}">Third person</button><button data-v="first" class="${FPV.on ? 'on' : ''}">First person</button></div></div><div class="row"><span class="ic">👆</span><span class="tx">Look sensitivity<small>How fast the right thumb turns the view in first person</small></span><input type="range" id="mSens" min="0.4" max="2" step="0.1" value="${FPV.sens()}" style="width:120px"></div><label class="switch"><input type="checkbox" id="mKid" ${F.kid ? 'checked' : ''}> Kid mode (no numbers, no energy)</label><label class="switch"><input type="checkbox" id="mLow" ${G.lowDetail ? 'checked' : ''}> Low detail (for older devices)</label><label class="switch"><input type="checkbox" id="mSound" ${AUDIO.on ? 'checked' : ''}> Sound effects & nature</label><label class="switch"><input type="checkbox" id="mMusic" ${MUSIC.on ? 'checked' : ''}> Music · ${esc((TRACKS.find((t) => t.key === MUSIC.pick) || { name: MUSIC.pick === 'shuffle' ? 'Shuffle' : 'Auto' }).name)}</label>` +
+    P.body.innerHTML = `<div class="row"><span class="ic">🎥</span><span class="tx">View<small>See the farm through your own eyes, or from above</small></span><div class="mseg" id="mView"><button data-v="third" class="${FPV.on ? '' : 'on'}">Third person</button><button data-v="first" class="${FPV.on ? 'on' : ''}">First person</button></div></div><div class="row"><span class="ic">🎮</span><span class="tx">First-person controls<small>${FPV.oneThumb() ? 'Left thumb walks and turns · right side looks up and down' : 'Left thumb moves · right thumb looks around'}</small></span><div class="mseg" id="mCtrl"><button data-c="twin" class="${FPV.oneThumb() ? '' : 'on'}">Two thumbs</button><button data-c="one" class="${FPV.oneThumb() ? 'on' : ''}">One thumb</button></div></div><div class="row"><span class="ic">👆</span><span class="tx">Look sensitivity<small>How fast the right thumb turns the view in first person</small></span><input type="range" id="mSens" min="0.4" max="2" step="0.1" value="${FPV.sens()}" style="width:120px"></div><label class="switch"><input type="checkbox" id="mKid" ${F.kid ? 'checked' : ''}> Kid mode (no numbers, no energy)</label><label class="switch"><input type="checkbox" id="mLow" ${G.lowDetail ? 'checked' : ''}> Low detail (for older devices)</label><label class="switch"><input type="checkbox" id="mSound" ${AUDIO.on ? 'checked' : ''}> Sound effects & nature</label><label class="switch"><input type="checkbox" id="mMusic" ${MUSIC.on ? 'checked' : ''}> Music · ${esc((TRACKS.find((t) => t.key === MUSIC.pick) || { name: MUSIC.pick === 'shuffle' ? 'Shuffle' : 'Auto' }).name)}</label>` +
       this.rows([{ id: 'photo', tap: true, icon: '📷', text: 'Photo mode', small: 'Free camera, filters, frames and an album' }, { id: 'tips', tap: true, icon: '💡', text: 'Property tips', small: 'What to do next on your place' }, { id: 'music', tap: true, icon: '🎵', text: 'Music & tracks', small: 'Cozy and lofi tunes, volume' }, { id: 'shop', tap: true, icon: '🛍️', text: 'Farm shop', small: 'Boosts, outfits, paint, farm pets, Golden Acorns' }, { id: 'journal', tap: true, icon: '📖', text: 'Farm journal & goals' }, { id: 'how', tap: true, icon: '🎬', text: 'How to play' }, { id: 'help', tap: true, icon: '❓', text: 'Controls' }, { id: 'save', tap: true, icon: '💾', text: 'Save now' }, { id: 'about', tap: true, icon: 'ℹ️', text: 'About & privacy' }, { id: 'quit', tap: true, icon: '🏠', text: 'Save & go to home screen' }]);
     $('mView').querySelectorAll('[data-v]').forEach((b) => { b.onclick = () => { if ((b.dataset.v === 'first') !== FPV.on) FPV.toggle(); $('mView').querySelectorAll('[data-v]').forEach((q) => q.classList.toggle('on', q === b)); }; });
     $('mSens').oninput = (e) => store.set('fq_look', +e.target.value);
+    $('mCtrl').querySelectorAll('[data-c]').forEach((b) => { b.onclick = () => { store.set('fq_ctrl', b.dataset.c); this.menu(); }; });
     $('mKid').onchange = (e) => { F.kid = e.target.checked; UI.hudTick(0, true); };
     $('mLow').onchange = (e) => { G.lowDetail = e.target.checked; store.set('pq_low', G.lowDetail); resize(); G.view.dirtyAll(); };
     $('mSound').onchange = (e) => { AUDIO.on = e.target.checked; store.set('pq_sound', AUDIO.on); };
@@ -18368,6 +18373,12 @@ function updateGame(dt) {
       // On a keyboard, WASD moves and the arrow keys turn.
       const keyTurn = (IN.keys.arrowleft ? 1 : 0) - (IN.keys.arrowright ? 1 : 0);
       if (keyTurn && !G.busy) { Fm.yaw += keyTurn * dt * 2.2; if (!IN.stick && !IN.keys.a && !IN.keys.d) mx = 0; }
+      if (FPV.oneThumb() && IN.stick) {
+        // one-thumb: left and right on the stick turn you (faster the further you push), up and down walk
+        const st = -IN.stick.dx, turn = Math.abs(st) > 0.12 ? Math.sign(st) * Math.pow((Math.abs(st) - 0.12) / 0.88, 1.4) : 0;
+        if (turn && !G.busy) Fm.yaw += turn * dt * 2.4;
+        mx = 0; my = Math.abs(IN.stick.dy) > 0.15 ? IN.stick.dy : 0;
+      }
       [mx, my] = FPV.toWorld(mx, my, Fm.yaw);
     }
     const mag = Math.hypot(mx, my);
@@ -18451,11 +18462,14 @@ const FPV = {
     if (G.drive) G.camMode = this.on ? 'first' : 'top';
     this.S = null; this.pitch = -0.12;
     $('moveHint').textContent = this.on ? 'Left thumb: move · right thumb: look around' : 'Drag on the left to walk, drag farther to run';
-    UI.toast(this.on ? '👁️ First person. Left thumb moves; right thumb looks around.' : 'Back to the farm view.');
+    UI.toast(this.on ? (this.oneThumb() ? 'First person. Left thumb walks and turns; right side looks up and down.' : 'First person. Left thumb moves; right thumb looks around.') : 'Back to the farm view.');
   },
   // the right thumb looks around: left/right turns, up/down tilts. Sensitivity is set in Settings.
   sens() { return store.get('fq_look', 1); },
-  look(dx, dy) { const Fm = G.Fm; if (!Fm || G.busy) return; const k = this.sens(); Fm.yaw -= dx * 0.0062 * k; this.pitch = clamp(this.pitch - dy * 0.0048 * k, -1.15, 0.85); },
+  // two ways to play: 'twin' (left thumb moves and side-steps, right thumb looks around: the usual layout) or 'one' (left thumb walks
+  // and turns, the right side only tilts the view up and down)
+  oneThumb() { return store.get('fq_ctrl', 'twin') === 'one'; },
+  look(dx, dy) { const Fm = G.Fm; if (!Fm) return; const k = this.sens(); if (!this.oneThumb() && !G.busy) Fm.yaw -= dx * 0.0062 * k; this.pitch = clamp(this.pitch - dy * 0.0048 * k, -1.15, 0.85); },
   // stick (x right, y down the screen) to a world direction: up the screen walks the way you face
   toWorld(mx, my, yaw) { const fx = Math.sin(yaw), fz = Math.cos(yaw), rx = -fz, rz = fx; return [fx * -my + rx * mx, fz * -my + rz * mx]; },
   eyePos(ground) {
