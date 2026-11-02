@@ -945,6 +945,16 @@ varying vec3 vN; varying vec4 vCol; varying vec3 vW; varying vec4 vL; varying ve
 uniform vec3 uSunDir, uSunCol, uSkyCol, uGndCol, uFogCol, uCam;
 uniform vec2 uFog;
 uniform float uSnow, uWet, uNight, uTime, uCloud, uShadowOn, uFlash, uSnowK, uExposure, uContour, uShellOn, uGrassUnder, uFade;
+uniform vec4 uLampP, uLampD;
+vec3 lampLight(vec3 W, vec3 n, vec3 lin) {
+  if (uLampP.w <= 0.0) return vec3(0.0);
+  vec3 Lv = uLampP.xyz - W; float ld = length(Lv); vec3 L = Lv / max(ld, 0.001);
+  float reach = uLampD.w < -0.5 ? 0.5 : 0.12;
+  float att = uLampP.w / (1.0 + ld * ld * reach);
+  float spot = uLampD.w < -0.5 ? 1.0 : smoothstep(uLampD.w, uLampD.w + 0.06, dot(-L, uLampD.xyz));
+  return lin * vec3(1.0, 0.8, 0.55) * att * spot * (0.3 + 0.7 * max(dot(n, L), 0.0));
+}
+
 uniform vec3 uFocusF;
 #define GRASS_FADE0 19.0
 #define GRASS_FADE1 33.0
@@ -1188,7 +1198,7 @@ void main() {
 #elif STYLE == 4
   light = mix(vec3(0.5, 0.45, 0.85) * (hemi * 1.4 + 0.12), uSunCol * 1.25 + hemi * 0.7, diff * (0.25 + 0.75 * sh));
 #endif
-  vec3 col = lin * light;
+  vec3 col = lin * light + lampLight(vW, n, lin);
   // leaves glow when the sun is behind them
   if (vMat > 4.5 && vMat < 7.5) col += lin * uSunCol * 0.6 * pow(max(dot(-V, uSunDir), 0.0), 3.0) * sh;
   float rim = pow(1.0 - max(dot(n, V), 0.0), 3.0);
@@ -1310,6 +1320,16 @@ varying vec3 vW; varying vec3 vB; varying vec3 vN; varying vec3 vNo; varying vec
 uniform vec3 uSunDir, uSunCol, uSkyCol, uGndCol, uFogCol, uCam;
 uniform vec2 uFog, uCloudMove;
 uniform float uSnow, uWet, uNight, uTime, uCloud, uShadowOn, uFlash, uSnowK, uExposure, uShellKind, uShellDens;
+uniform vec4 uLampP, uLampD;
+vec3 lampLight(vec3 W, vec3 n, vec3 lin) {
+  if (uLampP.w <= 0.0) return vec3(0.0);
+  vec3 Lv = uLampP.xyz - W; float ld = length(Lv); vec3 L = Lv / max(ld, 0.001);
+  float reach = uLampD.w < -0.5 ? 0.5 : 0.12;
+  float att = uLampP.w / (1.0 + ld * ld * reach);
+  float spot = uLampD.w < -0.5 ? 1.0 : smoothstep(uLampD.w, uLampD.w + 0.06, dot(-L, uLampD.xyz));
+  return lin * vec3(1.0, 0.8, 0.55) * att * spot * (0.3 + 0.7 * max(dot(n, L), 0.0));
+}
+
 uniform vec3 uFocusF;
 uniform vec4 uTint, uGS;   // uGS: blade speckle, clump pattern, patch colour, darkest shade at the roots
 uniform sampler2D uShadow;
@@ -1391,7 +1411,7 @@ void main() {
   float sh = shadowAt() * cloudSh;
   vec3 hemi = mix(uGndCol, uSkyCol, n.y * 0.5 + 0.5);
   vec3 light = hemi * 1.05 + uSunCol * diff * sh * 1.35;
-  vec3 col = lin * light * ao;
+  vec3 col = lin * light * ao + lampLight(vW, vec3(0.0, 1.0, 0.0), lin) * ao;
   col += lin * uSunCol * trans * pow(max(dot(-V, uSunDir), 0.0), 2.0) * sh;
   float rim = pow(1.0 - max(dot(n, V), 0.0), 2.4);
   col += rim * pow(uSkyCol, vec3(2.2)) * (0.1 + 0.5 * hairRim * h) * ao;
@@ -1717,6 +1737,7 @@ class Renderer {
     gl.uniform1f(u.uExposure, F.exposure || 1.0); gl.uniform1f(u.uCloud, F.cloud); gl.uniform1f(u.uShadowOn, F.shadowOn ? 1 : 0); gl.uniform1f(u.uFlash, F.flash);
     gl.uniform2fv(u.uCloudMove, F.cloudMove);
     if (u.uContour) gl.uniform1f(u.uContour, F.contour || 0);
+    if (u.uLampP) { gl.uniform4fv(u.uLampP, F.lampP || [0, 0, 0, 0]); gl.uniform4fv(u.uLampD, F.lampD || [0, 0, -1, -1]); }
     const shellOn = typeof ART !== 'undefined' && ART.shell > 0;
     if (u.uShellOn) gl.uniform1f(u.uShellOn, shellOn ? 1 : 0);
     if (u.uGrassUnder) gl.uniform1f(u.uGrassUnder, GRASS_SHELL.under === undefined ? 0.7 : GRASS_SHELL.under);
@@ -1746,6 +1767,7 @@ class Renderer {
       gl.uniform1f(su.uSnow, F.snow); gl.uniform1f(su.uWet, F.wet); gl.uniform1f(su.uNight, F.night); gl.uniform1f(su.uCloud, F.cloud);
       gl.uniform1f(su.uShadowOn, F.shadowOn ? 1 : 0); gl.uniform1f(su.uFlash, F.flash); gl.uniform1f(su.uExposure, F.exposure || 1.0);
       gl.uniform2fv(su.uCloudMove, F.cloudMove);
+      if (su.uLampP) { gl.uniform4fv(su.uLampP, F.lampP || [0, 0, 0, 0]); gl.uniform4fv(su.uLampD, F.lampD || [0, 0, -1, -1]); }
       gl.activeTexture(gl.TEXTURE0); gl.bindTexture(gl.TEXTURE_2D, this.shTex); gl.uniform1i(su.uShadow, 0);
       const q = ART.shell;
       gl.enable(gl.POLYGON_OFFSET_FILL);
@@ -2593,10 +2615,12 @@ function addHouse(mb, x, y, z, ry, opt) {
   mb.mat = 11; mb.roof(0, H + 0.2, 0, 5, 4, pitch, roof, 0.4); mb.mat = 0;
   for (const sx of [-1, 1]) for (const sz of [-1, 1]) if (st !== 'cabin') mb.box(sx * 2.5, 0.2, sz * 2.0, 0.16, H, 0.16, trim);
   mb.box(0, H + 0.15, 2.02, 5.1, 0.12, 0.08, trim); mb.box(0, H + 0.15, -2.02, 5.1, 0.12, 0.08, trim);
-  // door + windows (emissive)
-  mb.mat = 1; mb.box(0, 0.2, 2.02, 0.9, 1.5, 0.05, [140, 90, 60]); mb.mat = 0;
-  mb.box(0, 1.7, 2.04, 1.1, 0.1, 0.06, trim); mb.box(-0.5, 0.2, 2.04, 0.1, 1.55, 0.06, trim); mb.box(0.5, 0.2, 2.04, 0.1, 1.55, 0.06, trim);
-  mb.box(0.3, 0.9, 2.06, 0.08, 0.08, 0.04, [230, 200, 80]);
+  // door + windows (emissive); on a log cabin they sit out on the face of the logs, which stand proud of the wall
+  const fz = st === 'cabin' ? 2.19 : 2.0, sxw = st === 'cabin' ? 2.69 : 2.5;
+  if (st === 'cabin') { mb.box(0, 0.2, fz - 0.06, 1.2, 1.62, 0.1, [58, 40, 28]); for (const sx of [-1.6, 1.6]) mb.box(sx, 0.48, fz - 0.06, 1.0, 1.06, 0.1, [58, 40, 28]); }
+  mb.mat = 1; mb.box(0, 0.2, fz + 0.02, 0.9, 1.5, 0.05, [140, 90, 60]); mb.mat = 0;
+  mb.box(0, 1.7, fz + 0.04, 1.1, 0.1, 0.06, trim); mb.box(-0.5, 0.2, fz + 0.04, 0.1, 1.55, 0.06, trim); mb.box(0.5, 0.2, fz + 0.04, 0.1, 1.55, 0.06, trim);
+  mb.box(0.3, 0.9, fz + 0.06, 0.08, 0.08, 0.04, [230, 200, 80]);
   const win = (wx, wy, wz, side) => {
     mb.box(wx, wy - 0.06, wz, side ? 0.08 : 0.95, 0.95, side ? 0.95 : 0.08, trim);
     const W = new MB(); W.box(wx, wy, wz + (side ? 0 : 0.04), side ? 0.1 : 0.75, 0.8, side ? 0.75 : 0.06, [255, 214, 130]);
@@ -2611,13 +2635,14 @@ function addHouse(mb, x, y, z, ry, opt) {
       if (st === 'cottage') { mb.box(wx, wy - 0.5, wz + 0.2, 0.9, 0.18, 0.22, [120, 84, 54]); for (let i = 0; i < 6; i++) mb.ell(wx - 0.36 + i * 0.145, wy - 0.28, wz + 0.22, 0.07, 0.06, 0.07, i % 2 ? [232, 84, 104] : [250, 206, 70], { lat: 2, lon: 5 }); }
     }
   };
-  win(-1.6, 1.0, 2.0); win(1.6, 1.0, 2.0); win(-2.5, 1.0, 0, true); win(2.5, 1.0, 0, true);
+  win(-1.6, 1.0, fz); win(1.6, 1.0, fz); win(-sxw, 1.0, 0, true); win(sxw, 1.0, 0, true);
   if (st === 'twostory') { win(-1.6, 2.9, 2.0); win(0, 2.9, 2.0); win(1.6, 2.9, 2.0); win(-2.5, 2.9, 0, true); win(2.5, 2.9, 0, true); }
   // porch
   mb.mat = 1; mb.box(0, 0.1, 2.7, 2.4, 0.15, 1.2, C.wood); mb.mat = 0;
   mb.box(0, -0.1, 3.45, 1.0, 0.18, 0.4, C.stone);
-  mb.cyl(-1.05, 0.2, 3.2, 0.06, 0.06, 1.9, 6, trim); mb.cyl(1.05, 0.2, 3.2, 0.06, 0.06, 1.9, 6, trim);
-  mb.mat = 2; mb.push(M4.trs(0, 2.1, 2.7, 0, -0.25, 0)); mb.box(0, 0, 0, 2.8, 0.1, 1.5, roof); mb.pop();
+  mb.cyl(-1.05, 0.2, 3.2, 0.06, 0.06, 1.76, 6, trim); mb.cyl(1.05, 0.2, 3.2, 0.06, 0.06, 1.76, 6, trim);
+  // the porch roof sheds rain away from the house: high where it meets the wall, low over the steps
+  mb.mat = 2; mb.push(M4.trs(0, 2.1, 2.7, 0, 0.25, 0)); mb.box(0, 0, 0, 2.8, 0.1, 1.5, roof); mb.pop();
   // chimney (stone on a cabin, brick otherwise; taller on a two-story)
   const ch = st === 'cabin' ? [150, 146, 140] : [170, 90, 70], cy = H + 0.2, chH = pitch + 0.9;
   mb.mat = 6; mb.box(1.5, cy, -0.8, 0.6, chH, 0.6, ch); mb.box(1.5, cy + chH, -0.8, 0.72, 0.12, 0.72, shade(ch, 0.88)); mb.mat = 0;
@@ -2701,6 +2726,7 @@ function addCoop(mb, x, y, z, ry, wheels, opt) {
   if (wheels) return addEggmobile(mb, x, y, z, ry);
   opt = opt || {};
   const cst = opt.style || 'classic';
+  if (opt.upg) addCoopUpgrades(mb, x, y, z, ry, opt);
   if (cst === 'aframe') return addCoopAFrame(mb, x, y, z, ry, opt);
   mb.push(M4.trs(x, y, z, ry || 0, 0, 0));
   const wall = opt.wall || [240, 230, 200], roof = opt.roof || [80, 130, 90];
@@ -2720,6 +2746,41 @@ function addCoop(mb, x, y, z, ry, wheels, opt) {
     mb.box(0, yb + 1.85, 0, 0.42, 0.36, 0.42, wall); mb.mat = 2; mb.cyl(0, yb + 2.21, 0, 0.36, 0.0, 0.3, 4, roof, { rot: Math.PI / 4, flat: true }); mb.mat = 0; mb.cyl(0, yb + 2.5, 0, 0.015, 0.015, 0.25, 4, [60, 60, 60]); mb.box(0.06, yb + 2.7, 0, 0.18, 0.1, 0.02, [60, 60, 60]);
     for (const sx of [-1, 1]) { mb.box(sx * 0.98, yb + 0.48, 0, 0.18, 0.12, 0.62, [120, 84, 54]); for (let i = 0; i < 4; i++) mb.ell(sx * 0.98, yb + 0.6, -0.22 + i * 0.15, 0.06, 0.05, 0.06, i % 2 ? [232, 84, 104] : [250, 206, 70], { lat: 2, lon: 5 }); }
     for (const [ax, az, bx, bz] of [[-0.9, 1.15, -0.9, 2.4], [0.9, 1.15, 0.9, 2.4], [-0.9, 2.4, 0.9, 2.4]]) { const n = Math.ceil(Math.hypot(bx - ax, bz - az) / 0.6); for (let i = 0; i <= n; i++) mb.box(lerp(ax, bx, i / n), 0, lerp(az, bz, i / n), 0.06, 0.75, 0.06, tr); mb.box((ax + bx) / 2, 0.68, (az + bz) / 2, Math.abs(bx - ax) + 0.06, 0.05, Math.abs(bz - az) + 0.06, tr); mb.box((ax + bx) / 2, 0.3, (az + bz) / 2, Math.abs(bx - ax) + 0.04, 0.04, Math.abs(bz - az) + 0.04, tr); }
+  }
+  mb.pop();
+}
+// what coop upgrades add: a bank of nest boxes on the side (1), a wire run out the back (2), a second hen house joined on (3)
+function addCoopUpgrades(mb, x, y, z, ry, opt) {
+  const u = opt.upg || 0, wall = opt.wall || [240, 230, 200], roof = opt.roof || [80, 130, 90], tr = opt.trim || [250, 248, 240];
+  mb.push(M4.trs(x, y, z, ry || 0, 0, 0));
+  if (u >= 1) {   // nest boxes on the -x side, lids hinged up the wall
+    mb.mat = MAT.boards; mb.box(-1.08, 0.55, 0.15, 0.36, 0.42, 1.1, shade(wall, 0.92)); mb.mat = 0;
+    mb.mat = 2; mb.push(M4.trs(-1.08, 0.99, 0.15, 0, 0, 0.35)); mb.box(0, 0, 0, 0.46, 0.05, 1.2, roof); mb.pop(); mb.mat = 0;
+    for (let i = 0; i < 3; i++) mb.box(-1.27, 0.62, -0.22 + i * 0.37, 0.02, 0.24, 0.26, [70, 54, 40]);
+    for (const sz of [-0.4, 0.7]) mb.box(-1.08, 0.3, sz, 0.06, 0.26, 0.06, C.woodDk);
+  }
+  if (u >= 2) {   // a covered wire run off the back (-z): posts, a top rail, wire panels and a sheet roof over half of it
+    const z0 = -1.1, z1 = -3.3, xs = [-0.9, 0.9];
+    mb.mat = MAT.boards; for (const px of xs) for (const pz of [z0, (z0 + z1) / 2, z1]) mb.box(px, 0, pz, 0.08, 1.15, 0.08, C.woodDk);
+    for (const px of xs) mb.box(px, 1.12, (z0 + z1) / 2, 0.06, 0.06, z0 - z1, C.wood); mb.box(0, 1.12, z1, 1.86, 0.06, 0.06, C.wood); mb.mat = 0;
+    const wire = [168, 176, 180];
+    for (const px of xs) for (let k = 0; k <= 10; k++) { const pz = lerp(z0, z1, k / 10); mb.box(px, 0.05, pz, 0.012, 1.06, 0.012, wire); }
+    for (const px of xs) for (const h of [0.3, 0.6, 0.9]) mb.box(px, h, (z0 + z1) / 2, 0.012, 0.012, z0 - z1, wire);
+    for (let k = 0; k <= 8; k++) mb.box(lerp(-0.9, 0.9, k / 8), 0.05, z1, 0.012, 1.06, 0.012, wire);
+    for (const h of [0.3, 0.6, 0.9]) mb.box(0, h, z1, 1.8, 0.012, 0.012, wire);
+    mb.mat = MAT.metal; mb.box(0, 1.18, z0 - 0.55, 1.95, 0.03, 1.15, [150, 156, 162]); mb.mat = 0;
+    mb.box(0, 0.01, (z0 + z1) / 2, 1.78, 0.015, z0 - z1 - 0.1, [150, 124, 84]);
+  }
+  if (u >= 3) {   // a second hen house joined on at +x, with its own gable roof, window and pop door
+    mb.push(M4.trs(2.1, 0, 0.1, 0, 0, 0));
+    for (const sx of [-1, 1]) for (const sz of [-1, 1]) mb.box(sx * 0.62, 0, sz * 0.8, 0.12, 0.3, 0.12, C.woodDk);
+    mb.mat = 1; mb.box(0, 0.3, 0, 1.5, 1.1, 1.9, shade(wall, 0.97)); mb.gable(0, 1.4, 0, 1.5, 1.9, 0.6, shade(wall, 0.97));
+    mb.mat = 2; mb.push(M4.rotY(Math.PI / 2)); mb.roof(0, 1.4, 0, 1.9, 1.5, 0.6, roof, 0.2); mb.pop(); mb.mat = 0;
+    for (const sx of [-1, 1]) for (const sz of [-1, 1]) mb.box(sx * 0.75, 0.3, sz * 0.95, 0.08, 1.1, 0.08, tr);
+    mb.box(0.76, 0.95, 0, 0.04, 0.32, 0.5, tr); mb.box(0.78, 0.97, 0, 0.03, 0.26, 0.42, [60, 70, 70]);
+    mb.box(0.2, 0.32, 0.96, 0.36, 0.42, 0.04, [120, 80, 50]);
+    mb.push(M4.trs(0.2, 0.3, 1.2, 0, 0.6, 0)); mb.box(0, 0, 0, 0.32, 0.04, 0.6, C.wood); mb.pop();
+    mb.pop();
   }
   mb.pop();
 }
@@ -2872,9 +2933,13 @@ function addTrough(mb, x, y, z) {
     const b0 = bot[i], b1 = bot[i + 1], t0 = top[i], t1 = top[i + 1], n0 = nrm(b0), n1 = nrm(b1);
     mb.tri(b0, t1, b1, zinc, n0, n1, n1); mb.tri(b0, t0, t1, zinc, n0, n0, n1);
     // inner wall (dark galvanised) and the water
-    const i0 = [x + (t0[0] - x) * 0.93, wy + 0.1, z + (t0[2] - z) * 0.93], i1 = [x + (t1[0] - x) * 0.93, wy + 0.1, z + (t1[2] - z) * 0.93];
-    const w0 = [x + (t0[0] - x) * 0.93, wy, z + (t0[2] - z) * 0.93], w1 = [x + (t1[0] - x) * 0.93, wy, z + (t1[2] - z) * 0.93];
-    mb.tri(i0, i1, w1, zincDk, [-n0[0], 0, -n0[2]], [-n1[0], 0, -n1[2]], [-n1[0], 0, -n1[2]]); mb.tri(i0, w1, w0, zincDk, [-n0[0], 0, -n0[2]], [-n1[0], 0, -n1[2]], [-n0[0], 0, -n0[2]]);
+    // the inner wall runs from the rim right down to the water and faces inward, so you never see through the tank
+    const ty = t0[1], k = 0.95, i0 = [x + (t0[0] - x) * k, ty, z + (t0[2] - z) * k], i1 = [x + (t1[0] - x) * k, ty, z + (t1[2] - z) * k];
+    const w0 = [x + (t0[0] - x) * k, wy - 0.01, z + (t0[2] - z) * k], w1 = [x + (t1[0] - x) * k, wy - 0.01, z + (t1[2] - z) * k];
+    const m0 = [-n0[0], 0, -n0[2]], m1 = [-n1[0], 0, -n1[2]];
+    mb.tri(i0, w1, i1, zincDk, m0, m1, m1); mb.tri(i0, w0, w1, zincDk, m0, m0, m1);
+    // the flat lip between the outer and inner walls
+    mb.tri(t0, i1, t1, zincLt, [0, 1, 0], [0, 1, 0], [0, 1, 0]); mb.tri(t0, i0, i1, zincLt, [0, 1, 0], [0, 1, 0], [0, 1, 0]);
     const c = [x, wy, z];
     mb.tri(c, w1, w0, [92, 156, 204], [0, 1, 0], [0, 1, 0], [0, 1, 0]);
   }
@@ -3214,8 +3279,10 @@ function buildCow(br) {
   m.sel(0, -0.11 * k, 0.55 * k, 0.17 * k, 0.13 * k, 0.11 * k, 2.4, muzzleCol, { lat: 8, lon: 12 });
   for (const sx of [-1, 1]) m.ell(sx * 0.065 * k, -0.09 * k, 0.655 * k, 0.026 * k, 0.02 * k, 0.012 * k, [36, 28, 28], { lat: 3, lon: 6 });
   for (const sx of [-1, 1]) {
-    m.ell(sx * 0.17 * k, 0.07 * k, 0.37 * k, 0.034 * k, 0.04 * k, 0.03 * k, [26, 20, 20], { lat: 5, lon: 8 });
-    m.ell(sx * 0.18 * k, 0.085 * k, 0.392 * k, 0.009 * k, 0.011 * k, 0.006 * k, [255, 255, 255], { lat: 3, lon: 5 });
+    // eyes: a pale lid rim round a big dark eye with a bright catchlight, so they read even on a black head
+    m.ell(sx * 0.178 * k, 0.075 * k, 0.37 * k, 0.058 * k, 0.062 * k, 0.04 * k, [206, 190, 168], { lat: 5, lon: 8 });
+    m.ell(sx * 0.19 * k, 0.075 * k, 0.376 * k, 0.046 * k, 0.052 * k, 0.04 * k, [30, 20, 16], { lat: 5, lon: 8 });
+    m.ell(sx * 0.212 * k, 0.094 * k, 0.4 * k, 0.016 * k, 0.018 * k, 0.01 * k, [255, 255, 255], { lat: 3, lon: 5 });
     m.ell(sx * 0.16 * k, 0.105 * k, 0.37 * k, 0.04 * k, 0.012 * k, 0.03 * k, shade(hc, 0.8), { lat: 3, lon: 6 }); // brow
   }
   m.mat = MAT.hide;
@@ -3296,8 +3363,9 @@ function buildHorse(br) {
   m.sel(0, -0.02 * k, 0.52 * k, 0.1 * k, 0.1 * k, 0.09 * k, 2.4, br.blanket ? [70, 60, 60] : shade(col, 0.6), { lat: 8, lon: 10 });
   for (const sx of [-1, 1]) m.ell(sx * 0.05 * k, -0.01 * k, 0.6 * k, 0.02 * k, 0.025 * k, 0.012 * k, [30, 24, 24], { lat: 3, lon: 6 });
   for (const sx of [-1, 1]) {
-    m.ell(sx * 0.115 * k, 0.07 * k, 0.12 * k, 0.03 * k, 0.035 * k, 0.025 * k, [24, 20, 20], { lat: 5, lon: 8 });
-    m.ell(sx * 0.122 * k, 0.082 * k, 0.135 * k, 0.008 * k, 0.01 * k, 0.005 * k, [255, 255, 255], { lat: 3, lon: 5 });
+    m.ell(sx * 0.12 * k, 0.07 * k, 0.12 * k, 0.05 * k, 0.054 * k, 0.034 * k, [206, 190, 168], { lat: 5, lon: 8 });
+    m.ell(sx * 0.129 * k, 0.07 * k, 0.124 * k, 0.041 * k, 0.046 * k, 0.034 * k, [30, 20, 16], { lat: 5, lon: 8 });
+    m.ell(sx * 0.148 * k, 0.086 * k, 0.14 * k, 0.014 * k, 0.016 * k, 0.008 * k, [255, 255, 255], { lat: 3, lon: 5 });
     m.mat = MAT.hide; m.push(M4.trs(sx * 0.07 * k, 0.14 * k, 0.02 * k, 0, -0.2, sx * -0.25)); m.cyl(0, 0, 0, 0.035 * k, 0.005 * k, 0.15 * k, 6, col); m.pop(); m.mat = 0;
   }
   m.sel(0, 0.15 * k, 0.07 * k, 0.05 * k, 0.04 * k, 0.09 * k, 2, mane, { lat: 4, lon: 6 });
@@ -3350,8 +3418,9 @@ function buildPig(br) {
   m.pop();
   for (const sx of [-1, 1]) m.ell(sx * 0.038 * k, -0.04 * k, 0.452 * k, 0.02 * k, 0.028 * k, 0.008 * k, [100, 56, 56], { lat: 3, lon: 6 });
   for (const sx of [-1, 1]) {
-    m.ell(sx * 0.13 * k, 0.07 * k, 0.31 * k, 0.026 * k, 0.03 * k, 0.02 * k, [20, 16, 16], { lat: 4, lon: 6 });
-    m.ell(sx * 0.135 * k, 0.08 * k, 0.325 * k, 0.007 * k, 0.008 * k, 0.005 * k, [255, 255, 255], { lat: 3, lon: 4 });
+    m.ell(sx * 0.134 * k, 0.07 * k, 0.31 * k, 0.04 * k, 0.044 * k, 0.026 * k, [214, 196, 176], { lat: 4, lon: 6 });
+    m.ell(sx * 0.142 * k, 0.07 * k, 0.315 * k, 0.033 * k, 0.037 * k, 0.026 * k, [24, 16, 14], { lat: 4, lon: 6 });
+    m.ell(sx * 0.158 * k, 0.084 * k, 0.33 * k, 0.011 * k, 0.013 * k, 0.007 * k, [255, 255, 255], { lat: 3, lon: 4 });
   }
   m.mat = MAT.hide;
   for (const sx of [-1, 1]) {
@@ -3399,7 +3468,7 @@ function buildSheep(br) {
   if (br.wool) { m.mat = MAT.wool; m.sel(0, 0.11, 0.04, 0.14, 0.09, 0.13, 2, wool, { lat: 6, lon: 10, disp }); m.mat = MAT.hide; }
   for (const sx of [-1, 1]) { m.push(M4.trs(sx * 0.11, 0.05, 0.05, 0, 0, sx * 0.45)); m.sel(sx * 0.07, 0, 0, 0.1, 0.03, 0.045, 2, face, { lat: 4, lon: 8 }); m.pop(); }
   m.mat = 0;
-  for (const sx of [-1, 1]) { m.ell(sx * 0.085, 0.045, 0.24, 0.022, 0.026, 0.016, [24, 20, 20], { lat: 4, lon: 6 }); m.ell(sx * 0.088, 0.055, 0.252, 0.006, 0.007, 0.004, [255, 255, 255], { lat: 3, lon: 4 }); }
+  for (const sx of [-1, 1]) { m.ell(sx * 0.09, 0.045, 0.24, 0.035, 0.038, 0.022, [210, 196, 176], { lat: 4, lon: 6 }); m.ell(sx * 0.097, 0.045, 0.244, 0.029, 0.032, 0.022, [26, 18, 16], { lat: 4, lon: 6 }); m.ell(sx * 0.112, 0.056, 0.257, 0.009, 0.01, 0.006, [255, 255, 255], { lat: 3, lon: 4 }); }
   m.ell(0, -0.05, 0.345, 0.04, 0.025, 0.015, br.blackhead ? [60, 55, 58] : [196, 140, 140], { lat: 3, lon: 6 });
   P.head = m;
   const legC = br.blackhead ? face : [205, 186, 170];
@@ -3481,7 +3550,7 @@ function buildChicken(br) {
   } else {
     m.sel(0, 0.03, 0.17, 0.042, 0.016, 0.07, 2.2, br.key === 'pekin' ? [244, 160, 50] : [70, 90, 60], { lat: 4, lon: 8, shape: (q) => [q[0] * (1 + 0.2 * Math.max(0, q[2])), q[1], q[2]] });
   }
-  for (const sx of [-1, 1]) { m.ell(sx * 0.058, 0.08, 0.08, 0.014, 0.016, 0.01, [20, 14, 14], { lat: 3, lon: 5 }); m.ell(sx * 0.061, 0.085, 0.087, 0.004, 0.005, 0.003, [255, 255, 255], { lat: 2, lon: 4 }); }
+  for (const sx of [-1, 1]) { m.ell(sx * 0.056, 0.08, 0.079, 0.02, 0.022, 0.011, [236, 170, 60], { lat: 3, lon: 5 }); m.ell(sx * 0.06, 0.08, 0.082, 0.014, 0.016, 0.011, [16, 12, 12], { lat: 3, lon: 5 }); m.ell(sx * 0.064, 0.087, 0.089, 0.005, 0.006, 0.003, [255, 255, 255], { lat: 2, lon: 4 }); }
   P.head = m;
   m = new MB();
   const legC = duck ? [244, 150, 50] : br.key === 'ameraucana' ? [104, 118, 128] : [232, 184, 70];
@@ -3515,7 +3584,7 @@ function buildDog() {
   for (const sx of [-1, 1]) { m.push(M4.trs(sx * 0.08, 0.11, 0.0, 0, -0.3, sx * 0.35)); m.sel(0, 0.04, 0, 0.035, 0.07, 0.02, 2, col, { lat: 4, lon: 6 }); m.pop(); }
   m.mat = 0;
   m.ell(0, 0.0, 0.285, 0.024, 0.02, 0.018, [30, 24, 24], { lat: 4, lon: 6 });
-  for (const sx of [-1, 1]) m.ell(sx * 0.055, 0.05, 0.15, 0.018, 0.02, 0.012, [24, 18, 16], { lat: 4, lon: 6 });
+  for (const sx of [-1, 1]) { m.ell(sx * 0.055, 0.05, 0.15, 0.022, 0.024, 0.013, [24, 18, 16], { lat: 4, lon: 6 }); m.ell(sx * 0.061, 0.058, 0.162, 0.007, 0.008, 0.004, [255, 255, 255], { lat: 3, lon: 4 }); }
   m.box(0, -0.1, 0.0, 0.2, 0.035, 0.05, [200, 50, 44]);
   P.head = m;
   m = new MB(); m.mat = MAT.hide; m.cyl(0, -0.2, 0, 0.035, 0.045, 0.22, 6, white); m.mat = 0; P.leg = m;
@@ -4448,7 +4517,7 @@ class WeatherFX {
     const vy = h * 2.1, vx = wind * h * 3.2;
     for (const d of this.drops) {
       d.y += vy * d.v * dt; d.x += vx * d.v * dt;
-      if (d.y > h) { d.y -= h + r() * 40; d.x = r() * w * 1.3 - w * 0.15 - vx * 0.2; if (r() < 0.12) this.splash.push({ x: r() * w, y: h * (0.35 + r() * 0.65), t: 0 }); }
+      if (d.y > h) { d.y -= h + r() * 40; d.x = r() * w * 1.3 - w * 0.15 - vx * 0.2; if (r() < 0.12) this.splashQ = Math.min(40, (this.splashQ || 0) + 1); }
       if (d.x > w * 1.15) d.x -= w * 1.3;
     }
     for (const s of this.splash) s.t += dt;
@@ -4582,7 +4651,7 @@ class WeatherFX {
       if (p) {
         ctx.globalCompositeOperation = 'lighter';
         const flick = 1 + Math.sin(stage.t * 13) * 0.04 + Math.sin(stage.t * 7.3) * 0.04;
-        const rad = 230 * dpr * flick * (h / (390 * dpr));
+        const rad = 230 * dpr * flick * (h / (390 * dpr)) * (stage.lanternTier ? 0.3 : 1);
         const g = ctx.createRadialGradient(p[0], p[1], 0, p[0], p[1], rad);
         g.addColorStop(0, 'rgba(255,220,140,0.75)'); g.addColorStop(0.12, 'rgba(255,190,100,0.35)'); g.addColorStop(0.5, 'rgba(255,160,70,0.10)'); g.addColorStop(1, 'rgba(255,140,50,0)');
         ctx.fillStyle = g; ctx.fillRect(p[0] - rad, p[1] - rad, rad * 2, rad * 2);
@@ -4626,7 +4695,22 @@ class WeatherFX {
       for (const d of this.drops) { const dx = wind * 1.5 * L * d.l, dy = L * d.l; ctx.moveTo(d.x, d.y); ctx.lineTo(d.x - dx, d.y - dy); }
       ctx.stroke();
       ctx.strokeStyle = 'rgba(225,235,250,0.5)'; ctx.lineWidth = 1 * dpr;
-      for (const s of this.splash) { const k = s.t / 0.25; ctx.beginPath(); ctx.ellipse(s.x, s.y, (3 + k * 9) * dpr, (1 + k * 3) * dpr, 0, 0, Math.PI * 2); ctx.globalAlpha = 1 - k; ctx.stroke(); }
+      // splashes land on the ground in the world (so they stay put as you walk or run past), not on the glass
+      if (this.splashQ && F.vp) {
+        const iv = M4.inv(F.vp), T = G.view && G.mode === 'play' ? G.view.T : null;
+        const un = (x, y, zc) => { const v = [iv[0] * x + iv[4] * y + iv[8] * zc + iv[12], iv[1] * x + iv[5] * y + iv[9] * zc + iv[13], iv[2] * x + iv[6] * y + iv[10] * zc + iv[14], iv[3] * x + iv[7] * y + iv[11] * zc + iv[15]]; return [v[0] / v[3], v[1] / v[3], v[2] / v[3]]; };
+        for (; this.splashQ > 0; this.splashQ--) {
+          const nx = Math.random() * 2 - 1, ny = -Math.random() * 0.95, a = un(nx, ny, -1), b = un(nx, ny, 1);
+          let gy = F.focus ? F.focus[1] || 0 : 0, hit = null;
+          for (let it = 0; it < 3; it++) { const dy = b[1] - a[1]; if (Math.abs(dy) < 1e-6) break; const tt = (gy - a[1]) / dy; if (tt <= 0 || tt > 1) { hit = null; break; } hit = [a[0] + (b[0] - a[0]) * tt, gy, a[2] + (b[2] - a[2]) * tt]; if (!T) break; gy = T.at(hit[0], hit[2]); }
+          if (hit && (!F.cam || Math.hypot(hit[0] - F.cam[0], hit[2] - F.cam[2]) < 40)) this.splash.push({ wp: [hit[0], gy + 0.02, hit[2]], t: 0 });
+        }
+      }
+      for (const s of this.splash) {
+        if (!s.wp) continue; const q = projectPt(F, s.wp, w, h); if (!q) continue;
+        const k = s.t / 0.25, sc = clamp(14 / Math.max(1, q[2]), 0.35, 2.2);
+        ctx.beginPath(); ctx.ellipse(q[0], q[1], (3 + k * 9) * dpr * sc, (1 + k * 3) * dpr * sc, 0, 0, Math.PI * 2); ctx.globalAlpha = 1 - k; ctx.stroke();
+      }
       ctx.globalAlpha = 1;
       // misty veil in heavy rain
       if (W.rain > 0.7) { const g = ctx.createLinearGradient(0, 0, 0, h); g.addColorStop(0, 'rgba(160,170,185,0.25)'); g.addColorStop(0.5, 'rgba(160,170,185,0.06)'); g.addColorStop(1, 'rgba(160,170,185,0.12)'); ctx.fillStyle = g; ctx.fillRect(0, 0, w, h); }
@@ -4823,6 +4907,18 @@ function extraTools() {
   m.add(g);
   m.cyl(0, -0.09, 0, 0.1, 0.03, 0.06, 8, [60, 60, 64]);
   t.lantern = m;
+  // a flashlight: a dark barrel with a knurled grip and a wider head, its lens glowing warm (it points along -z)
+  m = new MB(); m.push(M4.trs(0, -0.1, 0, 0, Math.PI / 2, 0));
+  m.cyl(0, -0.12, 0, 0.028, 0.028, 0.2, 10, [44, 46, 50]); m.cyl(0, 0.08, 0, 0.028, 0.045, 0.05, 10, [60, 62, 66]); m.cyl(0, 0.13, 0, 0.045, 0.045, 0.04, 10, [70, 72, 76]);
+  { const L = new MB(); L.cyl(0, 0.169, 0, 0.038, 0.038, 0.006, 10, [255, 214, 140]); for (let i = 0; i < L.d.length; i += STRIDE) L.d[i + 9] = 2; m.add(L); }
+  m.box(0.03, -0.02, 0, 0.012, 0.03, 0.016, [200, 70, 50]);
+  m.pop(); t.flashlight = m;
+  // a handheld spotlight: a big round lamp on top of a pistol grip
+  m = new MB(); m.push(M4.trs(0, -0.12, 0, 0, Math.PI / 2, 0));
+  m.cyl(0, -0.06, 0, 0.085, 0.085, 0.16, 14, [230, 180, 40]); m.cyl(0, 0.1, 0, 0.095, 0.095, 0.03, 14, [40, 40, 44]);
+  { const L = new MB(); L.cyl(0, 0.131, 0, 0.082, 0.082, 0.006, 14, [255, 222, 150]); for (let i = 0; i < L.d.length; i += STRIDE) L.d[i + 9] = 2; m.add(L); }
+  m.pop(); m.box(0, -0.22, 0.02, 0.04, 0.13, 0.05, [40, 40, 44]); m.box(0, -0.14, -0.05, 0.03, 0.03, 0.08, [40, 40, 44]);
+  t.spotlight = m;
   m = new MB(); m.ell(0, 0, 0, 1, 1, 1, [235, 235, 235], { lat: 4, lon: 6 }); t.puff = m;
   // chimney smoke: three different lumpy clouds, each a cluster of overlapping soft balls
   for (let v = 0; v < 3; v++) {
@@ -5416,7 +5512,8 @@ defItem('milk', { name: 'Milk', unit: 'gallons', price: 8, icon: '🥛', kind: '
 defItem('honey', { name: 'Honey', unit: 'lbs', price: 12, icon: '🍯', kind: 'produce' });
 defItem('wool', { name: 'Wool', unit: 'lbs', price: 10, icon: '🧶', kind: 'produce' });
 for (const sp of ['beef', 'pork', 'lamb', 'chevon', 'chicken', 'duck', 'bison']) defItem('meat_' + sp, { name: sp === 'chevon' ? 'Goat meat' : sp[0].toUpperCase() + sp.slice(1), unit: 'lbs', price: MARKET_BASE[sp] || 12, icon: '🥩', kind: 'meat' });
-defItem('hay', { name: 'Hay', unit: 'bales', price: 40, buy: 60, icon: '🌾', kind: 'feed' });
+defItem('hay', { name: 'Round bales', unit: 'bales', price: 40, buy: 60, icon: '🌾', kind: 'feed' });
+defItem('sqbale', { name: 'Square bales', unit: 'bales', price: 5, buy: 8, icon: '🟨', kind: 'feed' });
 defItem('treehay', { name: 'Tree hay', unit: 'bundles', price: 15, icon: '🌿', kind: 'feed' });
 defItem('firewood', { name: 'Firewood', unit: 'loads', price: 90, buy: 160, icon: '🪵', kind: 'fuel' });
 defItem('feed_layer', { name: 'Layer feed', unit: 'bags', price: 0, buy: 19, icon: '🛍️', kind: 'feed' });
@@ -6001,8 +6098,9 @@ function newFarm(opt) {
   const hx = opt.house ? opt.house[0] : opt.listing === 'prime' ? -6 : -4, hz = opt.house ? opt.house[1] : -5;
   T.flatten(hx, hz, 3, 3, 0);
   add({ t: 'house', x: hx, z: hz, r: 0, style: opt.listing === 'worn' || opt.listing === 'woods' ? 'cabin' : 'farmhouse' });
-  add({ t: 'woodpile', x: hx - 3.6, z: hz + 0.5, r: Math.PI / 2 });
-  markBuilt(T, hx, hz, 3, 3, 0);
+  // the woodshed stands far enough off the end of the house that you can walk round and fill your arms at its open side
+  add({ t: 'woodpile', x: hx - 4.9, z: hz + 0.5, r: Math.PI / 2 });
+  markBuilt(T, hx, hz, 3, 3, 0); T.flatten(hx - 4.9, hz + 0.5, 0.9, 1.3, 0);
   if (opt.listing === 'prime') {
     const P = T.carvePond(8, -3, 3.6, 2.6);
     F.ponds.push({ id: F.nextId++, x: 8, z: -3, rx: 3.6, rz: 2.6, level: P.level, floor: P.floor, vol: 0.7 });
@@ -6060,6 +6158,15 @@ function farmFromSave(o) {
   // saves from when the farm had a truck and other vehicles: they go, and a gate stands at the road end of the driveway
   F.objs = F.objs.filter((q) => !(q.t === 'truck' || q.t === 'atv' || q.t === 'utv' || q.t === 'crew'));
   if (F.drive && !F.objs.some((q) => q.t === 'dgate')) F.objs.push({ id: F.nextId++, t: 'dgate', x: F.drive.x, z: F.drive.z0 - 0.4, r: 0 });
+  // older farms: the starting woodshed stood so close to the house there was no room to reach the wood. Slide it out if the spot is clear.
+  if (!F.shedMoved) {
+    F.shedMoved = 1;
+    const h = F.objs.find((q) => q.t === 'house'), w = F.objs.find((q) => q.t === 'woodpile');
+    if (h && w && Math.abs(w.x - (h.x - 3.6)) < 0.05 && Math.abs(w.z - (h.z + 0.5)) < 0.05) {
+      const nx = h.x - 4.9, clear = !F.objs.some((q) => q !== w && q !== h && q.t !== 'weed' && Math.abs(q.x - nx) < 1.8 && Math.abs(q.z - w.z) < 1.8);
+      if (clear) w.x = nx;
+    }
+  }
   return F;
 }
 // older saves get the fields newer versions expect
@@ -6521,7 +6628,9 @@ function padSync(p) {
   delete p.gate;
   return p;
 }
-function allFences(F) { return F.fences && F.fences.length ? F.paddocks.concat(F.fences) : F.paddocks; }
+// every fence that's actually built: paddocks you fenced, and open fence lines. (A paddock that's just the space closed in
+// by other fences, p.virtual, has no fence of its own.)
+function allFences(F) { const P = F.paddocks.some((p) => p.virtual) ? F.paddocks.filter((p) => !p.virtual) : F.paddocks; return F.fences && F.fences.length ? P.concat(F.fences) : P; }
 function padRect(p) { padSync(p); return [p.x0, p.x1, p.z0, p.z1]; }
 // an open fence line (p.open) has no side from its last post back to its first
 function paddockSides(p) { const P = padPts(p), n = p.open ? P.length - 1 : P.length, out = []; for (let i = 0; i < n; i++) out.push({ side: i, i, a: P[i], b: P[(i + 1) % P.length] }); return out; }
@@ -8905,7 +9014,7 @@ const COOK = {
 // ============================================================================ fishing and stocking ponds
 // Buy a rod at the Mercantile, then fish a pond (or the creek where there is one). Ponds start empty: order fingerlings from the
 // hatchery (tap the pond with your hands), keep the water full, and the fish breed. Bass eat the little fish. The catch is a
-// little timing game: wait for a bite, hook it, then reel when the marker is in the green. Fish go in your bag: sell them at the
+// rod-and-line game: cast, set the hook when the line runs, then play the fish on the line tension. Fish go in your bag: sell them at the
 // market, cook them (the kitchen knows pan-fried fish), give them as gifts or enter the biggest at the County Fair.
 //   F.ponds[i].fish   { species: count }
 //   F.fishLog         { species: { n, best } } what you have caught
@@ -8986,6 +9095,9 @@ const FISHING = {
     let r = Math.random() * tot; for (const [f, w] of pool) { r -= w; if (r <= 0) return f; }
     return pool[0] ? pool[0][0] : null;
   },
+  // Fishing, the way it feels on a real rod: cast (a longer cast reaches deeper water and bigger fish), watch the rod tip and
+  // the line, and only set the hook when the line starts to run (little nibbles just steal bait). Then play the fish: hold
+  // Reel to win back line, ease off when it runs so the line doesn't snap, but never let it go slack or it throws the hook.
   cast(src) {
     const F = G.F, self = this;
     if (!F.kid && F.energy < 6) return UI.toast('You are too tired to fish. Get some rest.', true);
@@ -8993,61 +9105,87 @@ const FISHING = {
     if (!this.pool(F, src).length) return UI.toast(src.p ? 'Nothing is biting: the pond has no fish yet. Tap it with your hands to order fingerlings.' : 'Nothing is biting in the creek today.', true);
     const w = todayW(F), prime = (F.hour >= 5 && F.hour < 9) || (F.hour >= 17 && F.hour < 20), wet = w.kind === 'rain' || w.kind === 'storm' || w.kind === 'cloud';
     const D = UI.open({ title: 'Fishing', sub: src.p ? 'The pond' : src.woods ? WOODS.waterName(F, src.pond) : 'The creek', icon: '🎣', foot: true, side: true });
-    D.body.innerHTML = `<div style="text-align:center"><div id="fsMsg" style="font-size:18px;font-weight:800;margin:6px 0 2px">Casting…</div><div id="fsSub" class="note" style="margin:0 0 6px">${prime ? 'Early and late are the best times to fish.' : wet ? 'Fish bite well under cloud.' : 'Midday is slow. Be patient.'}</div>`
-      + `<div id="fsBob" style="font-size:46px;transition:transform .15s">🎣</div>`
-      + `<div id="fsTrack" style="display:none;position:relative;height:36px;border-radius:18px;background:#d6e8f4;margin:12px 8px;overflow:hidden"><div id="fsZone" style="position:absolute;top:0;bottom:0;background:#7bc96f;border-radius:18px"></div><div id="fsCur" style="position:absolute;top:3px;bottom:3px;width:12px;margin-left:-6px;border-radius:6px;background:#2b4a6f"></div></div>`
-      + `<div id="fsPips" style="font-size:22px;letter-spacing:4px;min-height:26px"></div></div>`;
-    D.foot.innerHTML = '<button class="btn" id="fsCancel">Reel in</button><button class="btn go" id="fsAct" disabled>…</button>';
-    const $m = $('fsMsg'), $b = $('fsBob'), $t = $('fsTrack'), $z = $('fsZone'), $c = $('fsCur'), $p = $('fsPips'), $a = $('fsAct');
+    const bar = (id, col) => `<div style="position:relative;height:22px;border-radius:11px;background:#e4eef4;margin:6px 8px;overflow:hidden"><div id="${id}" style="position:absolute;left:0;top:0;bottom:0;width:0;background:${col};border-radius:11px"></div></div>`;
+    D.body.innerHTML = `<div style="text-align:center"><div id="fsMsg" style="font-size:18px;font-weight:800;margin:6px 0 2px">Ready to cast</div><div id="fsSub" class="note" style="margin:0 0 6px">${prime ? 'Early and late are the best times to fish.' : wet ? 'Fish bite well under cloud.' : 'Midday is slow. Be patient.'}</div>`
+      + `<canvas id="fsCv" width="300" height="110" style="width:100%;max-width:340px;height:110px;border-radius:12px;background:linear-gradient(#cfe6f2,#9cc6dc)"></canvas>`
+      + `<div id="fsBars" style="display:none;text-align:left;font-size:12px;font-weight:800;color:#3d4a55"><div style="margin:4px 10px 0">Line tension</div>${bar('fsTen', 'linear-gradient(90deg,#7bc96f 0,#7bc96f 60%,#f0b84a 75%,#d9534f 100%)')}<div id="fsDistL" style="margin:4px 10px 0">Line out</div>${bar('fsDist', '#5a86b0')}</div></div>`;
+    D.foot.innerHTML = '<button class="btn" id="fsCancel">Wind in</button><button class="btn go" id="fsAct">Cast</button>';
+    const $m = $('fsMsg'), $s = $('fsSub'), cv = $('fsCv'), g2 = cv.getContext('2d'), $a = $('fsAct'), $ten = $('fsTen'), $dist = $('fsDist'), $dl = $('fsDistL');
     const alive = () => $('fsMsg') === $m;
-    // the farmer stands at the water with the rod out until the panel goes away
     G.Fm.act = 'fish'; G.Fm.actT = 0;
     const pose = setInterval(() => { if (!alive() && !$('fsMsg')) { clearInterval(pose); if (G.Fm.act === 'fish') G.Fm.act = null; } else G.Fm.actT += 0.3; }, 300);
-    let state = 'wait', timer = 0, raf = 0, fish = null, lb = 0, need = 1, hits = 0, miss = 0, zc = 0.5, zw = 0.3, speed = 2, t0 = 0;
-    const finish = (spend) => { cancelAnimationFrame(raf); clearTimeout(timer); if (spend) spendTime(20, 1.5); };
-    $('fsCancel').onclick = () => { finish(false); UI.closeAll(); };
     const skill = Math.min(3, Math.floor(tallied(F, 'fish') / 12));
-    // 1. wait for a bite
-    $m.textContent = 'Waiting for a bite…'; $a.textContent = 'Hook it!'; $a.disabled = false;
-    const wait = (prime ? 1.6 : wet ? 2.2 : 3.2) + Math.random() * 3.4;
-    timer = setTimeout(bite, wait * 1000);
-    function bite() {
-      if (!alive()) return;
-      state = 'bite'; $m.textContent = 'A bite! Hook it now!'; $b.style.transform = 'translateY(16px)'; AUDIO.tone(700, 0.12, 'triangle', 0.1);
-      try { if (navigator.vibrate) navigator.vibrate(60); } catch (e) { /* no haptics */ }
-      timer = setTimeout(() => { if (!alive() || state !== 'bite') return; state = 'over'; finish(true); $m.textContent = 'It got away.'; $b.style.transform = ''; $a.textContent = 'Cast again'; $a.disabled = false; state = 'again'; }, 1500);
+    let state = 'aim', raf = 0, last = performance.now(), t = 0, power = 0, castD = 0.5, fish = null, lb = 0;
+    let tip = 0, nib = 0, nextNib = 0, takeAt = 0, takeT = 0, slack = 0, ten = 0, dist = 0, dist0 = 1, stam = 1, run = 0, runT = 0, reeling = false;
+    const finish = (spend) => { cancelAnimationFrame(raf); if (spend) spendTime(20, 1.5); };
+    $('fsCancel').onclick = () => { finish(state !== 'aim'); UI.closeAll(); };
+    const say = (m, sub) => { $m.textContent = m; if (sub !== undefined) $s.textContent = sub; };
+    // the little picture: a rod tip at the left, the line out over the water, the float of the line where it enters
+    function draw() {
+      const W = cv.width, H = cv.height; g2.clearRect(0, 0, W, H);
+      g2.fillStyle = '#7fb0cb'; g2.fillRect(0, 34, W, H - 34);
+      g2.strokeStyle = 'rgba(255,255,255,0.35)'; g2.lineWidth = 1; for (let i = 0; i < 6; i++) { const y = 44 + i * 12, o = (t * 18 + i * 37) % W; g2.beginPath(); g2.moveTo(o, y); g2.lineTo(o + 24, y); g2.stroke(); }
+      const bend = state === 'fight' ? ten / 100 : tip, rx = 30, ry = 26, tx = rx + 46 * Math.cos(bend * 0.9), ty = ry - 22 + 34 * Math.sin(bend * 0.9);
+      g2.strokeStyle = '#5a3a14'; g2.lineWidth = 4; g2.beginPath(); g2.moveTo(4, H - 6); g2.quadraticCurveTo(rx, ry, tx, ty); g2.stroke();
+      if (state === 'aim') { g2.fillStyle = 'rgba(255,255,255,0.85)'; g2.fillRect(70, 12, 210, 10); g2.fillStyle = '#f0b84a'; g2.fillRect(70, 12, 210 * power, 10); g2.fillStyle = '#3d2d1c'; g2.font = '700 10px system-ui'; g2.fillText('cast distance', 72, 32); return; }
+      const ex = 80 + (state === 'fight' ? 210 * dist / Math.max(1, dist0) : 210 * castD) + (run && state === 'fight' ? Math.sin(t * 9) * 6 : 0), ey = 40 + (state === 'take' ? 6 : 0) + nib * 3;
+      g2.strokeStyle = 'rgba(250,250,250,0.9)'; g2.lineWidth = 1.2; g2.beginPath(); g2.moveTo(tx, ty); g2.quadraticCurveTo((tx + ex) / 2, Math.max(ty, ey) + (state === 'fight' ? 10 * (1 - ten / 100) : 14), ex, ey); g2.stroke();
+      // rings where the line cuts the water: bigger when something is pulling
+      g2.strokeStyle = 'rgba(255,255,255,0.8)'; for (let i = 0; i < 2; i++) { const r = 4 + ((t * 2 + i * 0.5) % 1) * (state === 'take' || run ? 14 : 6); g2.globalAlpha = 1 - ((t * 2 + i * 0.5) % 1); g2.beginPath(); g2.ellipse(ex, ey + 2, r, r * 0.35, 0, 0, 6.3); g2.stroke(); }
+      g2.globalAlpha = 1;
     }
-    function reel() {
-      fish = self.pickFish(F, src);
-      if (!fish) { $m.textContent = 'Nothing there.'; return; }
-      lb = fish.lb[0] + (fish.lb[1] - fish.lb[0]) * Math.pow(Math.random(), 1.6);
-      need = lb < 1.6 ? 1 : lb < 5 ? 2 : 3; hits = 0; miss = 0;
-      zw = clamp(0.36 - fish.diff * 0.2 + skill * 0.03, 0.14, 0.42); speed = 1.6 + fish.diff * 2.2;
-      state = 'reel'; $t.style.display = 'block'; $a.textContent = 'Reel!'; $b.style.transform = 'translateY(0)';
-      $m.textContent = 'Fish on! Reel when the marker is in the green.';
-      newZone(); t0 = performance.now(); loop();
-    }
-    function newZone() { zc = 0.2 + Math.random() * 0.6; $z.style.left = ((zc - zw / 2) * 100) + '%'; $z.style.width = (zw * 100) + '%'; pips(); }
-    function pips() { $p.textContent = '🟢'.repeat(hits) + '⚪'.repeat(Math.max(0, need - hits)) + '  ' + '❌'.repeat(miss); }
     function loop() {
-      if (!alive() || state !== 'reel') return;
-      const pos = 0.5 + 0.5 * Math.sin(((performance.now() - t0) / 1000) * speed * 1.7);
-      $c.style.left = (pos * 100) + '%'; $c.dataset.pos = pos;
+      if (!alive()) { finish(false); return; }
+      const now = performance.now(), dt = Math.min(0.05, (now - last) / 1000); last = now; t += dt;
+      if (state === 'aim') power = 0.5 + 0.5 * Math.sin(t * 2.6 - Math.PI / 2);
+      if (state === 'wait' || state === 'take') {
+        // nibbles twitch the tip a little; a real take pulls it right over and the line starts moving off
+        if (state === 'wait' && t > nextNib) { nib = 1; nextNib = t + 0.7 + Math.random() * 1.6; AUDIO.tone(900, 0.03, 'triangle', 0.03); }
+        nib = Math.max(0, nib - dt * 5);
+        if (state === 'wait' && t > takeAt) { state = 'take'; takeT = 0; say('The line is running!', 'Set the hook now.'); AUDIO.tone(620, 0.16, 'triangle', 0.1); try { if (navigator.vibrate) navigator.vibrate([30, 40, 80]); } catch (e) { /* no haptics */ } }
+        if (state === 'take') { takeT += dt; if (takeT > 1.4 - skill * 0.1) { state = 'again'; finish(true); say('It dropped the bait and swam off.', 'Strike while the line is running.'); $a.textContent = 'Cast again'; } }
+        tip = state === 'take' ? 0.9 : nib * 0.25;
+      }
+      if (state === 'fight') {
+        // the fish: runs now and then (stronger and longer for a big, hard fish), tiring as it pulls against the drag
+        runT -= dt;
+        if (runT <= 0) { run = run ? 0 : (Math.random() < 0.55 + fish.diff * 0.3 ? 1 : 0); runT = run ? 0.8 + Math.random() * (0.6 + fish.diff * 1.4) : 0.8 + Math.random() * 1.6; if (run) { say('It\'s running! Ease off.'); try { if (navigator.vibrate) navigator.vibrate(40); } catch (e) { /* no haptics */ } } else say('Reel it in.'); }
+        const pull = (run ? 55 + fish.diff * 60 + lb * 4 : 8 + lb) * (0.35 + 0.65 * stam);
+        ten = clamp(ten + ((reeling ? 34 : -42) + pull - 18) * dt, 0, 100);
+        dist = Math.max(0, dist + (run ? (reeling ? 0.6 : 2.4) * stam : 0) * dt - (reeling ? (2.6 - (run ? 2.0 : 0)) : 0) * dt);
+        stam = Math.max(0.15, stam - (ten / 100) * dt * (0.09 + 0.05 / (1 + fish.diff)) * (1 + skill * 0.15));
+        slack = ten < 6 ? slack + dt : 0;
+        $ten.style.width = ten + '%'; $dist.style.width = clamp(dist / dist0 * 100, 0, 100) + '%'; $dl.textContent = `Line out: ${Math.round(dist * 5)} m`;
+        if (ten >= 100 - skill * 2) return lose('The line snapped. It got away.');
+        if (slack > 1.6) return lose('The line went slack and it threw the hook.');
+        if (dist <= 0.05) return land();
+      }
+      draw();
       raf = requestAnimationFrame(loop);
     }
-    function pull() {
-      const pos = +$c.dataset.pos;
-      if (Math.abs(pos - zc) <= zw / 2) { hits++; AUDIO.tone(520 + hits * 120, 0.1, 'triangle', 0.1); if (hits >= need) return land(); newZone(); } else { miss++; AUDIO.tone(200, 0.15, 'sawtooth', 0.05); pips(); if (miss >= 2) return lose(); }
+    function doCast() {
+      castD = clamp(power, 0.12, 1); state = 'wait'; t = 0; nextNib = 0.6;
+      // a longer cast reaches deeper water: a little longer to wait, but better odds of a big one
+      takeAt = ((prime ? 2.2 : wet ? 3 : 4.2) + Math.random() * 4) * (0.85 + castD * 0.3);
+      say(castD > 0.75 ? 'A long cast, out over the deep water.' : castD < 0.35 ? 'A short cast, in close.' : 'A nice easy cast.', 'Watch the rod tip. Nibbles just twitch it; wait for the line to run.');
+      $a.textContent = 'Set the hook';
     }
-    function lose() { state = 'again'; finish(true); cancelAnimationFrame(raf); $t.style.display = 'none'; $m.textContent = 'The line snapped. It got away.'; $a.textContent = 'Cast again'; }
+    function hook() {
+      fish = self.pickFish(F, src);
+      if (!fish) { say('Nothing there.'); state = 'again'; $a.textContent = 'Cast again'; return; }
+      const big = Math.pow(Math.random(), 1.6 - castD * 0.7);
+      lb = fish.lb[0] + (fish.lb[1] - fish.lb[0]) * big;
+      dist0 = dist = 2 + castD * 8; stam = 1; ten = 30; slack = 0; run = 1; runT = 0.6;
+      state = 'fight'; $('fsBars').style.display = 'block'; $a.textContent = 'Hold to reel';
+      say('Fish on!', 'Hold Reel to bring it in. Let go when it runs. Keep the tension out of the red, but never let the line go slack.');
+    }
+    function lose(msg) { state = 'again'; reeling = false; finish(true); $('fsBars').style.display = 'none'; say(msg, 'Ease off when it runs; keep a little pressure on always.'); $a.textContent = 'Cast again'; draw(); }
     function land() {
-      state = 'landed'; finish(true); $t.style.display = 'none';
+      state = 'landed'; reeling = false; finish(true); $('fsBars').style.display = 'none';
       const fl = F.fishLog = F.fishLog || {}, e = fl[fish.key] = fl[fish.key] || { n: 0, best: 0 };
       const first = e.n === 0, record = lb > e.best + 0.001; e.n++; if (record) e.best = Math.round(lb * 10) / 10;
       tally(F, 'fish'); if (src.woods) tally(F, 'creekfish');
-      $m.textContent = `${fish.icon} ${fish.name}, ${lb.toFixed(1)} lb!`;
-      $('fsSub').textContent = `${first ? 'A new kind for your log! ' : ''}${record && !first ? 'Your biggest yet. ' : ''}Worth about ${money(fish.price)}.`;
-      $p.textContent = '';
+      say(`${fish.icon} ${fish.name}, ${lb.toFixed(1)} lb!`, `${first ? 'A new kind for your log! ' : ''}${record && !first ? 'Your biggest yet. ' : ''}Worth about ${money(fish.price)}.`);
       D.foot.innerHTML = '<button class="btn" id="fsRel">Let it go</button><button class="btn go" id="fsKeep">Keep it</button>';
       $('fsRel').onclick = () => { PURSUE.check(F); self.cast(src); };
       $('fsKeep').onclick = () => {
@@ -9058,12 +9196,18 @@ const FISHING = {
       };
       AUDIO.fanfare();
     }
-    $a.onclick = () => {
-      if (state === 'wait') { clearTimeout(timer); state = 'over'; $m.textContent = 'Too early! You spooked it.'; $a.textContent = 'Cast again'; state = 'again'; return; }
-      if (state === 'bite') { clearTimeout(timer); return reel(); }
-      if (state === 'reel') return pull();
-      if (state === 'again') { self.cast(src); }
+    // one button does everything: cast, set the hook, and (held down) reel
+    $a.onpointerdown = (e) => {
+      e.preventDefault();
+      if (state === 'aim') return doCast();
+      if (state === 'wait') { state = 'again'; finish(true); say('Too soon! That was only a nibble, and you pulled the bait away.', 'Wait for the line to run.'); $a.textContent = 'Cast again'; return; }
+      if (state === 'take') return hook();
+      if (state === 'fight') { reeling = true; return; }
+      if (state === 'again') { finish(false); self.cast(src); }
     };
+    const stop = () => { reeling = false; };
+    $a.onpointerup = stop; $a.onpointerleave = stop; $a.onpointercancel = stop;
+    raf = requestAnimationFrame(loop);
   },
 };
 
@@ -12381,7 +12525,7 @@ function drawFarmer(out, F, P, T, t) {
   if (toolR === 'shovel' || toolR === 'hoe' || toolR === 'scythe' || toolR === 'axe' || toolR === 'rod' || toolR === 'pickaxe') { aR = [-0.35 + sw * 0.2, 0, 0.15]; rotR = M4.trs(0, 0, 0, 0, 0.35 - 0.5, 0); eR = -0.5; }
   if (toolR === 'can' || toolR === 'seeds' || toolR === 'sapling' || toolR === 'hammer') { aR = [-0.45 + sw * 0.2, 0, 0.1]; rotR = M4.trs(0, 0, 0, 0, 0.45, 0); eR = -0.55; }
   if (F.umbrella) { aL = [-1.25, 0, -0.18]; toolL = 'umbrella'; rotL = M4.trs(0, 0, 0, 0, 1.18, 0.18); eL = -1.2; }   // the shaft's tilt cancels the raised arm's, so the umbrella stands straight up over the head
-  if (F.lantern) { aL = [-0.7 + sw * 0.15, 0, -0.1]; toolL = 'lantern'; rotL = M4.trs(0, 0, 0, 0, 0.7 + Math.sin(t * 3) * 0.1, 0); eL = -0.7; }
+  if (F.lantern) { const lk = F.lightKey || 'lantern'; if (lk === 'lantern') { aL = [-0.7 + sw * 0.15, 0, -0.1]; rotL = M4.trs(0, 0, 0, 0, 0.7 + Math.sin(t * 3) * 0.1, 0); eL = -0.7; } else { aL = [-1.15, 0, 0.1]; rotL = M4.trs(0, 0, 0, 0, 0.25, 0); eL = -0.4; } toolL = lk; }
   if (F.carry === 'hay') { two(-1.2, 0.25); toolR = 'hay'; rotR = M4.trs(0.25, 0, 0, 0, 1.2, 0); toolL = null; lean = 0.12; eL = eR = -0.7; }
   if (F.carry === 'basket') { aL = [-0.25 + sw * 0.2, 0, -0.15]; toolL = 'basket'; rotL = M4.trs(0, 0, 0, 0, 0.25, 0); eL = -0.5; }
   if (F.carry === 'bucket') { aL = [-0.1 + sw * 0.1, 0, -0.25]; toolL = 'bucket'; rotL = M4.trs(0, 0, 0, 0, 0.1, 0.25); eL = -0.35; }
@@ -12460,8 +12604,8 @@ function drawFarmer(out, F, P, T, t) {
   // tools sit in the hand: position from the forearm, orientation from the upper arm (as the poses were tuned)
   const hand = (A, Fm, rot) => { const p = M4.xform(Fm, 0, -0.21, 0), R0 = A.slice(); R0[12] = p[0]; R0[13] = p[1]; R0[14] = p[2]; return M4.mul(R0, rot || M4.ident()); };
   F.handR = M4.xform(FR, 0, -0.21, 0);
-  if (toolL && P[toolL]) { const m = hand(AL, FL, rotL); out.push({ mesh: P[toolL], model: m, twoSided: true, snowK: 0 }); if (toolL === 'lantern') F.lanternPos = M4.xform(m, 0, -0.18, 0); }
-  if (toolL !== 'lantern') F.lanternPos = null;
+  if (toolL && P[toolL]) { const m = hand(AL, FL, rotL); out.push({ mesh: P[toolL], model: m, twoSided: true, snowK: 0 }); if (toolL === 'lantern' || toolL === 'flashlight' || toolL === 'spotlight') F.lanternPos = M4.xform(m, 0, -0.18, 0); }
+  if (toolL !== 'lantern' && toolL !== 'flashlight' && toolL !== 'spotlight') F.lanternPos = null;
   if (toolR && P[toolR]) { const m = hand(AR, FR, rotR); out.push({ mesh: P[toolR], model: m, twoSided: true, snowK: 0 }); if (toolR === 'rifle') F.muzzle = M4.xform(m, 0, 0.02, 0.8); }
   F.headPos = M4.xform(head, 0, 0.5, 0);
 }
@@ -12791,11 +12935,11 @@ class FarmView {
     switch (o.t) {
       case 'house': case 'barn': case 'coop': case 'stand': {
         // the building's own paint and style (from the Paint and Remodel menus) over the shop's paint presets; a size scales the whole thing
-        const k = o.sc || 1, look = Object.assign({ style: o.t === 'house' && o.style === 'cabin' && !o.hstyle ? 'cabin' : o.hstyle }, o.t === 'house' || o.t === 'barn' ? SHOP.paint(F, o.t) || {} : {}, o.paint || {});
+        const k = o.sc || 1, look = Object.assign({ style: o.hstyle }, o.t === 'house' && o.style === 'cabin' && !o.hstyle ? { wall: [176, 134, 92], roof: [92, 84, 76] } : {}, o.t === 'house' || o.t === 'barn' ? SHOP.paint(F, o.t) || {} : {}, o.paint || {});
         mb.push(M4.trs(o.x, y, o.z, 0, 0, 0, k));
         if (o.t === 'house') addHouse(mb, 0, 0, 0, o.r, look);
         else if (o.t === 'barn') addBarn(mb, 0, 0, 0, o.r, Object.assign({ hay: (F.inv.hay || 0) > 0, hayN: Math.min(6, Math.ceil((F.inv.hay || 0) / 8)) }, look));
-        else if (o.t === 'coop') addCoop(mb, 0, 0, 0, o.r, false, look);
+        else if (o.t === 'coop') addCoop(mb, 0, 0, 0, o.r, false, Object.assign({ upg: o.upg || 0 }, look));
         else addStall(mb, 0, 0, 0, o.r, look);
         mb.pop(); break;
       }
@@ -12810,6 +12954,7 @@ class FarmView {
       case 'mailbox': addMailbox(mb, o.x, y, o.z, MAIL.unread(F) > 0); break;
       case 'rock': addRock(mb, o.x, y - 0.1, o.z, o.s, R); break;
       case 'weed': addWeed(mb, o.kind, o.x, y, o.z, o.s || 1, R); break;
+      case 'hayfeed': addHayFeed(mb, o, T); break;
       case 'cactus': addTree(mb, o.kind, o.x, y, o.z, o.s, season, R); break;
       case 'brush': {
         const b = new MB();
@@ -12831,6 +12976,8 @@ class FarmView {
       }
       case 'bed': {
         addBedKind(mb, bedOf(o), o.x, y, o.z, 3, 1, o.r || 0);
+        // fresh compost shows as a dark, crumbly top dressing until a mulch covers it
+        if ((o.fert || 0) > 0.15 && !o.mulch && bedOf(o) !== 'hugel') { mb.push(M4.trs(o.x, y + bedTop(o) + 0.006, o.z, o.r || 0, 0, 0)); mb.box(0, 0, 0, 2.55, 0.02, 0.66, mixc([112, 88, 62], [58, 42, 30], Math.min(1, o.fert / 1.2)), { noBottom: true }); mb.pop(); }
         if (o.crop) {
           const cr = CROPS.find((k) => k.key === o.crop), stage = clamp(o.days / (cr.months * 30), 0.05, 1);
           const vis = { lettuce: 'lettuce', kale: 'kale', tomato: 'tomato', pepper: 'tomato', squash: 'squash', sweetpotato: 'squash', strawberry: 'squash', corn: 'corn', potato: 'cabbage', cucumber: 'squash', melon: 'squash', sunflower: 'corn', peas: 'tomato', beet: 'lettuce', basil: 'kale' }[cr.key] || 'default';
@@ -12922,6 +13069,8 @@ class FarmView {
         const k = o.sc || 1;
         if (s.porch) col.rect(o.x, o.z, 1.25 * k, 0.65 * k, o.r || 0, 0, 2.75 * k, true, o.id);
         if (s.hay && (this.F.inv.hay || 0) > 0) col.rect(o.x, o.z, 0.6 * k, 1.75 * k, o.r || 0, 4.0 * k, 0, false, o.id);
+        if (o.t === 'coop' && (o.upg || 0) >= 2) col.rect(o.x, o.z, 0.95, 1.15, o.r || 0, 0, -2.2, false, o.id);   // the wire run
+        if (o.t === 'coop' && (o.upg || 0) >= 3) col.rect(o.x, o.z, 0.8, 1.0, o.r || 0, 2.1, 0.1, false, o.id);   // the second hen house
       } else if (o.t === 'tree') { if (!o.cut && treeScale(o) > 0.35 && !treeVisual(o).shrub) col.circle(o.x, o.z, (treeVisual(o).kind === 'palm' ? 0.28 : treeVisual(o).vine ? 0.2 : 0.34) * Math.max(0.6, treeScale(o)), o.id); }
       else if (o.t === 'rock') col.circle(o.x, o.z, o.s * 0.75, o.id);
       else if (o.t === 'cactus') col.circle(o.x, o.z, 0.5 * o.s, o.id);
@@ -13194,7 +13343,7 @@ function addWoodshed(mb, x, y, z, rot, loads) {
   mb.mat = MAT.boards;
   for (const sx of [-1, 1]) for (const sz of [-1, 1]) mb.box(sx * 0.95, -0.1, sz * 0.5, 0.1, 1.6 + (sz < 0 ? 0.25 : 0), 0.1, C.woodDk);
   mb.box(0, -0.1, -0.55, 2.0, 1.75, 0.06, C.wood);
-  mb.mat = MAT.metal; mb.push(M4.trs(0, 1.6, 0, 0, -0.18, 0)); mb.box(0, 0, 0, 2.3, 0.06, 1.4, [120, 125, 132]); mb.pop(); mb.mat = 0;
+  mb.mat = MAT.metal; mb.push(M4.trs(0, 1.6, 0, 0, 0.18, 0)); mb.box(0, 0, 0, 2.3, 0.06, 1.4, [120, 125, 132]); mb.pop(); mb.mat = 0;
   // split logs stacked up to show the stock
   const rows = Math.min(8, Math.ceil(loads * 2));
   mb.mat = MAT.bark;
@@ -13399,7 +13548,65 @@ function planMonth(F) {
     const wind = kind === 'hurricane' ? 0.85 : kind === 'storm' ? 0.38 : kind === 'snow' ? 0.1 : R.wind * (0.1 + rnd() * 0.25);
     days.push({ rain, t, kind, wind, frost: t < 0 });
   }
+  // fog: morning fog is a fall, winter and spring thing, and much more common in the damp, hilly regions than out West.
+  // A day's fog is a density (0 none .. 1 thick); 'fog' days are the thick, slow-to-lift ones.
+  { const rf = mulberry(F.seed * 7 + F.year * 131 + m * 17 + 999), sea = seasonOf(m);
+    const damp = { pnw: 1.5, vermont: 1.3, shenandoah: 1.3, ozarks: 1.15, gulf: 1.2, plains: 0.6, sonoran: 0.15 }[R.key] || 1;
+    const base = [0.12, 0.05, 0.2, 0.15][sea] * damp;
+    for (const d of days) {
+      if (d.kind === 'fog') d.fog = 0.8 + rf() * 0.2;
+      else if (d.kind === 'rain' || d.kind === 'storm') d.fog = 0.2 + rf() * 0.15;
+      else if ((d.kind === 'sun' || d.kind === 'cloud') && rf() < base) d.fog = 0.3 + rf() * 0.45;
+      else d.fog = 0;
+    }
+  }
   F.weather = { m, year: F.year, monthRain: total, tMean, days, event, hurricane: hurricane >= 0, lateFrost: lateFrost >= 0, creek: F.weather ? F.weather.creek : 0.4 };
+}
+// the light you carry after dark, as a real light in the scene: a lantern lights a little circle around you; a flashlight and
+// then a spotlight throw a warm beam the way you're facing (or looking, in first person)
+function lampFrame(Fr) {
+  const Fm = G.Fm, F = G.F;
+  Fr.lampP = null; Fr.lampD = null;
+  if (!Fm || !F || !Fm.lantern || !(Fr.night > 0.05)) return;
+  const tier = lightTier(F), n = Math.min(1, Fr.night * 1.3);
+  let pos, dir;
+  if (FPV.on) { const c = FPV.camera(0); pos = [c.eye[0], c.eye[1] - 0.3, c.eye[2]]; const d = [c.at[0] - c.eye[0], c.at[1] - c.eye[1] - 0.12 * Math.hypot(c.at[0] - c.eye[0], c.at[2] - c.eye[2]), c.at[2] - c.eye[2]], l = Math.hypot(d[0], d[1], d[2]) || 1; dir = [d[0] / l, d[1] / l, d[2] / l]; }
+  else { pos = Fm.lanternPos ? Fm.lanternPos.slice(0, 3) : [Fm.x, (G.view && G.view.T ? G.view.T.at(Fm.x, Fm.z) : 0) + 1.0, Fm.z]; const d = [Math.sin(Fm.yaw), -0.32, Math.cos(Fm.yaw)], l = Math.hypot(d[0], d[1], d[2]); dir = [d[0] / l, d[1] / l, d[2] / l]; }
+  if (tier === 0) { Fr.lampP = [pos[0], pos[1] + 0.2, pos[2], 1.5 * n]; Fr.lampD = [0, 0, -1, -1]; }
+  else if (tier === 1) { Fr.lampP = [pos[0], pos[1], pos[2], 5.5 * n]; Fr.lampD = [dir[0], dir[1], dir[2], 0.9]; }
+  else { Fr.lampP = [pos[0], pos[1], pos[2], 13 * n]; Fr.lampD = [dir[0], dir[1], dir[2], 0.8]; }
+}
+// set today's weather by hand (unlocked farms, for testing)
+function setWeatherNow(F, k) {
+  const w = todayW(F); if (!w) return;
+  w.fogHold = false;
+  if (k === 'fogL') { w.kind = 'sun'; w.rain = 0; w.fog = 0.5; w.fogHold = true; }
+  else if (k === 'fogT') { w.kind = 'fog'; w.rain = 0; w.fog = 1; w.fogHold = true; }
+  else { w.kind = k; w.fog = k === 'rain' || k === 'storm' ? 0.25 : 0; w.rain = k === 'rain' ? 8 : k === 'storm' ? 26 : k === 'snow' ? 6 : 0; }
+  if (k === 'snow' && w.t > 0) w.t = -3; if ((k === 'rain' || k === 'storm') && w.t < 2) w.t = 8;
+  w.wind = k === 'storm' ? 0.38 : k === 'snow' ? 0.1 : Math.min(w.wind || 0.1, 0.2);
+  if (G.fx && G.fx.reset) G.fx.reset();
+  UI.hudTick(0, true);
+}
+// how thick the fog is right now: it lies heaviest around dawn and burns off through the morning (a real fog day lingers),
+// and can settle again in the evening
+function fogNow(F) {
+  const w = todayW(F); if (!w) return 0;
+  const f = w.fog !== undefined ? w.fog : w.kind === 'fog' ? 0.9 : 0; if (!f) return 0;
+  const h = F.hour + (F.minute || 0) / 60, heavy = w.kind === 'fog', wet = w.kind === 'rain' || w.kind === 'storm';
+  if (wet || w.fogHold) return f;
+  const k = h < 5 ? 0.85 : h < 9 ? 1 : h < 12 ? 1 - (h - 9) / 3 * (heavy ? 0.45 : 0.85) : h < 18 ? (heavy ? 0.55 : 0.12) : h < 21 ? (heavy ? 0.65 : 0.3) : 0.7;
+  return f * k;
+}
+// fog in the picture. In first person thick fog starts to soften things about 100 ft out; from above the camera is further
+// back, so the fog is pushed out past the farmer and you can always see yourself.
+function applyFog(Fr, d, focus) {
+  if (!d || d < 0.03) return;
+  let near = lerp(70, 6, d), far = lerp(220, 30, d);
+  if (!FPV.on && focus && Fr.cam) { const cd = Math.hypot(Fr.cam[0] - focus[0], Fr.cam[1] - (focus[1] || 0), Fr.cam[2] - focus[2]); near = Math.max(near, cd * 0.8); far = Math.max(far, cd * 2.6, near + 16); }
+  Fr.fog = [Math.min(Fr.fog[0], near), Math.min(Fr.fog[1], far)];
+  Fr.fogCol = mixc(Fr.fogCol, [0.84, 0.86, 0.88], Math.min(0.75, d * 0.8));
+  if (Fr.skyHor) Fr.skyHor = mixc(Fr.skyHor, Fr.fogCol, Math.min(0.85, d)); if (Fr.skyTop) Fr.skyTop = mixc(Fr.skyTop, Fr.fogCol, Math.min(0.6, d * 0.7));
 }
 const todayW = (F) => F.weather.days[clamp(F.day - 1, 0, 29)];
 // the game week: the 1st of every month is a Monday, so the 6th, 13th, 20th and 27th are Saturdays (market day and the livestock sale)
@@ -13490,7 +13697,13 @@ const WEEDS = {
   },
   // a weed (or bit of brush) this animal would go and eat, within its paddock or near its home
   pick(a, home) {
-    const F = G.F, list = this.eats[a.sp]; if (!F || !list || !a.rec) return null;
+    const F = G.F, list = this.eats[a.sp]; if (!F || !a.rec) return null;
+    // grazers with hay put out for them wander over to it often
+    if (GRAZERS.has(a.sp) && Math.random() < 0.6) {
+      const hay = F.objs.filter((o) => o.t === 'hayfeed' && (home.pad ? inPad(home.pad, o.x, o.z) : Math.hypot(o.x - home.x, o.z - home.z) < (home.r || 6) + 4));
+      if (hay.length) { const o = hay[Math.floor(Math.random() * hay.length)], [x, z] = HAYFEED.spot(o, Math.random); return { t: 'hayspot', x, z }; }
+    }
+    if (!list) return null;
     let best = null, bd = 1e9;
     for (const o of F.objs) {
       if (o.taken || !(o.t === 'weed' ? list.includes(o.kind) : o.t === 'brush' && list.includes('brush'))) continue;
@@ -13509,6 +13722,97 @@ const WEEDS = {
     if (F.weedsEaten === 1 || F.weedsEaten % 25 === 0) UI.toast(`Your ${SPECIES_EXTRA[a.sp].plural} are cleaning up the ${o.t === 'brush' ? 'brush' : (WEEDS.kinds[o.kind] || 'weed').toLowerCase() + 's'} 🌿`);
   },
 };
+// ---------------------------------------------------------------- hay out on the ground
+// Two ways to feed hay by hand, besides forking it out at the gate: carry a small square bale (25 kg) from the barn and drop it
+// where you like, or unroll a round bale (250 kg) across the pasture. Unrolled hay feeds the herd along a long strip and what
+// they trample and leave behind is litter that feeds the soil ("bale grazing"). Grazers in that paddock (or round the barnyard)
+// eat from it before anything comes out of the barn, and walk over to it to eat.
+const SQ_KG = 25;
+const HAYFEED = {
+  list(F) { return F.objs.filter((o) => o.t === 'hayfeed'); },
+  yardPt(F) { const b = F.objs.find((o) => o.t === 'barn') || F.objs.find((o) => o.t === 'house'); return b ? [b.x + 2, b.z + 4.5] : [0, 0]; },
+  // hay the animals of a group can reach
+  forGroup(F, g) {
+    if (g.barn) return [];
+    if (g.pad) return this.list(F).filter((o) => inPad(g.pad, o.x, o.z));
+    const [yx, yz] = this.yardPt(F);
+    return this.list(F).filter((o) => !F.paddocks.some((p) => inPad(p, o.x, o.z)) && Math.hypot(o.x - yx, o.z - yz) < 14);
+  },
+  kgFor(F, g) { return this.forGroup(F, g).reduce((n, o) => n + o.kg, 0); },
+  // points along a feed for an animal to walk to
+  spot(o, rnd) {
+    if (o.kind !== 'roll') return [o.x, o.z];
+    const f = o.kg / o.kg0, u = (rnd() - 0.5) * o.len * Math.max(0.3, f);
+    return [o.x + Math.sin(o.r) * u, o.z + Math.cos(o.r) * u];
+  },
+  // the day's eating: returns kg eaten
+  eat(F, g, need) {
+    const L = this.forGroup(F, g); let have = L.reduce((n, o) => n + o.kg, 0); if (!have || need <= 0) return 0;
+    const take = Math.min(need, have), T = F.terrain;
+    for (const o of L) {
+      const t = take * o.kg / have; o.kg -= t;
+      // trampled hay and dung along an unrolled strip build the soil where it lies
+      const steps = o.kind === 'roll' ? Math.max(2, Math.round(o.len / 1.5)) : 1;
+      for (let i = 0; i < steps; i++) {
+        const u = steps === 1 ? 0 : (i / (steps - 1) - 0.5) * o.len, k = T.idx(o.x + Math.sin(o.r) * u, o.z + Math.cos(o.r) * u);
+        if (k >= 0) { T.om[k] = Math.min(12, T.om[k] + t / steps * (o.kind === 'roll' ? 0.0011 : 0.0006)); T.bio[k] = Math.min(1, T.bio[k] + 0.004); }
+      }
+    }
+    F.objs = F.objs.filter((o) => o.t !== 'hayfeed' || o.kg > 1);
+    if (G.view && G.F === F) for (const o of L) G.view.dirtyAt(o.x, o.z, (o.len || 1) / 2 + 1.5);
+    return take;
+  },
+  // rain spoils hay left out a little at a time; an unrolled strip, flat on the ground, keeps a bit better than a broken bale
+  weather(F, rain) {
+    if (rain < 4) return;
+    for (const o of this.list(F)) o.kg *= o.kind === 'roll' ? 0.985 : 0.97;
+    F.objs = F.objs.filter((o) => o.t !== 'hayfeed' || o.kg > 1);
+  },
+  // unroll a round bale from where you stand, the way you're facing, stopping at a fence
+  unroll(F, x, z, yaw, dry) {
+    const pad = F.paddocks.find((p) => inPad(p, x, z)), T = F.terrain, step = 0.35;
+    let a = 0, b = 0;
+    const ok = (u) => { const px = x + Math.sin(yaw) * u, pz = z + Math.cos(yaw) * u, k = T.idx(px, pz); return k >= 0 && ownedAt(F, px, pz) && (!pad || inPad(pad, px, pz)) && T.cover[k] !== COVER.water && T.cover[k] !== COVER.built && !(G.view && G.view.col && G.view.col.blocked(px, pz, 0.15)); };
+    while (b < 9 && ok(b + step)) b += step;
+    while (a > -1 && ok(a - step)) a -= step;
+    const len = b - a; if (len < 2.5) return null;
+    if (dry) return { len };
+    const mid = (a + b) / 2, o = { id: F.nextId++, t: 'hayfeed', kind: 'roll', x: x + Math.sin(yaw) * mid, z: z + Math.cos(yaw) * mid, r: yaw, len, kg: BALE_KG, kg0: BALE_KG };
+    F.objs.push(o); return o;
+  },
+  drop(F, x, z, yaw) { const o = { id: F.nextId++, t: 'hayfeed', kind: 'square', x, z, r: yaw, len: 0.9, kg: SQ_KG, kg0: SQ_KG }; F.objs.push(o); return o; },
+};
+function addHayFeed(mb, o, T) {
+  const f = clamp(o.kg / o.kg0, 0, 1), R = rng(o.id * 31 + 7), hay = [214, 186, 112], hayDk = [176, 150, 86];
+  mb.mat = MAT.hay;
+  if (o.kind === 'square') {
+    // a 25 kg bale, twine cut, its flakes knocked over and spread a little as it's eaten
+    const n = Math.max(1, Math.ceil(f * 6));
+    for (let i = 0; i < n; i++) {
+      const spread = (1 - f) * 0.5, u = (i - 2.5) * 0.15, px = o.x + Math.sin(o.r) * u + (R() - 0.5) * spread, pz = o.z + Math.cos(o.r) * u + (R() - 0.5) * spread;
+      mb.push(M4.trs(px, T.at(px, pz), pz, o.r + (R() - 0.5) * (0.2 + (1 - f)), (1 - f) * (R() - 0.5) * 1.2, 0));
+      mb.box(0, 0, 0, 0.42, 0.34 * (0.5 + f * 0.5), 0.13, shade(hay, 0.9 + R() * 0.18), { sharp: true }); mb.pop();
+    }
+    if (f > 0.85) { mb.mat = 0; for (const sx of [-0.12, 0.12]) { mb.push(M4.trs(o.x, T.at(o.x, o.z), o.z, o.r, 0, 0)); mb.box(sx, 0.33, 0, 0.015, 0.02, 0.92, [200, 120, 60]); mb.pop(); } }
+  } else {
+    // an unrolled round bale: a long flat mat of hay, a loose fringe of straw along its edges. As it's eaten it thins and
+    // breaks into patches.
+    const n = Math.max(3, Math.round(o.len / 0.5)), c = Math.cos(o.r), sn = Math.sin(o.r);
+    for (let i = 0; i < n; i++) {
+      const u = (i / (n - 1) - 0.5) * o.len * 0.98;
+      if (R() > f * 1.2 + 0.05) continue;
+      const w = 0.85 + R() * 0.2 - (1 - f) * 0.3, px = o.x + sn * u + c * (R() - 0.5) * 0.08, pz = o.z + c * u - sn * (R() - 0.5) * 0.08, gy = T.at(px, pz);
+      // soft overlapping drifts (no hard edges), then loose straws lying every which way over the top hide the seams
+      for (const dw0 of [-0.22, 0.22]) { const dw = dw0 + (R() - 0.5) * 0.12, du = (R() - 0.5) * 0.2; mb.ell(px + c * dw + sn * du, gy + 0.005, pz - sn * dw + c * du, w * (0.3 + R() * 0.08), 0.035 + 0.05 * f, o.len / n * (1.2 + R() * 0.4), shade(hay, 0.94 + R() * 0.08), { lat: 3, lon: 8 }); }
+      for (let k = 0; k < 16; k++) {
+        const side = (R() - 0.5) * (w + 0.35), along = (R() - 0.5) * o.len / n, a = o.r + (R() - 0.5) * 2.2, L = 0.18 + R() * 0.22;
+        const sx = px + c * side + sn * along, sz = pz - sn * side + c * along, sy = gy + 0.02 + (Math.abs(side) < w / 2 ? 0.07 * f : 0);
+        mb.blade(sx, sy, sz, sx + Math.sin(a) * L, sy + 0.015, sz + Math.cos(a) * L, 0.025, shade(hay, 0.95 + R() * 0.2), shade(hayDk, 1.05), 0.05);
+      }
+    }
+  }
+  mb.mat = 0;
+}
 // the little plants themselves
 function addWeed(mb, kind, x, y, z, s, R) {
   const g = [86, 128, 62], gd = [70, 108, 52];
@@ -13522,6 +13826,7 @@ function addWeed(mb, kind, x, y, z, s, R) {
 function simDay(F, auto, rep) {
   const T = F.terrain, R = T.region, w = todayW(F), t = w.t;
   try { WEEDS.spawn(F); } catch (e) { /* never let weeds stop a day */ }
+  try { HAYFEED.weather(F, todayW(F).rain || 0); } catch (e) { /* ignore */ }
   const NC = TN * TN;
   if (!T.slopeC) { T.slopeC = new Float32Array(NC); for (let k = 0; k < NC; k++) T.slopeC[k] = T.slope((k % TN) - THALF + 0.5, Math.floor(k / TN) - THALF + 0.5); }
   const today = F.today || {};
@@ -13597,11 +13902,15 @@ function simDay(F, auto, rep) {
       eaten = take;
     }
     let short = Math.max(0, demand - eaten);
+    // hay you've put out on the ground goes first, whether or not anyone did the feeding chore today
+    if (short > 0.5 && g.list.some((a) => GRAZERS.has(a.sp))) short -= HAYFEED.eat(F, g, short);
     if (short > 0.5 && fedHay) {
       const tb = Math.min(F.inv.treehay || 0, Math.ceil(short / 40));
       F.inv.treehay = (F.inv.treehay || 0) - tb; short -= tb * 40;
       const bales = Math.min(F.inv.hay || 0, short / BALE_KG);
       F.inv.hay = Math.max(0, (F.inv.hay || 0) - bales); short -= bales * BALE_KG;
+      const sq = Math.min(F.inv.sqbale || 0, Math.ceil(short / SQ_KG));
+      if (sq > 0 && short > 0.5) { F.inv.sqbale -= sq; short = Math.max(0, short - sq * SQ_KG); }
     }
     const hungry = short > demand * 0.25 && demand > 0;
     const water = hasWater(F, g) || auto || today['water_' + g.key];
@@ -13657,6 +13966,7 @@ function simDay(F, auto, rep) {
     if (rep) rep.hurricane = { trees: Math.min(3, wild.length), beds: lost, tied };
   }
   for (const o of allObjs) {
+    if (o.t === 'bed') BEDSOIL.day(F, o);
     if (o.t === 'bed' && o.crop && !o.dead) {
       const cr = CROPS.find((c) => c.key === o.crop), inGH = o.gh || gh.some((g) => Math.abs(g.x - o.x) < 1.5 && Math.abs(g.z - o.z) < 3);
       const BKo = BED_KINDS[bedOf(o)], tt = inGH ? Math.max(t + 10, 8) : t + (BKo.warm || 0);
@@ -13666,10 +13976,10 @@ function simDay(F, auto, rep) {
       }
       const k = T.idx(o.x, o.z), mo = k >= 0 ? T.moist[k] : 0.5;
       const watered = today['water_' + o.id] || w.rain > 3 || inGH && auto;
-      const fw = watered ? 1 : smooth(0.1, 0.4, Math.min(1, mo + (BKo.keep || 0)));   // no-till and hugel beds hold water
+      const fw = watered ? 1 : smooth(0.1, 0.4, Math.min(1, mo + (BKo.keep || 0) + (o.mulch && bedOf(o) !== 'notill' ? 0.15 : 0)));   // no-till and hugel beds, and mulch, hold water
       if (watered && k >= 0) T.moist[k] = Math.max(T.moist[k], 0.6);
       const ftemp = tt < cr.temp[0] ? 0.25 : tt > cr.temp[1] ? 0.4 : 1;
-      o.days += fw * ftemp * (o.mulch && bedOf(o) !== 'notill' ? 1.1 : 1) * (BKo.grow || 1);
+      o.days += fw * ftemp * (o.mulch && bedOf(o) !== 'notill' ? 1.1 : 1) * (BKo.grow || 1) * (1 + Math.min(0.12, (o.fert || 0) * 0.06));
       if (!o.ready && o.days >= cr.months * 30) { o.ready = true; o.readyDays = 0; }
       if (o.ready) { o.readyDays++; if (auto) harvestBed(F, o, rep); else if (o.readyDays > 45) { o.dead = true; } }
     }
@@ -13736,11 +14046,37 @@ function collectEggs(F, rep) {
 }
 // every egg waiting in the nest boxes
 function nestTotal(F) { return (F.nestEggs || 0) + (F.nestDuck || 0) + (F.nestBlue || 0); }
+// ---------------------------------------------------------------- feeding the soil in a bed
+// Compost raises a bed's fertility (and the soil's organic matter) right away; each crop draws some of it back down. A straw
+// mulch holds the water in, keeps the soil cool, speeds growth a little and, as it breaks down over about four months, adds
+// organic matter. Both show up in the harvest.
+const BEDSOIL = {
+  cells(F, o, fn) { const T = F.terrain; T.eachCell(o.x - 1.6, o.z - 1.6, o.x + 1.6, o.z + 1.6, (x, z, k) => { if (T.cover[k] === COVER.bed && Math.hypot(x - o.x, z - o.z) < 1.7) fn(k); }); },
+  om(F, o) { const T = F.terrain, k = T.idx(o.x, o.z); return k >= 0 ? T.om[k] : 2; },
+  yieldMult(F, o, om) { return clamp(0.55 + (om === undefined ? this.om(F, o) : om) * 0.09 + Math.min(2, o.fert || 0) * 0.18 + (o.mulch ? 0.08 : 0), 0.5, 1.8); },
+  day(F, o) {
+    if (o.mulch && o.mulchD !== undefined) {
+      o.mulchD--; const T = F.terrain; this.cells(F, o, (k) => { T.om[k] = Math.min(12, T.om[k] + 0.0025); });
+      if (o.mulchD <= 0) { delete o.mulch; delete o.mulchD; if (G.view && G.F === F) G.view.dirtyAt(o.x, o.z); }
+    }
+  },
+  compost(F, o) {
+    F.inv.compost = Math.max(0, (F.inv.compost || 0) - 1); o.fert = Math.min(2, (o.fert || 0) + 0.6);
+    const T = F.terrain; this.cells(F, o, (k) => { T.om[k] = Math.min(12, T.om[k] + 0.3); T.moist[k] = Math.min(1, T.moist[k] + 0.05); });
+  },
+  // a square bale mulches a bed; a round bale's worth does ten
+  mulch(F, o) {
+    if ((F.inv.sqbale || 0) >= 1) F.inv.sqbale -= 1; else F.inv.hay = Math.max(0, (F.inv.hay || 0) - 0.1);
+    o.mulch = true; o.mulchD = 120;
+  },
+  canMulch(F) { return (F.inv.sqbale || 0) >= 1 || (F.inv.hay || 0) >= 0.1; },
+};
 function harvestBed(F, o, rep) {
   tally(F, 'harvest');
   const cr = CROPS.find((c) => c.key === o.crop), T = F.terrain, k = T.idx(o.x, o.z);
   const om = k >= 0 ? T.om[k] : 2;
-  const n = cr.cover ? 0 : Math.round(cr.yield * clamp(0.55 + om * 0.09, 0.5, 1.35));
+  const n = cr.cover ? 0 : Math.round(cr.yield * BEDSOIL.yieldMult(F, o, om));
+  if (!cr.cover) o.fert = Math.max(0, (o.fert || 0) - 0.4);   // a crop draws down what the compost put in
   if (cr.cover && k >= 0) { T.om[k] += 0.25; }
   if (n) { F.inv[cr.key] = (F.inv[cr.key] || 0) + n; if (rep) rep.harvest[cr.name] = (rep.harvest[cr.name] || 0) + n; }
   o.crop = null; o.days = 0; o.ready = false; o.dead = false;
@@ -13797,10 +14133,10 @@ function makeGameChores(F) {
     const name = groupName(F, g), n = g.list.length;
     const grazers = g.list.filter((a) => GRAZERS.has(a.sp));
     if (grazers.length) {
-      const demand = demandOf(grazers), grass = g.pad ? grassIn(F, g.pad) * 0.6 : 0;
+      const demand = demandOf(grazers), grass = (g.pad ? grassIn(F, g.pad) * 0.6 : 0) + HAYFEED.kgFor(F, g);
       if (grass < demand) {
         const bales = Math.ceil((demand - grass) / BALE_KG * 10) / 10;
-        const have = (F.inv.hay || 0) + (F.inv.treehay || 0) * 0.16;
+        const have = (F.inv.hay || 0) + (F.inv.treehay || 0) * 0.16 + (F.inv.sqbale || 0) * SQ_KG / BALE_KG;
         if (have >= Math.min(bales, 0.2)) add('must', '🌾', `Feed hay to the ${grazers.length} animals in ${name}`, (F2) => F2.today['fed_' + g.key], { act: 'feed', gkey: g.key });
         else add('should', '⚠️', `Out of hay! ${name} is short on grass. Buy hay in town or move them.`, () => false, { warn: true });
       } else if (g.pad && grassIn(F, g.pad) < demand * 6) add('should', '➡️', `Grass in ${name} is getting short. Move the herd soon.`, (F2) => !F2.animals.some((a) => a.pad === g.pad.id));
@@ -13862,63 +14198,109 @@ const choreDone = (F, c) => !!c.check(F);
 function mustLeft(F) { return (F.chores || []).filter((c) => c.group === 'must' && !choreDone(F, c)).length; }
 
 // ---------------------------------------------------------------- long-term goals (Yeomans scale of permanence order)
+// One-off milestones, plus "ladders": goals that climb. Finish one rung and the next one appears with a bigger target and a
+// bigger reward (catch 5 fish, then 10, 20, 35, 50 ...). Ladders with a natural ceiling (kinds of fish, recipes) stop there.
 const GOALS = [
   { id: 'pond', cat: 'Water', icon: '💧', name: 'Dig your first pond', reward: 500, prog: (F) => (F.ponds.length ? 1 : 0) },
-  { id: 'swale3', cat: 'Water', icon: '〰️', name: 'Build 3 swales on contour', reward: 800, prog: (F) => F.swales.length / 3 },
   { id: 'water', cat: 'Water', icon: '🌊', name: 'Fill a pond to the brim', reward: 1000, prog: (F) => Math.max(0, ...F.ponds.map((p) => p.vol)) },
-  { id: 'trees10', cat: 'Trees', icon: '🌳', name: 'Plant 10 trees', reward: 400, prog: (F) => F.stats.treesPlanted / 10 },
-  { id: 'trees40', cat: 'Trees', icon: '🌲', name: 'Plant a 40-tree food forest', reward: 2500, prog: (F) => F.stats.treesPlanted / 40 },
   { id: 'fruit', cat: 'Trees', icon: '🍎', name: 'Pick your first homegrown fruit', reward: 600, prog: (F) => (F.stats.firstFruit ? 1 : 0) },
   { id: 'barn', cat: 'Buildings', icon: '🏚️', name: 'Raise a barn', reward: 1000, prog: (F) => (F.objs.some((o) => o.t === 'barn') ? 1 : 0) },
   { id: 'coop', cat: 'Buildings', icon: '🐔', name: 'Build a coop and get eggs', reward: 300, prog: (F) => (F.stats.eggs > 0 ? 1 : 0) },
-  { id: 'species3', cat: 'Animals', icon: '🐄', name: 'Raise 3 kinds of animals', reward: 1200, prog: (F) => new Set(F.animals.map((a) => a.sp)).size / 3 },
-  { id: 'birth', cat: 'Animals', icon: '🍼', name: 'Welcome your first newborn', reward: 800, prog: (F) => (F.stats.births > 0 ? 1 : 0) },
-  { id: 'paddock6', cat: 'Animals', icon: '🔁', name: 'Set up 6 paddocks for rotational grazing', reward: 1500, prog: (F) => F.paddocks.length / 6 },
-  { id: 'hay', cat: 'Animals', icon: '🌾', name: 'Cut 10 bales of your own hay', reward: 700, prog: (F) => F.stats.bales / 10 },
-  { id: 'bid1', cat: 'Animals', icon: '🔨', name: 'Win a lot at the Saturday auction', reward: 400, prog: (F) => tallied(F, 'auctionWon') },
-  { id: 'bid3', cat: 'Animals', icon: '💰', name: 'Sell 3 animals in the auction ring', reward: 700, prog: (F) => tallied(F, 'auctionSold') / 3 },
-  { id: 'om1', cat: 'Soil', icon: '🪱', name: 'Raise soil organic matter by 0.5%', reward: 2000, prog: (F) => (F.terrain.avgOM(true) - F.stats.startOM) / 0.5 },
-  { id: 'om2', cat: 'Soil', icon: '🌍', name: 'Raise soil organic matter by 1.5%', reward: 6000, prog: (F) => (F.terrain.avgOM(true) - F.stats.startOM) / 1.5 },
-  { id: 'market', cat: 'Business', icon: '🏪', name: 'Sell at 10 farmers markets', reward: 800, prog: (F) => F.stats.marketVisits / 10 },
-  { id: 'income', cat: 'Business', icon: '💵', name: 'Earn $25,000 from farm sales', reward: 3000, prog: (F) => F.stats.income / 25000 },
-  { id: 'land', cat: 'Business', icon: '🏡', name: 'Own 9 lots of land', reward: 10000, prog: (F) => ownedCount(F) / 9 },
   { id: 'land25', cat: 'Business', icon: '🗺️', name: 'Own every lot on your side of the road', reward: 40000, prog: (F) => ownedCount(F) / Math.max(1, buyablePlots(F).length) },
-  { id: 'acres100', cat: 'Business', icon: '🏞️', name: 'Own 100 acres', reward: 5000, prog: (F) => HOLD.acres(F) / 100 },
-  { id: 'acres1000', cat: 'Business', icon: '⛰️', name: 'Own 1,000 acres', reward: 25000, prog: (F) => HOLD.acres(F) / 1000 },
-  { id: 'acres10000', cat: 'Business', icon: '🌄', name: 'Own 10,000 acres', reward: 100000, prog: (F) => HOLD.acres(F) / 10000 },
   { id: 'hand1', cat: 'Business', icon: '🧑‍🌾', name: 'Hire a farmhand', reward: 300, prog: (F) => (F.hand || tallied(F, 'hired') ? 1 : 0) },
-  { id: 'meet6', cat: 'Community', icon: '👋', name: 'Meet 6 people around the county', reward: 300, prog: (F) => FRIENDS.people(F).filter((p) => FRIENDS.met(F, p.id)).length / 6 },
-  { id: 'gift10', cat: 'Community', icon: '🎁', name: 'Give 10 gifts', reward: 400, prog: (F) => tallied(F, 'gifts') / 10 },
-  { id: 'jobs5', cat: 'Community', icon: '📌', name: 'Finish 5 jobs from the job board', reward: 600, prog: (F) => tallied(F, 'jobs') / 5 },
-  { id: 'friends3', cat: 'Community', icon: '❤️', name: 'Reach 5 hearts with 3 people', reward: 1000, prog: (F) => FRIENDS.count(F, 5) / 3 },
-  { id: 'talk10', cat: 'Community', icon: '💬', name: 'Have 10 proper chats', reward: 300, prog: (F) => tallied(F, 'talks') / 10 },
   { id: 'ribbon', cat: 'Community', icon: '🥇', name: 'Win a blue ribbon at the County Fair', reward: 1500, prog: (F) => (tallied(F, 'blueRibbons') ? 1 : 0) },
   { id: 'bff', cat: 'Community', icon: '💞', name: 'Reach 10 hearts with someone', reward: 2500, prog: (F) => FRIENDS.count(F, 10) },
   { id: 'fest1', cat: 'Community', icon: '🎉', name: 'Join in at a festival', reward: 300, prog: (F) => tallied(F, 'fests') },
   { id: 'fest4', cat: 'Community', icon: '🕯️', name: 'Take part in all four festivals', reward: 1500, prog: (F) => Object.keys(F.festLog || {}).length / 4 },
   { id: 'local', cat: 'Community', icon: '🏅', name: 'Become a Local in town', reward: 1200, prog: (F) => STANDING.score(F) / 90 },
-  { id: 'visit3', cat: 'Community', icon: '👋', name: 'Have 3 friends visit your farm', reward: 400, prog: (F) => tallied(F, 'visits') / 3 },
-  { id: 'forage1', cat: 'The woods', icon: '🍄', name: 'Pick your first wild food', reward: 100, prog: (F) => (tallied(F, 'forage') ? 1 : 0) },
-  { id: 'forage25', cat: 'The woods', icon: '🧺', name: 'Pick wild food 25 times', reward: 500, prog: (F) => tallied(F, 'forage') / 25 },
-  { id: 'forage10k', cat: 'The woods', icon: '🫐', name: 'Find 10 different wild foods', reward: 800, prog: (F) => Object.keys((F.woods || {}).log || {}).filter((k) => typeof WOOD_GROUP !== 'undefined' && ['mush', 'berry', 'fruit', 'nut', 'green', 'flower'].includes(WOOD_GROUP[k])).length / 10 },
-  { id: 'chop10', cat: 'The woods', icon: '🪓', name: 'Chop 10 trees in the woods', reward: 400, prog: (F) => tallied(F, 'chopped') / 10 },
-  { id: 'creekfish', cat: 'The woods', icon: '🎣', name: 'Catch 5 fish from the creek', reward: 300, prog: (F) => tallied(F, 'creekfish') / 5 },
-  { id: 'beetree1', cat: 'The woods', icon: '🍯', name: 'Take honey from a bee tree', reward: 300, prog: (F) => (tallied(F, 'beetree') ? 1 : 0) },
-  { id: 'wild5', cat: 'The woods', icon: '🦌', name: 'Spot 5 kinds of wildlife', reward: 500, prog: (F) => Object.keys((F.woods || {}).wild || {}).length / 5 },
   { id: 'wildall', cat: 'The woods', icon: '🦉', name: 'Spot every kind of wildlife in your woods', reward: 2500, prog: (F) => { const P = WOODS.prof(F), W = (F.woods || {}).wild || {}; return P.wild.filter((q) => W[q[0]]).length / P.wild.length; } },
-  { id: 'finds5', cat: 'The woods', icon: '✨', name: 'Dig up 5 odd finds', reward: 400, prog: (F) => tallied(F, 'finds') / 5 },
-  { id: 'bouquet1', cat: 'The woods', icon: '💐', name: 'Tie a wild bouquet', reward: 150, prog: (F) => (tallied(F, 'bouquets') ? 1 : 0) },
-  { id: 'cook1', cat: 'Kitchen', icon: '🍳', name: 'Cook your first dish', reward: 200, prog: (F) => (tallied(F, 'cooked') ? 1 : 0) },
-  { id: 'cook6', cat: 'Kitchen', icon: '🥧', name: 'Cook 6 different recipes', reward: 800, prog: (F) => Object.keys(F.cooked || {}).length / 6 },
-  { id: 'cook25', cat: 'Kitchen', icon: '👩‍🍳', name: 'Cook 25 dishes', reward: 1200, prog: (F) => tallied(F, 'cooked') / 25 },
-  { id: 'fish1', cat: 'Kitchen', icon: '🎣', name: 'Catch your first fish', reward: 250, prog: (F) => (tallied(F, 'fish') ? 1 : 0) },
-  { id: 'fish5k', cat: 'Kitchen', icon: '🐟', name: 'Catch 5 kinds of fish', reward: 1000, prog: (F) => Object.keys(F.fishLog || {}).length / 5 },
-  { id: 'photo1', cat: 'Memories', icon: '📷', name: 'Take a photo in photo mode', reward: 100, prog: (F) => tallied(F, 'photos') },
-  { id: 'photo10', cat: 'Memories', icon: '🖼️', name: 'Take 10 photos', reward: 300, prog: (F) => tallied(F, 'photos') / 10 },
 ];
+const GOAL_CATS = ['Water', 'Trees', 'Buildings', 'Animals', 'Soil', 'Business', 'Community', 'The woods', 'Kitchen', 'Memories'];
+const LADDER_MULT = [1, 2, 4, 7, 10, 15, 20, 30, 40, 60, 80, 100, 150, 200, 300, 400, 600, 800, 1000];
+const plural = (n, one, many) => `${n.toLocaleString()} ${n === 1 ? one : (many || one + 's')}`;
+// base: first target (later targets follow LADDER_MULT) or steps: an explicit list (extended by x1.5 after the last);
+// reward: the first rung's prize; max: a natural ceiling; old: earlier one-off goals -> how many rungs they already cover
+const LADDERS = [
+  { id: 'swales', cat: 'Water', icon: '〰️', base: 3, reward: 800, of: (F) => F.swales.length, name: (n) => `Build ${plural(n, 'swale')} on contour`, old: { swale3: 1 } },
+  { id: 'trees', cat: 'Trees', icon: '🌳', steps: [10, 25, 40, 60, 100, 150, 200, 300, 400, 600, 800, 1000], reward: 400, of: (F) => F.stats.treesPlanted, name: (n) => `Plant ${plural(n, 'tree')}`, old: { trees10: 1, trees40: 3 } },
+  { id: 'species', cat: 'Animals', icon: '🐄', steps: [2, 3, 4, 5, 6, 7, 8, 9, 10], reward: 600, of: (F) => new Set(F.animals.map((a) => a.sp)).size, max: () => Object.keys(SPECIES).length, name: (n) => `Raise ${n} kinds of animals`, old: { species3: 2 } },
+  { id: 'births', cat: 'Animals', icon: '🍼', steps: [1, 5, 10, 25, 50, 75, 100, 150, 200, 300], reward: 800, of: (F) => F.stats.births || 0, name: (n) => (n === 1 ? 'Welcome your first newborn' : `Welcome ${n} newborns`), old: { birth: 1 } },
+  { id: 'paddocks', cat: 'Animals', icon: '🔁', steps: [2, 4, 6, 10, 15, 20, 30, 40, 60], reward: 500, of: (F) => F.paddocks.length, name: (n) => `Set up ${n} paddocks for rotational grazing`, old: { paddock6: 3 } },
+  { id: 'hay', cat: 'Animals', icon: '🌾', base: 10, reward: 700, of: (F) => Math.floor(F.stats.bales || 0), name: (n) => `Cut ${plural(n, 'bale')} of your own hay`, old: { hay: 1 } },
+  { id: 'bidwon', cat: 'Animals', icon: '🔨', base: 1, reward: 400, of: (F) => tallied(F, 'auctionWon'), name: (n) => (n === 1 ? 'Win a lot at the Saturday auction' : `Win ${n} lots at the Saturday auction`), old: { bid1: 1 } },
+  { id: 'bidsold', cat: 'Animals', icon: '💰', base: 3, reward: 700, of: (F) => tallied(F, 'auctionSold'), name: (n) => `Sell ${plural(n, 'animal')} in the auction ring`, old: { bid3: 1 } },
+  { id: 'om', cat: 'Soil', icon: '🪱', steps: [0.5, 1, 1.5, 2, 2.5, 3, 4, 5, 6, 8], reward: 2000, of: (F) => F.terrain.avgOM(true) - F.stats.startOM, name: (n) => `Raise soil organic matter by ${n}%`, old: { om1: 1, om2: 3 }, frac: true },
+  { id: 'market', cat: 'Business', icon: '🏪', base: 5, reward: 600, of: (F) => F.stats.marketVisits || 0, name: (n) => `Sell at ${n} farmers markets`, old: { market: 2 } },
+  { id: 'income', cat: 'Business', icon: '💵', base: 25000, reward: 3000, of: (F) => F.stats.income || 0, name: (n) => `Earn $${n.toLocaleString()} from farm sales`, old: { income: 1 } },
+  { id: 'lots', cat: 'Business', icon: '🏡', steps: [2, 3, 4, 5, 6, 8, 10, 13, 16, 20, 25], reward: 1500, of: (F) => ownedCount(F), max: (F) => buyablePlots(F).length, name: (n) => `Own ${n} lots of land`, old: { land: 7 } },
+  { id: 'acres', cat: 'Business', icon: '🏞️', steps: [10, 25, 50, 100, 250, 500, 1000, 2500, 5000, 10000], reward: 1000, of: (F) => HOLD.acres(F), name: (n) => `Own ${n.toLocaleString()} acres`, old: { acres100: 4, acres1000: 7, acres10000: 10 } },
+  { id: 'meet', cat: 'Community', icon: '👋', steps: [3, 6, 10, 15, 20, 30], reward: 300, of: (F) => FRIENDS.people(F).filter((p) => FRIENDS.met(F, p.id)).length, max: (F) => FRIENDS.people(F).length, name: (n) => `Meet ${n} people around the county`, old: { meet6: 2 } },
+  { id: 'gifts', cat: 'Community', icon: '🎁', base: 10, reward: 400, of: (F) => tallied(F, 'gifts'), name: (n) => `Give ${plural(n, 'gift')}`, old: { gift10: 1 } },
+  { id: 'jobs', cat: 'Community', icon: '📌', base: 5, reward: 600, of: (F) => tallied(F, 'jobs'), name: (n) => `Finish ${plural(n, 'job')} from the job board`, old: { jobs5: 1 } },
+  { id: 'friends', cat: 'Community', icon: '❤️', steps: [1, 3, 5, 8, 12, 16, 20], reward: 500, of: (F) => FRIENDS.count(F, 5), max: (F) => FRIENDS.people(F).length, name: (n) => `Reach 5 hearts with ${plural(n, 'person', 'people')}`, old: { friends3: 2 } },
+  { id: 'talks', cat: 'Community', icon: '💬', base: 10, reward: 300, of: (F) => tallied(F, 'talks'), name: (n) => `Have ${n} proper chats`, old: { talk10: 1 } },
+  { id: 'visits', cat: 'Community', icon: '🏠', base: 3, reward: 400, of: (F) => tallied(F, 'visits'), name: (n) => `Have ${plural(n, 'friend')} visit your farm`, old: { visit3: 1 } },
+  { id: 'forage', cat: 'The woods', icon: '🍄', steps: [1, 10, 25, 50, 100, 200, 350, 500, 750, 1000], reward: 150, of: (F) => tallied(F, 'forage'), name: (n) => (n === 1 ? 'Pick your first wild food' : `Pick wild food ${n} times`), old: { forage1: 1, forage25: 3 } },
+  { id: 'wildkinds', cat: 'The woods', icon: '🫐', steps: [5, 10, 15, 20, 25, 30, 40], reward: 500, of: (F) => Object.keys((F.woods || {}).log || {}).filter((k) => typeof WOOD_GROUP !== 'undefined' && ['mush', 'berry', 'fruit', 'nut', 'green', 'flower'].includes(WOOD_GROUP[k])).length, max: () => (typeof WOOD_GROUP === 'undefined' ? 10 : Object.keys(WOOD_GROUP).filter((k) => ['mush', 'berry', 'fruit', 'nut', 'green', 'flower'].includes(WOOD_GROUP[k])).length), name: (n) => `Find ${n} different wild foods`, old: { forage10k: 2 } },
+  { id: 'chop', cat: 'The woods', icon: '🪓', base: 10, reward: 400, of: (F) => tallied(F, 'chopped'), name: (n) => `Chop ${plural(n, 'tree')} in the woods`, old: { chop10: 1 } },
+  { id: 'creekfish', cat: 'The woods', icon: '🎣', base: 5, reward: 300, of: (F) => tallied(F, 'creekfish'), name: (n) => `Catch ${plural(n, 'fish', 'fish')} from the creek`, old: { creekfish: 1 } },
+  { id: 'beetree', cat: 'The woods', icon: '🍯', base: 1, reward: 300, of: (F) => tallied(F, 'beetree'), name: (n) => (n === 1 ? 'Take honey from a bee tree' : `Take honey from bee trees ${n} times`), old: { beetree1: 1 } },
+  { id: 'wildlife', cat: 'The woods', icon: '🦌', steps: [3, 5, 8, 12, 16, 20, 25, 30], reward: 400, of: (F) => Object.keys((F.woods || {}).wild || {}).length, max: (F) => WOODS.prof(F).wild.length, name: (n) => `Spot ${n} kinds of wildlife`, old: { wild5: 2 } },
+  { id: 'finds', cat: 'The woods', icon: '✨', base: 5, reward: 400, of: (F) => tallied(F, 'finds'), name: (n) => `Dig up ${plural(n, 'odd find')}`, old: { finds5: 1 } },
+  { id: 'bouquets', cat: 'The woods', icon: '💐', base: 1, reward: 150, of: (F) => tallied(F, 'bouquets'), name: (n) => (n === 1 ? 'Tie a wild bouquet' : `Tie ${n} wild bouquets`), old: { bouquet1: 1 } },
+  { id: 'cooked', cat: 'Kitchen', icon: '🍳', steps: [1, 10, 25, 50, 100, 200, 350, 500, 750, 1000], reward: 200, of: (F) => tallied(F, 'cooked'), name: (n) => (n === 1 ? 'Cook your first dish' : `Cook ${n} dishes`), old: { cook1: 1, cook25: 3 } },
+  { id: 'recipes', cat: 'Kitchen', icon: '🥧', steps: [3, 6, 10, 15, 20, 25, 30, 40], reward: 500, of: (F) => Object.keys(F.cooked || {}).length, max: () => RECIPES.length, name: (n) => `Cook ${n} different recipes`, old: { cook6: 2 } },
+  { id: 'fish', cat: 'Kitchen', icon: '🎣', steps: [1, 5, 10, 20, 35, 50, 75, 100, 150, 200, 300], reward: 250, of: (F) => tallied(F, 'fish'), name: (n) => (n === 1 ? 'Catch your first fish' : `Catch ${n} fish`), old: { fish1: 1 } },
+  { id: 'fishkinds', cat: 'Kitchen', icon: '🐟', steps: [3, 5, 8, 12, 16, 20], reward: 600, of: (F) => Object.keys(F.fishLog || {}).length, max: () => FISH.length, name: (n) => `Catch ${n} kinds of fish`, old: { fish5k: 2 } },
+  { id: 'photos', cat: 'Memories', icon: '📷', steps: [1, 10, 25, 50, 100, 200, 350, 500], reward: 100, of: (F) => tallied(F, 'photos'), name: (n) => (n === 1 ? 'Take a photo in photo mode' : `Take ${n} photos`), old: { photo1: 1, photo10: 2 } },
+];
+const niceCount = (v) => { const m = v < 20 ? 1 : v < 100 ? 5 : v < 1000 ? 10 : v < 10000 ? 50 : v < 100000 ? 500 : 5000; return Math.round(v / m) * m; };
+const niceCash = (v) => { const m = v < 2000 ? 50 : v < 10000 ? 100 : v < 100000 ? 500 : 5000; return Math.round(v / m) * m; };
+const LADDER = {
+  rung(F, L) { return (F && F.ladder && F.ladder[L.id]) || 0; },
+  target(L, i) {
+    if (L.steps) return i < L.steps.length ? L.steps[i] : niceCount(L.steps[L.steps.length - 1] * Math.pow(1.5, i - L.steps.length + 1));
+    const m = i < LADDER_MULT.length ? LADDER_MULT[i] : LADDER_MULT[LADDER_MULT.length - 1] * Math.pow(1.5, i - LADDER_MULT.length + 1);
+    return niceCount(L.base * m);
+  },
+  // null once a ladder with a ceiling has been climbed to the top
+  next(F, L, i) { const t = this.target(L, i), mx = L.max && F ? L.max(F) : Infinity; if (t <= mx) return t; const prev = i > 0 ? this.target(L, i - 1) : 0; return prev < mx && mx > 0 ? mx : null; },
+  reward(L, i, t) { const t0 = this.target(L, 0); return niceCash(L.reward * Math.pow(Math.max(1, t / t0), 0.6) * (1 + 0.25 * i)); },
+  // goals that already counted under the old fixed list carry over without paying twice
+  init(F) {
+    if (F.ladder) return F.ladder;
+    F.ladder = {};
+    for (const L of LADDERS) { let r = 0; for (const [k, n] of Object.entries(L.old || {})) if (F.goals && F.goals[k]) r = Math.max(r, n); if (r) F.ladder[L.id] = r; }
+    return F.ladder;
+  },
+};
+// everything shown in the journal, in category order: each ladder shows its current rung
+function goalView(F) {
+  const out = [];
+  for (const cat of GOAL_CATS) {
+    for (const g of GOALS) if (g.cat === cat) out.push({ id: g.id, cat, icon: g.icon, name: g.name, reward: g.reward, done: !!(F && F.goals[g.id]), prog: F ? g.prog(F) : 0 });
+    for (const L of LADDERS) {
+      if (L.cat !== cat) continue;
+      const i = LADDER.rung(F, L), t = LADDER.next(F, L, i);
+      if (t === null) { const last = Math.min(LADDER.target(L, Math.max(0, i - 1)), L.max ? L.max(F) : Infinity); out.push({ id: L.id, cat, icon: L.icon, name: L.name(last), reward: 0, done: true, prog: 1, level: i, top: true }); continue; }
+      out.push({ id: L.id, cat, icon: L.icon, name: L.name(t), reward: LADDER.reward(L, i, t), done: false, prog: F ? L.of(F) / t : 0, level: i });
+    }
+  }
+  return out;
+}
 function checkGoals(F) {
   const done = [];
   for (const g of GOALS) if (!F.goals[g.id] && g.prog(F) >= 1) { F.goals[g.id] = { y: F.year, m: F.month }; F.money += g.reward; done.push(g); }
+  const R = LADDER.init(F);
+  for (const L of LADDERS) {
+    let v; try { v = L.of(F); } catch (e) { continue; }
+    for (let guard = 0; guard < 12; guard++) {
+      const i = R[L.id] || 0, t = LADDER.next(F, L, i);
+      if (t === null || v + 1e-9 < t) break;
+      const reward = LADDER.reward(L, i, t);
+      R[L.id] = i + 1; F.money += reward; done.push({ id: L.id, name: L.name(t), reward, icon: L.icon });
+    }
+  }
   return done;
 }
 // what's ready to pick today (for the morning toast and the markers over beds, hives and trees)
@@ -14824,7 +15206,7 @@ function buildRoom(type, F, obj) {
     for (let k = 0; k <= 4; k++) for (let i = 0; i < 8; i++) { const a0 = Math.PI * i / 8, a1 = Math.PI * (i + 1) / 8, z = z0 + k * D / 4; mb.box(Math.cos(a0) * 2.9, Math.sin(a0) * 3.0, z, 0.05, 0.05, 0.05, [200, 205, 210]); void a1; }
     lightW(0, 2.2, z0 + 0.02, 3.0, 1.2);
   }
-  return { mesh: mb, col, inter, bounds: [x0, x1, z0, z1], door, spawn: [0, z1 - 0.9], type, dyn: houseD ? (draws) => houseDyn(draws, houseD) : undefined, stalled: type === 'barn' ? BARN.layout(F, obj) : [], hens: type === 'coop' ? Math.min(4, F.animals.filter((a) => a.sp === 'chicken').length) : 0 };
+  return { mesh: mb, col, inter, bounds: [x0, x1, z0, z1], door, spawn: [0, z1 - 0.9], type, wallH, wallC, nightW, dyn: houseD ? (draws) => houseDyn(draws, houseD) : undefined, stalled: type === 'barn' ? BARN.layout(F, obj) : [], hens: type === 'coop' ? Math.min(4, F.animals.filter((a) => a.sp === 'chicken').length) : 0 };
 }
 // lighting for indoors: warm, flat, no sky
 function interiorFrame(F0, room) {
@@ -14844,7 +15226,7 @@ function interiorFrame(F0, room) {
 
 'use strict';
 // ============================================================================ profiles + saves (each profile has its own farm save)
-const FQ_VERSION = '1.2.1';
+const FQ_VERSION = '1.3.0';
 const LOOKS = [
   { shirt: [214, 74, 64], hair: [120, 76, 40] }, { shirt: [70, 130, 200], hair: [236, 206, 120] }, { shirt: [240, 170, 60], hair: [80, 50, 30] },
   { shirt: [120, 170, 90], hair: [40, 30, 28] }, { shirt: [170, 100, 190], hair: [200, 110, 60] }, { shirt: [60, 160, 160], hair: [150, 100, 60] },
@@ -15439,12 +15821,12 @@ const UI = {
       if (t === 'collect') { COLLECT.panel(b); return; }
       if (t === 'goals') {
         let cat = '', html = '';
-        for (const g of GOALS) {
+        for (const g of goalView(F)) {
           if (g.cat !== cat) { cat = g.cat; html += `<div class="grp">${cat}</div>`; }
-          const p = clamp(g.prog(F), 0, 1), done = !!F.goals[g.id];
-          html += `<div class="row${done ? '' : ''}"><span class="ic">${done ? '✅' : g.icon}</span><span class="tx">${esc(g.name)}<div class="gbar"><i style="width:${Math.round(p * 100)}%"></i></div></span><span class="amt">${done ? 'Done' : F.kid ? '' : '+' + money(g.reward)}</span></div>`;
+          const p = clamp(g.prog, 0, 1), done = g.done;
+          html += `<div class="row${done ? '' : ''}"><span class="ic">${done ? '✅' : g.icon}</span><span class="tx">${esc(g.name)}${g.level ? `<small style="opacity:.65"> · level ${g.level + (g.top ? 0 : 1)}${g.top ? ', all done' : ''}</small>` : ''}<div class="gbar"><i style="width:${Math.round(p * 100)}%"></i></div></span><span class="amt">${done ? 'Done' : F.kid ? '' : '+' + money(g.reward)}</span></div>`;
         }
-        b.innerHTML = `<p class="note">Goals follow the permaculture order of permanence: water first, then access and trees, buildings, fences, and soil.</p>${html}`;
+        b.innerHTML = `<p class="note">Goals follow the permaculture order of permanence: water first, then access and trees, buildings, fences, and soil. Finish one and the next level appears with a bigger target and a bigger reward.</p>${html}`;
       } else if (t === 'stats') {
         const T = F.terrain, om = T.avgOM(true), dOM = om - F.stats.startOM;
         let moist = 0, bio = 0, n = 0; for (let k = 0; k < TN * TN; k++) { const x = (k % TN) - THALF + 0.5, z = Math.floor(k / TN) - THALF + 0.5, p = plotOf(x, z); if (p >= 0 && F.owned[p]) { moist += T.moist[k]; bio += T.bio[k]; n++; } }
@@ -15518,7 +15900,7 @@ const UI = {
         const seeds = CROPS.filter((c) => !c.region || c.region.includes(R.key));
         const trees = TREES.slice().sort((a, b2) => treeFit(R, b2).score - treeFit(R, a).score);
         const hayPrice = Math.round(ITEMS.hay.buy * (R.t[F.month] < 2 ? 1.35 : 1) * (F.weather.event === 'drought' ? 1.5 : 1));
-        b.innerHTML = `<div class="grp">Feed, hay & supplies</div><div class="grid">${[['hay', hayPrice], ['feed_layer', ITEMS.feed_layer.buy], ['feed_pig', ITEMS.feed_pig.buy], ['mineral', ITEMS.mineral.buy], ['firewood', ITEMS.firewood.buy], ['compost', ITEMS.compost.buy]].map(([k, p]) => `<button class="card" data-buy="${k}" data-p="${p}"><span class="ic">${ITEMS[k].icon}</span><b>${ITEMS[k].name}</b><small>per ${ITEMS[k].unit.replace(/s$/, '')} · have ${fmt1(F.inv[k] || 0)}</small><span class="pr">${money(p)}</span></button>`).join('')}</div>
+        b.innerHTML = `<div class="grp">Feed, hay & supplies</div><div class="grid">${[['hay', hayPrice], ['sqbale', Math.max(6, Math.round(hayPrice / 8))], ['feed_layer', ITEMS.feed_layer.buy], ['feed_pig', ITEMS.feed_pig.buy], ['mineral', ITEMS.mineral.buy], ['firewood', ITEMS.firewood.buy], ['compost', ITEMS.compost.buy]].map(([k, p]) => `<button class="card" data-buy="${k}" data-p="${p}"><span class="ic">${ITEMS[k].icon}</span><b>${ITEMS[k].name}</b><small>per ${ITEMS[k].unit.replace(/s$/, '')} · have ${fmt1(F.inv[k] || 0)}</small><span class="pr">${money(p)}</span></button>`).join('')}</div>
           <div class="grp">Seeds (one packet plants a bed)</div><div class="grid">${seeds.map((c) => { const ok = cropFits(R, c, F.month); return `<button class="card${ok ? '' : ' bad'}" data-buy="seed_${c.key}" data-p="${ITEMS['seed_' + c.key].buy}"><span class="ic">${ITEMS[c.key] ? ITEMS[c.key].icon : '🌿'}</span><b>${c.name}</b><small>${ok ? 'Plant now' : 'Not this month'} · ${c.months} mo</small><span class="pr">${money(ITEMS['seed_' + c.key].buy)}</span></button>`; }).join('')}</div>
           <div class="grp">Trees & shrubs (zone ${zone}, ~${chillHours(R)} chill hours)</div><div class="grid"><label class="advrow" style="grid-column:1/-1;display:flex;gap:8px;align-items:center;font-weight:750;font-size:14px;padding:6px 4px"><input type="checkbox" id="advTrees" ${F.advTrees ? 'checked' : ''} style="width:20px;height:20px"> ⚙️ Advanced: choose each tree's rootstock<small style="font-weight:600;color:#7a6a4a;margin-left:auto">${F.advTrees ? 'tap a tree to pick its roots' : 'off: we match roots to your land'}</small></label>${trees.map((tr) => { const fit = treeFit(R, tr); return `<button class="card${fit.ok ? '' : ' bad'}" data-buy="sap_${tr.key}" data-p="${tr.price}"><span class="ic">${ITEMS['sap_' + tr.key].icon}</span><b>${esc(tr.name)}</b><small>${fit.ok ? (tr.kind === 'fodder' ? 'Fodder / tree hay' : tr.kind === 'support' ? (tr.nfix ? 'Fixes nitrogen' : 'Support plant') : `${tr.kind} · fruits ~${Math.max(1, Math.round(tr.bear / 12))} yr`) : fit.issues.join(', ')}</small><span class="pr">${money(tr.price)}</span></button>`; }).join('')}</div>
           <div class="grp">Grass seed for ${esc(R.name)} (sow it on bare or thin ground)</div><div class="grid">${grassMixes(R).map((M) => `<button class="card" data-buy="gs_${R.key}_${M.key}" data-p="${M.price}"><span class="ic">🌾</span><b>${esc(M.name)}</b><small>${M.native ? 'Native · ' : ''}${esc(M.note)}${F.inv['gs_' + R.key + '_' + M.key] > 0.05 ? ' · you have ' + Math.round(F.inv['gs_' + R.key + '_' + M.key] * 10) / 10 + ' bags' : ''}</small><span class="pr">${money(M.price)}</span></button>`).join('')}</div>`;
@@ -15568,11 +15950,13 @@ const UI = {
           <div class="grid">${Object.entries(FENCES).map(([k, f]) => `<button class="card" data-fb="${k}"><span class="ic">${FENCE_ICON[k]}</span><b>${f.name}</b><small>50 m roll · you have ${meters(fenceStock(F, k))} m</small><span class="pr">${money(f.perUnit * 10)}</span></button>`).join('')}<button class="card" data-fb="gate"><span class="ic">🚪</span><b>Paddock gate</b><small>you have ${F.inv.gate || 0}</small><span class="pr">${money(GATE_COST)}</span></button></div>
           ${spare ? `<div class="row"><span class="ic">💵</span><span class="tx">Sell all spare fencing back<small>${Object.keys(FENCES).filter((k) => fenceStock(F, k) > 0.05).map((k) => `${meters(fenceStock(F, k))} m ${FENCES[k].name.toLowerCase()}`).join(', ')}${F.inv.gate ? `, ${F.inv.gate} gates` : ''}</small></span><button class="btn" id="fbSell">${money(spare)}</button></div>` : ''}
           <div class="grp">Tools</div><div class="grid">${toolCards(false)}</div>
+          <div class="grp">Light for after dark</div><div class="grid">${LIGHTS.map((L, i) => { const have = lightTier(F) >= i, next = i === lightTier(F) + 1; return `<button class="card${!have && !next ? ' bad' : ''}" data-light="${i}"><span class="ic">${L.icon}</span><b>${L.name}</b><small>${have ? (i === lightTier(F) ? 'What you carry now' : 'Traded in') : esc(L.note)}</small><span class="pr">${have ? '✓' : F.kid ? '' : money(L.price)}</span></button>`; }).join('')}</div>
           <div class="grp">Animal care</div><div class="grid">${toolCards(true)}</div>
           <div class="grp">Horse tack</div><div class="grid">${Object.entries(TACK).map(([k, T]) => `<button class="card" data-tack="${k}"><span class="ic">${T.icon}</span><b>${T.name}</b><small>${F.tack === k && F.inv.saddle ? 'In your tack room' : esc(T.note)}</small><span class="pr">${F.tack === k && F.inv.saddle ? '✓' : F.unlocked ? 'Free' : money(T.price)}</span></button>`).join('')}</div>
           ${F.inv.saddle ? `<div class="chips" style="margin:6px 0">${Object.keys(BLANKETS).map((c) => `<button class="chip${(F.blanket || 'red') === c ? ' sel' : ''}" data-blk="${c}" style="border-left:14px solid rgb(${BLANKETS[c].join(',')})">${c[0].toUpperCase() + c.slice(1)} blanket</button>`).join('')}</div>` : ''}
           <div class="grp">Outfitter</div>${self.rows([{ id: 'shop', tap: true, icon: '👒', text: 'Hats, outfits, paint, pets & decorations', small: 'Spend Golden Acorns in the farm shop' }])}`;
         b.querySelectorAll('[data-tool]').forEach((c) => { c.onclick = () => { const k = c.dataset.tool, T = TOOL_SHOP[k]; if (ownsTool(F, k)) return; if (F.money < T.price) return UI.toast('Not enough money.', true); F.money -= T.price; F.stats.spent += T.price; F.tools = F.tools || {}; F.tools[k] = true; AUDIO.cash(); cash(); UI.toast(T.where ? `${T.name} bought ${T.icon}. ${T.where}` : `${T.name} bought ${T.icon}. It's in your tool list now.`); fill('merc', b); }; });
+        b.querySelectorAll('[data-light]').forEach((c) => { c.onclick = () => { const i = +c.dataset.light, L = LIGHTS[i]; if (lightTier(F) >= i) return; if (i > lightTier(F) + 1) return UI.toast(`Get the ${LIGHTS[lightTier(F) + 1].name.toLowerCase()} first.`, true); if (!F.kid && !F.unlocked && F.money < L.price) return UI.toast('Not enough money.', true); if (!F.kid && !F.unlocked) { F.money -= L.price; F.stats.spent += L.price; } F.light = i; AUDIO.cash(); cash(); UI.toast(`${L.icon} ${L.name}: yours. It comes out by itself after dark.`); fill('merc', b); }; });
         b.querySelectorAll('[data-tack]').forEach((c) => { c.onclick = () => { const k = c.dataset.tack, T = TACK[k]; if (F.tack === k && F.inv.saddle) return; if (!F.unlocked && F.money < T.price) return UI.toast('Not enough money.', true); if (!F.unlocked) { F.money -= T.price; F.stats.spent += T.price; } F.inv.saddle = 1; F.tack = k; AUDIO.cash(); cash(); UI.toast(`${T.name}: walk up to a grown horse and saddle up 🐎`); fill('merc', b); }; });
         b.querySelectorAll('[data-blk]').forEach((c) => { c.onclick = () => { F.blanket = c.dataset.blk; fill('merc', b); }; });
         b.querySelectorAll('[data-fb]').forEach((c) => { c.onclick = () => { const k = c.dataset.fb; if (k === 'gate') { if (buy('gate', 1, GATE_COST)) UI.toast('Bought a gate 🚪'); } else if (F.money >= FENCES[k].perUnit * 10) { F.money -= FENCES[k].perUnit * 10; F.stats.spent += FENCES[k].perUnit * 10; F.inv['fence_' + k] = (F.inv['fence_' + k] || 0) + 10; AUDIO.ding(); cash(); UI.toast(`+50 m of ${FENCES[k].name.toLowerCase()}`); } else UI.toast('Not enough money.', true); fill('merc', b); }; });
@@ -15688,18 +16072,51 @@ const UI = {
     };
   },
   // move / take down a building or garden bed
+  // ---------------- a garden bed's soil: compost, mulch, and what they're doing for the harvest
+  bedCare(o) {
+    const F = G.F, cr = o.crop && CROPS.find((c) => c.key === o.crop), om = BEDSOIL.om(F, o), mult = BEDSOIL.yieldMult(F, o, om);
+    const fertWord = (o.fert || 0) >= 1.2 ? 'Rich' : (o.fert || 0) >= 0.5 ? 'Good' : (o.fert || 0) > 0.05 ? 'A little' : 'None added';
+    const P = this.open({ title: cr ? cr.name : 'Garden bed', sub: BED_KINDS[bedOf(o)].name, icon: '🪴' });
+    const rows = [];
+    if (cr) rows.push({ icon: '🌿', text: `${Math.round(clamp(o.days / (cr.months * 30), 0, 1) * 100)}% grown`, small: o.ready ? 'Ready to pick' : `About ${Math.max(0, Math.ceil(cr.months * 30 - o.days))} more days` });
+    rows.push({ icon: '🪱', text: `Soil organic matter ${om.toFixed(1)}%`, small: 'Compost, mulch and cover crops raise it, season after season' });
+    rows.push({ icon: '🟤', text: `Compost: ${fertWord}`, small: 'Each crop uses some of it up' });
+    rows.push({ icon: '🍂', text: o.mulch ? (o.mulchD !== undefined ? `Mulched: about ${Math.ceil(o.mulchD / 30)} months left` : 'Mulched (no-till)') : 'No mulch', small: o.mulch ? 'Holding water in and feeding the soil as it breaks down' : 'Bare soil dries out and loses organic matter' });
+    rows.push({ icon: '🧺', text: `Expected harvest: ${Math.round(mult * 100)}% of normal`, small: 'Better soil, bigger harvests' });
+    const acts = [];
+    acts.push({ id: 'compost', tap: (F.inv.compost || 0) >= 1, icon: '🟤', text: 'Spread a load of compost', small: (F.inv.compost || 0) >= 1 ? `You have ${fmt1(F.inv.compost)} loads · harvest goes up about ${Math.round(Math.min(0.6, 2 - (o.fert || 0)) * 18)}%` : 'No compost. Buy it at the feed store or muck out the barn stalls.', cls: (F.inv.compost || 0) >= 1 ? '' : 'dim' });
+    if (!o.mulch || o.mulchD !== undefined) acts.push({ id: 'mulch', tap: BEDSOIL.canMulch(F), icon: '🍂', text: o.mulch ? 'Top up the mulch' : 'Mulch it with straw', small: BEDSOIL.canMulch(F) ? `Uses ${(F.inv.sqbale || 0) >= 1 ? 'a square bale' : 'a tenth of a round bale'} · holds water, +8% harvest, builds soil` : 'You need hay. Square bales are at the feed store.', cls: BEDSOIL.canMulch(F) ? '' : 'dim' });
+    if (!o.crop) acts.push({ id: 'seeds', tap: true, icon: '🌱', text: 'Plant something', small: 'Switch to your seeds' });
+    P.body.innerHTML = this.rows(rows) + '<div class="grp">Work the bed</div>' + this.rows(acts);
+    P.body.querySelectorAll('.row.tap').forEach((r) => {
+      r.onclick = () => {
+        const id = r.dataset.id; this.closeAll();
+        if (id === 'seeds') return setTool('seeds');
+        if (id === 'compost') act('plant', 1.6, 20, 4, () => { BEDSOIL.compost(F, o); G.view.dirtyAt(o.x, o.z); UI.toast(`🟤 Compost spread. This bed should now give about ${Math.round(BEDSOIL.yieldMult(F, o) * 100)}% of a normal harvest.`); });
+        if (id === 'mulch') act('plant', 1.6, 20, 3, () => { BEDSOIL.mulch(F, o); G.view.dirtyAt(o.x, o.z); UI.toast('🍂 Mulched. It will hold the water in and feed the soil for about four months.'); });
+      };
+    });
+  },
   objMenu(o) {
     const F = G.F, dc = COSMETICS.decor.find((c) => c.key === o.t), B = BUILD_LIST.find((b) => b.key === o.t) || (dc ? { key: dc.key, name: dc.name, price: dc.cash, hw: dc.hw, hd: dc.hd } : null), def = o.t === 'bed' ? { key: 'bed', hw: 1.5, hd: 0.5 } : B, name = objName(o);
     const hens = F.animals.filter((a) => a.home === o.id).length;
     const P = this.open({ title: name[0].toUpperCase() + name.slice(1), icon: o.t === 'bed' ? '🪴' : '🏗️' });
     const refund = o.t === 'bed' ? 20 : Math.round((B ? B.price : 0) * 0.35);
-    const canPaint = !!BPAINT[o.t], canRemodel = !!BSTYLES[o.t];
-    P.body.innerHTML = this.rows([].concat(canPaint ? [{ id: 'paint', tap: true, icon: '🎨', text: 'Paint it', small: 'Pick colours for the walls, roof and trim' }] : [], canRemodel ? [{ id: 'remodel', tap: true, icon: '🏗️', text: 'Remodel', small: 'A different style, or a bigger (or smaller) building' }] : [], [
+    const canPaint = !!BPAINT[o.t], canRemodel = !!BSTYLES[o.t], upNext = o.t === 'coop' ? COOP_UPG[o.upg || 0] : null;
+    P.body.innerHTML = this.rows([].concat(o.t === 'coop' ? [upNext ? { id: 'upg', tap: true, icon: '⬆️', text: `Upgrade: ${upNext.name}`, small: `${upNext.small}. Room for ${upNext.cap} hens (now ${coopCap(o)})${F.kid || F.unlocked ? '' : ' · ' + money(upNext.cost)}` } : { icon: '🏆', text: 'Fully upgraded', small: `Room for ${coopCap(o)} hens` }] : [], canPaint ? [{ id: 'paint', tap: true, icon: '🎨', text: 'Paint it', small: 'Pick colours for the walls, roof and trim' }] : [], canRemodel ? [{ id: 'remodel', tap: true, icon: '🏗️', text: 'Remodel', small: 'A different style, or a bigger (or smaller) building' }] : [], [
       { id: 'move', tap: true, icon: '↔️', text: 'Move it', small: o.t === 'bed' ? 'Pick it up, walk to a new spot, put it down. Plants and all.' : 'See it in its new spot before you commit. Turn it with ⟳.' },
       { id: 'down', tap: true, icon: o.t === 'bed' ? '🪵' : '🔨', text: o.t === 'bed' ? 'Remove the bed' : 'Take it down', small: hens ? `Move the ${hens} hens to another coop first` : `${F.kid ? 'Get some lumber back' : `Salvage about ${money(refund)} of materials`}`, cls: hens ? 'dim' : '' },
     ]));
     P.body.querySelectorAll('.row').forEach((r) => {
       r.onclick = () => {
+        if (!r.dataset.id) return;
+        if (r.dataset.id === 'upg' && upNext) {
+          if (!F.kid && !F.unlocked && F.money < upNext.cost) return UI.toast(`You need ${money(upNext.cost)} for that.`, true);
+          return this.confirm(`${upNext.name}?`, `${upNext.small}. The coop will hold ${upNext.cap} hens.${F.kid || F.unlocked ? '' : ` Costs ${money(upNext.cost)}.`}`, () => {
+            this.closeAll();
+            act('hammer', 2.4, upNext.mins, Math.round(upNext.mins / 30), () => { if (!F.kid && !F.unlocked) { F.money -= upNext.cost; F.stats.spent = (F.stats.spent || 0) + upNext.cost; } o.upg = (o.upg || 0) + 1; G.view.dirtyAt(o.x, o.z, 4); G.view.rebuildColliders(); AUDIO.fanfare(); UI.toast(`🐔 Coop upgraded: room for ${coopCap(o)} hens now.`); });
+          }, { yes: 'Build it', icon: '🐔' });
+        }
         if (r.dataset.id === 'paint') return UI.paintMenu(o);
         if (r.dataset.id === 'remodel') return UI.remodelMenu(o);
         if (r.dataset.id === 'move') startPlace({ kind: 'move', obj: o, def, rot: o.r || 0 });
@@ -15801,9 +16218,9 @@ const UI = {
       '<p class="note">Rotational grazing: let animals graze a paddock down, then move them on and give it 30+ days of rest so the grass regrows deep roots.</p>';
     P.body.querySelectorAll('.row.tap').forEach((r) => { r.onclick = () => { const g = groups.find((q) => q.key === r.dataset.id); this.closeAll(); moveAnimals(g.list.filter((a) => a.sp !== 'chicken' && a.sp !== 'duck'), p); }; });
     const [px0, px1, pz0, pz1] = padRect(p), troughIn = F.objs.some((o) => o.t === 'trough' && inPad(p, o.x, o.z)), troughs = F.objs.filter((o) => o.t === 'trough');
-    P.foot.innerHTML = `<button class="btn bad" id="pdRemove">Take down</button><button class="btn" id="pdMap">🗺️ Resize / move gate</button>${!troughIn && troughs.length ? '<button class="btn" id="pdTrough">💧 Bring a trough here</button>' : ''}${here.length ? '<button class="btn" id="pdOut">Move all out…</button>' : ''}`;
+    P.foot.innerHTML = `${p.virtual ? '' : '<button class="btn bad" id="pdRemove">Take down</button><button class="btn" id="pdMap">🗺️ Resize / move gate</button>'}${!troughIn && troughs.length ? '<button class="btn" id="pdTrough">💧 Bring a trough here</button>' : ''}${here.length ? '<button class="btn" id="pdOut">Move all out…</button>' : ''}`;
     if ($('pdTrough')) $('pdTrough').onclick = () => {
-      const g = gateOf(p), gx = g.cx, gz = g.cz, [cx, cz] = padCentroid(p);
+      const [cx, cz] = padCentroid(p), g = gateOf(p) || { cx, cz }, gx = g.cx, gz = g.cz;
       // the nearest trough that isn't watering another herd
       const busy = (t) => F.paddocks.some((q) => inPad(q, t.x, t.z) && F.animals.some((a) => a.pad === q.id));
       const tr = troughs.slice().sort((a, b) => (busy(a) - busy(b)) || (Math.hypot(a.x - cx, a.z - cz) - Math.hypot(b.x - cx, b.z - cz)))[0];
@@ -15811,8 +16228,9 @@ const UI = {
       if (!spot) return UI.toast('No clear spot in there. Drag a trough on the map instead.', true);
       this.closeAll(); act('hammer', 1.4, 20, 2, () => relocateObj(tr, spot[0], spot[1], 0, `Water trough moved into ${p.name} 💧`));
     };
-    $('pdMap').onclick = () => MAP.open({ edit: p.id });
-    $('pdRemove').onclick = () => { const b = fenceBill(F, p, null); this.confirm(`Take down ${p.name}?`, `The ${meters(b.returned)} m of ${FENCES[p.kind].name.toLowerCase()} and the gate go back into your stock, so you can put them up again for free.${here.length ? ' Animals inside go to the barnyard.' : ''}`, () => applyFence(F, p, null), { yes: 'Take it down', icon: ICO.fence }); };
+    if (p.virtual) P.body.insertAdjacentHTML('beforeend', '<p class="note">This paddock is the ground closed in by the fences around it. Change those fences on the map and it changes with them.</p>');
+    if ($('pdMap')) $('pdMap').onclick = () => MAP.open({ edit: p.id });
+    if ($('pdRemove')) $('pdRemove').onclick = () => { const b = fenceBill(F, p, null); this.confirm(`Take down ${p.name}?`, `The ${meters(b.returned)} m of ${FENCES[p.kind].name.toLowerCase()} and the gate go back into your stock, so you can put them up again for free.${here.length ? ' Animals inside go to the barnyard.' : ''}`, () => applyFence(F, p, null), { yes: 'Take it down', icon: ICO.fence }); };
     if (here.length) $('pdOut').onclick = () => this.moveMenu(here);
   },
   eggmobile(o) {
@@ -15917,6 +16335,13 @@ const UI = {
     $('mLow').onchange = (e) => { G.lowDetail = e.target.checked; store.set('pq_low', G.lowDetail); resize(); G.view.dirtyAll(); };
     $('mSound').onchange = (e) => { AUDIO.on = e.target.checked; store.set('pq_sound', AUDIO.on); };
     $('mMusic').onchange = (e) => { AUDIO.unlock(); MUSIC.setOn(e.target.checked); };
+    // unlocked (testing) farms: set today's weather by hand
+    if (F.unlocked) {
+      const WX = [['sun', '☀️ Sunny'], ['cloud', '☁️ Cloudy'], ['fogL', '🌫️ Light fog'], ['fogT', '🌫️ Thick fog'], ['rain', '🌧️ Rain'], ['storm', '⛈️ Storm'], ['snow', '❄️ Snow']];
+      const w = todayW(F), cur = w.kind === 'fog' ? 'fogT' : (w.fog || 0) > 0.2 && (w.kind === 'sun' || w.kind === 'cloud') ? 'fogL' : w.kind;
+      P.body.insertAdjacentHTML('afterbegin', `<div class="grp">Weather today (testing)</div><div id="mWx" style="display:flex;flex-wrap:wrap;gap:6px;margin:0 4px 10px">${WX.map(([k, n]) => `<button class="btn${k === cur ? ' go' : ''}" data-w="${k}" style="flex:1 1 30%;min-width:96px;padding:8px 6px">${n}</button>`).join('')}</div>`);
+      $('mWx').querySelectorAll('[data-w]').forEach((b) => { b.onclick = () => { setWeatherNow(F, b.dataset.w); this.menu(); }; });
+    }
     P.body.querySelectorAll('.row').forEach((r) => {
       r.onclick = () => {
         const id = r.dataset.id;
@@ -15973,7 +16398,17 @@ const UI = {
   },
 };
 // coops: capacity, how full, and a friendly name when you have several
-function coopCap(o) { return o.t === 'eggmobile' ? 30 : Math.round(12 * (o.sc || 1) * (o.sc || 1) * (o.hstyle === 'palace' ? 1.25 : 1)); }
+function coopCap(o) {
+  if (o.t === 'eggmobile') return 30;
+  const base = Math.round(12 * (o.sc || 1) * (o.sc || 1) * (o.hstyle === 'palace' ? 1.25 : 1));
+  return o.upg ? Math.max(base, COOP_UPG[Math.min(o.upg, COOP_UPG.length) - 1].cap) : base;
+}
+// coop upgrades, in order: each one takes the coop to a bigger flock, up to 50 hens
+const COOP_UPG = [
+  { name: 'More roosts and nest boxes', small: 'An outside bank of nest boxes and longer roost bars', cost: 400, cap: 20, mins: 120 },
+  { name: 'A covered run', small: 'A wire run out the back so the flock can stretch its legs', cost: 1200, cap: 32, mins: 240 },
+  { name: 'A big hen house extension', small: 'A second room with its own roof, roosts and pop door', cost: 2800, cap: 50, mins: 480 },
+];
 function coopLoad(F, o) { return F.animals.filter((a) => a.home === o.id && a.sp === 'chicken').length; }
 function coopName(F, id) {
   const o = F.objs.find((q) => q.id === id); if (!o) return 'the coop';
@@ -16130,6 +16565,7 @@ function applyFence(F, from, to, opt) {
     msg = `${from.name} taken down. ${meters(b.returned)} m of fencing and ${nGates(from)} gate${nGates(from) > 1 ? 's' : ''} are stacked in the barn for next time.${out.length ? ` ${out.length} animals went to the barnyard.` : ''}`;
   }
   if (b.work) spendTime(b.work, b.energy);
+  try { const made = ENCLOSE.update(F); if (made.length) msg += ` That closes off ${made.length === 1 ? 'a new paddock' : made.length + ' new paddocks'}: ${made.join(', ')}.`; } catch (e) { console.warn('enclose', e); }
   if (G.view) { G.view.dirtyAll(); G.view.rebuildColliders(); G.view.syncActors(true); }
   F.chores = makeGameChores(F); UI.choresBadge();
   AUDIO.actionSound('hammer');
@@ -16138,6 +16574,94 @@ function applyFence(F, from, to, opt) {
   return true;
 }
 function nGates(p) { return (p.gates || []).length; }
+// ---------------------------------------------------------------- enclosures
+// Any ground that fences shut off from the rest of the farm becomes a paddock by itself: an open fence line that runs between
+// the boundary fence and another paddock, two lines that cross the farm, a line that closes a gap. The fences are laid on a
+// fine grid, the open ground is split into pieces, and every piece but the one the house stands in (and anything already
+// inside a paddock) is a paddock, its outline traced back off the grid. These paddocks follow their fences: change the
+// fences and they're re-traced, or go when they're no longer closed in.
+const ENCLOSE = {
+  S: 0.25,
+  grid(F) {
+    const S = this.S, half = FARM_HALF + 1, N = Math.ceil(half * 2 / S), wall = new Uint8Array(N * N);
+    for (let j = 0; j < N; j++) for (let i = 0; i < N; i++) { const x = -half + (i + 0.5) * S, z = -half + (j + 0.5) * S; if (!ownedAt(F, x, z)) wall[j * N + i] = 1; }
+    const R = 0.3, rc = Math.ceil(R / S);
+    const mark = (x, z) => { const ci = Math.floor((x + half) / S), cj = Math.floor((z + half) / S); for (let dj = -rc; dj <= rc; dj++) for (let di = -rc; di <= rc; di++) { const i = ci + di, j = cj + dj; if (i < 0 || j < 0 || i >= N || j >= N) continue; const cx = -half + (i + 0.5) * S, cz = -half + (j + 0.5) * S; if (Math.hypot(cx - x, cz - z) <= R + S * 0.5) wall[j * N + i] = 1; } };
+    for (const q of allFences(F)) for (const sd of paddockSides(q)) { const L = edgeLen(sd), n = Math.max(1, Math.ceil(L / (S * 0.5))); for (let k = 0; k <= n; k++) mark(lerp(sd.a[0], sd.b[0], k / n), lerp(sd.a[1], sd.b[1], k / n)); }
+    return { N, half, wall };
+  },
+  // the pieces of open ground: a label per cell, and each piece's cells
+  pieces(F) {
+    const g = this.grid(F), { N, wall } = g, lab = new Int32Array(N * N).fill(-1), comps = [], stack = [];
+    for (let s0 = 0; s0 < N * N; s0++) {
+      if (wall[s0] || lab[s0] >= 0) continue;
+      const id = comps.length, cells = []; lab[s0] = id; stack.push(s0);
+      while (stack.length) { const c = stack.pop(); cells.push(c); const i = c % N, j = (c - i) / N; for (const [di, dj] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) { const a = i + di, b = j + dj; if (a < 0 || b < 0 || a >= N || b >= N) continue; const k = b * N + a; if (!wall[k] && lab[k] < 0) { lab[k] = id; stack.push(k); } } }
+      comps.push(cells);
+    }
+    return Object.assign(g, { lab, comps });
+  },
+  // the outer edge of a piece as a polygon in world units (cell edges walked into loops, the longest kept, then simplified)
+  outline(g, cells, id) {
+    const { N, half, lab } = g, S = this.S, next = new Map(), key = (i, j) => j * (N + 1) + i;
+    const inC = (i, j) => i >= 0 && j >= 0 && i < N && j < N && lab[j * N + i] === id;
+    const edge = (a, b) => { const k = key(a[0], a[1]); if (!next.has(k)) next.set(k, []); next.get(k).push(b); };
+    for (const c of cells) {
+      const i = c % N, j = (c - i) / N;
+      if (!inC(i, j - 1)) edge([i, j], [i + 1, j]);
+      if (!inC(i + 1, j)) edge([i + 1, j], [i + 1, j + 1]);
+      if (!inC(i, j + 1)) edge([i + 1, j + 1], [i, j + 1]);
+      if (!inC(i - 1, j)) edge([i, j + 1], [i, j]);
+    }
+    let best = null, bestA = 0;
+    for (const k0 of [...next.keys()]) {
+      while (next.has(k0) && next.get(k0).length) {
+        const loop = []; let k = k0, guard = 0;
+        while (guard++ < 200000) { const L = next.get(k); if (!L || !L.length) break; const v = L.pop(); if (!L.length) next.delete(k); loop.push(v); k = key(v[0], v[1]); if (k === k0) break; }
+        let A = 0; for (let t = 0; t < loop.length; t++) { const a = loop[t], b = loop[(t + 1) % loop.length]; A += a[0] * b[1] - b[0] * a[1]; }
+        if (Math.abs(A) > bestA) { bestA = Math.abs(A); best = loop; }
+      }
+    }
+    if (!best) return null;
+    const pts = best.map((v) => [-half + v[0] * S, -half + v[1] * S]);
+    return this.simplify(pts, 0.4).map((q) => [Math.round(q[0] * 4) / 4, Math.round(q[1] * 4) / 4]);
+  },
+  simplify(ring, tol) {
+    // Douglas-Peucker on a closed ring, split at the two points furthest apart
+    let a = 0, b = 0, dm = -1; for (let i = 0; i < ring.length; i += Math.max(1, Math.floor(ring.length / 60))) for (let j = 0; j < ring.length; j++) { const d = Math.hypot(ring[i][0] - ring[j][0], ring[i][1] - ring[j][1]); if (d > dm) { dm = d; a = i; b = j; } }
+    if (a > b) [a, b] = [b, a];
+    const dp = (P) => { if (P.length < 3) return P; const A = P[0], B = P[P.length - 1]; let im = 0, md = 0; for (let i = 1; i < P.length - 1; i++) { const d = distSeg(P[i][0], P[i][1], A, B); if (d > md) { md = d; im = i; } } if (md <= tol) return [A, B]; const L = dp(P.slice(0, im + 1)), R = dp(P.slice(im)); return L.slice(0, -1).concat(R); };
+    const h1 = dp(ring.slice(a, b + 1)), h2 = dp(ring.slice(b).concat(ring.slice(0, a + 1)));
+    return h1.slice(0, -1).concat(h2.slice(0, -1));
+  },
+  // bring the paddocks into line with the fences. Returns the names of new paddocks.
+  update(F) {
+    const g = this.pieces(F), { N, half, lab, comps } = g, S = this.S;
+    const cellAt = (x, z) => { const i = Math.floor((x + half) / S), j = Math.floor((z + half) / S); return i < 0 || j < 0 || i >= N || j >= N ? -1 : lab[j * N + i]; };
+    // the open farm: the piece the house is in (or the biggest)
+    const h = F.objs.find((o) => o.t === 'house'), dw = h ? doorWorld(h) : null;
+    let main = dw ? cellAt(dw[0], dw[1] + 0.6) : -1;
+    if (main < 0) { let n = 0; comps.forEach((c, i) => { if (c.length > n) { n = c.length; main = i; } }); }
+    const real = F.paddocks.filter((p) => !p.virtual), virt = F.paddocks.filter((p) => p.virtual), made = [], used = new Set();
+    for (let id = 0; id < comps.length; id++) {
+      const cells = comps[id];
+      if (id === main || cells.length * S * S < 6) continue;
+      const c = cells[Math.floor(cells.length / 2)], ci = c % N, cj = (c - ci) / N, cx = -half + (ci + 0.5) * S, cz = -half + (cj + 0.5) * S;
+      if (real.some((p) => inPad(p, cx, cz))) continue;
+      const pts = this.outline(g, cells, id); if (!pts || pts.length < 3) continue;
+      // an existing paddock of this kind that sits in this piece keeps its name, herd and rest days
+      const old = virt.find((p) => { if (used.has(p)) return false; const [px, pz] = padCentroid(p); return cellAt(px, pz) === id || inPoly(pts, px, pz); });
+      if (old) { used.add(old); old.pts = pts; padSync(old); continue; }
+      const p = padSync({ id: F.nextId++, name: `Paddock ${F.paddocks.length + 1}`, rest: 30, pts, gates: [], kind: 'poly', virtual: true });
+      if (padArea(p) < 6) continue;
+      F.paddocks.push(p); made.push(p.name);
+    }
+    // closed-in ground that's been opened up again stops being a paddock; its animals go back to the yard
+    for (const p of virt) if (!used.has(p)) { F.paddocks = F.paddocks.filter((q) => q !== p); for (const a of F.animals) if (a.pad === p.id) a.pad = null; }
+    return made;
+  },
+};
+
 // sell spare fencing back at the Mercantile
 function fenceSellValue(F) { let v = 0; for (const k of Object.keys(FENCES)) v += fenceStock(F, k) * FENCES[k].perUnit * 0.5; v += (F.inv.gate || 0) * GATE_COST * 0.5; return Math.round(v); }
 
@@ -16514,7 +17038,12 @@ const MAP = {
       this.drag = null; return;
     }
     const w = this.toW(e.clientX, e.clientY);
-    if (this.mode === 'draw') { this.drag = { t: 'drawtap', id: e.pointerId, p0: [e.clientX, e.clientY], w0: this.snapPt(w), c0: [this.cx, this.cz], moved: false }; return; }
+    if (this.mode === 'draw') {
+      // press on a post you've already placed and drag it to move it
+      const P = this.drawPts || []; let vi = -1, vd = 24;
+      P.forEach((q, i) => { const [sx, sy] = this.toS(q[0], q[1]), d = Math.hypot(sx - e.clientX, sy - e.clientY); if (d < vd) { vd = d; vi = i; } });
+      this.drag = { t: vi >= 0 ? 'drawv' : 'drawtap', i: vi, id: e.pointerId, p0: [e.clientX, e.clientY], w0: this.snapPt(w), c0: [this.cx, this.cz], moved: false }; return;
+    }
     if (this.mode === 'obj' && this.objDraft) {
       const [sx, sy] = this.toS(this.objDraft.x, this.objDraft.z), sd = OBJ_SOLID[this.objSel.t] || { hw: 1.5, hd: 0.5 };
       if (Math.hypot(sx - e.clientX, sy - e.clientY) < Math.max(26, (sd.hw || sd.r || 1.5) * this.s * 1.1) || Math.hypot(sx - e.clientX, sy + this.objHandleDy() - e.clientY) < 26) { this.drag = { t: 'obj', id: e.pointerId, off: [w[0] - this.objDraft.x, w[1] - this.objDraft.z] }; return; }
@@ -16545,6 +17074,7 @@ const MAP = {
     const D = this.drag; if (!D || D.id !== e.pointerId) return;
     if (D.p0 && Math.hypot(e.clientX - D.p0[0], e.clientY - D.p0[1]) > 7) D.moved = true;
     if (D.t === 'pan') { this.cx = D.c0[0] - (e.clientX - D.p0[0]) / this.s; this.cz = D.c0[1] - (e.clientY - D.p0[1]) / this.s; this.dirty = true; return; }
+    if (D.t === 'drawv') { if (!D.moved) return; this.drawPts[D.i] = this.snapPt(w); this.hover = null; this.dirty = true; return; }
     if (D.t === 'drawtap') {
       // dragging before any points are placed draws a quick rectangle; with points placed it pans
       if (!D.moved) return;
@@ -16568,6 +17098,7 @@ const MAP = {
     if (this.pinch) { if (this.pts.size < 2) this.pinch = null; return; }
     const D = this.drag; if (!D || D.id !== e.pointerId) return;
     this.drag = null;
+    if (D.t === 'drawv') { if (D.moved) { this.bar(); this.dirty = true; return; } D.t = 'drawtap'; }
     if (D.t === 'drawtap' && !D.moved) {
       // tap: add a corner, or close the shape by tapping the first one
       const P = this.drawPts = this.drawPts || [];
@@ -16620,6 +17151,7 @@ const MAP = {
       this.tip = { x: best.animal ? best.animal.x : best.x, z: best.animal ? best.animal.z : best.z, text, sub, until: performance.now() + 2500 };
       if (!p || best.animal) { this.dirty = true; return; }
     }
+    if (p && p.virtual) { UI.paddockCard(p); return; }
     if (p) this.select(p.id);
   },
   // ---------------- editing state
@@ -16821,7 +17353,7 @@ const MAP = {
       this.validateObj();
     } else if (this.mode === 'draw') {
       const P = this.drawPts || [], per = P.reduce((t, q, i) => (i ? t + Math.hypot(q[0] - P[i - 1][0], q[1] - P[i - 1][1]) : 0), 0);
-      B.innerHTML = `<div class="mrow"><span class="mhint">${P.length ? `<b>${P.length} corner${P.length > 1 ? 's' : ''} · ${meters(per)} m</b> so far. Tap the next post${P.length >= 3 ? ', tap the first (gold) one to close it' : ''}${P.length >= 2 ? ', or end the fence here. It doesn\'t have to close' : ''}.` : '<b>Tap the corners</b> of your fence one at a time, any shape. It doesn\'t have to close. Near the property line it snaps onto the boundary fence. Or drag for a quick rectangle.'}</span>${P.length ? '<button class="btn" id="mapUndo">↶ Undo</button>' : ''}${P.length >= 2 ? '<button class="btn" id="mapOpenLine">✓ End fence here</button>' : ''}${P.length >= 3 ? '<button class="btn go" id="mapClose2">✓ Close shape</button>' : ''}<button class="btn" id="mapCancel">Cancel</button></div><div class="mrow kinds">${this.kindChips(this.drawKind)}</div>`;
+      B.innerHTML = `<div class="mrow"><span class="mhint">${P.length ? `<b>${P.length} corner${P.length > 1 ? 's' : ''} · ${meters(per)} m</b> so far. Tap the next post${P.length >= 3 ? ', tap the first (gold) one to close it' : ''}${P.length >= 2 ? ', or end the fence here. It doesn\'t have to close' : ''}. Press and drag any post to move it.` : '<b>Tap the corners</b> of your fence one at a time, any shape. It doesn\'t have to close. Near the property line it snaps onto the boundary fence. Or drag for a quick rectangle.'}</span>${P.length ? '<button class="btn" id="mapUndo">↶ Undo</button>' : ''}${P.length >= 2 ? '<button class="btn" id="mapOpenLine">✓ End fence here</button>' : ''}${P.length >= 3 ? '<button class="btn go" id="mapClose2">✓ Close shape</button>' : ''}<button class="btn" id="mapCancel">Cancel</button></div><div class="mrow kinds">${this.kindChips(this.drawKind)}</div>`;
       if ($('mapOpenLine')) $('mapOpenLine').onclick = () => this.finishDraw(true);
       $('mapCancel').onclick = () => this.cancelEdit();
       if ($('mapUndo')) $('mapUndo').onclick = () => { P.pop(); this.bar(); this.dirty = true; };
@@ -17369,7 +17901,7 @@ function townParts(R, key) {
 // every business in Hollow Creek is shut on Sundays (the 7th, 14th, 21st and 28th) and at night
 const isSunday = (F) => F.day % 7 === 0;
 // the gas lamps stand only on the park side of the street, spaced so none is in front of the fountain or a bench
-const TOWN_LAMPS = []; for (const x of [-20, -11, -1, 13, 21, 31]) TOWN_LAMPS.push([x, 2.98, 3.25]);
+const TOWN_LAMPS = []; for (const x of [-20, -11, -1, 13, 21, 31]) TOWN_LAMPS.push([x, 2.98, 4.95]);
 function shopOpen(F) { return !isSunday(F) && F.hour >= 6 && F.hour < 20; }
 const closedText = (F, what) => (isSunday(F) ? `Closed on Sundays. ${what || 'Everything in Hollow Creek'} opens again Monday at 6 AM.` : `Closed for the night. Opens at 6 AM.`);
 
@@ -17402,23 +17934,20 @@ function townPlaquesDraw(draws) {
 function buildTownRoom(F) {
   const mb = new MB(), col = new Collision(), inter = [], R = rng(4242), Rg = regionByKey(F.region), P = Rg.palette, season = seasonOf(F.month);
   const grass = mixc(P.grass, P.dry, Rg.key === 'sonoran' ? 0.7 : 0.25);
-  // ground: grass, street, sidewalks, crosswalks
+  // ground: grass, the cobbled street, the boardwalk
   // the ground runs out past the fog in every direction, so there's never an edge to see past (or under)
   mb.mat = MAT.ground; mb.box(4, -0.3, 2, 90, 0.3, 60, grass); mb.box(4, -0.34, 2, 700, 0.3, 700, shade(grass, 0.94)); mb.mat = 0;
-  // an old cobbled main street: rounded setts in staggered rows, each a slightly different stone, with a gutter of larger stones each side
-  mb.mat = MAT.stone; mb.box(4, -0.28, 1.5, 80, 0.3, 3.2, [92, 88, 84]); mb.mat = 0;
+  // an old cobbled main street, cobble and nothing else from the boardwalk right across to the park grass: rounded setts in
+  // staggered rows, each a slightly different stone (no gutters, paving or crossings)
+  mb.mat = MAT.stone; mb.box(4, -0.28, 2.3, 80, 0.3, 4.75, [92, 88, 84]); mb.mat = 0;
   { const Rc = rng(9191), cols = [[132, 126, 118], [118, 112, 106], [146, 138, 126], [108, 104, 100], [138, 128, 112], [124, 120, 116]];
-    for (let row = 0; row < 12; row++) { const z = 0.05 + row * 0.25 + 0.12, off = (row % 2) * 0.17;
-      for (let x = -26 + off; x < 35.8; x += 0.34) { const w = 0.3 + Rc() * 0.03, d = 0.21 + Rc() * 0.02, c = cols[Math.floor(Rc() * cols.length)];
-        mb.ell(x + (Rc() - 0.5) * 0.02, 0.0, z + (Rc() - 0.5) * 0.02, w / 2, 0.035 + Rc() * 0.012, d / 2, shade(c, 0.92 + Rc() * 0.16), { lat: 2, lon: 6 }); } }
-    for (const gz of [-0.02, 3.02]) for (let x = -26; x < 35.8; x += 0.5) mb.box(x + 0.25, -0.02, gz, 0.46, 0.06, 0.16, shade([150, 144, 134], 0.9 + Rc() * 0.15)); }
+    for (let row = 0; row < 19; row++) { const z = -0.05 + row * 0.25 + 0.12, off = (row % 2) * 0.17;
+      for (let x = -36 + off; x < 43.8; x += 0.34) { const w = 0.3 + Rc() * 0.03, d = 0.21 + Rc() * 0.02, c = cols[Math.floor(Rc() * cols.length)];
+        mb.ell(x + (Rc() - 0.5) * 0.02, 0.0, z + (Rc() - 0.5) * 0.02, w / 2, 0.035 + Rc() * 0.012, d / 2, shade(c, 0.92 + Rc() * 0.16), { lat: 2, lon: 6 }); } } }
   // a covered-wagon-era wooden boardwalk along the shop fronts, planks running across it, and a timber edge
   mb.mat = MAT.boards; mb.box(4, -0.02, -1.3, 80, 0.14, 2.6, [64, 44, 30]);
   { const Rb = rng(7272); for (let x = -36; x < 44; x += 0.42) mb.box(x + 0.21, 0.12, -1.3, 0.405, 0.03, 2.56, shade([168, 124, 82], 0.85 + Rb() * 0.25), { sharp: true }); }
   mb.box(4, -0.04, 0.02, 80, 0.2, 0.12, [96, 68, 44]); mb.mat = 0;
-  // flagstones along the park side
-  mb.mat = MAT.stone; mb.box(4, -0.02, 3.8, 80, 0.06, 1.6, [168, 160, 146]);
-  { const Rf = rng(5353); for (let x = -36; x < 44; x += 0.8) for (const fz of [3.4, 4.2]) mb.box(x + 0.4 + (Rf() - 0.5) * 0.05, 0.04, fz, 0.74, 0.02, 0.74, shade([186, 178, 160], 0.85 + Rf() * 0.25)); }
   mb.mat = 0;
   // shops
   for (const S of TOWN_SHOPS) {
@@ -17726,7 +18255,7 @@ function buildShopRoom(kind, F) {
     // pie case on the counter
     mb.box(1.1, 1.07, cz, 0.7, 0.4, 0.5, [220, 236, 240]); for (let i = 0; i < 2; i++) mb.cyl(0.95 + i * 0.3, 1.1, cz, 0.12, 0.12, 0.08, 10, [220, 150, 80], { capCol: [240, 190, 110] });
   }
-  return { mesh: mb, col, inter, bounds: [x0, x1, z0, z1], door: [0, z1 + 0.15], spawn: [0, z1 - 0.9], type: 'shop', shop: kind, keeper, hens: 0 };
+  return { mesh: mb, col, inter, bounds: [x0, x1, z0, z1], door: [0, z1 + 0.15], spawn: [0, z1 - 0.9], type: 'shop', shop: kind, keeper, hens: 0, wallH, wallC };
 }
 
 // ---------------------------------------------------------------- townsfolk walking about
@@ -17880,7 +18409,7 @@ function goHome(mins) {
   if (G.iris) return;
   AUDIO.door();
   iris(true, () => {
-    NBV.free(); WOODS.free(); if (G.roomMesh) { G.R.free(G.roomMesh); G.roomMesh = null; }
+    NBV.free(); WOODS.free(); if (G.roomMesh) { G.R.free(G.roomMesh); G.roomMesh = null; } if (G.roomShell) { G.R.free(G.roomShell); G.roomShell = null; }
     G.mode = 'play'; G.room = null; G.roomObj = null;
     spendTime(mins || 20, 1);
     const gate = F.objs.find((o) => o.t === 'dgate');
@@ -18344,7 +18873,7 @@ const PROMO = {
     $('promoCap').style.opacity = 0;
     const el = $('promoEnd');
     el.hidden = false; el.style.pointerEvents = 'auto';
-    const cats = {}; for (const g of GOALS) (cats[g.cat] = cats[g.cat] || []).push(g);
+    const cats = {}; for (const g of goalView(null)) (cats[g.cat] = cats[g.cat] || []).push(g);
     el.innerHTML = `<div class="panel" style="position:relative;left:auto;top:auto;transform:none;max-height:calc(100vh - 40px)"><header><span style="font-size:26px">🎯</span><h2>Your goals<small>Build a farm that gets richer every year</small></h2></header><div class="body">${Object.entries(cats).map(([c, L]) => `<div class="grp">${c}</div>${L.slice(0, 3).map((g) => `<div class="row"><span class="ic">${g.icon}</span><span class="tx">${g.name}</span></div>`).join('')}`).join('')}<p class="note">Every chore, harvest and storm teaches something real about permaculture, grazing and water.</p></div><div class="foot"><button class="btn go" id="promoGo">🌱 Start farming</button></div></div>`;
     $('promoGo').onclick = () => this.stop();
     if (this.stage) { this.stage.dispose(); this.stage = null; }
@@ -18386,6 +18915,13 @@ const TOOL_SHOP = {
   brush: { name: 'Grooming brush', icon: '🧹', price: 16, care: true, where: 'Tap an animal and choose Brush.', note: 'Brush your animals: a sleek coat, a calmer animal and a better price at sale.' },
   shears: { name: 'Wool shears', icon: '✂️', price: 44, pair: true, care: true, where: 'Tap a woolly sheep and choose Shear.', note: 'Shear woolly sheep once a year for fleece to sell or spin.' },
 };
+// the light you carry after dark: each step up throws a warm light further and brighter
+const LIGHTS = [
+  { key: 'lantern', name: 'Oil lantern', icon: '🏮', price: 0, note: 'A soft warm glow all round you. Enough to see your feet.' },
+  { key: 'flashlight', name: 'Flashlight', icon: '🔦', price: 65, note: 'A warm beam where you\'re looking: the path, the gate, the next few fence posts.' },
+  { key: 'spotlight', name: 'Rechargeable spotlight', icon: '💡', price: 220, note: 'A big warm beam that reaches right across a paddock. Find the herd in the dark.' },
+];
+const lightTier = (F) => clamp(F.light || 0, 0, LIGHTS.length - 1);
 function ownsTool(F, key) { return !TOOL_SHOP[key] || F.kid || F.unlocked || !!(F.tools && F.tools[key]); }
 // tapping a tool you haven't bought: a little buzz on a phone, and a hint about where to get it
 function toolLocked(key) {
@@ -18443,7 +18979,8 @@ function loop(now) {
 function weatherState(F) {
   const w = todayW(F), W = { cloud: 0.15, wind: Math.max(0.03, w.wind) };
   if (w.kind === 'cloud') W.cloud = 0.6;
-  if (w.kind === 'fog') { W.cloud = 0.5; W.fog = true; }
+  if (w.kind === 'fog') W.cloud = 0.5;
+  { const fd = fogNow(F); if (fd > 0.03) { W.fog = fd; W.cloud = Math.max(W.cloud, 0.3 + fd * 0.3); } }
   if (w.kind === 'rain') { W.rain = 0.55; W.cloud = 0.85; }
   if (w.kind === 'storm') { W.rain = 0.9; W.cloud = 1; W.lightning = true; }
   if (w.kind === 'snow') { W.snow = 0.55; W.cloud = 0.6; }
@@ -18465,7 +19002,7 @@ function sceneS(F) {
 function facade() {
   const F = G.F;
   const cam = G.photo && G.mode === 'play' ? PHOTO.camera() : G.drive && G.mode === 'play' ? DRIVE.camera(G.camDt || 0.016) : FPV.on && G.mode === 'play' ? FPV.camera(groundAt(G.F, G.Fm.x, G.Fm.z)) : null;
-  return { cam, curve: cam ? 0 : undefined, S: sceneS(F), focus: G.focus, t: G.t, flash: G.flash || 0, region: G.view.T.region, windVec() { const s = this.S.weather.wind || 0.05; return [s, s * 0.3]; }, flies: G.view.flies, butterflies: butterflyDay(G.F), whistleRing: WHISTLE.ring, lanternPos: G.Fm.lanternPos, terrain: G.view.T, set flashV(v) { G.flash = v; } };
+  return { cam, curve: cam ? 0 : undefined, S: sceneS(F), focus: G.focus, t: G.t, flash: G.flash || 0, region: G.view.T.region, windVec() { const s = this.S.weather.wind || 0.05; return [s, s * 0.3]; }, flies: G.view.flies, butterflies: butterflyDay(G.F), whistleRing: WHISTLE.ring, lanternPos: G.Fm.lanternPos, lanternTier: G.F ? lightTier(G.F) : 0, terrain: G.view.T, set flashV(v) { G.flash = v; } };
 }
 
 // ---------------------------------------------------------------- starting / loading a farm
@@ -18505,7 +19042,7 @@ function initInput() {
     AUDIO.unlock();
     if (G.photo) { PHOTO.pointerDown(e); return; }
     // first person: a finger on the right side always looks around, even while the left thumb is walking (no pinch-zoom here)
-    if (FPV.on && !G.drive && (G.mode === 'play' || G.mode === 'room') && e.clientX > window.innerWidth * 0.45 && !IN.look) { IN.look = { id: e.pointerId, x: e.clientX, y: e.clientY }; glc.setPointerCapture(e.pointerId); return; }
+    if (FPV.on && !G.drive && (G.mode === 'play' || G.mode === 'room') && e.clientX > window.innerWidth * 0.45 && !IN.look) { IN.look = { id: e.pointerId, x: e.clientX, y: e.clientY, ox: e.clientX, oy: e.clientY }; glc.setPointerCapture(e.pointerId); return; }
     if (FPV.on && IN.stick) return;   // a third finger does nothing
     IN.pts.set(e.pointerId, [e.clientX, e.clientY]);
     if (IN.pts.size === 2 && !G.drive) { const [a, b] = [...IN.pts.values()]; IN.pinch = { d: Math.hypot(a[0] - b[0], a[1] - b[1]), k: G.camK }; IN.stick = null; $('stick').hidden = true; return; }
@@ -18601,6 +19138,13 @@ function updateGame(dt) {
       // On a keyboard, WASD moves and the arrow keys turn.
       const keyTurn = (IN.keys.arrowleft ? 1 : 0) - (IN.keys.arrowright ? 1 : 0);
       if (keyTurn && !G.busy) { Fm.yaw += keyTurn * dt * 2.2; if (!IN.stick && !IN.keys.a && !IN.keys.d) mx = 0; }
+      // the look thumb works like a stick too: drag and the view follows your finger, and while you hold it off to one side the
+      // view keeps turning that way (faster the further out you hold it) until you bring it back or let go
+      if (IN.look && IN.look.ox !== undefined && !G.busy) {
+        const k = FPV.sens(), offX = IN.look.x - IN.look.ox, offY = IN.look.y - IN.look.oy, dx = 22, dy = 46;
+        if (!FPV.oneThumb() && Math.abs(offX) > dx) Fm.yaw -= Math.sign(offX) * Math.pow(Math.min(1, (Math.abs(offX) - dx) / 120), 1.25) * dt * 2.6 * k;
+        if (Math.abs(offY) > dy) FPV.pitch = clamp(FPV.pitch - Math.sign(offY) * Math.min(1, (Math.abs(offY) - dy) / 140) * dt * 1.1 * k, -1.15, 0.85);
+      }
       if (FPV.oneThumb() && IN.stick) {
         // one-thumb: left and right on the stick turn you (faster the further you push), up and down walk
         const st = -IN.stick.dx, turn = Math.abs(st) > 0.12 ? Math.sign(st) * Math.pow((Math.abs(st) - 0.12) / 0.88, 1.4) : 0;
@@ -18640,7 +19184,7 @@ function updateGame(dt) {
   if (!G.panelOpen && !G.iris && !G.busy && !G.photo) advanceClock(dt / 45 * 60);
   const w = todayW(F);
   Fm.umbrella = !indoor && (w.kind === 'rain' || w.kind === 'storm') && !G.busy && Fm.tool === 'hand';
-  Fm.lantern = !indoor && (F.hour >= 20 || F.hour < 6) && !G.busy && !Fm.umbrella;
+  Fm.lantern = !indoor && (F.hour >= 20 || F.hour < 6) && !G.busy && !Fm.umbrella; Fm.lightKey = LIGHTS[lightTier(F)].key;
   Fm.windLean = !indoor && w.kind === 'hurricane' ? 0.3 : 0;
   // snow on the ground builds on snowy days and melts when warm
   if (!inRoom) G.snowDepth = clamp(G.snowDepth + (w.kind === 'snow' ? dt * 0.01 : w.t > 2 ? -dt * 0.004 : 0), 0, 1);
@@ -18740,7 +19284,7 @@ const FPV = {
     else if (item === 'rod') { R = [0.2 + bobX, -0.28 + bobY, -0.36]; dir = nrm([0.12, -0.5, 0.85]); }
     else if (item === 'can') { R = [0.2 + bobX, -0.29 + bobY, -0.36]; rot = [Math.PI - 0.3, 0.05, 0]; }
     else if (item) { R = [0.19 + bobX, -0.27 + bobY, -0.36]; rot = [0.2, -0.15, 0.1]; }
-    if (Fm.lantern) { L = [-0.2 - bobX, -0.3 + bobY, -0.36]; lItem = 'lantern'; lRot = [0, 0.1 + Math.sin(t * 3) * 0.06, 0]; }
+    if (Fm.lantern) { const lk = Fm.lightKey || 'lantern'; L = lk === 'lantern' ? [-0.2 - bobX, -0.3 + bobY, -0.36] : [-0.24 - bobX, -0.3 + bobY, -0.52]; lItem = lk; lRot = lk === 'lantern' ? [0, 0.1 + Math.sin(t * 3) * 0.06, 0] : [Math.PI, 0, 0]; }
     if (Fm.carry === 'basket') { L = [-0.19, -0.33 + bobY, -0.38]; lItem = 'basket'; }
     if (Fm.carry === 'bucket') { L = [-0.2, -0.34 + bobY, -0.38]; lItem = 'bucket'; }
     if (Fm.carry === 'hay') { R = [0.11, -0.25, -0.4]; L = [-0.11, -0.25, -0.4]; item = 'hay'; rot = [0, 1.2, 0]; dir = null; }
@@ -18818,7 +19362,7 @@ const FPV = {
     let L = ps.L && ps.L !== 'grip2' ? ps.L : null;
     if (L) {
       const Lh = L.map((v, i) => this.ease('L' + i, v, toolM && ps.two ? 40 : k, dt));
-      if (ps.lItem && P[ps.lItem]) local.push({ mesh: P[ps.lItem], model: M4.mul(M4.trans(Lh[0], Lh[1], Lh[2]), M4.mul(M4.rotX(ps.lRot[1] || 0), M4.rotZ(ps.lRot[2] || 0))), twoSided: true });
+      if (ps.lItem && P[ps.lItem]) local.push({ mesh: P[ps.lItem], model: M4.mul(M4.trans(Lh[0], Lh[1], Lh[2]), M4.mul(M4.rotY(ps.lRot[0] || 0), M4.mul(M4.rotX(ps.lRot[1] || 0), M4.rotZ(ps.lRot[2] || 0)))), twoSided: true });
     } else { for (let i = 0; i < 3; i++) this.ease('L' + i, [-0.3, -0.75, -0.3][i], 8, dt); }
     // rain: the umbrella's canopy over your head, held upright in the world (not tilted with your view), no handle in sight
     const umb = Fm.umbrella && P.umbrellaTop;
@@ -18840,7 +19384,7 @@ function renderGame(dt) {
   const fa = facade();
   G.fx.update(dt, fa, fxc.width, fxc.height); G.flash = fa.flash;
   let Fr = computeFrame(fa, glc.width, glc.height);
-  if (fa.S.weather.fog) { Fr.fog = [22, 62]; Fr.fogCol = mixc(Fr.fogCol, [0.86, 0.88, 0.9], 0.4); }
+  applyFog(Fr, fa.S.weather.fog, G.focus); lampFrame(Fr);
   if (G.lowDetail) Fr.shadowOn = false;
   if (G.contours3D) Fr.contour = 0.4;
   const draws = G.view.draws(G.focus, G.Fm, G.t);
@@ -18945,8 +19489,8 @@ function findTarget() {
       else if (tool === 'seeds' && !o.crop) push(0.5, { label: plantLabel(), icon: '🌱', cone: [o.x, o.z, 1, bedTop(o)], fn: () => plantBed(o), face: o });
       else if (tool === 'can' && o.crop && !o.ready) push(0.5, F.today['water_' + o.id] ? { label: 'Already watered today', icon: '💧', ring, fn: () => {} } : { label: 'Water this bed', icon: '🚿', ring, fn: () => waterBed(o), face: o });
       else if (tool === 'hoe') push(0.7, { label: 'Move or remove this bed', icon: '🪴', ring, fn: () => UI.objMenu(o) });
-      else if (tool === 'hand' && !o.crop) push(3, { label: 'Empty bed: use Seeds', icon: '🌱', ring, fn: () => setTool('seeds') });
-      else if (tool === 'hand' && o.crop) push(3, { label: `${cr.name}: ${Math.round(clamp(o.days / (cr.months * 30), 0, 1) * 100)}% grown`, icon: '🌿', ring, fn: () => UI.toast(`${cr.name} needs about ${Math.max(0, Math.ceil(cr.months * 30 - o.days))} more days.`) });
+      else if (tool === 'hand' && !o.crop) push(3, { label: 'Empty bed: compost, mulch or plant', icon: '🪴', ring, fn: () => UI.bedCare(o) });
+      else if (tool === 'hand' && o.crop) push(3, { label: `${cr.name}: ${Math.round(clamp(o.days / (cr.months * 30), 0, 1) * 100)}% grown · tend the soil`, icon: '🌿', ring, fn: () => UI.bedCare(o) });
     }
     if ((o.t === 'tree' || o.t === 'brush' || o.t === 'cactus') && d < 1.7) {
       const ring = [o.x, o.z, 1];
@@ -18969,7 +19513,9 @@ function findTarget() {
   if (best && tool === 'hand' && best.sp === 'horse' && best.rec.ageD > 720 && F.inv.saddle) push(0.25 + bd * 0.2, { at: [best.x, best.z], label: `${best.rec.name}: ride or move`, icon: '🐎', fn: () => UI.horseMenu(best) });
   // paddock gates: feeding, water, paddock card
   for (const p of F.paddocks) {
-    const g = gatesOf(p).sort((a, b) => Math.hypot(a.cx - Fm.x, a.cz - Fm.z) - Math.hypot(b.cx - Fm.x, b.cz - Fm.z))[0], cx = g.cx, cz = g.cz;
+    const g = gatesOf(p).sort((a, b) => Math.hypot(a.cx - Fm.x, a.cz - Fm.z) - Math.hypot(b.cx - Fm.x, b.cz - Fm.z))[0];
+    if (!g) { if (tool === 'hand' && inPad(p, Fm.x, Fm.z)) push(2.8, { label: `${p.name} · ${grassWord(F, p)}`, icon: ICO.fence, fn: () => UI.paddockCard(p) }); continue; }   // no gate in it yet
+    const cx = g.cx, cz = g.cz;
     if (!near(cx, cz, 2.2)) continue;
     const key = 'p' + p.id;
     const choreFeed = (F.chores || []).find((c) => c.act === 'feed' && c.gkey === key && !choreDone(F, c));
@@ -18986,6 +19532,29 @@ function findTarget() {
   if (yardChore && tool === 'hand' && near(barn.x + 2, barn.z + 4.5, 3.5)) push(0.25, { label: 'Feed hay in the barnyard', icon: '🌾', fn: () => act('feed', 1.2, 20, 4, () => { F.today['fed_' + yardChore.gkey] = true; doneChore('Hay fed'); }) });
   const pigYard = F.animals.some((a) => a.sp === 'pig' && !a.pad) && mustOpen('fedPigs');
   if (pigYard && tool === 'hand' && near(barn.x + 2, barn.z + 4.5, 3.5)) push(0.25, { label: 'Feed the pigs', icon: '🐖', fn: () => act('feed', 1.2, 15, 3, () => { F.today.fedPigs = true; doneChore('Pigs fed'); }) });
+  // hay by hand: carry a square bale out of the barn and set it down where you want them to eat, or unroll a round bale
+  {
+    // square bales come from the hay stacked against the side of the barn
+    const hb = F.objs.find((o) => o.t === 'barn'), hk = hb ? (hb.sc || 1) : 1, hs = hb ? [hb.x + Math.cos(hb.r || 0) * 4.0 * hk, hb.z - Math.sin(hb.r || 0) * 4.0 * hk] : null, atBarn = hs && near(hs[0], hs[1], 2.6);
+    const pad = F.paddocks.find((p) => inPad(p, Fm.x, Fm.z)), padKey = pad ? 'p' + pad.id : null;
+    const [yx, yz] = HAYFEED.yardPt(F), inYard = !pad && Math.hypot(Fm.x - yx, Fm.z - yz) < 12;
+    const grazersHere = pad ? F.animals.some((a) => a.pad === pad.id && !a.barn && GRAZERS.has(a.sp)) : inYard && F.animals.some((a) => !a.pad && !a.barn && GRAZERS.has(a.sp));
+    const fedNote = () => { if (padKey) F.today['fed_' + padKey] = true; else for (const g of animalGroups(F)) if (!g.pad && !g.barn && g.list.some((a) => GRAZERS.has(a.sp))) F.today['fed_' + g.key] = true; UI.choresBadge && UI.choresBadge(); };
+    if (G.baleCarry && Fm.carry === 'hay') {
+      if (atBarn) push(0.12, { label: 'Put the square bale back', icon: '🟨', fn: () => { Fm.carry = null; G.baleCarry = false; } });
+      else if (ownedAt(F, Fm.x, Fm.z)) push(0.1, { label: pad ? `Break the bale open in ${pad.name}` : 'Set the square bale down here', icon: '🟨', fn: () => act('feed', 1.0, 4, 1, () => {
+        const [dx, dz] = forward(Fm, 0.75); HAYFEED.drop(F, dx, dz, Fm.yaw); F.inv.sqbale = Math.max(0, (F.inv.sqbale || 0) - 1);
+        Fm.carry = null; G.baleCarry = false; if (grazersHere) fedNote(); G.view.dirtyAt(dx, dz, 2);
+        UI.toast(grazersHere ? '🟨 Hay down. They\'ll come and eat it through the day.' : '🟨 Bale set down. Animals that can reach it will eat it.');
+      }) });
+    } else if (tool === 'hand' && !Fm.carry) {
+      if (atBarn && (F.inv.sqbale || 0) >= 1) push(0.5, { label: `Pick up a square bale (${Math.floor(F.inv.sqbale)} in the barn)`, icon: '🟨', fn: () => { Fm.carry = 'hay'; G.baleCarry = true; UI.toast('Carry it out and set it down where you want the animals to eat.'); } });
+      if (grazersHere && (F.inv.hay || 0) >= 1 && ownedAt(F, Fm.x, Fm.z)) push(1.6, { label: `Unroll a round bale this way (${Math.floor(F.inv.hay)} left)`, icon: '🌾', fn: () => {
+        if (!HAYFEED.unroll(F, Fm.x, Fm.z, Fm.yaw, true)) return UI.toast('Not enough open ground that way to unroll a bale. Face down the pasture and try again.', true);
+        act('feed', 2.4, 25, 6, () => { const o = HAYFEED.unroll(F, Fm.x, Fm.z, Fm.yaw); if (!o) return; F.inv.hay = Math.max(0, (F.inv.hay || 0) - 1); fedNote(); G.view.dirtyAt(o.x, o.z, o.len / 2 + 2); UI.toast(`🌾 Unrolled ${Math.round(o.len * 5)} m of hay. What they trample feeds the soil too.`); });
+      } });
+    }
+  }
   // ponds
   for (const p of F.ponds) if (Math.hypot((Fm.x - p.x) / (p.rx + 1.6), (Fm.z - p.z) / (p.rz + 1.6)) < 1) {
     if (tool === 'hand') push(3, { label: `Pond: ${Math.round(p.vol * 100)}% full · ${FISHING.total(p)} fish`, icon: '💧', fn: () => FISHING.menu(p) });
@@ -19121,7 +19690,7 @@ UI.paintMenu = function (o) {
   };
 };
 UI.remodelMenu = function (o) {
-  const F = G.F, list = BSTYLES[o.t], cur = o.hstyle || (o.t === 'house' && o.style === 'cabin' ? 'cabin' : list[0].key), free = F.kid || F.unlocked;
+  const F = G.F, list = BSTYLES[o.t], cur = o.hstyle || list[0].key, free = F.kid || F.unlocked;
   const P = UI.open({ title: `Remodel the ${objName(o)}`, sub: 'A builder does the work in a day', icon: '🏗️' });
   const k0 = o.sc || 1, sizeCost = (k) => (k === k0 ? 0 : BSIZE_COST[o.t][k > k0 ? 1 : 0] * Math.round(Math.abs(k - k0) / 0.15));
   P.body.innerHTML = '<div class="grp">Style</div>' + UI.rows(list.map((q) => ({ id: 's:' + q.key, tap: q.key !== cur, cls: q.key === cur ? 'sel' : '', icon: q.key === cur ? '✓' : '🏠', text: q.name, small: q.desc, right: q.key === cur ? 'Yours' : free ? 'Free' : money(q.price || 1500) })))
@@ -19724,11 +20293,37 @@ function enterRoom(o) {
     G.fx.reset();
   });
 }
+// In first person you're standing inside the room, so it needs the parts the overhead view leaves off: the front wall (with
+// the doorway, daylight showing through it), the tops of the side walls, and a ceiling with a few beams.
+function roomShell(room) {
+  const [x0, x1, z0, z1] = room.bounds, H = room.wallH || 2.8, C = room.wallC || [226, 214, 186], mb = new MB(), W = x1 - x0, D = z1 - z0, dw = 0.75, dh = 2.15;
+  const barnish = room.type === 'barn' || room.type === 'loft' || (room.type === 'shop' && room.shop === 'stock');
+  mb.mat = room.type === 'house' ? MAT.siding : MAT.boards;
+  const lw = (x0 - 0.2) - (-dw), lx = ((x0 - 0.2) + (-dw)) / 2;
+  mb.box(lx, 0, z1 + 0.1, Math.abs(lw), H, 0.2, C); mb.box(-lx, 0, z1 + 0.1, Math.abs(lw), H, 0.2, C);
+  mb.box(0, dh, z1 + 0.1, dw * 2, H - dh, 0.2, C);
+  for (const sx of [x0 - 0.1, x1 + 0.1]) mb.box(sx, H * 0.88, 0, 0.2, H * 0.12 + 0.02, D + 0.2, shade(C, 0.92));
+  mb.mat = 0;
+  // door frame
+  const trim = room.type === 'house' ? [250, 246, 236] : [120, 86, 58];
+  mb.box(-dw - 0.04, 0, z1 - 0.01, 0.08, dh, 0.06, trim); mb.box(dw + 0.04, 0, z1 - 0.01, 0.08, dh, 0.06, trim); mb.box(0, dh, z1 - 0.01, dw * 2 + 0.16, 0.08, 0.06, trim);
+  // the doorway: daylight (or the night) outside
+  const L = new MB(); L.box(0, 0, z1 + 0.24, dw * 2, dh, 0.04, room.nightW ? [40, 54, 92] : [236, 240, 226]); for (let i = 0; i < L.d.length; i += STRIDE) L.d[i + 9] = 2; mb.add(L);
+  // ceiling, light so it reads in the lamp light, and beams across it
+  mb.mat = MAT.boards; mb.box(0, H, 0, W + 0.6, 0.14, D + 0.6, barnish ? [150, 112, 78] : shade(C, 1.02)); mb.mat = 0;
+  for (let x = x0 + 1; x < x1; x += barnish ? 1.6 : 2.0) mb.box(x, H - 0.16, 0, 0.16, 0.16, D + 0.2, barnish ? [104, 72, 48] : [168, 128, 90]);
+  // a ceiling light so the room isn't lit from nowhere
+  const lamp = new MB(); lamp.ell(0, H - 0.22, 0, 0.22, 0.12, 0.22, [255, 230, 170], { lat: 4, lon: 10 }); for (let i = 0; i < lamp.d.length; i += STRIDE) lamp.d[i + 9] = 2; mb.add(lamp);
+  mb.cyl(0, H - 0.12, 0, 0.02, 0.02, 0.12, 6, [60, 60, 60]);
+  return mb;
+}
 function buildRoomNow() {
   if (G.roomMesh) G.R.free(G.roomMesh);
+  if (G.roomShell) { G.R.free(G.roomShell); G.roomShell = null; }
   NBV.free(); WOODS.free();
   G.room = buildRoom(G.roomObj.t, G.F, G.roomObj);
   G.roomMesh = G.R.mesh(G.room.mesh);
+  if (!G.room.outdoor && G.room.bounds) { try { G.roomShell = G.R.mesh(roomShell(G.room)); } catch (e) { G.roomShell = null; } }
   if (G.room.type === 'neighbor') NBV.populate(G.room);
   G.roomHens = [];
   for (let i = 0; i < G.room.hens; i++) { const rec = G.F.animals.filter((a) => a.sp === 'chicken')[i]; G.roomHens.push(makeActor(G.R, rec, -1 + i * 0.8, 0.2, Math.random)); }
@@ -19825,13 +20420,13 @@ function updateRoomHens(dt) { for (const a of G.roomHens || []) updateActor(a, d
 const T0 = { at: () => 0 };
 function townFacade() {
   const F = G.F;
-  return { cam: FPV.on ? FPV.camera(0) : null, S: sceneS(F), focus: G.focus, t: G.t, flash: G.flash || 0, region: G.view.T.region, windVec() { const s2 = this.S.weather.wind || 0.05; return [s2, s2 * 0.3]; }, flies: [], lamps: G.room && G.room.type === 'town' ? TOWN_LAMPS : null, lanternPos: G.Fm.lanternPos, firePos: G.room && G.room.type === 'woods' && Math.hypot(WOODS_FIRE[0] - G.focus[0], WOODS_FIRE[1] - G.focus[2]) < 46 ? [WOODS_FIRE[0], 0.35, WOODS_FIRE[1]] : null, terrain: T0, set flashV(v) { G.flash = v; } };
+  return { cam: FPV.on ? FPV.camera(0) : null, S: sceneS(F), focus: G.focus, t: G.t, flash: G.flash || 0, region: G.view.T.region, windVec() { const s2 = this.S.weather.wind || 0.05; return [s2, s2 * 0.3]; }, flies: [], lamps: G.room && G.room.type === 'town' ? TOWN_LAMPS : null, lanternPos: G.Fm.lanternPos, lanternTier: G.F ? lightTier(G.F) : 0, firePos: G.room && G.room.type === 'woods' && Math.hypot(WOODS_FIRE[0] - G.focus[0], WOODS_FIRE[1] - G.focus[2]) < 46 ? [WOODS_FIRE[0], 0.35, WOODS_FIRE[1]] : null, terrain: T0, set flashV(v) { G.flash = v; } };
 }
 function renderTown(dt) {
   const R = G.R, fa = townFacade();
   G.fx.update(dt, fa, fxc.width, fxc.height); G.flash = fa.flash;
   const Fr = computeFrame(fa, glc.width, glc.height);
-  if (fa.S.weather.fog) { Fr.fog = [22, 62]; Fr.fogCol = mixc(Fr.fogCol, [0.86, 0.88, 0.9], 0.4); }
+  applyFog(Fr, fa.S.weather.fog, G.focus); lampFrame(Fr);
   if (G.room.type === 'woods') {   // the woods: a longer, leafy-tinted haze, not the cold grey-blue of open country
     const tc = WOODS.prof(G.F).dry ? [1.06, 0.95, 0.78] : [0.8, 1.04, 0.78];
     Fr.fog = [Fr.fog[0] * 1.2 + 8, Fr.fog[1] * 1.3 + 22]; Fr.fogCol = mixc(Fr.fogCol, Fr.fogCol.map((v, i) => v * tc[i]), 0.65);
@@ -19866,6 +20461,7 @@ function renderRoom(dt) {
   Fr.vp = M4.mul(proj, M4.lookAt(eye, at, [0, 1, 0])); Fr.cam = eye; Fr.focus = [G.focus[0], 0, G.focus[2]];
   Fr.lightVP = M4.mul(M4.ortho(-9, 9, -9, 9, 1, 60), M4.lookAt([Fr.sunDir[0] * 25, Fr.sunDir[1] * 25, Fr.sunDir[2] * 25], [0, 0, 0], [0, 1, 0]));
   const draws = [{ mesh: G.roomMesh }];
+  if (fpc && G.roomShell) draws.push({ mesh: G.roomShell, noShadow: true });
   if (fpc) drawFarmer([], G.Fm, G.view.parts, T0, G.t); else drawFarmer(draws, G.Fm, G.view.parts, T0, G.t);
   if (G.room.keeper && !G.room.keeper.away) drawFarmer(draws, G.room.keeper, townParts(R, G.room.keeper.key), T0, G.t);
   for (const n of G.room.npcs || []) { if (n.hidden) continue; drawFarmer(draws, n, n.nb ? NBV.partsOf(n) : townParts(R, n.key), T0, G.t); }
@@ -20048,7 +20644,7 @@ function passOut() {
     F.today.fedPoultry = true; F.today.fedPigs = true;
     const house = F.objs.find((o) => o.t === 'house');
     doSleep(1, true);
-    setTimeout(() => { if (G.mode === 'room') { NBV.free(); if (G.roomMesh) { G.R.free(G.roomMesh); G.roomMesh = null; } G.mode = 'play'; G.room = null; } G.Fm.x = house.x; G.Fm.z = house.z + 4.4; }, 800);
+    setTimeout(() => { if (G.mode === 'room') { NBV.free(); if (G.roomMesh) { G.R.free(G.roomMesh); G.roomMesh = null; } if (G.roomShell) { G.R.free(G.roomShell); G.roomShell = null; } G.mode = 'play'; G.room = null; } G.Fm.x = house.x; G.Fm.z = house.z + 4.4; }, 800);
   }, 900);
 }
 function wxWord(w) { return { sun: `Sunny, ${toF(w.t)}°F`, cloud: `Cloudy, ${toF(w.t)}°F`, fog: 'Foggy morning', rain: `Rain, ${toF(w.t)}°F`, storm: 'Thunderstorms!', snow: `Snow, ${toF(w.t)}°F`, hurricane: 'HURRICANE!' }[w.kind]; }
