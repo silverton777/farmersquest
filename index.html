@@ -13166,8 +13166,10 @@ function drawActor(out, a, T, pondLevel) {
   a.wk = a.wk === undefined ? (walking ? 1 : 0) : a.wk + ((walking ? 1 : 0) - a.wk) * (1 - Math.exp(-dtw * 7));
   const wk = a.wk;
   const bob = (Math.abs(Math.sin(ph)) * 0.045 * wk + Math.sin(tt * 1.8) * 0.008 * (1 - wk)) * (a.sleepy ? 0.3 : 1);
-  const lie = a.lie || 0;   // a dog lying down: belly on the ground, front legs out ahead, back legs tucked under
-  let root = M4.mul(M4.trs(a.x, y, a.z, a.yaw, 0, 0, s), M4.trans(0, lerp(D.height + bob, D.lieY || D.height * 0.45, lie), 0));
+  // dog poses (0..1 each): lie (belly down, front legs out ahead), roll (over on its back for a belly rub), sit, pawUp (shaking hands), pant
+  const lie = a.lie || 0, roll = a.roll || 0, sit = a.sit || 0, paw = a.pawUp || 0, pant = a.pant || 0, low = D.lieY || D.height * 0.45;
+  const hBody = lerp(lerp(D.height + bob, low, Math.max(lie, roll)), low * 1.06, sit);
+  let root = M4.mul(M4.trs(a.x, y, a.z, a.yaw, 0, 0, s), M4.trans(0, hBody, 0));
   if (a.dead) root = M4.mul(M4.trs(a.x, y, a.z, a.yaw, 0, 0, s), M4.mul(M4.trans(0, D.height * 0.45, 0), M4.rotZ(Math.min(1, a.deadT * 2.5) * 1.45)));
   const tint = a.dead ? [0.4, 0.4, 0.4, Math.min(0.6, a.deadT * 0.4)] : a.hl ? [1, 1, 0.7, 0.18] : null;
   const poultry = a.sp === 'chicken' || a.sp === 'duck' || a.sp === 'turkey';
@@ -13175,13 +13177,16 @@ function drawActor(out, a, T, pondLevel) {
   let body = root;
   if (poultry) { if (wk > 0.01) body = M4.mul(root, M4.rotX(Math.sin(ph * 2) * 0.08 * wk)); }
   else if (wk > 0.01) body = M4.mul(root, M4.mul(M4.rotY(Math.sin(ph) * 0.045 * wk), M4.mul(M4.rotZ(Math.sin(ph) * 0.03 * wk), M4.rotX(Math.cos(ph * 2) * 0.014 * wk))));
+  if (sit > 0.001) { const pz = (D.tailZ || -0.3) * 0.8; body = M4.mul(body, M4.mul(M4.trans(0, 0, pz), M4.mul(M4.rotX(-0.45 * sit), M4.trans(0, 0, -pz)))); }   // sitting: tipped back onto the haunches
+  if (roll > 0.001) body = M4.mul(body, M4.rotZ(roll * 2.45 * (a.rollDir || 1) + Math.sin(tt * 3.1) * 0.06 * roll));   // over on its back, wriggling
   const breath = 1 + (walking ? 0.004 : 0.014) * Math.sin(tt * 2.1);
   out.push({ mesh: M.body, model: M4.mul(body, M4.scale(1, breath, 1)), tint, snowK: 0.1, shell: fur });
   // head: nods with each step, chews while grazing, looks about when idle
-  const nod = Math.sin(ph * 2 + 0.5) * 0.045 * wk + (hy > 0.4 ? Math.sin(tt * 7) * 0.025 * hy : Math.sin(tt * 0.9) * 0.02) * (1 - wk);
+  const nod = Math.sin(ph * 2 + 0.5) * 0.045 * wk + (hy > 0.4 ? Math.sin(tt * 7) * 0.025 * hy : Math.sin(tt * 0.9) * 0.02) * (1 - wk) + Math.sin(tt * 15) * 0.03 * pant + 0.32 * sit;
   const look = Math.sin(tt * 0.5) * 0.25 * (1 - hy) + Math.sin(ph) * 0.05 * wk;
   const headM = M4.mul(body, M4.mul(M4.trans(0, D.headY - hy * D.height * (D.grazeDrop || 0.55), D.headZ), M4.mul(M4.rotX(hy * 0.9 + nod + (a.sleepy ? 0.25 : 0)), M4.rotY(look))));
   out.push({ mesh: M.head, model: headM, tint, snowK: 0.1, shell: fur });
+  if (M.tongue && pant > 0.03 && D.mouth) out.push({ mesh: M.tongue, model: M4.mul(headM, M4.mul(M4.trans(D.mouth[0], D.mouth[1], D.mouth[2]), M4.mul(M4.rotX(0.12 * Math.sin(tt * 15)), M4.scale(0.6 + 0.4 * pant, 0.3 + 0.7 * pant, 0.6 + 0.4 * pant)))), tint, snowK: 0 });
   if (!a.swim) {
     if (D.two) {
       const sw = Math.sin(ph) * 0.55 * wk;
@@ -13191,7 +13196,9 @@ function drawActor(out, a, T, pondLevel) {
       // diagonal gait: front-left with back-right. The lower leg folds at the knee / hock while the leg swings forward.
       const LL = D.legL || 0.5;
       for (const l of [[-1, 1, 1], [1, 1, -1], [-1, -1, -1], [1, -1, 1]]) {
-        const front = l[1] > 0, r = Math.sin(ph) * l[2] * 0.6 * wk - lie * (front ? 1.45 : 1.3);
+        const front = l[1] > 0, paddle = roll * (Math.sin(tt * 6 + l[0] * 1.7 + l[1]) * 0.28 + (front ? -0.6 : 0.4));
+        let r = Math.sin(ph) * l[2] * 0.6 * wk - lie * (1 - roll) * (front ? 1.45 : 1.3) + paddle + sit * (front ? 0.45 : -1.15);
+        if (front && l[0] > 0 && paw > 0.001) r -= paw * (1.25 + 0.12 * Math.sin(tt * 9));   // shaking hands: the right front paw held up
         const flex = Math.max(0, -l[2] * Math.cos(ph)) * wk;
         const bend = flex > 0.002 ? [flex * (front ? 1.05 : 0.9), -LL * (front ? 0.46 : 0.48), front ? 0.02 : -LL * 0.13, 1] : null;
         out.push({ mesh: l[1] < 0 && M.legB ? M.legB : M.leg, model: M4.mul(body, M4.mul(M4.trans(l[0] * D.legX, D.legY, l[1] * D.legZ), M4.rotX(r))), tint, snowK: 0, bend, shell: fur });
@@ -15702,7 +15709,7 @@ function interiorFrame(F0, room) {
 
 'use strict';
 // ============================================================================ profiles + saves (each profile has its own farm save)
-const FQ_VERSION = '1.4.0';
+const FQ_VERSION = '1.4.1';
 const LOOKS = [
   { shirt: [214, 74, 64], hair: [120, 76, 40] }, { shirt: [70, 130, 200], hair: [236, 206, 120] }, { shirt: [240, 170, 60], hair: [80, 50, 30] },
   { shirt: [120, 170, 90], hair: [40, 30, 28] }, { shirt: [170, 100, 190], hair: [200, 110, 60] }, { shirt: [60, 160, 160], hair: [150, 100, 60] },
@@ -15794,6 +15801,19 @@ const AUDIO = {
     if (w.kind === 'storm' || w.kind === 'hurricane') { if (Math.random() < 0.002) this.noise(2.5, 90, 0.5, 'lowpass'); }
   },
   step(inRoom) { this.noise(0.06, inRoom ? 900 : 500, 0.05); },
+  // a dog panting: quick breathy huffs, out (lower) and in (higher), a little uneven like the real thing
+  pant(n) {
+    if (!this.ctx || !this.on || !this.noiseBuf) return;
+    const c = this.ctx, t0 = c.currentTime + 0.02, k = n || 10;
+    for (let i = 0; i < k; i++) {
+      const out = i % 2 === 0, t = t0 + i * 0.16 + (Math.random() - 0.5) * 0.02, dur = out ? 0.12 : 0.085, fade = 1 - 0.4 * (i / k);
+      const s = c.createBufferSource(), f = c.createBiquadFilter(), g = c.createGain();
+      s.buffer = this.noiseBuf; f.type = 'bandpass'; f.frequency.value = (out ? 1050 : 1550) * (0.94 + Math.random() * 0.12); f.Q.value = 1.3;
+      const v = (out ? 0.1 : 0.065) * (0.85 + Math.random() * 0.3) * fade;
+      g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(v, t + 0.022); g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+      s.connect(f); f.connect(g); g.connect(this.master); s.start(t, Math.random() * 1.5); s.stop(t + dur + 0.05);
+    }
+  },
   // a running engine: two detuned oscillators through a low-pass, pitch follows the revs. engine(null) switches it off.
   engine(kind, rpm, load, def) {
     if (!this.ctx) return;
@@ -18193,6 +18213,12 @@ const PETS = {
       if (p.kind === 'farmdog') {
         const following = (p.rec.job || 'follow') === 'follow' || !DOGS.post(F, p.rec);
         const w = DOGS.think(V, p, dt, Fm, following ? slot++ : 0); tx = w.tx; tz = w.tz; speed = w.speed;
+        const dF = Math.hypot(Fm.x - p.x, Fm.z - p.z);
+        p.pantCool = (p.pantCool || 0) - dt; p.pantT = (p.pantT || 0) - dt;
+        if (dF < 3 && (p.lastDF === undefined || p.lastDF >= 3) && p.pantCool <= 0) { p.pantT = 4.5; p.pantCool = 10; if (G.mode === 'play') AUDIO.pant(14); }   // you walk up: tongue out, panting happily
+        if (speed > 4) p.runT = (p.runT || 0) + dt; else if (p.runT > 2.5 && tx === undefined) { p.pantT = Math.max(p.pantT, 3.5); if (dF < 6 && p.pantCool <= 0) { AUDIO.pant(10); p.pantCool = 8; } p.runT = 0; } else if (speed < 2) p.runT = 0;
+        p.lastDF = dF;
+        p.pant = lerp(p.pant || 0, p.pantT > 0 ? 1 : 0, 1 - Math.exp(-dt * 5));
         p.lie = lerp(p.lie || 0, tx !== undefined ? 0 : p.wantLie || 0, 1 - Math.exp(-dt * (p.wantLie ? 1.6 : 5)));
       } else if (p.kind === 'dog') {
         const bx = Fm.x - Math.sin(Fm.yaw) * 1.2 + Math.cos(Fm.yaw) * 0.9, bz = Fm.z - Math.cos(Fm.yaw) * 1.2 - Math.sin(Fm.yaw) * 0.9;
@@ -18262,6 +18288,11 @@ const DOG_BREEDS = [
   { key: 'lab', name: 'Labrador Retriever', role: 'comp', price: 800, size: 1.14, bulk: 1.1, ears: 'drop', tail: 'otter', fur: 'short', coats: [['Yellow', 'solid', [224, 186, 124], [238, 210, 160]], ['Black', 'solid', [30, 28, 28], [46, 42, 42]], ['Chocolate', 'solid', [98, 64, 44], [116, 78, 54]]], note: 'Everybody’s friend. Rides along, fetches the ducks and greets every visitor.' },
   { key: 'gsd', name: 'German Shepherd', role: 'comp', price: 1100, size: 1.24, bulk: 1.04, ears: 'prick', tail: 'plume', fur: 'medium', coats: [['Black and tan', 'saddle', [196, 128, 66], [36, 32, 30]], ['Sable', 'sable', [164, 120, 72], [44, 38, 34]]], note: 'Bred to tend sheep in Germany. Loyal, watchful and quick to learn.' },
 ];
+// the farm's own two dogs, who come home with every farm
+DOG_BREEDS.push(
+  { key: 'luna', own: true, name: 'Great Pyrenees', role: 'comp', price: 0, size: 1.58, bulk: 1.2, muzzle: 0.92, ears: 'drop', tail: 'plume', fur: 'long', eyeRing: -1, coats: [['White, with a dark ring round one eye', 'luna', [244, 240, 231], [232, 222, 200]]], note: 'Luna: a big, soft-hearted white Pyrenees with a faint dark ring round one eye. Friendly with everyone, and never far from your side.' },
+  { key: 'juneau', own: true, name: 'Pyrenees × Bernese', role: 'comp', price: 0, size: 1.58, bulk: 1.12, muzzle: 0.98, ears: 'drop', tail: 'flag', fur: 'long', coats: [['Golden, with a white blaze and socks', 'juneau', [214, 162, 96], [246, 242, 232], [236, 214, 170]]], note: 'Juneau: half Great Pyrenees, half Bernese. Golden coat, white socks and a white blaze, and a big plume of a tail she carries curled up high.' },
+);
 const DOG_NAMES = { f: ['Belle', 'Daisy', 'Molly', 'Sadie', 'Rosie', 'Ellie', 'Penny', 'Maggie', 'Willow', 'Ruby', 'Lady', 'Pepper', 'Hazel', 'Clover', 'Juniper', 'June', 'Dolly', 'Birdie', 'Ginger', 'Opal'],
   m: ['Blue', 'Duke', 'Ranger', 'Bear', 'Rusty', 'Jake', 'Boone', 'Tex', 'Copper', 'Gus', 'Bandit', 'Shep', 'Moose', 'Otis', 'Buck', 'Bo', 'Tucker', 'Jasper', 'Cash', 'Rowdy'] };
 const DOG_COLLARS = [[188, 48, 42], [52, 92, 160], [58, 120, 66], [214, 132, 40], [112, 70, 44], [140, 60, 120]];
@@ -18306,11 +18337,31 @@ function dogCoatAt(C, part, q) {
       if (part === 'body') return patchN([x * 1.4, y * 1.4, z * 1.4], 3.3) > 0.28 && y > -0.2 ? B : W;
       return W;
     }
+    case 'luna': return (part === 'body' && y > 0.55 && z < 0.2) || part === 'ear' ? mixc(A, B, 0.4) : part === 'muzzle' ? A : sh(A);
+    case 'juneau': {
+      const T2 = C[4] || W;
+      if (feet || chest || belly || (part === 'neck' && y < 0.15) || part === 'muzzle') return W;
+      if (part === 'leg' && y < -0.15) return W;
+      if (part === 'head' && ((Math.abs(x) < 0.13 && z > -0.35 && y > -0.2) || (z > 0.7 && y < 0.25))) return W;   // the white blaze up the forehead
+      if (part === 'tail') return y > 0.55 ? W : mixc(T2, A, 0.25);
+      if (part === 'ear') return shade(A, 0.9);
+      return sh(A);
+    }
     case 'berner': if (feet || chest || blaze || tip || (part === 'muzzle' && y < 0.3)) return W; if (cheek || brow || (part === 'leg' && y > -0.6 && y < 0.2)) return T; return A;
     case 'saddle': if (back || (part === 'tail' && y < 0.8) || (part === 'muzzle') || (part === 'head' && y > 0.3 && Math.abs(x) < 0.4 && z < 0.5)) return B; return sh(A);
     case 'sable': return back || part === 'muzzle' || (part === 'tail' && y > 0.3) ? mixc(A, B, 0.6) : sh(A);
     default: return part === 'muzzle' ? shade(A, 1.04) : sh(A);
   }
+}
+// Luna and Juneau, the farm's own dogs: they're there from the first day on every farm, and follow you about
+function homeDogs(F) {
+  F.dogs = F.dogs || [];
+  if (F.homeDogs) return;
+  F.homeDogs = 1;
+  const dn = FRIENDS.dayN(F);
+  F.dogs.unshift(
+    { id: F.nextId++, breed: 'luna', coat: 0, collarCol: [140, 104, 74], name: 'Luna', sex: 'f', born: dn - 4 * 360, job: 'follow', own: true },
+    { id: F.nextId++, breed: 'juneau', coat: 0, collarCol: [204, 146, 160], name: 'Juneau', sex: 'f', born: dn - 2 * 360, job: 'follow', own: true });
 }
 // a dog of breed B in coat c with collar colour cc: body (with neck), head, front and back legs, tail, and the dims drawActor needs
 function buildFarmDog(B, c, cc) {
@@ -18358,6 +18409,7 @@ function buildFarmDog(B, c, cc) {
     m.ell(ex, ey, ez, 0.017 * hb, 0.016 * hb, 0.01, [28, 20, 16], { lat: 4, lon: 6 });
     m.ell(ex + sx * 0.002, ey + 0.001, ez + 0.006, 0.011 * hb, 0.011 * hb, 0.005, iris, { lat: 3, lon: 6 });
     m.ell(ex, ey + 0.006, ez + 0.009, 0.004, 0.004, 0.003, [255, 255, 255], { lat: 3, lon: 4 });
+    if (B.eyeRing === sx) m.ell(ex, ey + 0.002, ez - 0.004, 0.027 * hb, 0.025 * hb, 0.011, [62, 54, 50], { lat: 5, lon: 10 });   // a faint dark ring round this eye
   }
   m.mat = MAT.hide;
   const earC = (q) => dogCoatAt(C, 'ear', q);
@@ -18385,7 +18437,12 @@ function buildFarmDog(B, c, cc) {
   // tail, from its root: plume (hangs low and sweeps up at the end), curl (up over the back), bob, straight, otter (thick)
   m = new MB(); m.mat = MAT.hide;
   const tc = (q) => dogCoatAt(C, 'tail', q);
-  if (B.tail === 'bob') m.sel(0, 0.012, -0.012, 0.03 * bk, 0.03 * bk, 0.026, 2, dogCoatAt(C, 'tail', [0, 0, 0]), { lat: 4, lon: 6 });
+  if (B.tail === 'flag') {   // the Pyrenees' plume, carried up and curled over the back: a chain of soft tufts
+    for (let i = 0; i <= 12; i++) {
+      const u = i / 12, a = u * 2.3, r = (0.026 + 0.036 * Math.sin(Math.min(1, u * 1.25) * Math.PI * 0.8)) * bk;
+      m.sel(0, 0.13 * (1 - Math.cos(a)) + 0.06 * u, -0.13 * Math.sin(a), r, r * 1.15, r * 1.1, 2, dogCoatAt(C, 'tail', [0, u * 2 - 1, 0]), { lat: 6, lon: 9 });
+    }
+  } else if (B.tail === 'bob') m.sel(0, 0.012, -0.012, 0.03 * bk, 0.03 * bk, 0.026, 2, dogCoatAt(C, 'tail', [0, 0, 0]), { lat: 4, lon: 6 });
   else if (B.tail === 'curl') { m.push(M4.rotX(-0.35)); horn(m, [[0, 0, 0], [0, 0.08, -0.035], [0, 0.15, -0.02], [0, 0.19, 0.05], [0, 0.165, 0.11]], 0.03 * bk * (fluffy ? 1.4 : 1), 0.016, C[2]); m.pop(); }
   else {
     const L = B.tail === 'plume' ? 0.3 : B.tail === 'otter' ? 0.25 : 0.24, r = B.tail === 'plume' ? (fluffy ? 0.045 : 0.034) : B.tail === 'otter' ? 0.034 : 0.019;
@@ -18394,8 +18451,12 @@ function buildFarmDog(B, c, cc) {
     m.pop();
   }
   m.mat = 0; P.tail = m;
+  // panting: the open mouth and a tongue hanging out, drawn from the corner of the mouth
+  m = new MB(); m.ell(0, 0.004, 0.0, 0.03 * hb, 0.013, 0.034 * hb, [66, 28, 32], { lat: 4, lon: 8 });
+  m.ell(0, -0.026 * hb, 0.016, 0.022 * hb, 0.034 * hb, 0.009, [226, 108, 122], { lat: 5, lon: 8 }); m.ell(0, -0.012 * hb, 0.02, 0.003, 0.03 * hb, 0.003, [196, 84, 100], { lat: 3, lon: 4 });
+  P.tongue = m;
   const legY = -0.055 * bk;
-  P.dims = { legL: LL, legX: 0.066 * bk, legZ: 0.19 * BL, legY, height: LL - legY - 0.003, lieY: 0.13 * bk, headY: (fluffy || bk > 1.15 ? 0.155 : 0.185) * bk, headZ: (fluffy || bk > 1.15 ? 0.31 : 0.335) * BL, tailZ: -0.29 * BL, tailY: 0.07 * bk, radius: 0.18 + 0.06 * bk, grazeDrop: 0.45 };
+  P.dims = { legL: LL, legX: 0.066 * bk, legZ: 0.19 * BL, legY, height: LL - legY - 0.003, lieY: 0.13 * bk, headY: (fluffy || bk > 1.15 ? 0.155 : 0.185) * bk, headZ: (fluffy || bk > 1.15 ? 0.31 : 0.335) * BL, tailZ: -0.29 * BL, tailY: 0.07 * bk, radius: 0.18 + 0.06 * bk, grazeDrop: 0.45, mouth: [0, -0.03 * hb, mzC + mzL * 0.15] };
   return P;
 }
 // a little side-on picture of a dog, like the breed portraits at the barn
@@ -18443,10 +18504,10 @@ function dogPortrait(B, c, size) {
 const DOGS = {
   meshes: {},
   mesh(R, rec) {
-    const B = dogBreed(rec.breed), key = B.key + ':' + (rec.coat || 0) + ':' + (rec.collar || 0);
+    const B = dogBreed(rec.breed), cc = rec.collarCol || DOG_COLLARS[rec.collar || 0], key = B.key + ':' + (rec.coat || 0) + ':' + cc.join(',');
     if (this.meshes[key]) return this.meshes[key];
-    const P = buildFarmDog(B, rec.coat || 0, DOG_COLLARS[rec.collar || 0]), m = { dims: P.dims, fur: DOG_FUR[B.fur] || null };
-    for (const k of ['body', 'head', 'leg', 'legB', 'tail']) if (P[k]) m[k] = R.mesh(P[k]);
+    const P = buildFarmDog(B, rec.coat || 0, cc), m = { dims: P.dims, fur: DOG_FUR[B.fur] || null };
+    for (const k of ['body', 'head', 'leg', 'legB', 'tail', 'tongue']) if (P[k]) m[k] = R.mesh(P[k]);
     return (this.meshes[key] = m);
   },
   list(F) { return (F && F.dogs) || []; },
@@ -18477,7 +18538,7 @@ const DOGS = {
     const dn = this.dayN(F), R = mulberry(((F.seed || 1) * 389 + dn * 7349 + 3) | 0); for (let i = 0; i < 4; i++) R();
     const first = F.dogDay !== undefined && (dn === F.dogDay || dn === F.dogDay + 1);
     const n = first ? 1 + (R() < 0.6 ? 1 : 0) : 1 + Math.floor(R() * 2.4);
-    const pool = DOG_BREEDS.slice(), out = [];
+    const pool = DOG_BREEDS.filter((b) => !b.own), out = [];
     for (let i = 0; i < n && pool.length; i++) {
       const B = pool.splice(Math.floor(R() * pool.length), 1)[0], coat = Math.floor(R() * B.coats.length), sex = R() < 0.5 ? 'f' : 'm';
       const pup = R() < 0.55, ageD = pup ? 56 + Math.floor(R() * 50) : 240 + Math.floor(R() * 900);
@@ -18494,7 +18555,7 @@ const DOGS = {
   buy(F, o) {
     const B = dogBreed(o.breed);
     if (!F.kid && !F.unlocked && F.money < o.price) return UI.toast(`${o.name} is ${money(o.price)} and you have ${money(F.money)}.`, true);
-    if (this.list(F).length >= 6) return UI.toast('Six dogs is plenty for one farm!', true);
+    if (this.list(F).filter((d) => !d.own).length >= 6) return UI.toast('Six dogs from the barn is plenty for one farm!', true);
     const dn = this.dayN(F);
     if (!F.kid && !F.unlocked) { F.money -= o.price; F.stats.spent += o.price; }
     F.dogSold = F.dogSold && F.dogSold.dn === dn ? F.dogSold : { dn, ids: [] }; F.dogSold.ids.push(o.id);
@@ -18542,6 +18603,24 @@ const DOGS = {
     let tx, tz, speed = 0;
     p.size = (B.size || 1) * this.grown(F, rec);
     const lieTo = (v) => { p.wantLie = v; };
+    const ease = (k, v, rate) => { p[k] = lerp(p[k] || 0, v, 1 - Math.exp(-dt * rate)); };
+    const turnTo = (ang, rate) => { let d = ang - p.yaw; while (d > Math.PI) d -= Math.PI * 2; while (d < -Math.PI) d += Math.PI * 2; p.yaw += d * (1 - Math.exp(-dt * rate)); };
+    if (p.pose) {   // being made a fuss of: a belly rub, or shaking hands
+      const P = p.pose, toF = Math.atan2(Fm.x - p.x, Fm.z - p.z); P.t += dt;
+      if (P.kind === 'belly') {   // lies down side-on to you, then rolls over and wriggles with its paws in the air
+        turnTo(toF - Math.PI / 2, 5); p.rollDir = 1; lieTo(1);
+        ease('roll', P.t > 0.45 && P.t < P.dur - 0.5 ? 1 : 0, 4.5);
+      } else {                    // sits square in front of you and lifts a paw
+        turnTo(toF, 6); lieTo(0);
+        ease('sit', P.t < P.dur - 0.35 ? 1 : 0, 7);
+        ease('pawUp', P.t > 0.55 && P.t < P.dur - 0.7 ? 1 : 0, 8);
+      }
+      p.pantT = Math.max(p.pantT || 0, 1);
+      p.head = lerp(p.head || 0, 0, dt * 4);
+      if (P.t >= P.dur) { p.pose = null; lieTo(0); p.idleT = 0; }
+      return { tx: undefined, tz: undefined, speed: 0 };
+    }
+    ease('roll', 0, 5); ease('sit', 0, 6); ease('pawUp', 0, 8);
     // the whistle: out wide round the herd and back to you
     if (p.gather) {
       const g = p.gather; g.t += dt;
@@ -18559,7 +18638,7 @@ const DOGS = {
         if (p.st < 0) { p.st = 2 + Math.random() * 3; p.sniff = Math.random() < 0.35 ? [p.x + (Math.random() - 0.5) * 2, p.z + (Math.random() - 0.5) * 2] : null; }
         if (p.sniff) { tx = p.sniff[0]; tz = p.sniff[1]; speed = 1.1; if (Math.hypot(tx - p.x, tz - p.z) < 0.2) p.sniff = null; }
         lieTo(p.idleT > 9 && Fm.walk < 0.1 ? 1 : 0);
-        if (!tx) p.yaw += (Math.atan2(Fm.x - p.x, Fm.z - p.z) - p.yaw) * dt * 1.2 * (p.wantLie ? 0.3 : 1);
+        if (!tx) turnTo(Math.atan2(Fm.x - p.x, Fm.z - p.z), 1.2 * (p.wantLie ? 0.3 : 1));
       }
     } else if (tx === undefined) {
       // a post: wander it, lie down often, walk the fence line at night
@@ -18574,7 +18653,7 @@ const DOGS = {
       if (d > 0.3 && !(p.resting && p.lie > 0.5)) { tx = p.goal[0]; tz = p.goal[1]; speed = d > 8 ? 3.2 : 1.1; lieTo(0); }
       else lieTo(p.resting ? 1 : 0);
       if (P.sniffy && !tx) p.nose = 1;
-      if (Math.hypot(Fm.x - p.x, Fm.z - p.z) < 3 && Fm.walk < 0.2 && !tx) p.yaw += (Math.atan2(Fm.x - p.x, Fm.z - p.z) - p.yaw) * dt * 1.5;   // looks round at you
+      if (Math.hypot(Fm.x - p.x, Fm.z - p.z) < 3 && Fm.walk < 0.2 && !tx) turnTo(Math.atan2(Fm.x - p.x, Fm.z - p.z), 1.5);   // looks round at you
     }
     p.head = lerp(p.head || 0, p.nose || p.sniff ? 0.6 : 0, dt * 2); p.nose = 0;   // nose down on a scent
     return { tx, tz, speed };
@@ -18603,26 +18682,41 @@ const DOGS = {
     if (F.objs.some((o) => o.t === 'coop' || o.t === 'eggmobile')) jobs.push({ id: 'hens', text: 'Guard the hens', small: 'Keeps watch round the coop' });
     if (F.objs.some((o) => o.t === 'barn' || o.t === 'coop')) jobs.push({ id: 'barn', text: 'Mind the barn and coop', small: 'Patrols for rats and mice' });
     const cur = rec.job || 'follow';
-    P.body.innerHTML = `<div class="dogHead">${dogPortrait(B, rec.coat || 0, 120)}<div><b>${RL.icon} ${esc(RL.name)}</b><small>${esc(B.note)}</small><small class="dogPerk">${esc(RL.perk)}</small>${this.age(F, rec) <= 90 ? `<small class="dogPerk">Still a pup: ${rec.sex === 'f' ? 'she' : 'he'} starts working at about three months old.</small>` : ''}</div></div>`
+    P.body.innerHTML = `<div class="dogHead">${dogPortrait(B, rec.coat || 0, 120)}<div><b>${RL.icon} ${esc(RL.name)}</b><small>${esc(B.note)}</small><small class="dogPerk">${esc(RL.perk)}</small>${rec.own ? `<small>Your own dog, home with you from the very first day.</small>` : ''}${this.age(F, rec) <= 90 ? `<small class="dogPerk">Still a pup: ${rec.sex === 'f' ? 'she' : 'he'} starts working at about three months old.</small>` : ''}</div></div>`
+      + UI.rows([{ id: 'pet', tap: true, icon: '🤚', text: `Pet ${rec.name}`, small: 'Some days that means a belly rub' }, { id: 'shake', tap: true, icon: '🐾', text: 'Shake', small: `${rec.name} sits and gives you a paw` }])
       + `<div class="grp">${esc(rec.name)}'s job</div>` + UI.rows(jobs.map((j) => ({ id: 'job|' + j.id, tap: true, cls: j.id === cur ? 'sel' : '', icon: j.id === cur ? '✅' : j.id === 'follow' ? '👣' : j.id === 'hens' ? '🐔' : j.id === 'barn' ? '🐀' : '🛡️', text: j.text, small: j.small })))
-      + `<div class="grp">With ${rec.sex === 'f' ? 'her' : 'him'}</div>` + UI.rows([{ id: 'pet', tap: true, icon: '🤚', text: `Pet ${rec.name}` }, { id: 'rename', tap: true, icon: '✏️', text: 'Rename' }]);
+      + UI.rows([{ id: 'rename', tap: true, icon: '✏️', text: 'Rename' }]);
     P.body.querySelectorAll('.row').forEach((r) => {
       r.onclick = () => {
         const id = r.dataset.id;
         if (id.startsWith('job|')) { rec.job = id.slice(4); const p = (G.view.pets || []).find((q) => q.rec === rec); if (p) { p.goal = null; p.st = 0; p.wantLie = 0; } UI.toast(`${rec.name}: ${self.jobName(F, rec).toLowerCase()}.`); self.card(rec); return; }
         if (id === 'pet') { UI.closeAll(); self.pet(rec); return; }
+        if (id === 'shake') { UI.closeAll(); self.shake(rec); return; }
         if (id === 'rename') { const nm = prompt(`New name for ${rec.name}?`, rec.name); if (nm && nm.trim()) { rec.name = nm.trim().slice(0, 18); } self.card(rec); }
       };
     });
   },
   pet(rec) {
-    const F = G.F, p = (G.view.pets || []).find((q) => q.rec === rec);
-    act('pet', 1.6, 3, 0, () => {
+    const F = G.F, p = (G.view.pets || []).find((q) => q.rec === rec), she = rec.sex === 'f' ? 'her' : 'his', B = dogBreed(rec.breed), big = (B.size || 1) > 1.2;
+    const belly = !!p && this.age(F, rec) > 60 && Math.random() < 0.45;   // sometimes over it goes, paws in the air
+    if (p) { p.pose = belly ? { kind: 'belly', t: 0, dur: 3.9 } : null; p.pantT = 4.5; p.wantLie = 0; p.idleT = 0; p.sniff = null; }
+    AUDIO.pant(belly ? 18 : 12);
+    act('pet', belly ? 3.6 : 1.6, belly ? 5 : 3, 0, () => {
       AUDIO.tone(520, 0.08, 'square', 0.05, 0.7); AUDIO.tone(480, 0.1, 'square', 0.05, 0.7, 0.14);
-      const B = dogBreed(rec.breed), big = (B.size || 1) > 1.2;
-      UI.toast(big ? `${rec.name} leans the whole of ${rec.sex === 'f' ? 'her' : 'his'} weight against your legs 🐕` : `${rec.name} wags so hard the whole dog wiggles 🐕`);
-      F.energy = Math.min(100, F.energy + 2);
-      if (p) { p.wantLie = 0; p.idleT = 0; for (let i = 0; i < 3; i++) G.view.puffs.push({ twinkle: true, x: p.x + (Math.random() - 0.5) * 0.4, y: G.view.T.at(p.x, p.z) + 0.6 * p.size + Math.random() * 0.3, z: p.z + (Math.random() - 0.5) * 0.4, t: 0 }); }
+      UI.toast(belly ? `${rec.name} flops over for a belly rub, back leg kicking 🐾` : big ? `${rec.name} leans the whole of ${she} weight against your legs 🐕` : `${rec.name} wags so hard the whole dog wiggles 🐕`);
+      F.energy = Math.min(100, F.energy + (belly ? 4 : 2));
+      if (p) { for (let i = 0; i < 3; i++) G.view.puffs.push({ twinkle: true, x: p.x + (Math.random() - 0.5) * 0.4, y: G.view.T.at(p.x, p.z) + 0.6 * p.size + Math.random() * 0.3, z: p.z + (Math.random() - 0.5) * 0.4, t: 0 }); }
+    }, { face: p || G.Fm });
+  },
+  shake(rec) {
+    const F = G.F, p = (G.view.pets || []).find((q) => q.rec === rec), she = rec.sex === 'f' ? 'she' : 'he';
+    if (this.age(F, rec) < 75) return UI.toast(`${rec.name} is still a pup. ${she[0].toUpperCase() + she.slice(1)}'ll learn to shake soon.`);
+    if (p) { p.pose = { kind: 'shake', t: 0, dur: 2.9 }; p.pantT = 3.5; p.wantLie = 0; p.sniff = null; }
+    AUDIO.pant(8);
+    act('pet', 2.7, 2, 0, () => {
+      AUDIO.tone(660, 0.07, 'triangle', 0.06); AUDIO.tone(880, 0.09, 'triangle', 0.05, 1, 0.08);
+      UI.toast(`${rec.name} sits and puts ${rec.sex === 'f' ? 'her' : 'his'} paw in your hand 🐾`);
+      if (p) for (let i = 0; i < 2; i++) G.view.puffs.push({ twinkle: true, x: p.x + (Math.random() - 0.5) * 0.3, y: G.view.T.at(p.x, p.z) + 0.5 * p.size + Math.random() * 0.2, z: p.z + (Math.random() - 0.5) * 0.3, t: 0 });
     }, { face: p || G.Fm });
   },
   // ---- the dog pen at the livestock barn
@@ -19987,6 +20081,7 @@ function facade() {
 // ---------------------------------------------------------------- starting / loading a farm
 function startFarm(F, profile) {
   G.F = F; G.profile = profile;
+  homeDogs(F);
   if (!F.weather) planMonth(F);
   NEIGHBORS.setup(F);
   if (G.view) disposeView();
