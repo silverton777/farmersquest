@@ -362,6 +362,58 @@
   .passrow { background: linear-gradient(90deg, #fff6d8, #fffdf5); }
   .speech { font-size: 15.5px; font-style: italic; color: var(--ink); background: #fffdf5; border-radius: 12px; padding: 10px 12px; border: 1.5px solid #eadcbc; }
   .row.ask { background: #fff6d8; }
+
+  /* ---------------- country look: a pine-plank sign on top, a linen-and-kraft paper body with a stitched edge, gingham tabs */
+  .panel { background-color: #fbf1d9;
+    background-image: repeating-linear-gradient(0deg, rgba(150, 110, 60, .045) 0 1px, transparent 1px 4px), repeating-linear-gradient(90deg, rgba(150, 110, 60, .04) 0 1px, transparent 1px 5px); }
+  .panel header { position: relative; color: #fff4dc; padding: 12px 14px 11px; border-bottom: 3px solid #5c3a1e;
+    background-color: #a26a3c;
+    background-image: radial-gradient(circle at 9px 50%, #4a2e16 0 2.2px, rgba(255, 240, 210, .5) 2.6px, transparent 3.4px), radial-gradient(circle at calc(100% - 9px) 50%, #4a2e16 0 2.2px, rgba(255, 240, 210, .5) 2.6px, transparent 3.4px),
+      repeating-linear-gradient(0deg, transparent 0 21px, rgba(60, 30, 10, .28) 21px 23px), repeating-linear-gradient(90deg, rgba(255, 230, 190, .07) 0 2px, transparent 2px 7px, rgba(60, 30, 10, .06) 7px 9px, transparent 9px 15px),
+      linear-gradient(180deg, #b4794a, #94603a); }
+  .panel header h2 { font-family: 'FQ Lilita', ui-rounded, system-ui, sans-serif; font-weight: 400; font-size: 21px; letter-spacing: .01em; text-shadow: 0 2px 0 rgba(60, 30, 10, .45); }
+  .panel header small { font-family: ui-rounded, "Nunito", system-ui, sans-serif; color: #fde9c4; opacity: .95; text-shadow: 0 1px 0 rgba(60, 30, 10, .4); }
+  .panel .x { background: #f6e6bf; color: #6b4423; border: 2px solid #5c3a1e; box-shadow: 0 2px 0 rgba(40, 20, 8, .45); }
+  .tabs { background-color: #fff6e4; padding-top: 8px;
+    background-image: linear-gradient(90deg, rgba(196, 64, 52, .22) 50%, transparent 50%), linear-gradient(0deg, rgba(196, 64, 52, .22) 50%, transparent 50%); background-size: 14px 14px; border-bottom: 2px solid #c8a46a; }
+  .tab { background: rgba(255, 250, 236, .85); border: 1.5px dashed rgba(122, 78, 42, .35); }
+  .tab.on { background: #fffaf0; border: 2px solid #7a4e2a; color: #5c3a1e; }
+  .panel .foot { background: #f1e1bb; border-top: 2px dashed rgba(122, 78, 42, .35); }
+  .grp { font-family: 'FQ Lilita', ui-rounded, system-ui, sans-serif; font-weight: 400; font-size: 13px; letter-spacing: .05em; opacity: .85; color: #8a4b2a; display: flex; align-items: center; gap: 8px; }
+  .grp::after { content: ""; flex: 1; border-top: 2px dashed rgba(138, 75, 42, .3); }
+  .row { background: #fffaf0; border: 1.5px solid rgba(160, 118, 70, .28); }
+  .card { border: 1.5px solid rgba(160, 118, 70, .3); }
+  .btn { border: 2px solid rgba(92, 58, 30, .55); background: #f6e6bf; color: #5a3a1e; }
+  .btn.go { background: #5f9a3c; border-color: #3f6e26; color: #fffbea; text-shadow: 0 1px 0 rgba(30, 60, 10, .4); }
+  .btn.bad { background: #b8432f; border-color: #7e2a1c; }
+  #toast { background: #6d8f3e; border: 2px solid #4a6a26; outline: 1.5px dashed rgba(255, 250, 230, .55); outline-offset: -6px; }
+  #toast.bad { background: #b8432f; border-color: #7e2a1c; }
+  /* moving or building something: a small sign up top, out of the way of the thing you're placing */
+  #placeBar { top: max(64px, calc(env(safe-area-inset-top) + 54px)); bottom: auto; padding: 5px 6px 5px 12px; gap: 6px; border-radius: 14px; max-width: min(520px, calc(100vw - 150px));
+    background: #fbf1d9; border: 2px solid #7a4e2a; box-shadow: 0 3px 0 rgba(70, 42, 20, .4); }
+  #placeBar span { font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; flex: 1; }
+  #placeBar .btn { padding: 5px 9px; font-size: 13px; border-radius: 10px; flex: none; }
+  #placeBar #placeCancel { width: 30px; height: 30px; padding: 0; border-radius: 50%; display: grid; place-items: center; font-size: 15px; }
+  body.placing #toast { top: max(104px, calc(env(safe-area-inset-top) + 94px)); }
+  @media (orientation: portrait) { body.placing #toast { top: max(156px, calc(env(safe-area-inset-top) + 146px)); } }
+  @media (orientation: portrait) { #placeBar { bottom: auto; top: max(110px, calc(env(safe-area-inset-top) + 100px)); max-width: calc(100vw - 32px); } }
+  /* farm dogs */
+  .stTile.locked small { color: #8a4b2a; opacity: .9; }
+  .dogHead { display: flex; gap: 12px; align-items: center; margin: 2px 0 8px; }
+  .dogHead > div { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+  .dogHead b { font-size: 15px; } .dogHead small { font-size: 12.5px; line-height: 1.35; opacity: .85; }
+  .dogPerk { display: block; background: #eef3dc; border: 1.5px dashed #a3b878; border-radius: 10px; padding: 4px 8px; color: #3f5a22; opacity: 1 !important; }
+  .stBreed .dogPerk { font-size: 11.5px; }
+  .dogBuy { margin-top: 4px; }
+  /* milestones on top of the journal's goals */
+  .miles { background: linear-gradient(#fff6dc, #fbeac0); border: 2px solid #c89a52; border-radius: 16px; padding: 10px 10px 8px; margin: 2px 0 10px; box-shadow: 0 2px 0 rgba(120, 80, 30, .25); }
+  .milesTop { display: flex; flex-direction: column; gap: 3px; }
+  .milesTop b { font-family: 'FQ Lilita', ui-rounded, system-ui, sans-serif; font-weight: 400; font-size: 17px; color: #7a4520; }
+  .milesTop small { font-size: 12.5px; opacity: .85; }
+  .mileRow { display: flex; gap: 6px; overflow-x: auto; padding: 8px 1px 2px; scrollbar-width: none; }
+  .mile { flex: none; width: 84px; display: flex; flex-direction: column; align-items: center; gap: 1px; padding: 6px 4px; border-radius: 12px; background: #fffdf5; border: 1.5px solid #e2cfa3; text-align: center; }
+  .mile span { font-size: 20px; } .mile b { font-size: 12px; } .mile small { font-size: 11px; line-height: 1.2; opacity: .75; }
+  .mile.done { background: #eef3dc; border-color: #a3b878; } .mile.next { border: 2px solid #c27a2c; box-shadow: 0 0 0 3px rgba(194, 122, 44, .15); }
 </style>
 </head>
 <body class="ui">
@@ -399,7 +451,7 @@
   <div id="actLabel" hidden></div>
   <div id="actWrap"><button class="big" id="whistleBtn" aria-label="Whistle to call your animals" title="Whistle (H)" hidden><svg viewBox="0 0 32 32" width="30" height="30" aria-hidden="true"><g stroke="#5a3a1c" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round"><path d="M15.5 13.4 28.2 9.4 29.4 14.6 19.4 18.4Z" fill="#e8bb5c"/><circle cx="11.2" cy="19.4" r="7.6" fill="#dca43e"/><circle cx="11.2" cy="19.4" r="2.5" fill="#5a3a1c" stroke="none"/><path d="M5.4 12.6C3.3 9.6 4.8 5.8 9 5.6" fill="none"/><path d="M15 10.6c1-1.6 2.4-2.6 4-3" fill="none" stroke="#8a6a3c"/></g></svg></button><button class="big" id="toolBtn" aria-label="Choose tool">✋</button><button class="big" id="actBtn" aria-label="Action">✋</button></div>
   <div id="moveHint">Drag on the left to walk, drag farther to run</div>
-  <div id="placeBar" hidden><span id="placeTxt"></span><button class="btn" id="placeMinus" hidden aria-label="One vine fewer">−</button><button class="btn" id="placePlus" hidden aria-label="One vine more">＋</button><button class="btn" id="placeRot" hidden>⟳</button><button class="btn" id="placeCancel">Cancel</button></div>
+  <div id="placeBar" hidden><span id="placeTxt"></span><button class="btn" id="placeMinus" hidden aria-label="One vine fewer">−</button><button class="btn" id="placePlus" hidden aria-label="One vine more">＋</button><button class="btn" id="placeRot" hidden>⟳</button><button class="btn" id="placeCancel" aria-label="Cancel" title="Cancel">✕</button></div>
 </div>
 <div id="mapView" hidden>
   <canvas id="mapC" aria-label="Farm map"></canvas>
@@ -682,6 +734,13 @@ const TREES = [
   { key: 'apple_liberty', name: "Apple 'Liberty'", kind: 'fruit', bear: 36, price: 35, chill: 800, zone: [4, 7], fruit: [200, 40, 40], unit: 'lbs apples', yield: 150, sell: 1.5 },
   { key: 'apple_honeycrisp', name: "Apple 'Honeycrisp'", kind: 'fruit', bear: 42, price: 40, chill: 1000, zone: [3, 6], fruit: [220, 70, 50], unit: 'lbs apples', yield: 140, sell: 2.5 },
   { key: 'apple_anna', name: "Apple 'Anna' (low chill)", kind: 'fruit', bear: 30, price: 35, chill: 250, zone: [8, 10], fruit: [210, 180, 60], unit: 'lbs apples', yield: 120, sell: 1.8 },
+  // heirloom fruit (at the nursery once every goal has reached level 6)
+  { key: 'apple_arkblack', heirloom: true, name: "Apple 'Arkansas Black' (heirloom)", kind: 'fruit', bear: 48, price: 60, chill: 800, zone: [5, 8], fruit: [96, 18, 30], unit: 'lbs apples', yield: 140, sell: 4 },
+  { key: 'apple_spitz', heirloom: true, name: "Apple 'Esopus Spitzenburg' (heirloom)", kind: 'fruit', bear: 48, price: 60, chill: 900, zone: [4, 7], fruit: [204, 70, 42], unit: 'lbs apples', yield: 130, sell: 4 },
+  { key: 'apple_roxbury', heirloom: true, name: "Apple 'Roxbury Russet' (heirloom)", kind: 'fruit', bear: 48, price: 55, chill: 800, zone: [4, 7], fruit: [168, 134, 72], unit: 'lbs apples', yield: 140, sell: 3.5 },
+  { key: 'pear_kieffer', heirloom: true, name: "Pear 'Kieffer' (heirloom)", kind: 'fruit', bear: 42, price: 50, chill: 350, zone: [4, 9], fruit: [204, 176, 74], unit: 'lbs pears', yield: 160, sell: 2.5 },
+  { key: 'peach_blood', heirloom: true, name: "Peach 'Indian Blood' (heirloom)", kind: 'fruit', bear: 30, price: 50, chill: 750, zone: [5, 8], fruit: [168, 48, 62], unit: 'lbs peaches', yield: 90, sell: 4 },
+  { key: 'plum_gage', heirloom: true, name: "Plum 'Green Gage' (heirloom)", kind: 'fruit', bear: 36, price: 50, chill: 700, zone: [5, 8], fruit: [150, 184, 84], unit: 'lbs plums', yield: 70, sell: 4.5 },
   { key: 'pear', name: "Pear 'Seckel'", kind: 'fruit', bear: 48, price: 35, chill: 700, zone: [4, 8], fruit: [190, 150, 60], unit: 'lbs pears', yield: 120, sell: 2 },
   { key: 'peach', name: "Peach 'Redhaven'", kind: 'fruit', bear: 30, price: 30, chill: 900, zone: [5, 8], fruit: [240, 150, 90], unit: 'lbs peaches', yield: 100, sell: 2.5 },
   { key: 'plum', name: "Plum 'Methley'", kind: 'fruit', bear: 30, price: 30, chill: 250, zone: [5, 9], fruit: [120, 40, 90], unit: 'lbs plums', yield: 80, sell: 2.5 },
@@ -768,6 +827,19 @@ const BREEDS = [
   { key: 'orpington', sp: 'chicken', name: 'Buff Orpington', price: 8, col: [226, 178, 90], col2: [244, 214, 150], layer: true, note: 'Big, fluffy and gentle. Good brown-egg layer and a devoted broody mother.' },
   { key: 'khaki', sp: 'duck', name: 'Khaki Campbell', price: 8, col: [170, 140, 90], col2: [60, 90, 60], layer: true, note: 'Lays more than most chickens. Slug patrol!' },
   { key: 'pekin', sp: 'duck', name: 'Pekin', price: 7, col: [250, 248, 235], col2: [250, 248, 235], note: 'Big white meat duck.' },
+  // heritage breeds: rare old American breeds, in at the livestock barn once every goal has reached level 3
+  { key: 'randall', sp: 'cattle', heritage: true, name: 'Randall Lineback', price: 2400, col: [52, 54, 62], col2: [240, 238, 230], lineback: true, horns: true, dairy: true, note: 'Heritage. A Vermont farm cow nearly lost forever: roan sides, a white line down the back. Milk, beef and oxen.', stats: { grass: 5, heat: 3, cold: 5, calm: 5, calving: 5, milk: 3, beef: 3 } },
+  { key: 'devon', sp: 'cattle', heritage: true, name: 'Milking Devon', price: 2200, col: [150, 52, 34], col2: [150, 52, 34], horns: true, dairy: true, note: 'Heritage. The red cow that came over with the Pilgrims. Thrives on rough grass.', stats: { grass: 5, heat: 4, cold: 4, calm: 4, calving: 5, milk: 3, beef: 3 } },
+  { key: 'pineywoods', sp: 'cattle', heritage: true, name: 'Pineywoods', price: 1500, col: [94, 64, 46], col2: [236, 228, 214], patches: true, horns: true, small: true, note: 'Heritage. Small, tough Gulf Coast cattle that live on what the woods give them.', stats: { grass: 5, heat: 5, cold: 2, calm: 3, calving: 5, milk: 1, beef: 2 } },
+  { key: 'ossabaw', sp: 'pig', heritage: true, name: 'Ossabaw Island', price: 340, col: [44, 38, 36], col2: [150, 120, 90], small: true, note: 'Heritage. Small island hogs, fattened on acorns. Some of the finest pork there is.' },
+  { key: 'mulefoot', sp: 'pig', heritage: true, name: 'Mulefoot', price: 320, col: [34, 32, 34], col2: [34, 32, 34], note: 'Heritage. A rare black hog with solid, mule-like hooves. A calm grazer.' },
+  { key: 'churro', sp: 'sheep', heritage: true, name: 'Navajo-Churro', price: 460, col: [176, 150, 120], col2: [92, 70, 54], wool: true, fleece: 6, note: 'Heritage. The first sheep in America. Long, strong wool for weaving. Shear once a year.' },
+  { key: 'gulfcoast', sp: 'sheep', heritage: true, name: 'Gulf Coast Native', price: 420, col: [236, 230, 214], col2: [226, 214, 192], wool: true, fleece: 5, note: 'Heritage. Wool sheep that shrug off Southern heat and parasites. Shear once a year.' },
+  { key: 'dominique', sp: 'chicken', heritage: true, name: 'Dominique', price: 12, col: [98, 98, 104], col2: [222, 222, 222], barred: true, layer: true, note: 'Heritage. America’s oldest chicken breed: cuckoo-barred, hardy, a good forager.' },
+  { key: 'buckeye', sp: 'chicken', heritage: true, name: 'Buckeye', price: 12, col: [124, 46, 30], col2: [104, 36, 24], layer: true, note: 'Heritage. Mahogany Ohio hens bred by a woman farmer. Cold hardy and great mousers.' },
+  { key: 'java', sp: 'chicken', heritage: true, name: 'Java', price: 11, col: [30, 34, 38], col2: [30, 34, 38], layer: true, note: 'Heritage. Glossy black, calm, a fine forager. One of America’s oldest breeds.' },
+  { key: 'cayuga', sp: 'duck', heritage: true, name: 'Cayuga', price: 14, col: [28, 34, 32], col2: [40, 70, 56], layer: true, note: 'Heritage. Black ducks with a green sheen. Quiet, hardy, and they lay grey eggs.' },
+  { key: 'amcream', sp: 'horse', heritage: true, name: 'American Cream Draft', price: 7200, col: [226, 200, 150], col2: [246, 236, 212], big: true, feather: true, note: 'Heritage. The only draft horse bred in America: cream coat, amber eyes, a gentle worker.' },
   { key: 'bourbon', sp: 'turkey', name: 'Bourbon Red turkey', price: 15, col: [120, 50, 30], col2: [240, 235, 225], note: 'Heritage turkey, forages well.' },
   { key: 'nzwhite', sp: 'rabbit', name: 'New Zealand White', price: 25, col: [250, 250, 248], col2: [250, 250, 248], note: 'Classic meat rabbit.' },
 ];
@@ -852,6 +924,8 @@ vec2 h22(vec2 p) { return fract(sin(vec2(dot(p, vec2(127.1, 311.7)), dot(p, vec2
 float noise(vec2 p) { vec2 i = floor(p), f = fract(p); f = f*f*(3.0-2.0*f);
   return mix(mix(hash(i), hash(i+vec2(1,0)), f.x), mix(hash(i+vec2(0,1)), hash(i+vec2(1,1)), f.x), f.y); }
 float fbm(vec2 p) { return noise(p) * 0.5 + noise(p * 2.03 + 7.1) * 0.3 + noise(p * 4.1 + 3.3) * 0.2; }
+// cellular noise: distance to the nearest and second-nearest random point (their difference is small along cell borders)
+vec2 vor(vec2 p) { vec2 i = floor(p), f = fract(p); float d1 = 8.0, d2 = 8.0; for (int y = -1; y <= 1; y++) for (int x = -1; x <= 1; x++) { vec2 o = vec2(float(x), float(y)), r = o + h22(i + o) * 0.85 - f; float d = dot(r, r); if (d < d1) { d2 = d1; d1 = d; } else if (d < d2) d2 = d; } return vec2(sqrt(d1), sqrt(d2)); }
 // cut-out cluster of leaves on a card (uv 0..1): five fat leaves fanned out from the middle, so a canopy reads as chunky leafy clumps, not confetti
 float leafMask(vec2 uv, out float tone) {
   vec2 c = uv - 0.5; float best = 0.0; tone = 0.5;
@@ -864,6 +938,25 @@ float leafMask(vec2 uv, out float tone) {
     if (t > 0.0 && t < 1.0) {
       float wv = 0.19 * pow(sin(3.14159 * pow(t, 0.8)), 0.8);
       if (abs(d.y) < wv) { best = 1.0; tone = max(tone, 0.35 + 0.65 * rn.y); }
+    }
+  }
+  float r = length(c);
+  if (r < 0.1) best = 1.0;
+  if (r > 0.5) best = 0.0;
+  return best;
+}
+// the same cluster, but saying which leaf a point is on: info = (distance along it 0..1, across it -1..1, which leaf)
+float leafInfo(vec2 uv, out float tone, out vec3 info) {
+  vec2 c = uv - 0.5; float best = 0.0; tone = 0.5; info = vec3(0.5, 0.0, 0.37);
+  for (int i = 0; i < 5; i++) {
+    float fi = float(i);
+    vec2 rn = h22(vec2(fi * 3.1, 1.7));
+    float a = fi * 1.2566 + rn.x * 0.7, ca = cos(a), sa = sin(a);
+    vec2 d = vec2(ca * c.x + sa * c.y, -sa * c.x + ca * c.y) - vec2(0.03, 0.0);
+    float t = d.x / 0.46;
+    if (t > 0.0 && t < 1.0) {
+      float wv = 0.19 * pow(sin(3.14159 * pow(t, 0.8)), 0.8);
+      if (abs(d.y) < wv) { best = 1.0; float tt = 0.35 + 0.65 * rn.y; if (tt >= tone) { tone = tt; info = vec3(t, d.y / max(wv, 0.001), fi * 1.7 + rn.x); } }
     }
   }
   float r = length(c);
@@ -965,9 +1058,229 @@ uniform sampler2D uShadow;
 ` + SH_PAT + `
 ` + SH_SHADOW + `
 vec3 aces(vec3 x) { return clamp((x * (2.51 * x + 0.03)) / (x * (2.43 * x + 0.59) + 0.14), 0.0, 1.0); }
+float gH; vec3 gTilt; float gSpec;
+#if DETAIL
+// ---- high-definition surfaces (DETAIL): real relief, not just colour. Each material sets gH, a height in world units, which
+// the lighting turns into a bumped normal, so grooves, laps and furrows catch the sun and fall into shade like the grass does.
+bool detailSurface(inout vec3 base, vec3 n0, float camD) {
+  float m = vMat;
+  vec3 t = normalize(cross(vec3(0.0, 1.0, 0.0), n0) + vec3(1e-4, 0.0, 1e-4));
+  float u = dot(vP, t);
+  if (m > 3.5 && m < 4.5) {   // bark
+    float a = atan(n0.z, n0.x);
+    float lum = dot(base, vec3(0.3, 0.59, 0.11));
+    if (lum > 0.6) {
+      // birch and sycamore: pale papery bark, dark horizontal lenticels, black scars where branches fell, curls of peeling bark
+      float row = vP.y * 11.0 + noise(vec2(a * 2.0, vP.y * 3.0)) * 1.2, rid = floor(row);
+      float dash = smoothstep(0.6, 0.8, noise(vec2(a * 3.2 + rid * 3.1, rid * 0.7))) * smoothstep(0.2, 0.06, abs(fract(row) - 0.5));
+      float scar = smoothstep(0.84, 0.93, noise(vec2(a * 2.3, vP.y * 1.6) + 4.0));
+      float peel = smoothstep(0.68, 0.78, noise(vec2(a * 4.0, vP.y * 5.0) + 11.0));
+      base = mix(base, base * vec3(1.02, 0.86, 0.72), peel * 0.5);
+      base *= (1.0 - 0.62 * dash) * (1.0 - 0.7 * scar) * (0.92 + 0.12 * fbm(vec2(a * 3.0, vP.y * 4.0)));
+      gH = -0.007 * dash - 0.012 * scar + 0.004 * peel + 0.0025 * noise(vec2(a * 14.0, vP.y * 22.0));
+      return true;
+    }
+    // furrowed bark: thick corky plates, longer than they are wide, split apart by deep dark furrows. Laid on from the two
+    // side views (triplanar) so it wraps a trunk or a branch with no seam.
+    vec3 wv = abs(n0); wv = wv / (wv.x + wv.z + 0.0001);
+    vec2 sc = vec2(17.0, 3.4);
+    vec2 v1 = vor(vec2(vP.z, vP.y) * sc + vec2(0.0, noise(vP.zy * 3.0) * 0.6)), v2 = vor(vec2(vP.x, vP.y) * sc + vec2(5.3, noise(vP.xy * 3.0) * 0.6));
+    float e1 = v1.y - v1.x, e2 = v2.y - v2.x;
+    float edge = mix(e2, e1, wv.x);                                   // distance from a furrow, in cell units
+    float plate = smoothstep(0.02, 0.22, edge);
+    float grain = mix(noise(vec2(vP.z * 60.0, vP.y * 120.0)), noise(vec2(vP.x * 60.0, vP.y * 120.0)), 0.5);
+    float fleck = mix(noise(vec2(vP.z, vP.y) * vec2(150.0, 90.0)), noise(vec2(vP.x, vP.y) * vec2(150.0, 90.0)), wv.z);
+    float x = vP.x + vP.z;
+    gH = plate * 0.016 + grain * 0.003 + fleck * 0.001;
+    vec3 c = base * (0.32 + 0.82 * plate) * (0.86 + 0.24 * grain);
+    c = mix(c, c * vec3(1.14, 1.06, 0.92), smoothstep(0.62, 0.9, fleck) * plate * 0.7);         // dry, sun-bleached flakes on the plates
+    float lich = smoothstep(0.7, 0.84, fbm(vec2(x * 1.6, vP.y * 1.3) + 9.0)) * plate;
+    c = mix(c, vec3(0.6, 0.65, 0.54) * (0.85 + 0.3 * fleck), lich * 0.6);                      // grey-green lichen
+    float moss = smoothstep(0.15, -0.55, n0.z) * smoothstep(1.4, 0.25, vP.y) * smoothstep(0.38, 0.7, fbm(vec2(x * 2.4, vP.y * 3.0)));
+    c = mix(c, vec3(0.24, 0.36, 0.13) * (0.8 + 0.4 * grain), moss * 0.75);                     // moss low down on the shady side
+    gH += moss * 0.006;
+    base = c * (0.62 + 0.38 * smoothstep(0.0, 0.9, vP.y));
+    return true;
+  }
+  if (m > 4.5 && m < 5.5) {   // broad leaves: every leaf in a cluster gets its own shade, its own tilt to the sun, a midrib and side veins
+    float tn; vec3 li; leafInfo(vUV, tn, li);
+    float rid = li.z, along = li.x, acr = li.y;
+    tn = mix(tn, 0.35 + 0.65 * hash(vec2(rid, 7.0)), 0.6);
+    float mid = smoothstep(0.09, 0.0, abs(acr)) * step(0.04, along) * (1.0 - smoothstep(0.85, 1.0, along));
+    float sv = smoothstep(0.12, 0.0, abs(fract(along * 5.5 - abs(acr) * 1.6) - 0.5)) * smoothstep(0.15, 0.35, abs(acr)) * (1.0 - smoothstep(0.75, 0.95, abs(acr)));
+    float edge = smoothstep(0.7, 1.0, abs(acr));
+    // up close every leaf is its own; further off it settles back to the soft clump shading, so the canopy never turns to static
+    float kd = 1.0 - smoothstep(4.0, 13.0, camD);
+    vec3 hue = mix(vec3(1.0), vec3(1.1, 1.08, 0.78), hash(vec2(rid, 3.0)));                  // some leaves yellower, some bluer
+    hue = mix(hue, vec3(0.9, 1.0, 1.08), step(0.7, hash(vec2(rid, 9.0))) * 0.6);
+    float tOld; leafMask(vUV, tOld);
+    vec3 far = base * (0.78 + 0.38 * tOld), near = base * hue * (0.66 + 0.5 * tn) * (1.0 + 0.22 * mid + 0.08 * sv - 0.16 * edge);
+    base = mix(far, near, kd);
+    base *= (0.82 + 0.18 * smoothstep(0.1, 1.8, length(vP.xz))) * (0.9 + 0.1 * smoothstep(0.6, 3.6, vP.y));
+    gTilt = vec3(hash(vec2(rid, 1.0)) - 0.5, hash(vec2(rid, 2.0)) * 0.6 - 0.1, hash(vec2(rid, 5.0)) - 0.5) * 0.8 * kd;
+    gSpec = 0.12;   // a waxy sheen on the sunny leaves
+    return true;
+  }
+  if (m > 6.5 && m < 7.5) {   // needle sprays: fine needles combed along the frond, lighter new growth at the tips
+    float ax = vUV.x, ac = abs(vUV.y - 0.5) * 2.0, kd = 1.0 - smoothstep(3.0, 11.0, camD);
+    float row = ax * 52.0 + ac * 4.0, rr = floor(row), seg = ac * 9.0 + hash(vec2(rr, 1.0)) * 3.0;
+    float nd = smoothstep(0.2, 0.45, fract(row)) * smoothstep(0.9, 0.65, fract(row)) * smoothstep(0.05, 0.25, fract(seg)) * smoothstep(1.0, 0.8, fract(seg)) * (0.6 + 0.4 * hash(vec2(rr, floor(seg))));
+    base *= 1.0 + kd * (0.26 * nd - 0.1);
+    base *= 1.0 - 0.16 * smoothstep(0.6, 1.0, ac);
+    base = mix(base, base * vec3(1.15, 1.26, 0.92), smoothstep(0.74, 1.0, ax) * 0.5);
+    gSpec = 0.06;
+    return true;
+  }
+  if (m > 16.5 && m < 17.5) {   // fruit skin: tiny pale lenticels, faint streaks, a deeper colour on the sunny shoulder, the stem well on top
+    float a = atan(n0.z, n0.x);
+    float streak = noise(vec2(a * 7.0, n0.y * 2.5 + 3.0));
+    base *= 0.88 + 0.22 * streak;
+    base = mix(base, base * vec3(1.06, 0.82, 0.8), smoothstep(-0.2, 0.8, dot(n0, normalize(vec3(0.4, 0.7, 0.5)))) * 0.35);
+    float dots = smoothstep(0.82, 0.9, noise(vP.xz * 140.0 + vP.y * 90.0));
+    base = mix(base, base * 1.35 + 0.08, dots * 0.5);
+    float well = smoothstep(0.82, 0.95, n0.y);
+    base = mix(base, base * vec3(0.75, 0.85, 0.55), well * 0.6);
+    base *= 1.0 - 0.6 * smoothstep(0.975, 0.995, n0.y);
+    base *= 0.82 + 0.18 * smoothstep(-1.0, 0.0, n0.y);
+    gH = -well * 0.004 + dots * 0.0004;
+    gSpec = 0.55;
+    return true;
+  }
+  if (m > 11.5 && m < 12.5) {   // lap siding: each board laps over the one below, so a crisp shadow line under every lap
+    float f = fract(vP.y / 0.19), id = floor(vP.y / 0.19);
+    float jf = fract((u + hash(vec2(id, 2.0)) * 2.4) / 2.4), joint = smoothstep(0.004, 0.0, min(jf, 1.0 - jf) * 2.4);
+    float grain = noise(vec2(u * 2.2 + id * 7.0, vP.y * 95.0)) * 0.6 + noise(vec2(u * 0.9 + id * 3.0, vP.y * 30.0)) * 0.4;
+    float peel = smoothstep(0.78, 0.86, fbm(vec2(u * 1.8, vP.y * 2.4) + 3.0));
+    float nail = smoothstep(0.016, 0.007, length(vec2((fract(u / 0.6) - 0.5) * 0.6, (f - 0.82) * 0.19)));
+    base *= 0.5 + 0.5 * smoothstep(0.0, 0.16, f);
+    base *= 1.0 + 0.06 * smoothstep(0.7, 1.0, f);                                             // the rounded top edge of each board catches light
+    base *= 0.9 + 0.14 * grain;
+    base *= 1.0 - 0.3 * joint;
+    base *= 1.0 - 0.09 * smoothstep(0.55, 0.9, noise(vec2(u * 9.0, vP.y * 0.3)));
+    base = mix(base, base * 1.12 + 0.02, 0.4 * smoothstep(0.62, 0.9, fbm(vec2(u * 1.3, vP.y * 0.9))));
+    base = mix(base, vec3(0.52, 0.47, 0.42) * (0.85 + 0.25 * grain), peel * 0.8);              // paint worn back to grey wood
+    base *= 1.0 - 0.35 * nail;
+    gH = f * 0.02 - joint * 0.003 + grain * 0.0012 - peel * 0.0015;
+    return true;
+  }
+  if (m > 10.5 && m < 11.5) {   // shingles: thick butts on every row, gaps between tabs, gritty granules, chipped corners
+    float r = vP.y * 6.5, row = floor(r), f = fract(r);
+    vec3 t2 = normalize(cross(n0, vec3(0.0, 1.0, 0.0)) + vec3(1e-4, 0.0, 1e-4));
+    float c = dot(vP, t2) / 0.34 + hash(vec2(row, 1.0)) * 0.7, cf = fract(c), cid = floor(c);
+    float gap = smoothstep(0.045, 0.0, min(cf, 1.0 - cf));
+    float grit = noise(vP.xz * 150.0 + vP.y * 70.0);
+    float chip = smoothstep(0.92, 0.97, hash(vec2(cid, row + 3.0))) * smoothstep(0.25, 0.0, f) * smoothstep(0.3, 0.0, min(cf, 1.0 - cf));
+    base *= 0.66 + 0.34 * smoothstep(0.0, 0.2, f);
+    base *= 0.84 + 0.26 * hash(vec2(cid, row));
+    base *= 1.0 - 0.45 * gap;
+    base *= 0.88 + 0.22 * grit;
+    float mo = smoothstep(0.64, 0.86, fbm(vP.xz * 0.9 + row * 0.13)) * smoothstep(0.2, 0.7, n0.y) * 0.45;
+    base = mix(base, base * vec3(0.7, 0.92, 0.55) + vec3(0.0, 0.025, 0.0), mo);
+    base *= 0.95 + 0.1 * fbm(vP.xz * 0.35);
+    base *= 1.0 - 0.3 * chip;
+    gH = (1.0 - f) * 0.016 - gap * 0.006 + grit * 0.0012 - chip * 0.006 + mo * 0.003;
+    return true;
+  }
+  if (m > 0.5 && m < 1.5) {   // boards: deep seams between boards, raised battens, open grain and knots you can feel
+    if (abs(n0.y) > 0.7) {   // a deck or floor: planks running along x
+      float pf = fract(vP.z / 0.22), pid = floor(vP.z / 0.22);
+      float seam = smoothstep(0.06, 0.0, min(pf, 1.0 - pf));
+      float gr = noise(vec2(vP.x * 4.0 + pid * 5.0, vP.z * 70.0));
+      base *= (0.86 + 0.18 * hash(vec2(pid, 4.0))) * (0.9 + 0.14 * gr) * (1.0 - 0.45 * seam);
+      gH = -seam * 0.006 + gr * 0.0008;
+      return true;
+    }
+    float f = fract(u / 0.26), id = floor(u / 0.26);
+    float seam = smoothstep(0.06, 0.0, min(f, 1.0 - f));
+    float batten = smoothstep(0.1, 0.06, f) + smoothstep(0.9, 0.94, f);
+    float gr = noise(vec2(u * 45.0, vP.y * 1.8)), gr2 = noise(vec2(u * 140.0 + id * 9.0, vP.y * 4.0));
+    base *= 1.0 - 0.55 * seam;
+    base *= 0.9 + 0.14 * smoothstep(0.3, 0.7, noise(vec2(u * 60.0 + id * 4.0, vP.y * 0.9)));   // long open grain running down each board
+    base *= 0.88 + 0.2 * hash(vec2(id, 3.0));
+    base *= 0.88 + 0.14 * gr + 0.06 * gr2;
+    base *= 0.92 + 0.1 * noise(vec2(u * 2.0, vP.y * 0.7));
+    float kr = floor(vP.y / 1.3), kid = hash(vec2(id, kr));
+    vec2 kp = (vec2(f, fract(vP.y / 1.3)) - vec2(0.5, 0.25 + 0.5 * hash(vec2(id, 7.0)))) * vec2(0.26, 1.3);
+    float kd = length(kp * vec2(1.0, 0.62)), knot = step(0.86, kid) * smoothstep(0.036, 0.018, kd);
+    base *= 1.0 - 0.35 * knot;
+    base *= 1.0 - 0.1 * smoothstep(0.55, 0.9, noise(vec2(u * 11.0, vP.y * 0.28 + id)));
+    base *= 0.94 + 0.1 * fbm(vec2(u * 0.7, vP.y * 0.5));
+    gH = -seam * 0.008 + batten * 0.006 + gr2 * 0.0012 - knot * 0.002;
+    return true;
+  }
+  if (m > 1.5 && m < 2.5) {   // standing-seam metal: raised seams, ribs between, rust bleeding down from the fasteners
+    vec3 t2 = normalize(cross(n0, vec3(0.0, 1.0, 0.0)) + vec3(1e-4, 0.0, 1e-4));
+    float s = dot(vP, t2) / 0.5, f = fract(s), sid = floor(s);
+    float seamR = smoothstep(0.04, 0.0, abs(f - 0.5));
+    float rib = smoothstep(0.02, 0.0, abs(abs(f - 0.5) - 0.22));
+    float rust = smoothstep(0.55, 0.85, fbm(vec2(s * 3.0, vP.y * 0.7) + sid)) * smoothstep(0.75, 0.0, abs(f - 0.5));
+    base *= 0.95 + 0.05 * sin(f * 37.7);
+    base += vec3(0.1) * seamR;
+    base = mix(base, base * vec3(0.8, 0.62, 0.48), rust * 0.45);
+    base = mix(base, base * vec3(0.82, 0.68, 0.55), 0.3 * smoothstep(0.58, 0.85, fbm(vP.xz * 1.3 + vP.y)));
+    gH = seamR * 0.014 + rib * 0.004 + 0.0015 * sin(f * 37.7);
+    gSpec = 0.25;
+    return true;
+  }
+  if (m > 17.5 && m < 18.5) {   // a plank or rail: grain streaming along its length, the odd knot and check, weathered grey in patches
+    float g1 = noise(vec2(u * 1.6, vP.y * 140.0)), g2 = noise(vec2(u * 0.5 + 3.0, vP.y * 40.0));
+    vec2 kc = vec2(u * 1.2, vP.y * 9.0), kid = floor(kc); vec2 kf = fract(kc) - 0.5;
+    float knot = step(0.82, hash(kid)) * smoothstep(0.18, 0.08, length(kf * vec2(1.0, 0.7)));
+    float check = smoothstep(0.035, 0.0, abs(noise(vec2(u * 0.8, vP.y * 3.0)) - 0.5)) * step(0.6, noise(vec2(u * 2.0, 7.0)));
+    float wea = smoothstep(0.55, 0.85, fbm(vec2(u * 0.9, vP.y * 2.0) + 5.0));
+    base *= (0.84 + 0.2 * g1) * (0.92 + 0.12 * g2) * (1.0 - 0.4 * knot) * (1.0 - 0.35 * check);
+    base = mix(base, vec3(0.55, 0.52, 0.48) * (0.85 + 0.25 * g1), wea * 0.35);
+    gH = g1 * 0.0015 - knot * 0.003 - check * 0.002;
+    return true;
+  }
+  if (m > 5.5 && m < 6.5) {   // stone: lumpy, pitted, cracked, lichen in the hollows
+    float s1 = fbm(vP.xz * 2.5 + vP.y * 3.0), s2 = noise(vP.xy * 9.0 + vP.z * 7.0), s3 = noise(vP.xz * 30.0 + vP.y * 25.0);
+    float crack = smoothstep(0.05, 0.0, abs(noise(vP.xz * 4.0 + vP.y * 5.0 + 2.0) - 0.5));
+    float lich = smoothstep(0.7, 0.82, fbm(vP.xz * 3.1 + vP.y * 2.0 + 9.0));
+    base = mix(base, base * vec3(0.86, 1.02, 0.8), lich * 0.5);
+    base *= (0.72 + 0.38 * s1) * (1.0 - 0.25 * smoothstep(0.75, 0.85, s2)) * (0.9 + 0.16 * s3) * (1.0 - 0.4 * crack);
+    gH = s1 * 0.03 + s3 * 0.004 - crack * 0.006;
+    return true;
+  }
+  if (m > 18.5 && m < 19.5) {   // garden foliage: crinkled leaves with pale veins and a dull waxy sheen
+    float kd = 1.0 - smoothstep(3.0, 12.0, camD);
+    vec3 q = vP * 38.0;
+    float cr = noise(q.xz + q.y * 0.7) * 0.6 + noise(q.xy * 1.9 + q.z) * 0.4;
+    float vein = smoothstep(0.07, 0.0, abs(fract(dot(vP, normalize(vec3(0.7, 1.0, 0.4))) * 24.0 + noise(vP.xz * 9.0) * 0.6) - 0.5));
+    base *= 1.0 + kd * (0.2 * (cr - 0.5) + 0.1 * vein);
+    base *= 0.9 + 0.12 * noise(vP.xz * 5.0 + vP.y * 3.0);
+    gH = kd * (cr * 0.003 - vein * 0.0012);
+    gSpec = 0.1;
+    return true;
+  }
+  if (m > 9.5 && m < 10.5) {   // hay and straw: stalks you can see
+    float h = noise(vec2(u * 60.0 + vP.y * 7.0, vP.y * 4.0 + u)) * 0.6 + noise(vec2(vP.x * 70.0, vP.z * 70.0)) * 0.4;
+    float st = smoothstep(0.4, 0.7, noise(vec2(u * 140.0, vP.y * 12.0 + u * 3.0)));
+    base *= (0.74 + 0.34 * h) * (0.9 + 0.18 * st);
+    gH = h * 0.006 + st * 0.002;
+    return true;
+  }
+  if (m > 2.5 && m < 3.5 && uShellOn < 0.5) {   // bare ground: clods, pebbles and little hollows
+    float fade = 1.0 - smoothstep(16.0, 42.0, camD);
+    float n1 = fbm(vP.xz * 0.3), n2 = noise(vP.xz * 2.1), n3 = noise(vP.xz * 9.0), n4 = noise(vP.xz * 27.0 + 5.0);
+    vec2 pc = vP.xz * 6.0, pid = floor(pc); vec2 pr = h22(pid); float pd = length(fract(pc) - 0.25 - pr * 0.5);
+    float peb = step(0.78, hash(pid + 0.3)) * smoothstep(0.13, 0.07, pd);
+    base *= 0.88 + 0.16 * n1;
+    base = mix(base, base * vec3(1.08, 1.04, 0.82), n2 * 0.3);
+    base *= 1.0 - fade * (0.06 * (n3 - 0.5) - 0.04 * smoothstep(0.75, 0.92, n4));
+    base = mix(base, base * vec3(1.25, 1.2, 1.1), peb * fade * 0.6);
+    gH = n2 * 0.01 + n3 * 0.004 + peb * 0.008;
+    return true;
+  }
+  return false;
+}
+#endif
 // procedural surface detail by material id
 vec3 surface(vec3 base, vec3 n0, float camD) {
   float m = vMat;
+#if DETAIL
+  if (m > 0.5 && detailSurface(base, n0, camD)) return base;
+#endif
   if (m < 0.5) return base;
   vec3 t = normalize(cross(vec3(0.0, 1.0, 0.0), n0) + vec3(1e-4, 0.0, 1e-4));
   float u = dot(vP, t);
@@ -1101,6 +1414,7 @@ vec3 surface(vec3 base, vec3 n0, float camD) {
     col = mix(col, vec3(0.98, 0.82, 0.35), heart);
     return col * (0.96 + 0.05 * noise(c * 220.0));
   }
+  if (m > 17.5 && m < 18.5) return base * (0.9 + 0.12 * noise(vec2(u * 3.0, vP.y * 50.0)));   // a plank: grain along its length
   return base;
 }
 void main() {
@@ -1111,7 +1425,21 @@ void main() {
   float emis = step(1.5, vCol.a);
   float camD = length(uCam - vW);
   vec3 base = vCol.rgb;
+  gH = 0.0; gTilt = vec3(0.0); gSpec = 0.0;
   if (emis < 0.5) base = surface(base, n0, camD);
+#if DETAIL
+  { // relief: the height each material gave turned into a bumped normal (screen-space derivatives), faded out with distance
+    float fadeB = 1.0 - smoothstep(12.0, 36.0, camD), hh = gH * fadeB;
+    vec3 dpdx = dFdx(vW), dpdy = dFdy(vW);
+    float dhdx = dFdx(hh), dhdy = dFdy(hh);
+    vec3 r1 = cross(dpdy, n), r2 = cross(n, dpdx);
+    float det = dot(dpdx, r1);
+    vec3 sg = sign(det) * (dhdx * r1 + dhdy * r2);
+    vec3 nb = abs(det) * n - sg;
+    if (dot(nb, nb) > 1e-12) n = normalize(nb);
+    n = normalize(n + gTilt * fadeB);
+  }
+#endif
   float up = smoothstep(0.45, 0.85, n.y);
   if (vTop > 0.001) {
     // Trees: snow settles from the crown down, in clumps. The snowier it gets, the further down the tree it reaches; up-facing
@@ -1207,6 +1535,9 @@ void main() {
   float metal = step(1.5, vMat) * step(vMat, 2.5), stoneM = step(5.5, vMat) * step(vMat, 6.5);
   col += uSunCol * pow(max(dot(n, H), 0.0), 48.0) * (0.03 + 0.4 * uWet + 0.22 * metal + 0.05 * stoneM) * sh * mix(up, 1.0, metal);
   col += uSunCol * pow(max(dot(n, H), 0.0), 9.0) * 0.07 * metal * sh;
+#if DETAIL
+  col += uSunCol * pow(max(dot(n, H), 0.0), 36.0) * gSpec * sh;
+#endif
 #if STYLE > 0
   { float ndv = max(dot(n, V0), 0.0), obj = 1.0 - isGround;
 #if STYLE == 1
@@ -1567,6 +1898,7 @@ class Renderer {
     if (!gl) throw new Error('WebGL not available');
     this.gl = gl;
     this.variants = {};
+    this.derivOK = !!gl.getExtension('OES_standard_derivatives'); this.detail = false;
     this.setStyle(0);
     this.water = this.prog(VS_WATER, FS_WATER);
     this.outline = this.prog(VS_OUTLINE, FS_OUTLINE);
@@ -1582,8 +1914,16 @@ class Renderer {
   // art style: 0 = the current look, 1 soft clay, 2 felted wool, 3 storybook gouache, 4 bubble gloss
   setStyle(n) {
     n = n | 0;
-    if (!this.variants[n]) { const h = '#define STYLE ' + n + '\n'; this.variants[n] = { main: this.prog(VS_MAIN, h + FS_MAIN), depth: this.prog(VS_DEPTH, h + FS_DEPTH) }; }
-    this.style = n; this.main = this.variants[n].main; this.depth = this.variants[n].depth;
+    const d = this.detail && this.derivOK ? 1 : 0, key = n + ':' + d;
+    if (!this.variants[key]) {
+      const h = (d ? '#extension GL_OES_standard_derivatives : enable\n' : '') + '#define STYLE ' + n + '\n#define DETAIL ' + d + '\n';
+      try { this.variants[key] = { main: this.prog(VS_MAIN, h + FS_MAIN), depth: this.prog(VS_DEPTH, h + FS_DEPTH) }; }
+      catch (e) { if (!d) throw e; console.warn('detail shaders failed, using the standard ones', e); this.derivOK = false; return this.setStyle(n); }
+    }
+    this.style = n; this.main = this.variants[key].main; this.depth = this.variants[key].depth;
+  }
+  // high-definition surfaces: relief on bark, siding, shingles, boards, stone, leaves and fruit (needs screen-space derivatives)
+  setDetail(on) { this.detail = !!on; this.setStyle(this.style || 0);
   }
   prog(vs, fs) {
     const gl = this.gl;
@@ -1780,7 +2120,8 @@ class Renderer {
         gl.uniform4fv(su.uGS, sp.gs || GS_DEF); gl.uniform1f(su.uShellKind, sp.kind); gl.uniform1f(su.uShellLen, sp.len); gl.uniform1f(su.uShellDens, sp.dens);
         this.bindMesh(S2, d.mesh);
         const n = Math.max(3, Math.round(sp.layers * q));
-        for (let i = 1; i <= n; i++) { gl.polygonOffset(0, -1.2 * i); gl.uniform1f(su.uShellH, i / n); gl.drawArrays(gl.TRIANGLES, 0, d.mesh.count); }   // each layer pulled a little forward so a 16-bit depth buffer cannot z-fight the stack into rings
+        const lf = d.lift ? 1 : 0;   // a surface laid over the ground (swales) is pulled forward already, so its grass layers start from there
+        for (let i = 1; i <= n; i++) { gl.polygonOffset(-2 * lf, -6 * lf - 1.2 * i); gl.uniform1f(su.uShellH, i / n); gl.drawArrays(gl.TRIANGLES, 0, d.mesh.count); }   // each layer pulled a little forward so a 16-bit depth buffer cannot z-fight the stack into rings
       }
       gl.disable(gl.POLYGON_OFFSET_FILL);
     }
@@ -2304,7 +2645,7 @@ function buildChicken(br) {
   const P = {}, col = br.col;
   let m = new MB();
   m.ell(0, 0, 0, 0.17, 0.16, 0.22, col, { lat: 6, lon: 8, colBot: shade(col, 0.85) });
-  if (br.key === 'barred') for (let i = 0; i < 3; i++) m.ell(0, -0.04 + i * 0.06, 0, 0.175, 0.012, 0.225, br.col2, { lat: 3, lon: 8 });
+  if ((br.key === 'barred' || br.barred)) for (let i = 0; i < 3; i++) m.ell(0, -0.04 + i * 0.06, 0, 0.175, 0.012, 0.225, br.col2, { lat: 3, lon: 8 });
   // tail feathers
   m.push(M4.trs(0, 0.08, -0.18, 0, -0.7, 0)); m.ell(0, 0, 0, 0.05, 0.14, 0.09, shade(col, 0.8), { lat: 4, lon: 6, flat: true }); m.pop();
   // wings
@@ -2522,6 +2863,11 @@ function cropLeaf(mb, cx, cy, cz, a, len, wid, col, droop) {
   mb.blade(mx, cy + len * 0.3, mz, tx, cy + len * 0.3 - droop, tz, wid * 0.85, shade(col, 1.1), shade(col, 1.25), 0.35);
 }
 function addCrop(mb, kind, x, y, z, stage, R, lod) {
+  const m0 = mb.mat; mb.mat = MAT.veg;   // HD: leafy foliage, fruit skins (set below), the stake's grain
+  addCropParts(mb, kind, x, y, z, stage, R, lod);
+  mb.mat = m0;
+}
+function addCropParts(mb, kind, x, y, z, stage, R, lod) {
   // stage 0..1; lod 0 = cheap version for big fields
   const st = Math.max(0.05, Math.min(1, stage)), g = [80, 150, 60], lo = lod === 0;
   if (kind === 'corn') {
@@ -2537,7 +2883,7 @@ function addCrop(mb, kind, x, y, z, stage, R, lod) {
     }
   } else if (kind === 'tomato') {
     const h = 0.5 + st * 0.55;
-    mb.cyl(x + 0.11, y, z, 0.016, 0.014, h + 0.3, 5, C.wood);
+    mb.mat = MAT.plank; mb.cyl(x + 0.11, y, z, 0.016, 0.014, h + 0.3, 5, C.wood); mb.mat = MAT.veg;
     mb.sway = 0.1;
     mb.cyl(x, y, z, 0.022, 0.014, h, 5, [96, 140, 60]);
     const n = (lo ? 3 : 4) + Math.round(st * 2);
@@ -2545,7 +2891,7 @@ function addCrop(mb, kind, x, y, z, stage, R, lod) {
       const f = (i + 0.5) / n, a = i * 2.3, cy = y + 0.1 + h * f * 0.95, r = (0.15 + 0.09 * (1 - Math.abs(f - 0.45))) * (0.5 + st * 0.5);
       for (let k = 0; k < (lo ? 2 : 3); k++) { const b = a + k * 2.1; mb.ell(x + Math.cos(b) * r * 0.95, cy + (k - 1) * 0.04, z + Math.sin(b) * r * 0.95, r * 0.8, r * 0.34, r * 0.55, jitc(g, R, 0.14), { lat: 3, lon: 6, colTop: [124, 184, 84] }); }
     }
-    if (st > 0.55) { const ripe = st > 0.8; for (let i = 0; i < (lo ? 2 : 4); i++) { const b = i * 1.7 + 0.5, px = x + Math.cos(b) * 0.15, pz = z + Math.sin(b) * 0.15, fy = y + 0.25 + i * 0.13 * (0.6 + st * 0.5); mb.ell(px, fy, pz, 0.058, 0.052, 0.058, ripe ? [222, 56, 44] : [150, 190, 80], { lat: 4, lon: 7 }); if (!lo) mb.ell(px, fy + 0.05, pz, 0.032, 0.01, 0.032, [60, 120, 50], { lat: 2, lon: 5 }); } }
+    if (st > 0.55) { const ripe = st > 0.8; for (let i = 0; i < (lo ? 2 : 4); i++) { const b = i * 1.7 + 0.5, px = x + Math.cos(b) * 0.15, pz = z + Math.sin(b) * 0.15, fy = y + 0.25 + i * 0.13 * (0.6 + st * 0.5); mb.mat = MAT.fruit; mb.ell(px, fy, pz, 0.058, 0.052, 0.058, ripe ? [222, 56, 44] : [150, 190, 80], { lat: 5, lon: 8 }); mb.mat = MAT.veg; if (!lo) mb.ell(px, fy + 0.05, pz, 0.032, 0.01, 0.032, [60, 120, 50], { lat: 2, lon: 5 }); } }
     mb.sway = 0;
   } else if (kind === 'squash') {
     mb.sway = 0.08;
@@ -2555,7 +2901,7 @@ function addCrop(mb, kind, x, y, z, stage, R, lod) {
       mb.ell(lx, y + 0.14, lz, 0.14, 0.025, 0.12, jitc([70, 142, 60], R, 0.15), { lat: 3, lon: 7, colTop: [112, 176, 78] });
     }
     mb.sway = 0;
-    if (st > 0.55) { mb.ell(x + 0.04, y + 0.1, z - 0.02, 0.17, 0.12, 0.19, [232, 148, 44], { lat: 5, lon: 9, colTop: [244, 170, 60], colBot: [200, 120, 36] }); mb.cyl(x + 0.04, y + 0.2, z - 0.02, 0.03, 0.022, 0.07, 5, [110, 120, 60]); }
+    if (st > 0.55) { mb.mat = MAT.fruit; mb.ell(x + 0.04, y + 0.1, z - 0.02, 0.17, 0.12, 0.19, [232, 148, 44], { lat: 6, lon: 12, colTop: [244, 170, 60], colBot: [200, 120, 36], disp: (q) => 1 - 0.07 * Math.pow(Math.abs(Math.sin(Math.atan2(q[2], q[0]) * 5)), 0.6) }); mb.mat = MAT.veg; mb.cyl(x + 0.04, y + 0.2, z - 0.02, 0.03, 0.022, 0.07, 5, [110, 120, 60]); }
   } else if (kind === 'cabbage' || kind === 'lettuce' || kind === 'kale') {
     const kale = kind === 'kale', cab = kind === 'cabbage';
     const c = kale ? [50, 108, 84] : kind === 'lettuce' ? [132, 206, 92] : [150, 198, 138];
@@ -2582,7 +2928,7 @@ function addCrop(mb, kind, x, y, z, stage, R, lod) {
     mb.sway = 0;
   } else if (kind === 'carrot') {
     for (let i = 0; i < (lo ? 5 : 9); i++) { const a = i * 0.7 + R() * 0.3; cropLeaf(mb, x, y + 0.02, z, a, 0.12 + st * 0.16, 0.02, jitc([92, 170, 66], R, 0.1), 0.06 + st * 0.08); }
-    if (st > 0.5) mb.ell(x, y + 0.01, z, 0.03, 0.018, 0.03, [238, 128, 36], { lat: 3, lon: 6 });
+    if (st > 0.5) { mb.mat = MAT.fruit; mb.ell(x, y + 0.01, z, 0.03, 0.018, 0.03, [238, 128, 36], { lat: 3, lon: 6 }); mb.mat = MAT.veg; }
   } else {
     // bushy low crops: potato, beans, peppers, strawberry...
     mb.sway = 0.1;
@@ -2676,7 +3022,12 @@ function addBarn(mb, x, y, z, ry, opt) {
   mb.mat = 1; mb.box(0, p3[1], 0, 0.9, 0.7, 0.9, red); mb.mat = 0;
   for (const sx of [-1, 1]) { mb.box(sx * 0.46, p3[1] + 0.15, 0, 0.04, 0.4, 0.5, wt); mb.box(0, p3[1] + 0.15, sx * 0.46, 0.5, 0.4, 0.04, wt); }
   mb.mat = 2; mb.cyl(0, p3[1] + 0.7, 0, 0.72, 0.0, 0.55, 4, roofC, { rot: Math.PI / 4, flat: true }); mb.mat = 0;
-  mb.cyl(0, p3[1] + 1.2, 0, 0.02, 0.02, 0.5, 4, [60, 60, 60]); mb.box(0.05, p3[1] + 1.55, 0, 0.4, 0.12, 0.02, [60, 60, 60]);
+  if (opt.vane) {   // the copper weathervane: a rod with the four arms fixed; the rooster on top turns with the wind (drawn on its own)
+    const cu = [86, 150, 128]; mb.cyl(0, p3[1] + 1.2, 0, 0.022, 0.022, 0.62, 6, [60, 62, 64]);
+    mb.box(0, p3[1] + 1.5, 0, 0.62, 0.025, 0.025, cu); mb.box(0, p3[1] + 1.5, 0, 0.025, 0.025, 0.62, cu);
+    mb.ell(0, p3[1] + 1.5, 0, 0.05, 0.05, 0.05, [196, 150, 70], { lat: 4, lon: 6 });
+    for (const [ax, az] of [[0.33, 0], [-0.33, 0], [0, 0.33], [0, -0.33]]) mb.ell(ax, p3[1] + 1.5, az, 0.035, 0.035, 0.035, cu, { lat: 3, lon: 5 });
+  } else { mb.cyl(0, p3[1] + 1.2, 0, 0.02, 0.02, 0.5, 4, [60, 60, 60]); mb.box(0.05, p3[1] + 1.55, 0, 0.4, 0.12, 0.02, [60, 60, 60]); }
   // side windows
   for (const sz of [-1, 1]) for (const wx of [-1.8, 1.8]) { mb.box(wx, 1.4, sz * (D / 2 + 0.03), 0.8, 0.8, 0.06, wt); mb.box(wx, 1.47, sz * (D / 2 + 0.05), 0.62, 0.66, 0.05, [70, 80, 90]); mb.box(wx, 1.47, sz * (D / 2 + 0.08), 0.05, 0.66, 0.03, wt); mb.box(wx, 1.77, sz * (D / 2 + 0.08), 0.62, 0.05, 0.03, wt); }
   // end walls of gambrel
@@ -2687,6 +3038,7 @@ function addBarn(mb, x, y, z, ry, opt) {
       mb.mat = 1; if (sx > 0) mb.tri(a, c, b, red); else mb.tri(a, b, c, red); mb.mat = 0;
     }
   }
+  if (opt.quilt !== undefined && opt.quilt >= 0) for (const sx of [-1, 1]) addBarnQuilt(mb, sx, W / 2, y0 + 0.78, 1.15, BARN_QUILTS[opt.quilt % BARN_QUILTS.length]);
   // big doors with white X trim on the +z side (a steel barn gets a sliding door on a track instead)
   if (bst === 'metal') { mb.box(0, 0.1, D / 2 + 0.03, 2.6, 2.3, 0.06, shade(red, 0.8)); for (let rx = -1.2; rx <= 1.21; rx += 0.3) mb.box(rx, 0.1, D / 2 + 0.07, 0.05, 2.3, 0.03, shade(red, 0.7)); mb.box(0, 2.42, D / 2 + 0.08, 3.2, 0.1, 0.08, [60, 62, 66]); }
   else {
@@ -2716,6 +3068,46 @@ function addBarn(mb, x, y, z, ry, opt) {
   }
   mb.mat = 0;
   mb.pop();
+}
+// ---- barn quilts (unlocked when every goal reaches level 5): a painted block on each gable end, hung as a diamond.
+// Each cell is a colour, or two colours split on a diagonal: 'a/b' (a above-left of a / line, b below-right) or 'a%b' (a above-right of a \\ line, b below-left).
+const QUILT_INK = { w: [244, 236, 210], r: [178, 40, 38], y: [232, 180, 56], g: [64, 116, 66], n: [42, 60, 104], k: [34, 30, 28] };
+const BARN_QUILTS = [
+  { name: 'Sawtooth Star', g: ['w w/r w%r w', 'w/r y y w%r', 'r%w y y r/w', 'w r%w r/w w'] },
+  { name: 'Country Diamond', g: ['g g g g', 'g w/r w%r g', 'g r%w r/w g', 'g g g g'] },
+  { name: 'Nine Patch', g: ['n w n', 'w r w', 'n w n'] },
+  { name: 'Log Cabin', g: ['w w n', 'w r n', 'w n n'] },
+  { name: 'Blue Barn Star', g: ['w w/n w%n w', 'w/n y y w%n', 'n%w y y n/w', 'w n%w n/w w'] },
+];
+function addBarnQuilt(mb, sx, hw, cy, size, Q) {
+  if (!Q) return;
+  const N = Q.g.length, cell = size / N, r2 = Math.SQRT1_2;
+  // (u, v) on the block, u to the right as you face the wall, turned 45 degrees into a diamond, out to the wall's face
+  const P = (u, v, off) => { const a = (u - v) * r2, b = (u + v) * r2; return [sx * (hw + off), cy + b, -sx * a]; };
+  const both = (pts, col) => { if (pts.length === 4) { mb.quad(pts[0], pts[1], pts[2], pts[3], col); mb.quad(pts[3], pts[2], pts[1], pts[0], col); } else { mb.tri(pts[0], pts[1], pts[2], col); mb.tri(pts[2], pts[1], pts[0], col); } };
+  const h = size / 2 + 0.07;   // a white painted frame round it
+  both([P(-h, -h, 0.02), P(h, -h, 0.02), P(h, h, 0.02), P(-h, h, 0.02)], [246, 242, 232]);
+  for (let r = 0; r < N; r++) { const cells = Q.g[r].split(' '); for (let c = 0; c < N; c++) {
+    const u0 = -size / 2 + c * cell, u1 = u0 + cell, v1 = size / 2 - r * cell, v0 = v1 - cell, s = cells[c], o = 0.03;
+    const TL = P(u0, v1, o), TR = P(u1, v1, o), BL = P(u0, v0, o), BR = P(u1, v0, o);
+    if (s.includes('/')) { const [a, b] = s.split('/'); both([TL, TR, BL], QUILT_INK[a]); both([TR, BR, BL], QUILT_INK[b]); }
+    else if (s.includes('%')) { const [a, b] = s.split('%'); both([TL, TR, BR], QUILT_INK[a]); both([TL, BR, BL], QUILT_INK[b]); }
+    else both([TL, TR, BR, BL], QUILT_INK[s] || QUILT_INK.w);
+  } }
+}
+// the rooster on the barn's weathervane (it turns, so it's drawn on its own): built facing +x, beak first
+function buildVaneRooster() {
+  const m = new MB(), cu = [190, 112, 58], dk = [150, 84, 44];
+  m.box(0.02, 0, 0, 0.62, 0.025, 0.025, dk);                                   // the arrow shaft
+  for (const s of [-1, 1]) { m.push(M4.trs(0.31, 0, 0, 0, 0, s * 0.6)); m.box(-0.05, 0, 0, 0.1, 0.02, 0.02, dk); m.pop(); }   // arrowhead
+  m.box(-0.28, 0.02, 0, 0.1, 0.12, 0.012, dk);                                  // the feather
+  m.ell(0.0, 0.17, 0, 0.13, 0.085, 0.014, cu, { lat: 5, lon: 10 });              // body
+  m.ell(0.11, 0.27, 0, 0.045, 0.07, 0.014, cu, { lat: 4, lon: 8 });              // neck and head
+  m.ell(0.11, 0.33, 0, 0.04, 0.03, 0.012, [200, 70, 48], { lat: 3, lon: 6 });    // comb
+  m.ell(0.155, 0.29, 0, 0.022, 0.008, 0.01, [220, 170, 70], { lat: 3, lon: 5 }); // beak
+  for (let i = 0; i < 4; i++) { m.push(M4.trs(-0.1, 0.2, 0, 0, 0, 0.4 + i * 0.32)); m.ell(-0.09, 0, 0, 0.1, 0.022, 0.012, i % 2 ? cu : dk, { lat: 3, lon: 6 }); m.pop(); }   // tail plumes
+  m.box(0.0, 0.07, 0, 0.012, 0.09, 0.012, dk); m.box(0.04, 0.07, 0, 0.012, 0.09, 0.012, dk);   // legs to the shaft
+  return m;
 }
 function addHayBale(mb, x, y, z, ry) {
   mb.push(M4.trs(x, y + 0.55, z, ry, 0, Math.PI / 2));
@@ -3188,8 +3580,10 @@ function horn(mb, pts, r0, r1, col) {
   for (let i = 0; i < pts.length - 1; i++) {
     const a = pts[i], b = pts[i + 1], dx = b[0] - a[0], dy = b[1] - a[1], dz = b[2] - a[2], L = Math.hypot(dx, dy, dz);
     const ry = Math.atan2(dx, dz), rx = Math.acos(clamp(dy / L, -1, 1));
+    // each piece after the first starts a little way back inside the one before, so the outside of a bend never opens a gap
+    const ra = lerp(r0, r1, i / (pts.length - 1)), back = i > 0 ? ra * 0.7 : 0;
     mb.push(M4.mul(M4.trans(a[0], a[1], a[2]), M4.mul(M4.rotY(ry), M4.rotX(rx))));
-    mb.cyl(0, 0, 0, lerp(r0, r1, i / (pts.length - 1)), lerp(r0, r1, (i + 1) / (pts.length - 1)), L, 6, col, { noCap: i < pts.length - 2 });
+    mb.cyl(0, -back, 0, ra, lerp(r0, r1, (i + 1) / (pts.length - 1)), L + back, 6, col, { noCap: i < pts.length - 2 });
     mb.pop();
   }
 }
@@ -3231,6 +3625,7 @@ function buildCow(br) {
   const bodyCol = (q) => {
     if (br.key === 'hereford' && (q[1] < -0.62 || (q[2] > 0.72 && q[1] < 0.2))) return col2;
     if (br.belted && Math.abs(q[2] + 0.05) < 0.28) return [245, 243, 236];
+    if (br.lineback) return (Math.abs(q[0]) < 0.24 && q[1] > 0.45) || q[1] < -0.72 ? col2 : mixc(col, col2, 0.18 * hashN(q[0] * 9, q[1] * 9, q[2] * 9));
     if (br.patches && (patchN(q, br.key.length) > 0.12 || q[1] < -0.75)) return col2;
     if (isBison) return mixc([136, 100, 68], [72, 50, 36], smooth(-0.15, 0.35, q[2]));
     if (shaggy) return shade(mixc(col, col2, hashN(q[0] * 3, q[1] * 3, q[2] * 3)), 0.95 + 0.1 * Math.sin(q[2] * 20 + q[1] * 9));
@@ -3526,13 +3921,13 @@ function buildChicken(br) {
   let m = new MB();
   m.mat = MAT.wool; // soft feather noise
   const bk = br.key === 'orpington' ? 1.14 : 1;      // the Buff Orpington is a big, fluffy bird
-  const featherCol = br.key === 'barred' ? (q) => (Math.floor((q[1] + q[2] * 0.3) * 9) % 2 ? col2 : col) : (q) => mixc(col, shade(col, 0.82), smooth(-0.2, -0.9, q[2]));
+  const featherCol = (br.key === 'barred' || br.barred) ? (q) => (Math.floor((q[1] + q[2] * 0.3) * 9) % 2 ? col2 : col) : (q) => mixc(col, shade(col, 0.82), smooth(-0.2, -0.9, q[2]));
   if (duck) m.sel(0, 0, 0, 0.17, 0.14, 0.27, 2.2, col, { lat: 10, lon: 14, colFn: br.key === 'khaki' ? (q) => mixc(col, shade(col, 0.85), smooth(0.4, -0.6, q[1])) : () => col, shape: (q) => [q[0], q[1] + 0.25 * smooth(-0.3, -0.95, q[2]) * Math.max(0, q[1] + 0.3), q[2]] });
   else m.sel(0, 0, 0, 0.15 * bk, 0.16 * bk, 0.2 * bk, 2.1, col, { lat: 10, lon: 14, colFn: featherCol, shape: (q) => [q[0] * (1 - 0.2 * Math.max(0, q[2])), q[1] + 0.35 * smooth(-0.3, -0.95, q[2]) * Math.max(0, q[1]), q[2] + 0.1 * Math.max(0, q[1]) * q[2]] });
   // tail: a fan of feather blades
   if (!duck) for (let i = -2; i <= 2; i++) { m.push(M4.trs(i * 0.025, 0.1, -0.15, i * 0.12, -1.0 + Math.abs(i) * 0.12, 0)); m.sel(0, 0.09, 0, 0.03, 0.11, 0.05, 2, shade(br.key === 'rir' ? [60, 40, 30] : br.key === 'ameraucana' ? [44, 34, 30] : col, 0.75 + Math.abs(i) * 0.05), { lat: 4, lon: 6 }); m.pop(); }
   else { m.push(M4.trs(0, 0.06, -0.24, 0, -0.6, 0)); m.sel(0, 0.03, 0, 0.06, 0.05, 0.06, 2, shade(col, 0.9), { lat: 4, lon: 6 }); m.pop(); }
-  for (const sx of [-1, 1]) m.sel(sx * 0.13, 0.03, -0.02, 0.035, 0.09, 0.15, 2.2, br.key === 'barred' ? col2 : shade(col, 0.85), { lat: 6, lon: 8, colFn: br.key === 'barred' ? featherCol : null });
+  for (const sx of [-1, 1]) m.sel(sx * 0.13, 0.03, -0.02, 0.035, 0.09, 0.15, 2.2, (br.key === 'barred' || br.barred) ? col2 : shade(col, 0.85), { lat: 6, lon: 8, colFn: (br.key === 'barred' || br.barred) ? featherCol : null });
   // neck
   m.push(M4.trs(0, 0.08, duck ? 0.18 : 0.13, 0, -0.5, 0)); m.sel(0, 0.04, 0, duck ? 0.065 : 0.07, 0.1, duck ? 0.065 : 0.07, 2, duck && br.key === 'khaki' ? br.col2 : br.key === 'rir' ? shade(col, 1.15) : col, { lat: 6, lon: 8 }); m.pop();
   m.mat = 0;
@@ -3612,7 +4007,7 @@ function buildCat() {
 
 'use strict';
 // ============================================================================ trees v2: branching trunks + alpha-cut leaf / needle cards
-const MAT = { plain: 0, boards: 1, metal: 2, ground: 3, bark: 4, leaf: 5, stone: 6, needle: 7, hide: 8, wool: 9, hay: 10, shingle: 11, siding: 12, cloth: 13, denim: 14, fabric: 15, floral: 16 };
+const MAT = { plain: 0, boards: 1, metal: 2, ground: 3, bark: 4, leaf: 5, stone: 6, needle: 7, hide: 8, wool: 9, hay: 10, shingle: 11, siding: 12, cloth: 13, denim: 14, fabric: 15, floral: 16, fruit: 17, plank: 18, veg: 19 };
 const v3 = {
   add: (a, b) => [a[0] + b[0], a[1] + b[1], a[2] + b[2]], sub: (a, b) => [a[0] - b[0], a[1] - b[1], a[2] - b[2]],
   mul: (a, k) => [a[0] * k, a[1] * k, a[2] * k], len: (a) => Math.hypot(a[0], a[1], a[2]),
@@ -3720,8 +4115,9 @@ function addFruitLoad(mb, ends, C, fs, ripeCol, R) {
     const cnt = look.clus || (look.pair ? 2 : 1);
     for (let c = 0; c < cnt; c++) {
       const p = c ? v3.add(base, [(R() - 0.5) * r * 3, -R() * r * 2.4, (R() - 0.5) * r * 3]) : base, col = fruitColorAt(fs.key, ripeCol, fs.k, R);
-      mb.ell(p[0], p[1], p[2], r, r * sy, r, col, { lat: 4, lon: 6, swayTop: 0.3, swayBot: 0.3 });
-      if (r > 0.045) mb.ell(p[0] - r * 0.3, p[1] + r * sy * 0.38, p[2] + r * 0.28, r * 0.3, r * 0.22, r * 0.3, mixc(col, [255, 255, 255], 0.5), { lat: 2, lon: 4, swayTop: 0.3, swayBot: 0.3 });   // a glint of sun on the skin
+      mb.mat = MAT.fruit; mb.ell(p[0], p[1], p[2], r, r * sy, r, col, { lat: 5, lon: 8, swayTop: 0.3, swayBot: 0.3 }); mb.mat = 0;
+      if (r > 0.05 && grow > 0.5) mb.cyl(p[0], p[1] + r * sy * 0.8, p[2], r * 0.08, r * 0.05, r * 0.55, 4, [92, 64, 36], { swayTop: 0.3, swayBot: 0.3 });   // the stalk
+      if (r > 0.045 && !(G.R && G.R.detail)) mb.ell(p[0] - r * 0.3, p[1] + r * sy * 0.38, p[2] + r * 0.28, r * 0.3, r * 0.22, r * 0.3, mixc(col, [255, 255, 255], 0.5), { lat: 2, lon: 4, swayTop: 0.3, swayBot: 0.3 });   // a glint of sun on the skin
     }
   }
 }
@@ -5452,7 +5848,7 @@ function breedPortrait(br, size) {
       g += legs([27, 33], 34, 44, 1.8, '#e2a43a');
       g += tk ? `<path d="M40 30 q6 -24 20 -18 q-2 14 -14 22z" fill="${B}" stroke="${A}" stroke-width="1.5"/>` : `<path d="M42 26 q6 -18 16 -14 q-4 12 -10 18z" fill="${dk(br.col, 0.75)}"/>`;
       g += `<ellipse cx="32" cy="27" rx="${tk ? 14 : 13}" ry="${tk ? 10 : 9.5}" fill="${A}"/>`;
-      if (br.key === 'barred') for (let k = 0; k < 6; k++) g += `<path d="M${22 + k * 3.6} 20 q1 7 0 15" stroke="${B}" stroke-width="1.4" fill="none"/>`;
+      if ((br.key === 'barred' || br.barred)) for (let k = 0; k < 6; k++) g += `<path d="M${22 + k * 3.6} 20 q1 7 0 15" stroke="${B}" stroke-width="1.4" fill="none"/>`;
       if (br.key === 'ameraucana') g += `<ellipse cx="34" cy="28" rx="8" ry="5" fill="${B}"/>`;
       g += `<circle cx="${tk ? 17 : 20}" cy="${tk ? 15 : 16}" r="${tk ? 4.5 : 6}" fill="${tk ? '#9fb3c6' : A}"/><path d="M${tk ? 13 : 14} ${tk ? 15 : 16} l-4 1.6 l4 1.4z" fill="#e6a53c"/>`;
       g += tk ? `<path d="M14 17 q-1 6 2 8" stroke="#d2443a" stroke-width="2.2" fill="none" stroke-linecap="round"/>` : `<path d="M17 10.5 q1 -3 2.5 0 q1 -3 2.5 0 q1.6 -2 2 1.5 l-6.8 1z" fill="#d93a2e"/><ellipse cx="15.5" cy="20" rx="1.4" ry="2" fill="#d93a2e"/>`;
@@ -5526,7 +5922,7 @@ defItem('fence_woven', { name: 'Woven wire & posts', unit: 'm', price: 0, icon: 
 defItem('fence_board', { name: 'Fence boards & posts', unit: 'm', price: 0, icon: '🪵', kind: 'fencing' });
 defItem('gate', { name: 'Paddock gates', unit: 'gates', price: 0, icon: '🚪', kind: 'fencing' });
 function cropIcon(k) { return { lettuce: '🥬', kale: '🥬', carrot: '🥕', potato: '🥔', garlic: '🧄', tomato: '🍅', pepper: '🫑', squash: '🎃', corn: '🌽', beans: '🫘', tepary: '🫘', okra: '🌿', sweetpotato: '🍠', strawberry: '🍓', onion: '🧅', peas: '🫛', cucumber: '🥒', melon: '🍉', sunflower: '🌻', basil: '🌿', beet: '🥗' }[k] || '🥗'; }
-function treeIcon(t) { const k = t.key; if (k.startsWith('apple')) return '🍎'; if (k === 'pear') return '🍐'; if (k === 'peach') return '🍑'; if (k === 'cherry') return '🍒'; if (k === 'citrus') return '🍊'; if (['chestnut', 'hazel', 'pecan', 'walnut'].includes(k)) return '🌰'; if (['blueberry', 'elder', 'aronia', 'mulberry'].includes(k)) return '🫐'; return '🍇'; }
+function treeIcon(t) { const k = t.key; if (k.startsWith('apple')) return '🍎'; if (k.startsWith('pear')) return '🍐'; if (k.startsWith('peach')) return '🍑'; if (k === 'cherry') return '🍒'; if (k === 'citrus') return '🍊'; if (['chestnut', 'hazel', 'pecan', 'walnut'].includes(k)) return '🌰'; if (['blueberry', 'elder', 'aronia', 'mulberry'].includes(k)) return '🫐'; return '🍇'; }
 
 const meatOf = (sp, breed) => (breed === 'bison' ? 'meat_bison' : { cattle: 'meat_beef', pig: 'meat_pork', sheep: 'meat_lamb', goat: 'meat_chevon', chicken: 'meat_chicken', duck: 'meat_duck' }[sp]);
 
@@ -5860,6 +6256,22 @@ class GameTerrain {
     });
     return S;
   }
+  // the nearest point on a finished swale's line to (x, z): distance, signed offset across it (+ = downhill toward the berm), how far along, how far past an end
+  swaleNear(P, N, x, z) {
+    let best = null;
+    for (let i = 0; i + 1 < P.length; i++) {
+      const a = P[i], b = P[i + 1], ex = b[0] - a[0], ez = b[1] - a[1], L2 = ex * ex + ez * ez || 1e-9, tr = ((x - a[0]) * ex + (z - a[1]) * ez) / L2, t = clamp(tr, 0, 1);
+      const px = a[0] + ex * t, pz = a[1] + ez * t, d = Math.hypot(x - px, z - pz);
+      if (!best || d < best.d) { const n = [lerp(N[i][0], N[i + 1][0], t), lerp(N[i][1], N[i + 1][1], t)]; best = { d, s: (x - px) * n[0] + (z - pz) * n[1], along: (i + t) * 0.5, past: (i === 0 && tr < 0 ? -tr : i === P.length - 2 && tr > 1 ? tr - 1 : 0) * Math.sqrt(L2) }; }
+    }
+    return best;
+  }
+  // fill earthworks back in: every ground point in the box goes back toward the land's own shape by wt(x, z) (0..1). Points that something else
+  // still shapes (another pond or swale, a building's levelled pad) are left as they are.
+  unDig(x0, z0, x1, z1, wt, keep) {
+    if (!this.base) return;
+    this.eachVert(x0, z0, x1, z1, (x, z, k) => { const w = wt(x, z); if (w <= 0 || (keep && keep(x, z))) return; this.h[k] = lerp(this.h[k], this.base(x, z), clamp(w, 0, 1)); });
+  }
   flatten(x, z, hw, hd, rot) {
     const c = Math.cos(rot || 0), s = Math.sin(rot || 0), hp = this.at(x, z), m = Math.max(hw, hd) + 2.2;
     this.eachVert(x - m, z - m, x + m, z + m, (vx, vz, k) => {
@@ -6173,6 +6585,7 @@ function farmFromSave(o) {
 const SAVE_VERSION = 5;
 function migrateFarm(F) {
   F.inv = F.inv || {}; F.stats = F.stats || {}; F.goals = F.goals || {}; F.today = F.today || {};
+  F.dogs = F.dogs || []; F.miles = F.miles || {}; F.unlocks = F.unlocks || {};
   F.paddocks = F.paddocks || []; F.fences = F.fences || []; F.animals = F.animals || []; F.objs = F.objs || []; F.ponds = F.ponds || []; F.swales = F.swales || [];
   for (const p of F.paddocks) { p.kind = FENCES[p.kind] ? p.kind : 'poly'; padSync(p); }
   for (const a of F.animals) { if (!a.name) a.name = pickName(F, a.sp, a.sex); }
@@ -6394,6 +6807,63 @@ function roadFenceSegs(F, owned) {
   return { segs: out, gaps };
 }
 // ---------------------------------------------------------------- meshes
+// ---- swales: drawn as one smooth profiled surface (uphill bank, level-bottomed ditch, rounded berm, easing back into the turf),
+// finer than the 1 m ground grid so the curve and the cross-section stay clean. It is its own mesh so the grass carpet grows over it
+// exactly like the turf around it: the colour and blade length on each side are taken from the ground just beyond the swale.
+function buildSwaleMesh(F, season, dry) {
+  const mb = new MB(), T = F.terrain;
+  const Rg = T.region, grassC = shade(mixc(Rg.palette.grass, Rg.palette.dry, 0.25), 0.82);
+  const S_ = [-2.6, -2.2, -1.8, -1.45, -1.15, -0.85, -0.6, -0.35, -0.12, 0.12, 0.35, 0.6, 0.85, 1.1, 1.35, 1.6, 1.85, 2.1, 2.35, 2.65, 3.0, 3.5];
+  // the turf beside the swale: colour and grass length of the nearest grown cell out past its edge
+  const turf = (x, z, nx, nz) => {
+    for (const d of [0, 0.8, 1.6, 2.6]) {
+      const k = T.idx(x + nx * d, z + nz * d); if (k < 0) continue;
+      const cv = T.cover[k]; if (cv !== COVER.grass && cv !== COVER.forest && cv !== COVER.bare) continue;
+      const cx = (k % TN) - THALF + 0.5, cz = Math.floor(k / TN) - THALF + 0.5;
+      return { c: T.cellColor(k, cx, cz, season || 0, dry || 0), g: T.grassLen(k, season || 0) };
+    }
+    return { c: grassC, g: 0.8 };
+  };
+  const soften = (arr) => arr.map((_, i) => { let r = 0, g = 0, b = 0, l = 0, n = 0; for (let d = -2; d <= 2; d++) { const q = arr[Math.max(0, Math.min(arr.length - 1, i + d))], w = 3 - Math.abs(d); r += q.c[0] * w; g += q.c[1] * w; b += q.c[2] * w; l += q.g * w; n += w; } return { c: [r / n, g / n, b / n], g: l / n }; });
+  for (const sw of F.swales || []) {
+    if (!sw.pts || sw.pts.length < 2) continue;
+    const SH = sw.N && sw.N.length === sw.pts.length ? { pts: sw.pts, N: sw.N } : T.swaleShape(sw.pts, sw.level);
+    const P = SH.pts, N = SH.N, L = sw.level !== undefined ? sw.level : T.at(P[0][0], P[0][1]), total = (P.length - 1) * 0.5;
+    const up = soften(P.map((p, i) => turf(p[0] - N[i][0] * 3.0, p[1] - N[i][1] * 3.0, -N[i][0], -N[i][1])));
+    const dn = soften(P.map((p, i) => turf(p[0] + N[i][0] * 3.8, p[1] + N[i][1] * 3.8, N[i][0], N[i][1])));
+    const grid = P.map((p, i) => { const e = swaleEnd(i * 0.5, total), ls = swaleLat(e); return S_.map((sv) => { const x = p[0] + N[i][0] * sv * ls, z = p[1] + N[i][1] * sv * ls, h0 = T.at(x, z); return [x, swaleSurf(sv, L, h0, e) + (0.025 - 0.16 * (1 - smooth(-2.3, -1.5, sv) * smooth(3.3, 2.6, sv))) * e - 0.12 * (1 - e) * (1 - smooth(-1.4, -0.9, sv) * smooth(1.2, 0.9, sv)), z]; }); });   // outer edges and the tapering tips tuck under the turf; only the ditch runs out to the point   // the outer edges tuck just under the turf so the real grass carries on over them
+    // the inner part (ditch and berm) always lies on top of the ground under it, even at the shallow tips where the cut is slight,
+    // so the bare ground left under it never shows through
+    for (const row of grid) for (let j = 0; j < S_.length; j++) if (S_[j] > -1.25 && S_[j] < 2.65) row[j][1] = Math.max(row[j][1], T.at(row[j][0], row[j][2]) + 0.015);
+    const nrm = (i, j) => {
+      const g = grid, a = g[Math.max(0, i - 1)][j], b = g[Math.min(g.length - 1, i + 1)][j], c = g[i][Math.max(0, j - 1)], d = g[i][Math.min(S_.length - 1, j + 1)];
+      const ux = b[0] - a[0], uy = b[1] - a[1], uz = b[2] - a[2], vx = d[0] - c[0], vy = d[1] - c[1], vz = d[2] - c[2];
+      let nx = uy * vz - uz * vy, ny = uz * vx - ux * vz, nz = ux * vy - uy * vx; if (ny < 0) { nx = -nx; ny = -ny; nz = -nz; } const l = Math.hypot(nx, ny, nz) || 1; return [nx / l, ny / l, nz / l];
+    };
+    mb.mat = MAT.ground;
+    // across the swale: the uphill turf runs down the bank, the downhill turf over the berm; the ditch floor holds more water, so its grass is a little lusher and darker
+    const cell = (i, j) => {
+      const sv = S_[j], k = smooth(-1.0, 1.4, sv), a = up[i], b = dn[i];
+      let c = mixc(a.c, b.c, k), g = lerp(a.g, b.g, k);
+      const floor = 1 - smooth(0.55, 1.15, Math.abs(sv - 0.1));
+      c = mixc(c, shade(mixc(c, [70, 120, 56], 0.35), 0.86), floor * 0.6);
+      g *= 1 - 0.15 * floor;
+      return { c, g: Math.max(g, 0.25) };
+    };
+    const CC = grid.map((row, i) => S_.map((_, j) => cell(i, j)));
+    for (let i = 0; i + 1 < grid.length; i++) for (let j = 0; j + 1 < S_.length; j++) {
+      const q = [[i, j], [i + 1, j], [i + 1, j + 1], [i, j + 1]];
+      for (const [a, b, c] of [[0, 1, 2], [0, 2, 3]]) {
+        let tri = [q[a], q[b], q[c]];
+        const A = grid[tri[0][0]][tri[0][1]], B = grid[tri[1][0]][tri[1][1]], Cc = grid[tri[2][0]][tri[2][1]];
+        if ((B[2] - A[2]) * (Cc[0] - A[0]) - (B[0] - A[0]) * (Cc[2] - A[2]) < 0) tri = [tri[0], tri[2], tri[1]];   // face up
+        for (const v of tri) { const cc = CC[v[0]][v[1]]; mb.vert(grid[v[0]][v[1]], nrm(v[0], v[1]), cc.c, 0, [0, cc.g], MAT.ground); }
+      }
+    }
+    mb.mat = 0;
+  }
+  return mb;
+}
 function buildRoadMesh(F) {
   const mb = new MB(), rz = roadZ(F), T = F.terrain, step = (x) => (Math.abs(x) < THALF ? 1 : 4);
   // ---- the county road: brown packed dirt. Two wheel ruts worn darker, a lighter crown between them, soft shoulders, a few stones
@@ -6451,49 +6921,10 @@ function buildRoadMesh(F) {
       });
     }
   }
-  // ---- swales: drawn as one smooth profiled surface (uphill bank, level-bottomed ditch, rounded berm, easing back into the turf),
-  // finer than the 1 m ground grid so the curve and the cross-section stay clean
-  const Rg = T.region, grassC = shade(mixc(Rg.palette.grass, Rg.palette.dry, 0.25), 0.82);
-  const S_ = [-2.6, -2.2, -1.8, -1.45, -1.15, -0.85, -0.6, -0.35, -0.12, 0.12, 0.35, 0.6, 0.85, 1.1, 1.35, 1.6, 1.85, 2.1, 2.35, 2.65, 3.0, 3.5];
-  const soil = [128, 102, 72], wet = [84, 70, 52], berm = shade(mixc(Rg.palette.grass, [150, 140, 90], 0.25), 0.9), mulch = [196, 172, 116];
-  const colAt = (s) => {
-    if (s <= -1.8) return grassC;
-    if (s < -1.15) return mixc(grassC, soil, (s + 1.8) / 0.65);
-    if (s < -0.6) return mixc(soil, wet, (s + 1.15) / 0.55);
-    if (s <= 0.6) return wet;
-    if (s < 1.1) return mixc(wet, soil, (s - 0.6) / 0.5);
-    if (s < 1.45) return mixc(soil, berm, (s - 1.1) / 0.35);
-    if (s < 2.3) return mixc(berm, mulch, Math.max(0, 1 - Math.abs(s - 1.85) / 0.45) * 0.65);
-    if (s < 3.0) return mixc(berm, grassC, (s - 2.3) / 0.7);
-    return grassC;
-  };
-  for (const sw of F.swales || []) {
-    if (!sw.pts || sw.pts.length < 2) continue;
-    const SH = sw.N && sw.N.length === sw.pts.length ? { pts: sw.pts, N: sw.N } : T.swaleShape(sw.pts, sw.level);
-    const P = SH.pts, N = SH.N, L = sw.level !== undefined ? sw.level : T.at(P[0][0], P[0][1]), total = (P.length - 1) * 0.5;
-    const grid = P.map((p, i) => { const e = swaleEnd(i * 0.5, total), ls = swaleLat(e); return S_.map((sv) => { const x = p[0] + N[i][0] * sv * ls, z = p[1] + N[i][1] * sv * ls, h0 = T.at(x, z); return [x, swaleSurf(sv, L, h0, e) + (0.025 - 0.16 * (1 - smooth(-2.3, -1.5, sv) * smooth(3.3, 2.6, sv))) * e - 0.12 * (1 - e) * (1 - smooth(-1.4, -0.9, sv) * smooth(1.2, 0.9, sv)), z]; }); });   // outer edges and the tapering tips tuck under the turf; only the ditch runs out to the point   // the outer edges tuck just under the turf so the real grass carries on over them
-    const nrm = (i, j) => {
-      const g = grid, a = g[Math.max(0, i - 1)][j], b = g[Math.min(g.length - 1, i + 1)][j], c = g[i][Math.max(0, j - 1)], d = g[i][Math.min(S_.length - 1, j + 1)];
-      const ux = b[0] - a[0], uy = b[1] - a[1], uz = b[2] - a[2], vx = d[0] - c[0], vy = d[1] - c[1], vz = d[2] - c[2];
-      let nx = uy * vz - uz * vy, ny = uz * vx - ux * vz, nz = ux * vy - uy * vx; if (ny < 0) { nx = -nx; ny = -ny; nz = -nz; } const l = Math.hypot(nx, ny, nz) || 1; return [nx / l, ny / l, nz / l];
-    };
-    const C = S_.map(colAt);
-    mb.mat = MAT.ground;
-    for (let i = 0; i + 1 < grid.length; i++) for (let j = 0; j + 1 < S_.length; j++) {
-      const q = [[i, j], [i + 1, j], [i + 1, j + 1], [i, j + 1]];
-      for (const [a, b, c] of [[0, 1, 2], [0, 2, 3]]) {
-        let tri = [q[a], q[b], q[c]];
-        const A = grid[tri[0][0]][tri[0][1]], B = grid[tri[1][0]][tri[1][1]], Cc = grid[tri[2][0]][tri[2][1]];
-        if ((B[2] - A[2]) * (Cc[0] - A[0]) - (B[0] - A[0]) * (Cc[2] - A[2]) < 0) tri = [tri[0], tri[2], tri[1]];   // face up
-        for (const v of tri) mb.vert(grid[v[0]][v[1]], nrm(v[0], v[1]), C[v[1]], 0, [0, 0], MAT.ground);
-      }
-    }
-    mb.mat = 0;
-  }
   return mb;
 }
 // the ranch gate at the road end of the driveway: two tall posts, a header beam with a hanging sign board, and two gate leaves
-function addDriveGate(mb, x, y, z) {
+function addDriveGate(mb, x, y, z, opt) {
   const wood = [128, 94, 62], dark = [92, 66, 44], light = [160, 124, 84], iron = [52, 54, 60];
   const up = 0.46;                       // the arch stands 20% taller than it used to: posts, header and sign all rise by this much
   mb.mat = MAT.boards;
@@ -6522,6 +6953,13 @@ function addDriveGate(mb, x, y, z) {
   for (const sx of [-1, 1]) for (const hy of [0.4, 1.2]) mb.box(x + sx * 1.47, y + hy, z + 0.05, 0.16, 0.05, 0.03, iron);
   mb.box(x - 0.06, y + 0.95, z + 0.05, 0.05, 0.22, 0.03, iron); mb.box(x + 0.06, y + 0.95, z + 0.05, 0.05, 0.22, 0.03, iron);
   mb.mat = 0;
+  if (opt && opt.master) {   // the Master Farmer plaque (every goal at level 9), hung on two short chains under the farm sign
+    const py = y + 1.3 + up;
+    for (const sx of [-0.4, 0.4]) mb.box(x + sx, py + 0.2, z + 0.02, 0.018, 0.16, 0.018, iron);
+    mb.mat = MAT.boards; mb.box(x, py - 0.14, z + 0.02, 1.02, 0.28, 0.05, [40, 78, 50]); mb.mat = 0;
+    mb.box(x, py - 0.14, z + 0.048, 0.96, 0.22, 0.01, [52, 96, 62]);
+    for (const s of [1, -1]) { mb.push(M4.trs(x, 0, z + 0.02, s > 0 ? 0 : Math.PI, 0, 0)); addSignText(mb, ['MASTER FARMER'], 0, py - 0.14, 0.032, 0.0112, [232, 196, 92], { blocks: true }); mb.pop(); }
+  }
 }
 function addMailbox(mb, x, y, z, flagUp) {
   mb.mat = MAT.boards; mb.box(x, y - 0.1, z, 0.1, 1.05, 0.1, [120, 88, 60]); mb.mat = 0;
@@ -6778,20 +7216,20 @@ const WHISTLE = {
     if (!list.length) { UI.toast(S.pad ? `Nobody in ${S.pad.name} to call.` : 'No loose animals in the barnyard to call.', true); return; }
     // the near ones first, so they take the front of the ring
     list.sort((p, q) => Math.hypot(p.x - Fm.x, p.z - Fm.z) - Math.hypot(q.x - Fm.x, q.z - Fm.z));
-    const rnd = Math.random;
+    const rnd = Math.random, dog = DOGS.gather(list), quick = dog ? 0.45 : 1;   // a herding dog runs out round them, and they come in at a trot
     list.forEach((a, i) => {
       const ang = Fm.yaw + (i % 2 ? 1 : -1) * (0.35 + Math.floor(i / 2) * 0.62 + rnd() * 0.15), r = 1.7 + 0.5 * Math.sqrt(i) + rnd() * 0.3;
       let x = Fm.x + Math.sin(ang) * r, z = Fm.z + Math.cos(ang) * r;
       // inside a paddock the spot must be inside it too, a body's width from the wire
       if (S.pad) for (let k = 0; k < 6 && !(inPad(S.pad, x, z) && distToEdges(S.pad, x, z) > a.rad * 0.8); k++) { x = lerp(x, Fm.x, 0.3); z = lerp(z, Fm.z, 0.3); }
       const d = Math.hypot(a.x - Fm.x, a.z - Fm.z);
-      a.call = { fx: Fm.x, fz: Fm.z, x, z, delay: 0.2 + rnd() * 0.8 + d / 45, t: 14 + d * 1.2, best: 1e9, chk: 2.5, sgn: rnd() < 0.5 ? 1 : -1 };
+      a.call = { fx: Fm.x, fz: Fm.z, x, z, delay: (0.2 + rnd() * 0.8 + d / 45) * quick, t: 14 + d * 1.2, fast: !!dog, best: 1e9, chk: 2.5, sgn: rnd() < 0.5 ? 1 : -1 };
       a.goingIn = false; a.flee = null;
     });
     // a couple of them answer
     const talkers = list.filter((a) => Math.hypot(a.x - Fm.x, a.z - Fm.z) < 32).slice(0, 2);
     talkers.forEach((a, i) => setTimeout(() => AUDIO.animal(a.sp), 500 + i * 650 + rnd() * 300));
-    UI.toast(S.pad ? `${list.length} came to the whistle` : `${list.length} from the barnyard came to the whistle`);
+    UI.toast(dog ? `${dog.rec.name} runs out and brings ${list.length} in 🐕` : S.pad ? `${list.length} came to the whistle` : `${list.length} from the barnyard came to the whistle`);
   },
 };
 
@@ -10182,7 +10620,7 @@ const AUCTION = {
     if (F.auction && F.auction.wk === wk && F.auction.v === 2) return F.auction.lots;
     const R = mulberry((F.seed || 1) + wk * 1013 + 17);
     const shuf = (a) => { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(R() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
-    const pool = ALL_BREEDS().filter((b) => SPECIES_EXTRA[b.sp]), seen = new Set(), lots = [];
+    const pool = ALL_BREEDS().filter((b) => SPECIES_EXTRA[b.sp] && (!b.heritage || hasUnlock(F, 'heritage'))), seen = new Set(), lots = [];
     const add = (br, kind) => {
       const key = br.key + ':' + kind; if (seen.has(key)) return false; seen.add(key);
       const i = lots.length, lot = this.barnLot(R, br, kind, wk * 100 + i); if (!lot) return false;
@@ -10358,12 +10796,13 @@ const AUCTION = {
   stock(F) {
     const dn = this.barnDay(F), full = this.newcomer(F);
     if (!F.barn || F.barn.dn !== dn) F.barn = { dn, sold: {} };
-    if (this._st && this._st.dn === dn && this._st.seed === F.seed && this._st.full === full) { for (const l of this._st.lots) l.sold = !!F.barn.sold[l.id]; return this._st.lots; }
+    const her = hasUnlock(F, 'heritage');
+    if (this._st && this._st.dn === dn && this._st.seed === F.seed && this._st.full === full && this._st.her === her) { for (const l of this._st.lots) l.sold = !!F.barn.sold[l.id]; return this._st.lots; }
     if (full) {
       const R = mulberry(((F.seed || 1) * 37 + dn * 104729 + 5) | 0), lots = [];
       const FULL = { cattle: ['f', 'm', 'pair'], horse: ['f', 'm'], sheep: ['f', 'm', 'two'], goat: ['f', 'm', 'two'], pig: ['f', 'm', 'weaners'], chicken: ['pen', 'trio', 'rooster'], duck: ['pen', 'pair'] };
-      for (const br of ALL_BREEDS().filter((q) => SPECIES_EXTRA[q.sp] && FULL[q.sp])) for (const k of (br.broiler ? ['broil10', 'broil25'] : FULL[br.sp])) { const lot = this.barnLot(R, br, k, `${dn}-n${lots.length}`); if (lot) lots.push(lot); }
-      this._st = { dn, seed: F.seed, lots, full };
+      for (const br of ALL_BREEDS().filter((q) => SPECIES_EXTRA[q.sp] && FULL[q.sp] && (!q.heritage || hasUnlock(F, 'heritage')))) for (const k of (br.broiler ? ['broil10', 'broil25'] : FULL[br.sp])) { const lot = this.barnLot(R, br, k, `${dn}-n${lots.length}`); if (lot) lots.push(lot); }
+      this._st = { dn, seed: F.seed, lots, full, her };
       for (const l of lots) l.sold = !!F.barn.sold[l.id];
       return lots;
     }
@@ -10372,7 +10811,7 @@ const AUCTION = {
     // what's in the pens each day: 2-4 cattle breeds, 1-2 sheep, 1-2 goats, 2-3 pigs, at least 3 laying breeds of hen (and broiler
     // chicks you can always order), 1-2 duck breeds, and horses some days. Each breed comes as a few different lots: a cow, a bull,
     // a cow with her calf, a pair of heifers... so there's a real choice within the breed too.
-    const all = ALL_BREEDS().filter((b) => SPECIES_EXTRA[b.sp]), lots = [];
+    const all = ALL_BREEDS().filter((b) => SPECIES_EXTRA[b.sp] && (!b.heritage || hasUnlock(F, 'heritage'))), lots = [];
     const pick = (list, lo, hi) => shuf(list).slice(0, Math.min(list.length, lo + Math.floor(R() * (hi - lo + 1))));
     const plan = [
       ['cattle', all.filter((b) => b.sp === 'cattle'), 2, 4],
@@ -10391,7 +10830,7 @@ const AUCTION = {
     }
     // broilers are ordered in, so there are always some: a box of 10 or 25 chicks
     for (const br of all.filter((b) => b.sp === 'chicken' && b.broiler)) for (const k of ['broil10', 'broil25']) { const lot = this.barnLot(R, br, k, `${dn}-${lots.length}`); if (lot) lots.push(lot); }
-    this._st = { dn, seed: F.seed, lots, full: false };
+    this._st = { dn, seed: F.seed, lots, full: false, her };
     for (const l of lots) l.sold = !!F.barn.sold[l.id];
     return lots;
   },
@@ -10446,6 +10885,10 @@ const AUCTION = {
 const STOCKUI = {
   SPECIES_ORDER: ['cattle', 'sheep', 'goat', 'pig', 'chicken', 'duck', 'horse'],
   sp: null, showCart: false,
+  dogTile(F) {
+    const on = DOGS.unlocked(F), n = on ? DOGS.forSale(F).length : 0, B = n ? dogBreed(DOGS.forSale(F)[0].breed) : dogBreed('aussie');
+    return `<button class="stTile${n ? '' : ' none'}${on ? '' : ' locked'}" data-sp="dogs">${dogPortrait(B, n ? DOGS.forSale(F)[0].coat : 0, 74)}<b>Farm dogs</b><small>${esc(DOGS.tileText(F))}</small></button>`;
+  },
   cart(F) { const dn = AUCTION.barnDay(F); if (!this._cart || this._cart.dn !== dn || this._cart.seed !== F.seed) this._cart = { dn, seed: F.seed, ids: [] }; return this._cart; },
   render(b, F, again, cash) {
     const self = this;
@@ -10462,9 +10905,12 @@ const STOCKUI = {
         + `<div class="stTiles">${this.SPECIES_ORDER.filter((sp) => SPECIES[sp] && SPECIES_EXTRA[sp]).map((sp) => {
           const here = lots.filter((l) => l.sp === sp && !l.sold), brs = new Set(here.map((l) => l.breed)), rep = breedOf(here.length ? here[0].breed : ALL_BREEDS().find((q) => q.sp === sp).key), nCart = cartLots.filter((l) => l.sp === sp).length;
           return `<button class="stTile${here.length ? '' : ' none'}" data-sp="${sp}">${breedPortrait(rep, 74)}<b>${SPECIES[sp].name}</b><small>${here.length ? `${brs.size} breed${brs.size === 1 ? '' : 's'} in today` : 'None in today'}</small>${nCart ? `<i class="stIn">${nCart} in cart</i>` : ''}</button>`;
-        }).join('')}</div>`;
+        }).join('')}${this.dogTile(F)}</div>`;
+    } else if (this.sp === 'dogs') {
+      body = DOGS.shopHtml(F) || '';
+      if (!body) { this.sp = null; return this.render(b, F, again, cash); }
     } else {
-      const sp = this.sp, breeds = ALL_BREEDS().filter((q) => q.sp === sp);
+      const sp = this.sp, breeds = ALL_BREEDS().filter((q) => q.sp === sp && (!q.heritage || hasUnlock(F, 'heritage')));
       breeds.sort((x, y) => (lots.some((l) => l.breed === y.key && !l.sold) ? 1 : 0) - (lots.some((l) => l.breed === x.key && !l.sold) ? 1 : 0));
       body = `<div class="stTop"><button class="btn" id="stBack">← All animals</button><b>${SPECIES_EXTRA[sp].icon} ${SPECIES[sp].name}</b></div>`
         + `<div class="stBreeds">${breeds.map((br) => {
@@ -10475,7 +10921,13 @@ const STOCKUI = {
     }
     b.innerHTML = body + bar;
     const redraw = () => { self.render(b, F, again, cash); };
-    b.querySelectorAll('[data-sp]').forEach((t) => { t.onclick = () => { self.sp = t.dataset.sp; self.showCart = false; redraw(); b.scrollTop = 0; }; });
+    b.querySelectorAll('[data-sp]').forEach((t) => { t.onclick = () => {
+      if (t.dataset.sp === 'dogs') {   // the dog pen: locked until every goal is at level 2, and only some days
+        if (!DOGS.unlocked(F)) { const pr = MILESTONES.progress(F, 2); UI.toast(`Farm dogs unlock when every goal in your journal reaches level 2 (${pr.n} of ${pr.of} so far).`); return; }
+        if (!DOGS.forSale(F).length) { UI.toast('Sorry, no dogs for sale today!'); return; }
+      }
+      self.sp = t.dataset.sp; self.showCart = false; redraw(); b.scrollTop = 0; }; });
+    if (this.sp === 'dogs') DOGS.wireShop(b, F, redraw);
     if ($('stBack')) $('stBack').onclick = () => { self.sp = null; redraw(); b.scrollTop = 0; };
     b.querySelectorAll('[data-lot]').forEach((t) => { t.onclick = () => { const id = t.dataset.lot; if (inCart(id)) C.ids = C.ids.filter((q) => q !== id); else { C.ids.push(id); AUDIO.ding && AUDIO.ding(); } const top = b.scrollTop; redraw(); b.scrollTop = top; }; });
     $('stCartBtn').onclick = () => { self.showCart = !self.showCart; redraw(); b.scrollTop = 0; };
@@ -11374,7 +11826,8 @@ const WOODS = {
       const n = self.amount(F, p); self.add(F, item, n); tally(F, 'forage'); tally(F, 'forage_' + p.type);
       let msg = self.say(item, n);
       // a lucky second find, a little more often as you learn the woods
-      if (Math.random() < 0.08 + 0.04 * self.skill(F)) { const lst = self.list(F, p.type), alt = lst[Math.floor(Math.random() * lst.length)]; if (alt) { self.add(F, alt, 1); msg += ` and ${ITEMS[alt].name.toLowerCase()} ${ITEMS[alt].icon}`; } }
+      const hound = DOGS.list(F).find((d) => dogBreed(d.breed).role === 'hunt' && (d.job || 'follow') === 'follow' && DOGS.age(F, d) > 90);
+      if (Math.random() < 0.08 + 0.04 * self.skill(F) + (hound ? 0.22 : 0)) { const lst = self.list(F, p.type), alt = lst[Math.floor(Math.random() * lst.length)]; if (alt) { self.add(F, alt, 1); msg += ` and ${ITEMS[alt].name.toLowerCase()} ${ITEMS[alt].icon}${hound ? ` (${hound.name} nosed it out)` : ''}`; } }
       AUDIO.ding(); UI.toast(msg); UI.hudTick(0, true);
       const before = self.skill(F); void before;
       PURSUE.check(F); checkGoalsToast();
@@ -12644,7 +13097,7 @@ function callStep(a, dt, rnd, spd, blocked) {
   const dx = c.x - a.x, dz = c.z - a.z, d = Math.hypot(dx, dz);
   if (d < 0.3 || c.t <= 0) { end(8 + rnd() * 8); return false; }
   c.chk -= dt; if (c.chk <= 0) { if (c.best - d < 0.6) { end(3 + rnd() * 3); return false; } c.best = d; c.chk = 2.5; }   // wedged behind something: give up
-  const s = Math.min(d, spd * 2.4 * dt), ang = Math.atan2(dx, dz), r = a.rad * 0.8;
+  const s = Math.min(d, spd * (c.fast ? 3.4 : 2.4) * dt), ang = Math.atan2(dx, dz), r = a.rad * 0.8;   // with a dog behind them they come at a trot
   let pick = null;
   for (const off of (c.sgn > 0 ? [0, 0.5, -0.5, 1, -1, 1.6, -1.6] : [0, -0.5, 0.5, -1, 1, -1.6, 1.6])) {
     const nx = a.x + Math.sin(ang + off) * (s + 0.25), nz = a.z + Math.cos(ang + off) * (s + 0.25);
@@ -12713,7 +13166,8 @@ function drawActor(out, a, T, pondLevel) {
   a.wk = a.wk === undefined ? (walking ? 1 : 0) : a.wk + ((walking ? 1 : 0) - a.wk) * (1 - Math.exp(-dtw * 7));
   const wk = a.wk;
   const bob = (Math.abs(Math.sin(ph)) * 0.045 * wk + Math.sin(tt * 1.8) * 0.008 * (1 - wk)) * (a.sleepy ? 0.3 : 1);
-  let root = M4.mul(M4.trs(a.x, y, a.z, a.yaw, 0, 0, s), M4.trans(0, D.height + bob, 0));
+  const lie = a.lie || 0;   // a dog lying down: belly on the ground, front legs out ahead, back legs tucked under
+  let root = M4.mul(M4.trs(a.x, y, a.z, a.yaw, 0, 0, s), M4.trans(0, lerp(D.height + bob, D.lieY || D.height * 0.45, lie), 0));
   if (a.dead) root = M4.mul(M4.trs(a.x, y, a.z, a.yaw, 0, 0, s), M4.mul(M4.trans(0, D.height * 0.45, 0), M4.rotZ(Math.min(1, a.deadT * 2.5) * 1.45)));
   const tint = a.dead ? [0.4, 0.4, 0.4, Math.min(0.6, a.deadT * 0.4)] : a.hl ? [1, 1, 0.7, 0.18] : null;
   const poultry = a.sp === 'chicken' || a.sp === 'duck' || a.sp === 'turkey';
@@ -12737,7 +13191,7 @@ function drawActor(out, a, T, pondLevel) {
       // diagonal gait: front-left with back-right. The lower leg folds at the knee / hock while the leg swings forward.
       const LL = D.legL || 0.5;
       for (const l of [[-1, 1, 1], [1, 1, -1], [-1, -1, -1], [1, -1, 1]]) {
-        const r = Math.sin(ph) * l[2] * 0.6 * wk, front = l[1] > 0;
+        const front = l[1] > 0, r = Math.sin(ph) * l[2] * 0.6 * wk - lie * (front ? 1.45 : 1.3);
         const flex = Math.max(0, -l[2] * Math.cos(ph)) * wk;
         const bend = flex > 0.002 ? [flex * (front ? 1.05 : 0.9), -LL * (front ? 0.46 : 0.48), front ? 0.02 : -LL * 0.13, 1] : null;
         out.push({ mesh: l[1] < 0 && M.legB ? M.legB : M.leg, model: M4.mul(body, M4.mul(M4.trans(l[0] * D.legX, D.legY, l[1] * D.legZ), M4.rotX(r))), tint, snowK: 0, bend, shell: fur });
@@ -12774,7 +13228,7 @@ function treeVisual(o) {
   if (T.vine) return { kind: 'grapevine', T, fruitTree: true, vine: true };
   if (T.palm) return { kind: 'palm', T };
   if (shrub) return { kind: 'berry', T, shrub: true };
-  const leafKind = T.key.startsWith('apple') || ['pear', 'peach', 'plum', 'cherry', 'persimmon', 'pawpaw', 'pomegranate', 'jujube', 'fig'].includes(T.key) ? 'apple' : T.key === 'citrus' ? 'magnolia' : T.key === 'willow' || T.key === 'poplar' ? 'poplar' : T.key === 'mesquite' ? 'mesquite' : T.key === 'walnut' ? 'walnut' : 'oak';
+  const leafKind = T.key.startsWith('apple') || ['pear', 'peach', 'plum', 'cherry', 'persimmon', 'pawpaw', 'pomegranate', 'jujube', 'fig'].includes(T.key.split('_')[0]) ? 'apple' : T.key === 'citrus' ? 'magnolia' : T.key === 'willow' || T.key === 'poplar' ? 'poplar' : T.key === 'mesquite' ? 'mesquite' : T.key === 'walnut' ? 'walnut' : 'oak';
   return { kind: leafKind, T, fruitTree: T.kind === 'fruit' };
 }
 function treeScale(o) {
@@ -12828,6 +13282,7 @@ class FarmView {
     const key = this.season() + ':' + Math.round(this.dryness() * 4);
     if (this.farKey !== key) { if (this.farMesh) this.R.free(this.farMesh); this.farMesh = this.R.mesh(this.T.buildFar(this.season(), this.dryness())); this.farKey = key; }
     if (this.roadMesh) this.R.free(this.roadMesh); this.roadMesh = this.R.mesh(buildRoadMesh(this.F));
+    if (this.swaleMesh) this.R.free(this.swaleMesh); this.swaleMesh = (this.F.swales || []).length ? this.R.mesh(buildSwaleMesh(this.F, this.season(), this.dryness())) : null;
   }
   chunkOf(x, z) { const i = clamp(Math.floor((x - CH0) / CHUNK), 0, CHN - 1), j = clamp(Math.floor((z - CH0) / CHUNK), 0, CHN - 1); return j * CHN + i; }
   dirtyAt(x, z, r) { r = r || 0; for (const dx of [-r, r]) for (const dz of [-r, r]) this.dirty[this.chunkOf(x + dx, z + dz)] = true; }
@@ -12938,7 +13393,7 @@ class FarmView {
         const k = o.sc || 1, look = Object.assign({ style: o.hstyle }, o.t === 'house' && o.style === 'cabin' && !o.hstyle ? { wall: [176, 134, 92], roof: [92, 84, 76] } : {}, o.t === 'house' || o.t === 'barn' ? SHOP.paint(F, o.t) || {} : {}, o.paint || {});
         mb.push(M4.trs(o.x, y, o.z, 0, 0, 0, k));
         if (o.t === 'house') addHouse(mb, 0, 0, 0, o.r, look);
-        else if (o.t === 'barn') addBarn(mb, 0, 0, 0, o.r, Object.assign({ hay: (F.inv.hay || 0) > 0, hayN: Math.min(6, Math.ceil((F.inv.hay || 0) / 8)) }, look));
+        else if (o.t === 'barn') addBarn(mb, 0, 0, 0, o.r, Object.assign({ hay: (F.inv.hay || 0) > 0, hayN: Math.min(6, Math.ceil((F.inv.hay || 0) / 8)), quilt: hasUnlock(F, 'quilt') ? (o.quilt === undefined ? 0 : o.quilt) : -1, vane: hasUnlock(F, 'vane') }, look));
         else if (o.t === 'coop') addCoop(mb, 0, 0, 0, o.r, false, Object.assign({ upg: o.upg || 0 }, look));
         else addStall(mb, 0, 0, 0, o.r, look);
         mb.pop(); break;
@@ -12950,7 +13405,7 @@ class FarmView {
       case 'trough': addTrough(mb, o.x, y, o.z, o.r); break;
       case 'tank': addTank(mb, o.x, y, o.z); break;
       case 'woodpile': addWoodshed(mb, o.x, y, o.z, o.r, F.inv.firewood || 0); break;
-      case 'dgate': addDriveGate(mb, o.x, y, o.z); break;
+      case 'dgate': addDriveGate(mb, o.x, y, o.z, { master: hasUnlock(F, 'master') }); break;
       case 'mailbox': addMailbox(mb, o.x, y, o.z, MAIL.unread(F) > 0); break;
       case 'rock': addRock(mb, o.x, y - 0.1, o.z, o.s, R); break;
       case 'weed': addWeed(mb, o.kind, o.x, y, o.z, o.s || 1, R); break;
@@ -13264,14 +13719,32 @@ class FarmView {
   draws(focus, Fm, t) {
     const out = [{ mesh: this.farMesh, noShadow: true }, { mesh: this.roadMesh, noShadow: true, lift: true }];
     // the usual camera looks north from the south; riding cameras can look any way, so keep everything nearby
-    const wide = !!(G.drive && G.camMode !== 'top');
-    const vis = wide ? (x, z, m) => Math.hypot(x - focus[0], z - focus[2]) < 70 + (m || 0) : (x, z, m) => Math.abs(x - focus[0]) < 30 + (m || 0) && z - focus[2] < 22 + (m || 0) && focus[2] - z < 40 + (m || 0);
+    // first person can look any way and see a long way: everything close by, and everything out ahead to the haze (the camera's
+    // own frustum, plus a margin so nothing pops in at the edges as you turn)
+    const fp = !!(FPV.on && !G.drive && !G.photo && Fm);
+    const wide = !!(G.drive && G.camMode !== 'top') || fp;
+    let vis;
+    if (fp) {
+      const fx = Math.sin(Fm.yaw), fz = Math.cos(Fm.yaw), aspect = glc.width / Math.max(1, glc.height);
+      const half = Math.atan(Math.tan((aspect < 1 ? 41.25 : 33) * Math.PI / 180) * aspect) + 0.3, ch = Math.cos(Math.min(1.45, half));
+      vis = (x, z, m) => { const dx = x - Fm.x, dz = z - Fm.z, d = Math.hypot(dx, dz), mm = m || 0; if (d < 24 + mm) return true; if (d > 200 + mm) return false; return dx * fx + dz * fz > d * ch - mm * 1.2; };
+    } else vis = wide ? (x, z, m) => Math.hypot(x - focus[0], z - focus[2]) < 70 + (m || 0) : (x, z, m) => Math.abs(x - focus[0]) < 30 + (m || 0) && z - focus[2] < 22 + (m || 0) && focus[2] - z < 40 + (m || 0);
     // the ground in tiles: only the ones the camera can see, and the grass carpet only on those near enough to show it
     for (const t of this.tiles) {
       if (!vis(t.cx, t.cz, t.r)) continue;
       // the grass carpet thins out blade by blade between 19 and 33 m from the farmer (in the shaders), so every tile that reaches inside 33 m carries it and there is never a seam
       const d = Math.hypot(t.cx - focus[0], t.cz - focus[2]) - t.r * 1.42;
       out.push({ mesh: t.mesh, shell: d < 33 ? GRASS_SHELL : undefined });
+    }
+    if (this.swaleMesh) out.push({ mesh: this.swaleMesh, noShadow: true, lift: true, shell: GRASS_SHELL });   // swales carry the same grass carpet as the turf round them
+    if (hasUnlock(this.F, 'vane')) {   // the copper rooster on each barn's weathervane swings round into the wind
+      this.vaneMesh = this.vaneMesh || this.R.mesh(buildVaneRooster());
+      for (const o of this.F.objs) {
+        if (o.t !== 'barn' || !vis(o.x, o.z, 8)) continue;
+        const k = o.sc || 1, st = o.hstyle || 'gambrel', top = (st === 'gambrel' || st === 'bank' ? 4.7 : 4.8) + 1.62, wv = this.windNow || 0.1;
+        const yaw = 2.85 + Math.sin(t * 0.7 + o.id) * (0.08 + 0.25 * wv) + Math.sin(t * 2.3) * 0.05 * wv;
+        out.push({ mesh: this.vaneMesh, model: M4.trs(o.x, this.T.at(o.x, o.z) + top * k, o.z, yaw, 0, 0, k * 1.15), snowK: 0.2 });
+      }
     }
     for (const c of this.chunks) if (c && vis(c.cx, c.cz, 6)) out.push({ mesh: c.mesh, noShadow: Math.hypot(c.cx - focus[0], c.cz - focus[2]) > 24 });
     NEIGHBORS.draws(this, out, focus, wide);
@@ -13330,7 +13803,9 @@ class FarmView {
 }
 function boardBetween(mb, A, B, col) {
   const dx = B[0] - A[0], dz = B[2] - A[2], L = Math.hypot(dx, dz), ang = Math.atan2(dx, dz);
+  const m0 = mb.mat; mb.mat = MAT.plank;   // a rail: one long board with the grain running its length
   mb.push(M4.trs((A[0] + B[0]) / 2, (A[1] + B[1]) / 2, (A[2] + B[2]) / 2, ang, 0, 0)); mb.box(0, -0.06, 0, 0.05, 0.13, L, col); mb.pop();
+  mb.mat = m0;
 }
 function wovenBetween(mb, A, B) {
   const n = 6;
@@ -13391,10 +13866,10 @@ const ROOTS = {
 };
 function rootFamily(T) {
   if (!T) return null;
-  const k = T.key;
+  const k = T.key, k0 = k.split('_')[0];
   if (k.startsWith('apple')) return 'pome';
-  if (k === 'pear') return 'pear';
-  if (['peach', 'plum', 'cherry', 'jujube'].includes(k)) return 'stone';
+  if (k0 === 'pear') return 'pear';
+  if (['peach', 'plum', 'cherry', 'jujube'].includes(k0)) return 'stone';
   if (k === 'citrus') return 'citrus';
   if (['chestnut', 'pecan', 'walnut'].includes(k)) return 'nut';
   if (k === 'persimmon') return 'persimmon';
@@ -13519,8 +13994,8 @@ const TREELIFE = {
 const CELL_KG = 75;            // kg dry matter on a fully grown pasture cell (1 cell ~ 5 m x 5 m)
 const BALE_KG = 250;           // one round bale of hay
 const RIPEN = { apple_liberty: 8, apple_honeycrisp: 8, apple_anna: 6, pear: 8, peach: 6, plum: 6, cherry: 5, fig: 7, persimmon: 9, pawpaw: 8, pomegranate: 9, date: 8, citrus: 10, jujube: 8, mulberry: 5, chestnut: 8, hazel: 7, pecan: 9, walnut: 9, elder: 7, blueberry: 5, aronia: 7, goumi: 5, mesquite: 6, honeylocust: 9, grape_frontenac: 8, grape_concord: 8, grape_niagara: 8, grape_catawba: 9, grape_muscadine: 8, grape_thompson: 7 };
-const MILK = { jersey: 4, holstein: 6, shorthorn: 4, normande: 4, nubian: 0.7 };
-const LAYERS = { rir: 0.72, barred: 0.68, australorp: 0.78, ameraucana: 0.6, orpington: 0.62, ranger: 0.35, khaki: 0.8, pekin: 0.45 };
+const MILK = { jersey: 4, holstein: 6, shorthorn: 4, normande: 4, nubian: 0.7, randall: 3, devon: 3 };
+const LAYERS = { rir: 0.72, barred: 0.68, australorp: 0.78, ameraucana: 0.6, orpington: 0.62, ranger: 0.35, khaki: 0.8, pekin: 0.45, dominique: 0.62, buckeye: 0.6, java: 0.6, cayuga: 0.55 };
 
 function gauss(r) { return Math.sqrt(-2 * Math.log(r() + 1e-9)) * Math.cos(6.283 * r()); }
 // ---------------------------------------------------------------- month weather plan
@@ -13917,7 +14392,8 @@ function simDay(F, auto, rep) {
     // poultry and pigs eat bagged feed
     const birds = g.list.filter((a) => a.sp === 'chicken' || a.sp === 'duck'), pigs = g.list.filter((a) => a.sp === 'pig');
     let birdFed = false, pigFed = false;
-    if (birds.length && (auto || today.fedPoultry)) { const need = birds.length * 0.006; if ((F.inv.feed_layer || 0) >= need) { F.inv.feed_layer -= need; birdFed = true; } }
+    const layK = DOGS.layK(F);   // a guardian watching the hens: calmer birds lay a little more
+    if (birds.length && (auto || today.fedPoultry)) { const need = birds.length * 0.006 * DOGS.feedK(F); /* a ratter in the barn: less feed lost to rats */ if ((F.inv.feed_layer || 0) >= need) { F.inv.feed_layer -= need; birdFed = true; } }
     if (pigs.length && (auto || today.fedPigs)) { const acorns = seasonOf(F.month) === 2 && F.objs.some((o) => o.t === 'tree' && o.wild && g.pad && o.x > Math.min(g.pad.x0, g.pad.x1) && o.x < Math.max(g.pad.x0, g.pad.x1) && o.z > Math.min(g.pad.z0, g.pad.z1) && o.z < Math.max(g.pad.z0, g.pad.z1)); const need = pigs.length * (g.pad ? 0.05 : 0.1) * (acorns ? 0.4 : 1); if ((F.inv.feed_pig || 0) >= need) { F.inv.feed_pig -= need; pigFed = true; } }
     for (const a of g.list) {
       const SX = SPECIES_EXTRA[a.sp], SP = SPECIES[a.sp], br = breedOf(a.breed);
@@ -13927,7 +14403,7 @@ function simDay(F, auto, rep) {
       if (a.sp === 'chicken' && !birdFed) fed = true; // hens forage, but lay less
       if (!water) fed = false;
       a.hunger = fed ? 0 : (a.hunger || 0) + 1;
-      if (a.hunger > 5) a.health = Math.max(0, (a.health ?? 1) - 0.02); else a.health = Math.min(1, (a.health ?? 1) + 0.01);
+      if (a.hunger > 5) a.health = Math.max(0, (a.health ?? 1) - 0.02); else a.health = Math.min(1, (a.health ?? 1) + (g.pad && DOGS.guards(F, g.pad.id) ? 0.02 : 0.01));   // a guardian dog in the paddock: calmer, healthier animals
       if (!auto && !g.barn && t < -10 && (GRAZERS.has(a.sp) || a.sp === 'pig') && (a.ageD < 150 || a.sp === 'pig' || t < -18)) { a.health = Math.max(0, (a.health ?? 1) - 0.03); if (rep) rep.coldStress = (rep.coldStress || 0) + 1; }
       if (t >= 33 && !auto && !g.barn && (GRAZERS.has(a.sp) || a.sp === 'pig') && !(F.shield && F.shield.heat === FRIENDS.dayN(F))) { a.health = Math.max(0, (a.health ?? 1) - 0.035); if (rep) rep.heatStress = (rep.heatStress || 0) + 1; }
       if (t >= 28 && !auto && !g.barn && woolly(a) && fleeceDays(F, a) > 300) { a.health = Math.max(0, (a.health ?? 1) - 0.02); if (rep) rep.fleeceHeat = (rep.fleeceHeat || 0) + 1; }
@@ -13946,7 +14422,7 @@ function simDay(F, auto, rep) {
       // eggs go to the nest box
       if ((a.sp === 'chicken' || a.sp === 'duck') && a.sex === 'f' && a.ageD > 150) {
         const daylight = 0.55 + 0.45 * Math.sin(((F.month - 2) / 12) * Math.PI * 2 + 0.2);
-        const rate = (LAYERS[a.breed] || 0.6) * clamp(daylight + 0.25, 0.3, 1) * (birdFed ? 1 : 0.55) * (t < -5 ? 0.6 : 1);
+        const rate = (LAYERS[a.breed] || 0.6) * clamp(daylight + 0.25, 0.3, 1) * (birdFed ? 1 : 0.55) * (t < -5 ? 0.6 : 1) * layK;
         if (Math.random() < rate) { const key = a.sp === 'duck' ? 'nestDuck' : a.breed === 'ameraucana' ? 'nestBlue' : 'nestEggs'; F[key] = (F[key] || 0) + 1; }
       }
       // spring broodiness when a rooster is around
@@ -14116,7 +14592,7 @@ function sleepDays(F, n) {
     MAIL.daily(F); FRIENDS.daily(F); FEST.daily(F); AUCTION.daily(F); VISIT.daily(F);
   }
   F.hour = 6; F.minute = 30;
-  F.energy = F.cold ? 70 : 100;
+  F.energy = F.cold ? (DOGS.has(F, 'comp') ? 85 : 70) : 100;   // a companion dog curled up with you on a cold night
   return notes;
 }
 function yearEnd(F) {
@@ -15226,7 +15702,7 @@ function interiorFrame(F0, room) {
 
 'use strict';
 // ============================================================================ profiles + saves (each profile has its own farm save)
-const FQ_VERSION = '1.3.0';
+const FQ_VERSION = '1.4.0';
 const LOOKS = [
   { shirt: [214, 74, 64], hair: [120, 76, 40] }, { shirt: [70, 130, 200], hair: [236, 206, 120] }, { shirt: [240, 170, 60], hair: [80, 50, 30] },
   { shirt: [120, 170, 90], hair: [40, 30, 28] }, { shirt: [170, 100, 190], hair: [200, 110, 60] }, { shirt: [60, 160, 160], hair: [150, 100, 60] },
@@ -15771,10 +16247,13 @@ const UI = {
       { id: 'swale', icon: '〰️', text: 'Swale on contour', small: 'A level ditch + mound. Stops runoff and soaks it into the hill. Plant trees on the mound.', right: '$30 / unit' },
       { id: 'rip', icon: '🚜', text: 'Keyline ripping', small: 'Breaks up compacted soil so rain sinks in', right: '$10 / unit' },
     ];
+    const F = G.F, here = G.Fm ? (pondAt(F, G.Fm.x, G.Fm.z) || swaleAt(F, G.Fm.x, G.Fm.z)) : null;
+    if (F.ponds.length || F.swales.length) items.push({ id: 'fill', icon: '🪏', text: here ? (F.ponds.includes(here) ? 'Fill in this pond' : 'Fill in this swale') : 'Fill in a pond or swale', small: here ? 'Back to the lie of the land. Saplings on a swale are dug up for replanting; grown trees become firewood.' : 'Walk onto the pond bank or the swale with your shovel, then choose Fill in.', right: 'Free' });
     P.body.innerHTML = this.rows(items.map((i) => Object.assign({ tap: true }, i))) + '<p class="note">Water always runs downhill. Ponds fill from the land above them; swales slow water down on slopes.</p>';
     P.body.querySelectorAll('.row').forEach((r) => {
       r.onclick = () => {
         const id = r.dataset.id;
+        if (id === 'fill') { if (!here) { UI.toast('Walk onto the pond bank or the swale first, then choose Fill in.'); return; } this.closeAll(); if (F.ponds.includes(here)) fillPond(here); else fillSwale(here); return; }
         if (id.startsWith('pond')) { const s = { pond_s: [2.8, 2.1, 3000, 'Small'], pond_m: [3.8, 2.8, 6500, 'Medium'], pond_l: [5.0, 3.6, 12000, 'Large'] }[id]; startPlace({ kind: 'pond', rx: s[0], rz: s[1], price: s[2], label: s[3] }); }
         else startPlace({ kind: id });
       };
@@ -15826,7 +16305,7 @@ const UI = {
           const p = clamp(g.prog, 0, 1), done = g.done;
           html += `<div class="row${done ? '' : ''}"><span class="ic">${done ? '✅' : g.icon}</span><span class="tx">${esc(g.name)}${g.level ? `<small style="opacity:.65"> · level ${g.level + (g.top ? 0 : 1)}${g.top ? ', all done' : ''}</small>` : ''}<div class="gbar"><i style="width:${Math.round(p * 100)}%"></i></div></span><span class="amt">${done ? 'Done' : F.kid ? '' : '+' + money(g.reward)}</span></div>`;
         }
-        b.innerHTML = `<p class="note">Goals follow the permaculture order of permanence: water first, then access and trees, buildings, fences, and soil. Finish one and the next level appears with a bigger target and a bigger reward.</p>${html}`;
+        b.innerHTML = MILESTONES.html(F) + `<p class="note">Goals follow the permaculture order of permanence: water first, then access and trees, buildings, fences, and soil. Finish one and the next level appears with a bigger target and a bigger reward.</p>${html}`;
       } else if (t === 'stats') {
         const T = F.terrain, om = T.avgOM(true), dOM = om - F.stats.startOM;
         let moist = 0, bio = 0, n = 0; for (let k = 0; k < TN * TN; k++) { const x = (k % TN) - THALF + 0.5, z = Math.floor(k / TN) - THALF + 0.5, p = plotOf(x, z); if (p >= 0 && F.owned[p]) { moist += T.moist[k]; bio += T.bio[k]; n++; } }
@@ -15898,7 +16377,7 @@ const UI = {
       if (t === 'feed') {
         const zone = hardinessZone(R);
         const seeds = CROPS.filter((c) => !c.region || c.region.includes(R.key));
-        const trees = TREES.slice().sort((a, b2) => treeFit(R, b2).score - treeFit(R, a).score);
+        const trees = TREES.filter((t) => !t.heirloom || hasUnlock(F, 'heirloom')).sort((a, b2) => treeFit(R, b2).score - treeFit(R, a).score);
         const hayPrice = Math.round(ITEMS.hay.buy * (R.t[F.month] < 2 ? 1.35 : 1) * (F.weather.event === 'drought' ? 1.5 : 1));
         b.innerHTML = `<div class="grp">Feed, hay & supplies</div><div class="grid">${[['hay', hayPrice], ['sqbale', Math.max(6, Math.round(hayPrice / 8))], ['feed_layer', ITEMS.feed_layer.buy], ['feed_pig', ITEMS.feed_pig.buy], ['mineral', ITEMS.mineral.buy], ['firewood', ITEMS.firewood.buy], ['compost', ITEMS.compost.buy]].map(([k, p]) => `<button class="card" data-buy="${k}" data-p="${p}"><span class="ic">${ITEMS[k].icon}</span><b>${ITEMS[k].name}</b><small>per ${ITEMS[k].unit.replace(/s$/, '')} · have ${fmt1(F.inv[k] || 0)}</small><span class="pr">${money(p)}</span></button>`).join('')}</div>
           <div class="grp">Seeds (one packet plants a bed)</div><div class="grid">${seeds.map((c) => { const ok = cropFits(R, c, F.month); return `<button class="card${ok ? '' : ' bad'}" data-buy="seed_${c.key}" data-p="${ITEMS['seed_' + c.key].buy}"><span class="ic">${ITEMS[c.key] ? ITEMS[c.key].icon : '🌿'}</span><b>${c.name}</b><small>${ok ? 'Plant now' : 'Not this month'} · ${c.months} mo</small><span class="pr">${money(ITEMS['seed_' + c.key].buy)}</span></button>`; }).join('')}</div>
@@ -16103,7 +16582,7 @@ const UI = {
     const P = this.open({ title: name[0].toUpperCase() + name.slice(1), icon: o.t === 'bed' ? '🪴' : '🏗️' });
     const refund = o.t === 'bed' ? 20 : Math.round((B ? B.price : 0) * 0.35);
     const canPaint = !!BPAINT[o.t], canRemodel = !!BSTYLES[o.t], upNext = o.t === 'coop' ? COOP_UPG[o.upg || 0] : null;
-    P.body.innerHTML = this.rows([].concat(o.t === 'coop' ? [upNext ? { id: 'upg', tap: true, icon: '⬆️', text: `Upgrade: ${upNext.name}`, small: `${upNext.small}. Room for ${upNext.cap} hens (now ${coopCap(o)})${F.kid || F.unlocked ? '' : ' · ' + money(upNext.cost)}` } : { icon: '🏆', text: 'Fully upgraded', small: `Room for ${coopCap(o)} hens` }] : [], canPaint ? [{ id: 'paint', tap: true, icon: '🎨', text: 'Paint it', small: 'Pick colours for the walls, roof and trim' }] : [], canRemodel ? [{ id: 'remodel', tap: true, icon: '🏗️', text: 'Remodel', small: 'A different style, or a bigger (or smaller) building' }] : [], [
+    P.body.innerHTML = this.rows([].concat(o.t === 'coop' ? [upNext ? { id: 'upg', tap: true, icon: '⬆️', text: `Upgrade: ${upNext.name}`, small: `${upNext.small}. Room for ${upNext.cap} hens (now ${coopCap(o)})${F.kid || F.unlocked ? '' : ' · ' + money(upNext.cost)}` } : { icon: '🏆', text: 'Fully upgraded', small: `Room for ${coopCap(o)} hens` }] : [], canPaint ? [{ id: 'paint', tap: true, icon: '🎨', text: 'Paint it', small: 'Pick colours for the walls, roof and trim' }] : [], canRemodel ? [{ id: 'remodel', tap: true, icon: '🏗️', text: 'Remodel', small: 'A different style, or a bigger (or smaller) building' }] : [], o.t === 'barn' && hasUnlock(F, 'quilt') ? [{ id: 'quilt', tap: true, icon: '🟥', text: `Barn quilt: ${o.quilt === -1 ? 'none' : BARN_QUILTS[(o.quilt || 0) % BARN_QUILTS.length].name}`, small: 'Tap to paint the next block on the gable ends' }] : [], [
       { id: 'move', tap: true, icon: '↔️', text: 'Move it', small: o.t === 'bed' ? 'Pick it up, walk to a new spot, put it down. Plants and all.' : 'See it in its new spot before you commit. Turn it with ⟳.' },
       { id: 'down', tap: true, icon: o.t === 'bed' ? '🪵' : '🔨', text: o.t === 'bed' ? 'Remove the bed' : 'Take it down', small: hens ? `Move the ${hens} hens to another coop first` : `${F.kid ? 'Get some lumber back' : `Salvage about ${money(refund)} of materials`}`, cls: hens ? 'dim' : '' },
     ]));
@@ -16117,6 +16596,7 @@ const UI = {
             act('hammer', 2.4, upNext.mins, Math.round(upNext.mins / 30), () => { if (!F.kid && !F.unlocked) { F.money -= upNext.cost; F.stats.spent = (F.stats.spent || 0) + upNext.cost; } o.upg = (o.upg || 0) + 1; G.view.dirtyAt(o.x, o.z, 4); G.view.rebuildColliders(); AUDIO.fanfare(); UI.toast(`🐔 Coop upgraded: room for ${coopCap(o)} hens now.`); });
           }, { yes: 'Build it', icon: '🐔' });
         }
+        if (r.dataset.id === 'quilt') { const cur = o.quilt === undefined ? 0 : o.quilt; o.quilt = cur + 1 >= BARN_QUILTS.length ? -1 : cur + 1; G.view.dirtyAt(o.x, o.z, 5); UI.toast(o.quilt === -1 ? 'The quilt block comes down.' : `You paint a ${BARN_QUILTS[o.quilt].name} block on the barn 🟥`); return this.objMenu(o); }
         if (r.dataset.id === 'paint') return UI.paintMenu(o);
         if (r.dataset.id === 'remodel') return UI.remodelMenu(o);
         if (r.dataset.id === 'move') startPlace({ kind: 'move', obj: o, def, rot: o.r || 0 });
@@ -16332,7 +16812,7 @@ const UI = {
     $('mSens').oninput = (e) => store.set('fq_look', +e.target.value);
     $('mCtrl').querySelectorAll('[data-c]').forEach((b) => { b.onclick = () => { store.set('fq_ctrl', b.dataset.c); this.menu(); }; });
     $('mKid').onchange = (e) => { F.kid = e.target.checked; UI.hudTick(0, true); };
-    $('mLow').onchange = (e) => { G.lowDetail = e.target.checked; store.set('pq_low', G.lowDetail); resize(); G.view.dirtyAll(); };
+    $('mLow').onchange = (e) => { G.lowDetail = e.target.checked; store.set('pq_low', G.lowDetail); resize(); G.R.setDetail(!G.lowDetail); G.view.dirtyAll(); };
     $('mSound').onchange = (e) => { AUDIO.on = e.target.checked; store.set('pq_sound', AUDIO.on); };
     $('mMusic').onchange = (e) => { AUDIO.unlock(); MUSIC.setOn(e.target.checked); };
     // unlocked (testing) farms: set today's weather by hand
@@ -17690,7 +18170,14 @@ const PETS = {
   name(F, kind) { const st = SHOP.style(F); return st[kind + 'Name'] || (kind === 'dog' ? 'Scout' : 'Mittens'); },
   sync(V) {
     const F = V.F, st = SHOP.style(F);
-    V.pets = (V.pets || []).filter((p) => st.pets[p.kind] && SHOP.owned('pet', p.kind));
+    const dogs = DOGS.list(F);
+    V.pets = (V.pets || []).filter((p) => (p.kind === 'farmdog' ? dogs.includes(p.rec) : st.pets[p.kind] && SHOP.owned('pet', p.kind)));
+    for (const rec of dogs) {
+      const have = V.pets.find((p) => p.rec === rec), mesh = DOGS.mesh(V.R, rec);
+      if (have) { have.mesh = mesh; continue; }
+      const house = F.objs.find((o) => o.t === 'house') || { x: 0, z: 0 }, B = dogBreed(rec.breed);
+      V.pets.push({ kind: 'farmdog', sp: 'dog', rec, mesh, x: house.x + 1.5 + Math.random() * 2, z: house.z + 4 + Math.random() * 1.5, yaw: Math.random() * 6.28, size: (B.size || 1) * DOGS.grown(F, rec), state: 'idle', st: 1, phase: Math.random() * 6, walkPh: 0, head: 0, lie: 0, wantLie: 0, rad: 0.22 * (B.size || 1) });
+    }
     for (const kind of ['dog', 'cat']) {
       if (!st.pets[kind] || !SHOP.owned('pet', kind) || V.pets.some((p) => p.kind === kind)) continue;
       const house = F.objs.find((o) => o.t === 'house') || { x: 0, z: 0 };
@@ -17698,11 +18185,16 @@ const PETS = {
     }
   },
   update(V, dt, Fm) {
+    let slot = 0;
     for (const p of V.pets || []) {
       p.phase += dt; p.st -= dt;
       const F = V.F, house = F.objs.find((o) => o.t === 'house') || { x: 0, z: 0, r: 0 };
       let tx, tz, speed;
-      if (p.kind === 'dog') {
+      if (p.kind === 'farmdog') {
+        const following = (p.rec.job || 'follow') === 'follow' || !DOGS.post(F, p.rec);
+        const w = DOGS.think(V, p, dt, Fm, following ? slot++ : 0); tx = w.tx; tz = w.tz; speed = w.speed;
+        p.lie = lerp(p.lie || 0, tx !== undefined ? 0 : p.wantLie || 0, 1 - Math.exp(-dt * (p.wantLie ? 1.6 : 5)));
+      } else if (p.kind === 'dog') {
         const bx = Fm.x - Math.sin(Fm.yaw) * 1.2 + Math.cos(Fm.yaw) * 0.9, bz = Fm.z - Math.cos(Fm.yaw) * 1.2 - Math.sin(Fm.yaw) * 0.9;
         const d = Math.hypot(bx - p.x, bz - p.z);
         if (d > 1.0) { tx = bx; tz = bz; speed = clamp(d * 1.6, 1.4, 4.6); }
@@ -17717,15 +18209,501 @@ const PETS = {
       }
       if (tx !== undefined) {
         const dx = tx - p.x, dz = tz - p.z, d = Math.hypot(dx, dz), s = Math.min(d, speed * dt);
-        p.x += dx / d * s; p.z += dz / d * s; p.walkPh += s * (p.kind === 'dog' ? 5 : 7); p.state = 'walk';
+        p.x += dx / d * s; p.z += dz / d * s; p.walkPh += s * (p.kind === 'farmdog' ? 4.6 / Math.max(0.5, p.size) : p.kind === 'dog' ? 5 : 7); p.state = 'walk';
         let dd = Math.atan2(dx, dz) - p.yaw; while (dd > Math.PI) dd -= Math.PI * 2; while (dd < -Math.PI) dd += Math.PI * 2; p.yaw += dd * (1 - Math.exp(-dt * 8));
         V.col.resolve(p, p.rad, { noFence: true });
       } else p.state = 'idle';
-      p.head = lerp(p.head, p.kind === 'cat' && p.state === 'idle' && (F.hour >= 13 && F.hour < 16) ? 0.5 : 0, dt * 2);
+      if (p.kind !== 'farmdog') p.head = lerp(p.head, p.kind === 'cat' && p.state === 'idle' && (F.hour >= 13 && F.hour < 16) ? 0.5 : 0, dt * 2);
     }
   },
   draws(V, out) { for (const p of V.pets || []) drawActor(out, p, V.T); },
   near(V, Fm) { for (const p of V.pets || []) if (Math.hypot(p.x - Fm.x, p.z - Fm.z) < 1.4) return p; return null; },
+};
+
+
+'use strict';
+// ============================================================================ farm dogs
+// Working dogs from the livestock barn. They unlock once every goal in the journal has reached level 2, and even then Hank only has
+// dogs in seven days a month, spread out, though the day they unlock and the day after there is always a dog or two in.
+// Each breed was bred for a job, and it does that job here:
+//   guard  - livestock guardians live out with a herd (or the hens): the animals they watch stay healthier, hens lay a little more
+//   herd   - herding dogs follow you; when you whistle, the dog runs out round the herd and brings it in at a trot
+//   hunt   - curs and hounds follow you; in the woods they nose out extra wild food
+//   ratter - terriers patrol the barn and coop, so less feed goes to the rats
+//   comp   - companions follow you everywhere, and with a dog by the fire you shake off a cold faster
+// F.dogs: [{ id, breed, coat, collar, name, sex, born (day number), job }]   job: 'follow' | 'hens' | 'barn' | 'pad:<paddock id>'
+const DOG_ROLES = {
+  guard: { name: 'Livestock guardian', short: 'Guardian', icon: '🛡️', perk: 'Lives out with a herd or the hens. The animals it watches stay healthier, and guarded hens lay a little more.' },
+  herd: { name: 'Herding dog', short: 'Herder', icon: '🐑', perk: 'Follows you. When you whistle it runs out round the herd and brings them in at a trot.' },
+  hunt: { name: 'Cur dog', short: 'Woods dog', icon: '🌲', perk: 'Follows you. In the woods it noses out extra wild food.' },
+  ratter: { name: 'Barn ratter', short: 'Ratter', icon: '🐀', perk: 'Patrols the barn and the coop. Much less feed goes to the rats.' },
+  comp: { name: 'Companion', short: 'Companion', icon: '❤️', perk: 'Follows you everywhere, and on a night when the farmhouse runs cold it keeps you warm: you wake with more energy.' },
+};
+// coats: [name, pattern, main colour, second colour, third colour?, blue eyes?]
+const DOG_BREEDS = [
+  { key: 'pyrenees', name: 'Great Pyrenees', role: 'guard', price: 950, size: 1.45, bulk: 1.2, muzzle: 0.92, ears: 'drop', tail: 'plume', fur: 'long', coats: [['White', 'solid', [242, 238, 228], [222, 210, 186]], ['White with badger ears', 'badger', [244, 240, 230], [196, 162, 112]]], note: 'A calm white giant. Lives out with the flock and barks the night prowlers away.' },
+  { key: 'anatolian', name: 'Anatolian Shepherd', role: 'guard', price: 1000, size: 1.42, bulk: 1.02, leg: 1.12, ears: 'drop', tail: 'curl', fur: 'short', coats: [['Fawn with a black mask', 'mask', [212, 176, 124], [46, 38, 34]], ['Brindle', 'brindle', [182, 144, 98], [74, 58, 42]]], note: 'Lean, watchful and independent. Guards goats and sheep across big open country.' },
+  { key: 'maremma', name: 'Maremma Sheepdog', role: 'guard', price: 900, size: 1.34, bulk: 1.12, ears: 'drop', tail: 'plume', fur: 'long', coats: [['White', 'solid', [244, 240, 230], [228, 216, 190]]], note: 'The Italian flock guardian, with a thick white coat. Bonds tight with its animals.' },
+  { key: 'akbash', name: 'Akbash', role: 'guard', price: 950, size: 1.42, bulk: 0.98, leg: 1.18, ears: 'drop', tail: 'curl', fur: 'medium', coats: [['White', 'solid', [246, 244, 236], [232, 224, 206]]], note: 'A tall, leggy Turkish guardian, bred all white so the shepherd can tell it from a wolf.' },
+  { key: 'kangal', name: 'Kangal', role: 'guard', price: 1100, size: 1.45, bulk: 1.14, leg: 1.08, ears: 'drop', tail: 'curl', fur: 'short', coats: [['Dun with a black mask', 'mask', [202, 172, 126], [40, 34, 30]]], note: 'A powerful Turkish guardian with a black mask. Gentle with stock, fearless with coyotes.' },
+  { key: 'aussie', name: 'Australian Shepherd', role: 'herd', price: 800, size: 1.1, ears: 'fold', tail: 'bob', fur: 'medium', coats: [['Blue merle', 'merle', [156, 162, 170], [40, 40, 46], [182, 108, 58], 1], ['Red merle', 'merle', [204, 150, 118], [128, 64, 42], [190, 116, 64]], ['Black tri', 'tri', [34, 32, 32], [246, 242, 232], [184, 110, 56]], ['Red tri', 'tri', [140, 66, 36], [246, 242, 232], [200, 140, 86]]], note: 'A busy, bright herder that needs a job. Cattle, sheep or ducks, it will move them.' },
+  { key: 'collie', name: 'Border Collie', role: 'herd', price: 750, size: 1.06, bulk: 0.9, ears: 'fold', tail: 'plume', fur: 'medium', coats: [['Black and white', 'collar', [30, 28, 28], [246, 244, 238]], ['Red and white', 'collar', [142, 78, 48], [246, 244, 238]]], note: 'The great sheepdog. Works low with that famous eye and never stops thinking.' },
+  { key: 'heeler', name: 'Australian Cattle Dog', role: 'herd', price: 700, size: 1.0, bulk: 1.06, leg: 0.94, ears: 'prick', tail: 'straight', fur: 'short', coats: [['Blue heeler', 'speckle', [96, 108, 128], [190, 124, 68]], ['Red heeler', 'speckle', [178, 94, 58], [236, 224, 212]]], note: 'Tough and tireless. Nips at the heels of cattle that will not move for anyone else.' },
+  { key: 'kelpie', name: 'Kelpie', role: 'herd', price: 650, size: 1.0, bulk: 0.86, leg: 1.06, ears: 'prick', tail: 'straight', fur: 'short', coats: [['Black and tan', 'tan', [34, 30, 30], [186, 112, 58]], ['Red', 'solid', [152, 76, 42], [186, 108, 66]]], note: 'A lean Australian sheepdog that will run across the backs of a packed flock.' },
+  { key: 'englishshep', name: 'English Shepherd', role: 'herd', price: 650, size: 1.1, ears: 'fold', tail: 'plume', fur: 'medium', coats: [['Sable and white', 'collar', [178, 118, 60], [246, 240, 228]], ['Black and tan', 'tan', [36, 32, 30], [190, 120, 62]]], note: 'The old all-round American farm dog: herds, minds the yard and keeps the rats down.' },
+  { key: 'corgi', name: 'Pembroke Welsh Corgi', role: 'herd', price: 900, size: 0.86, bulk: 1.14, leg: 0.5, long: 1.08, muzzle: 0.95, ears: 'prick', tail: 'bob', fur: 'medium', coats: [['Red and white', 'collar', [206, 124, 58], [246, 240, 228]], ['Tricolor', 'tri', [42, 36, 34], [244, 238, 228], [190, 120, 62]]], note: 'Short legs, big heart. Drives cattle by nipping low and ducking under the kicks.' },
+  { key: 'oes', name: 'Old English Sheepdog', role: 'herd', price: 1000, size: 1.2, bulk: 1.22, ears: 'drop', tail: 'bob', fur: 'shaggy', coats: [['Grey and white', 'oes', [146, 150, 156], [242, 240, 234]]], note: 'A shaggy old drover’s dog that walked sheep and cattle to market for centuries.' },
+  { key: 'catahoula', name: 'Catahoula Leopard Dog', role: 'hunt', price: 700, size: 1.18, leg: 1.05, ears: 'drop', tail: 'straight', fur: 'short', coats: [['Blue leopard', 'merle', [134, 142, 152], [36, 36, 42], [186, 112, 60], 1], ['Red leopard', 'merle', [192, 130, 92], [112, 58, 38], [210, 150, 100]]], note: 'Louisiana’s state dog. Rounds up hogs and cattle in the woods, often with glass-blue eyes.' },
+  { key: 'blackmouth', name: 'Black Mouth Cur', role: 'hunt', price: 600, size: 1.2, bulk: 1.06, ears: 'drop', tail: 'straight', fur: 'short', coats: [['Yellow', 'muzzle', [206, 162, 98], [44, 36, 30]], ['Red', 'muzzle', [172, 98, 54], [40, 32, 28]]], note: 'A Southern farm and hunting dog. Trees squirrels, works stock and watches the kids.' },
+  { key: 'mtcur', name: 'Mountain Cur', role: 'hunt', price: 600, size: 1.12, bulk: 1.04, ears: 'drop', tail: 'bob', fur: 'short', coats: [['Brindle', 'brindle', [150, 112, 70], [52, 40, 30]], ['Yellow', 'solid', [196, 150, 92], [214, 176, 120]]], note: 'A pioneer dog from the Appalachians: hunted, guarded the cabin and drove the hogs.' },
+  { key: 'ratterrier', name: 'Rat Terrier', role: 'ratter', price: 450, size: 0.72, bulk: 0.86, leg: 1.06, muzzle: 1.04, ears: 'prick', tail: 'straight', fur: 'short', coats: [['Black and white', 'pied', [246, 244, 238], [32, 30, 30], [190, 118, 62]], ['Tan and white', 'pied', [246, 242, 234], [190, 118, 62]]], note: 'Small and quick. Clears the barn and the coop of rats and mice.' },
+  { key: 'jackrussell', name: 'Jack Russell Terrier', role: 'ratter', price: 500, size: 0.64, bulk: 0.9, ears: 'fold', tail: 'straight', fur: 'short', coats: [['White and tan', 'pied', [246, 244, 238], [178, 112, 58]]], note: 'A fearless little terrier. Nothing that squeaks is safe in the feed room.' },
+  { key: 'bernese', name: 'Bernese Mountain Dog', role: 'comp', price: 1300, size: 1.34, bulk: 1.22, muzzle: 0.94, ears: 'drop', tail: 'plume', fur: 'long', coats: [['Tricolor', 'berner', [30, 28, 28], [246, 242, 234], [176, 96, 50]]], note: 'A Swiss farm dog that once pulled the milk cart to the dairy. Gentle with everyone.' },
+  { key: 'lab', name: 'Labrador Retriever', role: 'comp', price: 800, size: 1.14, bulk: 1.1, ears: 'drop', tail: 'otter', fur: 'short', coats: [['Yellow', 'solid', [224, 186, 124], [238, 210, 160]], ['Black', 'solid', [30, 28, 28], [46, 42, 42]], ['Chocolate', 'solid', [98, 64, 44], [116, 78, 54]]], note: 'Everybody’s friend. Rides along, fetches the ducks and greets every visitor.' },
+  { key: 'gsd', name: 'German Shepherd', role: 'comp', price: 1100, size: 1.24, bulk: 1.04, ears: 'prick', tail: 'plume', fur: 'medium', coats: [['Black and tan', 'saddle', [196, 128, 66], [36, 32, 30]], ['Sable', 'sable', [164, 120, 72], [44, 38, 34]]], note: 'Bred to tend sheep in Germany. Loyal, watchful and quick to learn.' },
+];
+const DOG_NAMES = { f: ['Belle', 'Daisy', 'Molly', 'Sadie', 'Rosie', 'Ellie', 'Penny', 'Maggie', 'Willow', 'Ruby', 'Lady', 'Pepper', 'Hazel', 'Clover', 'Juniper', 'June', 'Dolly', 'Birdie', 'Ginger', 'Opal'],
+  m: ['Blue', 'Duke', 'Ranger', 'Bear', 'Rusty', 'Jake', 'Boone', 'Tex', 'Copper', 'Gus', 'Bandit', 'Shep', 'Moose', 'Otis', 'Buck', 'Bo', 'Tucker', 'Jasper', 'Cash', 'Rowdy'] };
+const DOG_COLLARS = [[188, 48, 42], [52, 92, 160], [58, 120, 66], [214, 132, 40], [112, 70, 44], [140, 60, 120]];
+// dogs read best smooth-coated (strand shells make a white coat look like a fleece); long coats get a ruff and feathering instead, and only the shaggy drover's dog keeps a shell
+const DOG_FUR = { short: null, medium: null, long: null, shaggy: { kind: 1, len: 0.014, dens: 60, layers: 5 } };
+const dogBreed = (k) => DOG_BREEDS.find((b) => b.key === k) || DOG_BREEDS[0];
+const dogCoat = (B, i) => B.coats[i] || B.coats[0];
+
+// coat colour of a dog at a point on one of its parts. q is the point on the unit shape (x across, y up, z forward).
+function dogCoatAt(C, part, q) {
+  const pat = C[1], A = C[2], B = C[3], T = C[4] || [182, 110, 56], W = [246, 242, 232];
+  const x = q[0], y = q[1], z = q[2];
+  const chest = part === 'body' && z > 0.5 && y < 0.25, belly = part === 'body' && y < -0.55, back = part === 'body' && y > 0.45;
+  const blaze = part === 'head' && Math.abs(x) < 0.2 && z > -0.1 && y > -0.3, cheek = part === 'head' && y < 0.05 && z > 0.1;
+  const brow = part === 'head' && Math.abs(Math.abs(x) - 0.42) < 0.14 && y > 0.25 && y < 0.55 && z > 0.45;
+  const feet = part === 'paw', tip = part === 'tail' && y > 0.55;
+  const sh = (c) => mixc(c, shade(c, 1.12), smooth(-0.1, -0.9, y) * 0.35);          // a touch lighter underneath
+  switch (pat) {
+    case 'badger': return part === 'ear' || (part === 'head' && Math.abs(Math.abs(x) - 0.45) < 0.3 && y > 0.1 && z > -0.1 && z < 0.6) ? B : sh(A);
+    case 'mask': return part === 'muzzle' || part === 'ear' || (part === 'head' && z > 0.55) ? B : sh(A);
+    case 'muzzle': return part === 'muzzle' ? B : sh(A);
+    case 'brindle': { const s = Math.sin((part === 'body' ? z * 15 + x * 4 : (y + z) * 11) + 3 * patchN(q, 2.2)); return part === 'muzzle' ? shade(B, 1.1) : mixc(A, B, smooth(0.15, 0.6, s) * 0.85); }
+    case 'merle': {
+      if (feet || chest || (part === 'neck' && y < 0.1) || blaze) return W;
+      if (cheek || brow || (part === 'leg' && y < 0.1)) return T;
+      const p1 = patchN([x * 1.7, y * 1.7, z * 1.7], 4.1), p2 = patchN([x * 3.3 + 2, y * 3.1, z * 2.9], 7.7);
+      return p1 > 0.32 || p2 > 0.5 ? B : sh(A);
+    }
+    case 'tri': if (feet || chest || belly || (part === 'neck' && y < 0) || blaze || tip) return W; if (cheek || brow || (part === 'leg' && y < 0.2)) return T; return A;
+    case 'collar': if (feet || chest || belly || part === 'neck' || blaze || tip || (part === 'muzzle')) return W; return sh(A);
+    case 'speckle': {
+      if (part === 'leg' || feet || cheek || brow) return mixc(B, T, 0.2);
+      if (part === 'ear' || (part === 'head' && Math.abs(x) > 0.25 && y > 0 && z < 0.5)) return shade(A, 0.62);
+      const s = Math.sin(x * 53 + y * 37) * Math.sin(z * 47 - y * 29);
+      return s > 0.35 ? mixc(A, W, 0.5) : s < -0.5 ? shade(A, 0.8) : A;
+    }
+    case 'tan': return feet || part === 'leg' || cheek || brow || part === 'muzzle' || (part === 'body' && (chest || belly)) ? B : A;
+    case 'oes': return part === 'body' && z < 0.1 && y > -0.45 ? A : part === 'tail' ? A : W;
+    case 'pied': {
+      if (part === 'ear') return B;
+      if (part === 'head') return x > 0.05 && y > -0.1 && !blaze ? (C[4] && z > 0.4 ? C[4] : B) : W;
+      if (part === 'body') return patchN([x * 1.4, y * 1.4, z * 1.4], 3.3) > 0.28 && y > -0.2 ? B : W;
+      return W;
+    }
+    case 'berner': if (feet || chest || blaze || tip || (part === 'muzzle' && y < 0.3)) return W; if (cheek || brow || (part === 'leg' && y > -0.6 && y < 0.2)) return T; return A;
+    case 'saddle': if (back || (part === 'tail' && y < 0.8) || (part === 'muzzle') || (part === 'head' && y > 0.3 && Math.abs(x) < 0.4 && z < 0.5)) return B; return sh(A);
+    case 'sable': return back || part === 'muzzle' || (part === 'tail' && y > 0.3) ? mixc(A, B, 0.6) : sh(A);
+    default: return part === 'muzzle' ? shade(A, 1.04) : sh(A);
+  }
+}
+// a dog of breed B in coat c with collar colour cc: body (with neck), head, front and back legs, tail, and the dims drawActor needs
+function buildFarmDog(B, c, cc) {
+  const C = dogCoat(B, c), bk = B.bulk || 1, LL = 0.29 * (B.leg || 1), BL = B.long || 1, mz = B.muzzle || 1, hb = 0.84 + 0.2 * bk;
+  const fluffy = B.fur === 'long' || B.fur === 'shaggy';
+  const col = (part) => (q) => dogCoatAt(C, part, q), P = {};
+  // body: a deep chest up front, a tucked waist, a level back and a rounded rump
+  let m = new MB(); m.mat = MAT.hide;
+  m.sel(0, 0, 0, 0.11 * bk, 0.125 * bk, 0.3 * BL, 2.2, C[2], {
+    lat: 16, lon: 22, colFn: col('body'),
+    shape: (q) => {
+      let [x, y, z] = q;
+      if (y < 0) y *= 1 + 0.3 * smooth(-0.1, 0.55, z) - 0.3 * smooth(0.05, -0.6, z) * (1 - 0.6 * smooth(-0.7, -0.95, z));
+      x *= 1 - 0.16 * smooth(0.15, -0.45, z) * (1 - smooth(-0.55, -0.9, z)) + 0.06 * smooth(0.2, 0.8, z);
+      if (y > 0) y += 0.08 * smooth(-0.55, -0.85, z) * (1 - smooth(-0.85, -1, z));
+      return [x, y, z];
+    },
+  });
+  // neck, rising up and forward to the head, with the collar round it
+  m.push(M4.trs(0, 0.05 * bk, 0.24 * BL, 0, 0.62, 0));
+  const nk = fluffy || bk > 1.15 ? 0.82 : 1;   // the big, heavy-coated dogs carry their heads on a shorter, thicker neck
+  m.sel(0, 0.085 * nk, 0, 0.066 * bk / nk, 0.125 * nk, 0.074 * bk / nk, 2.2, C[2], { lat: 10, lon: 14, colFn: col('neck') });
+  m.mat = 0; m.cyl(0, 0.09, 0, 0.07 * bk, 0.07 * bk, 0.028, 12, cc || DOG_COLLARS[0]); m.ell(0, 0.1, 0.075 * bk, 0.012, 0.016, 0.006, [214, 190, 90], { lat: 3, lon: 6 }); m.mat = MAT.hide;
+  m.pop();
+  // long coats: a ruff at the chest and britches over the hips
+  if (fluffy) {
+    m.sel(0, -0.035, 0.2 * BL, 0.1 * bk, 0.13 * bk, 0.11, 2.2, dogCoatAt(C, 'neck', [0, -0.5, 0.6]), { lat: 8, lon: 12 });
+  }
+  m.mat = 0;
+  P.body = m;
+  // head (from the top of the neck): skull, a muzzle with a clear stop, nose, eyes and ears
+  m = new MB(); m.mat = MAT.hide;
+  const sk = [0.068 * hb * (0.94 + 0.06 * bk), 0.068 * hb, 0.082 * hb];
+  m.sel(0, 0.035, 0.03, sk[0], sk[1], sk[2], 2.2, C[2], { lat: 12, lon: 14, colFn: col('head'), shape: (q) => [q[0] * (1 - 0.12 * Math.max(0, q[2])), q[1], q[2]] });
+  const mzL = 0.085 * mz * hb, mzC = 0.03 + sk[2] * 0.7 + mzL * 0.5;
+  m.mat = B.fur === 'shaggy' ? MAT.hide : 0;   // short hair on the muzzle, whatever the coat
+  m.sel(0, 0.005, mzC, 0.04 * hb * (0.92 + 0.08 * bk), 0.038 * hb, mzL * 0.6, 2.1, C[2], { lat: 8, lon: 10, colFn: col('muzzle'), shape: (q) => [q[0] * (1 - 0.22 * Math.max(0, q[2])), q[1] * (1 - 0.12 * Math.max(0, q[2])) - 0.1 * Math.max(0, q[2]) * Math.max(0, q[1]), q[2]] });
+  m.mat = 0;
+  const noseZ = mzC + mzL * 0.58;
+  m.ell(0, 0.012 * hb, noseZ, 0.02 * hb, 0.016 * hb, 0.014 * hb, [24, 20, 20], { lat: 4, lon: 6 });
+  m.ell(0, -0.022 * hb, mzC + mzL * 0.15, 0.036 * hb, 0.006, mzL * 0.4, [64, 36, 36], { lat: 3, lon: 6 });   // the line of the mouth
+  const blue = C[5], iris = blue ? [124, 170, 210] : [74, 46, 26];
+  for (const sx of [-1, 1]) {
+    const ex = sx * 0.04 * hb, ey = 0.042 * hb, ez = 0.03 + sk[2] * 0.8;
+    m.ell(ex, ey, ez, 0.017 * hb, 0.016 * hb, 0.01, [28, 20, 16], { lat: 4, lon: 6 });
+    m.ell(ex + sx * 0.002, ey + 0.001, ez + 0.006, 0.011 * hb, 0.011 * hb, 0.005, iris, { lat: 3, lon: 6 });
+    m.ell(ex, ey + 0.006, ez + 0.009, 0.004, 0.004, 0.003, [255, 255, 255], { lat: 3, lon: 4 });
+  }
+  m.mat = MAT.hide;
+  const earC = (q) => dogCoatAt(C, 'ear', q);
+  for (const sx of [-1, 1]) {
+    if (B.ears === 'prick') { m.push(M4.trs(sx * 0.042 * hb, 0.088 * hb, 0.01, 0, -0.12, sx * -0.28)); m.sel(0, 0.04 * hb, 0, 0.028 * hb, 0.05 * hb, 0.011, 2, C[2], { lat: 5, lon: 8, colFn: earC, shape: (q) => [q[0] * (1 - 0.7 * Math.max(0, q[1])), q[1], q[2]] }); m.pop(); }
+    else if (B.ears === 'fold') { m.push(M4.trs(sx * 0.044 * hb, 0.088 * hb, 0.015, 0, 0.35, sx * -0.42)); m.sel(0, 0.03 * hb, 0, 0.027 * hb, 0.04 * hb, 0.01, 2, C[2], { lat: 5, lon: 8, colFn: earC, shape: (q) => [q[0] * (1 - 0.45 * Math.max(0, q[1])), q[1], q[2] + 0.9 * Math.max(0, q[1]) ** 2] }); m.pop(); }
+    else { m.push(M4.trs(sx * 0.062 * hb * (0.95 + 0.05 * bk), 0.075 * hb, 0.012, 0, 0.12, sx * 0.18)); m.sel(sx * 0.004, -0.04 * hb, 0, 0.011, 0.055 * hb, 0.034 * hb, 2, C[2], { lat: 5, lon: 8, colFn: earC, shape: (q) => [q[0], q[1], q[2] * (1 - 0.25 * Math.max(0, q[1]))] }); m.pop(); }
+  }
+  if (B.fur === 'shaggy') m.sel(0, 0.075 * hb, 0.07, 0.06 * hb, 0.035, 0.05, 2, dogCoatAt(C, 'head', [0, 0.8, 0.4]), { lat: 5, lon: 8 });   // the shaggy fringe over the eyes
+  m.mat = 0;
+  P.head = m;
+  // legs: a slim front leg; a back leg with a muscled thigh and the hock set back. Coat at the top, paws below.
+  const legR = 0.026 * bk;
+  const leg = (back) => {
+    const g = new MB(); g.mat = MAT.hide;
+    const z1 = back ? -0.022 : 0.002;   // the back leg's hock sits behind the hip
+    if (back) g.sel(0, -LL * 0.1, -0.008, legR * 1.65, LL * 0.4, legR * 2.3, 2.1, C[2], { lat: 8, lon: 10, colFn: col('leg'), shape: (q) => [q[0] * (1 - 0.35 * smooth(0, -1, q[1])), q[1], q[2] * (1 - 0.3 * smooth(0, -1, q[1])) + 0.25 * smooth(0.2, -1, q[1]) * -1] });
+    else g.sel(0, -LL * 0.16, 0.004, legR * 1.3, LL * 0.36, legR * 1.6, 2.1, C[2], { lat: 8, lon: 10, colFn: col('leg'), shape: (q) => [q[0] * (1 - 0.3 * smooth(0, -1, q[1])), q[1], q[2] * (1 - 0.3 * smooth(0, -1, q[1]))] });
+    g.mat = 0; g.cyl(0, -LL + 0.012, z1, legR * 0.74, legR * 0.98, LL * 0.6, 8, dogCoatAt(C, 'leg', [0, -0.5, 0])); g.mat = MAT.hide;
+    g.sel(0, -LL + 0.014, z1 + 0.016, legR * 1.1, 0.017, legR * 1.42, 2, dogCoatAt(C, 'paw', [0, -1, 0]), { lat: 4, lon: 8 });
+    if (fluffy) g.sel(0, -LL * 0.32, z1 - 0.012, legR * 1.15, LL * 0.24, legR * 1.4, 2, dogCoatAt(C, 'leg', [0, 0, 0]), { lat: 5, lon: 6 });   // feathering
+    g.mat = 0; return g;
+  };
+  P.leg = leg(false); P.legB = leg(true);
+  // tail, from its root: plume (hangs low and sweeps up at the end), curl (up over the back), bob, straight, otter (thick)
+  m = new MB(); m.mat = MAT.hide;
+  const tc = (q) => dogCoatAt(C, 'tail', q);
+  if (B.tail === 'bob') m.sel(0, 0.012, -0.012, 0.03 * bk, 0.03 * bk, 0.026, 2, dogCoatAt(C, 'tail', [0, 0, 0]), { lat: 4, lon: 6 });
+  else if (B.tail === 'curl') { m.push(M4.rotX(-0.35)); horn(m, [[0, 0, 0], [0, 0.08, -0.035], [0, 0.15, -0.02], [0, 0.19, 0.05], [0, 0.165, 0.11]], 0.03 * bk * (fluffy ? 1.4 : 1), 0.016, C[2]); m.pop(); }
+  else {
+    const L = B.tail === 'plume' ? 0.3 : B.tail === 'otter' ? 0.25 : 0.24, r = B.tail === 'plume' ? (fluffy ? 0.045 : 0.034) : B.tail === 'otter' ? 0.034 : 0.019;
+    m.push(M4.rotX(Math.PI * (B.tail === 'plume' ? 0.8 : 0.7)));
+    m.sel(0, L * 0.5, 0, r * bk, L * 0.5, r * bk, 2, C[2], { lat: 6, lon: 8, colFn: tc, shape: (q) => [q[0] * (1 - 0.45 * Math.max(0, q[1])), q[1], q[2] - (B.tail === 'plume' ? 0.5 * Math.max(0, q[1]) ** 2 : 0.1 * Math.max(0, q[1]))] });
+    m.pop();
+  }
+  m.mat = 0; P.tail = m;
+  const legY = -0.055 * bk;
+  P.dims = { legL: LL, legX: 0.066 * bk, legZ: 0.19 * BL, legY, height: LL - legY - 0.003, lieY: 0.13 * bk, headY: (fluffy || bk > 1.15 ? 0.155 : 0.185) * bk, headZ: (fluffy || bk > 1.15 ? 0.31 : 0.335) * BL, tailZ: -0.29 * BL, tailY: 0.07 * bk, radius: 0.18 + 0.06 * bk, grazeDrop: 0.45 };
+  return P;
+}
+// a little side-on picture of a dog, like the breed portraits at the barn
+function dogPortrait(B, c, size) {
+  const C = dogCoat(B, c), rgb = (v) => `rgb(${v[0] | 0},${v[1] | 0},${v[2] | 0})`, at = (part, q) => rgb(dogCoatAt(C, part, q));
+  const bk = B.bulk || 1, lg = 10 * (B.leg || 1), BL = (B.long || 1), sz = size || 60;
+  const bodyY = 40 - lg - 8 * bk, bw = 34 * BL, bh = 14 * bk, x0 = 16, hx = x0 + bw - 2, hy = bodyY - 7 * bk;
+  let g = '';
+  // tail
+  const tcol = at('tail', [0, 0.3, 0]);
+  if (B.tail === 'curl') g += `<path d="M${x0 + 2} ${bodyY + 2} q-7 -10 2 -12 q5 -1 3 4" stroke="${tcol}" stroke-width="${4 * bk}" fill="none" stroke-linecap="round"/>`;
+  else if (B.tail === 'plume') g += `<path d="M${x0 + 2} ${bodyY + 3} q-9 6 -8 16" stroke="${tcol}" stroke-width="${5.2 * bk}" fill="none" stroke-linecap="round"/>${C[1] === 'collar' || C[1] === 'tri' || C[1] === 'berner' ? `<circle cx="${x0 - 6}" cy="${bodyY + 19}" r="${2.4 * bk}" fill="#f6f2e8"/>` : ''}`;
+  else if (B.tail !== 'bob') g += `<path d="M${x0 + 2} ${bodyY + 2} q-8 2 -10 10" stroke="${tcol}" stroke-width="${(B.tail === 'otter' ? 4.4 : 3) * bk}" fill="none" stroke-linecap="round"/>`;
+  // legs (far pair darker), with paws
+  const legs = (xs, k) => xs.map((x) => `<rect x="${x}" y="${bodyY + bh * 0.4}" width="${4.6 * bk}" height="${lg + bh * 0.6 + 1}" rx="2" fill="${k ? at('leg', [0, 0.4, 0]) : rgb(shade(dogCoatAt(C, 'leg', [0, 0.4, 0]), 0.8))}"/><rect x="${x - 0.4}" y="${40 - 3}" width="${5.4 * bk}" height="3.2" rx="1.6" fill="${at('paw', [0, -1, 0])}"/>`).join('');
+  g += legs([x0 + 4, hx - 9], 0) + legs([x0 + 9, hx - 4], 1);
+  // body, with the coat pattern sampled along it
+  const id = 'dg' + B.key + c;
+  let stops = ''; for (let i = 0; i <= 6; i++) { const z = -0.9 + i * 0.3; stops += `<stop offset="${i / 6}" stop-color="${at('body', [0, 0.6, z])}"/>`; }
+  g += `<defs><linearGradient id="${id}" x1="0" x2="1">${stops}</linearGradient></defs>`;
+  g += `<rect x="${x0}" y="${bodyY}" width="${bw}" height="${bh}" rx="${bh / 2}" fill="url(#${id})"/>`;
+  g += `<ellipse cx="${x0 + bw * 0.62}" cy="${bodyY + bh * 0.82}" rx="${bw * 0.3}" ry="${bh * 0.28}" fill="${at('body', [0, -0.8, 0.3])}"/>`;
+  g += `<ellipse cx="${hx - 3}" cy="${bodyY + bh * 0.55}" rx="${6 * bk}" ry="${bh * 0.48}" fill="${at('body', [0, 0, 0.8])}"/>`;
+  if (C[1] === 'merle') g += `<circle cx="${x0 + bw * 0.35}" cy="${bodyY + 4}" r="3" fill="${rgb(C[3])}"/><circle cx="${x0 + bw * 0.6}" cy="${bodyY + 6}" r="2.2" fill="${rgb(C[3])}"/><circle cx="${x0 + bw * 0.2}" cy="${bodyY + 8}" r="1.8" fill="${rgb(C[3])}"/>`;
+  if (C[1] === 'pied') g += `<ellipse cx="${x0 + bw * 0.45}" cy="${bodyY + 4.5}" rx="7" ry="4" fill="${rgb(C[3])}"/>`;
+  if (C[1] === 'saddle') g += `<path d="M${x0 + 3} ${bodyY + 1} h${bw * 0.7} q-3 7 -10 8 h-${bw * 0.45} q-4 -3 -4 -8z" fill="${rgb(C[3])}"/>`;
+  if (C[1] === 'speckle') for (let i = 0; i < 9; i++) g += `<circle cx="${x0 + 4 + (i * 7.3) % (bw - 6)}" cy="${bodyY + 3 + (i * 5.1) % (bh - 5)}" r="0.9" fill="#e8e6e0" opacity=".8"/>`;
+  if (B.fur === 'long' || B.fur === 'shaggy') g += `<path d="M${x0 + 3} ${bodyY + bh - 1} l2 3 l2 -3 l2 3 l2 -3 l2 3 l2 -3 l2 3 l2 -3 l2 3 l2 -3 l2 3 l2 -3" fill="${at('body', [0, -0.8, 0])}"/>`;
+  // neck and head
+  g += `<path d="M${hx - 6} ${bodyY + 4} L${hx + 2} ${hy - 1} L${hx + 9} ${hy + 3} L${hx + 4} ${bodyY + bh * 0.7} z" fill="${at('neck', [0, 0.5, 0])}"/>`;
+  const hr = 7.4 * (0.9 + 0.12 * bk), mzl = 7.5 * (B.muzzle || 1);
+  g += `<circle cx="${hx + 4}" cy="${hy}" r="${hr}" fill="${at('head', [0, 0.5, -0.2])}"/>`;
+  g += `<rect x="${hx + 6}" y="${hy + 0.5}" width="${mzl + 2}" height="${hr * 0.8}" rx="${hr * 0.38}" fill="${at('muzzle', [0, 0, 0.5])}"/>`;
+  g += `<circle cx="${hx + 7 + mzl}" cy="${hy + 1.6}" r="1.8" fill="#1e1a18"/>`;
+  g += `<path d="M${hx + 2} ${hy + hr * 0.68} h7" stroke="${rgb(DOG_COLLARS[0])}" stroke-width="2.2"/>`;
+  const ec = C[5] ? '#78a8d0' : '#2a1a10';
+  g += `<circle cx="${hx + 7}" cy="${hy - 1.5}" r="1.35" fill="${ec}"/><circle cx="${hx + 6.6}" cy="${hy - 1.9}" r="0.45" fill="#fff"/>`;
+  const ecol = at('ear', [0, 0.5, 0]);
+  if (B.ears === 'prick') g += `<path d="M${hx - 0.5} ${hy - hr + 2} l1.6 -8 l4.6 6.4 z" fill="${ecol}"/>`;
+  else if (B.ears === 'fold') g += `<path d="M${hx - 0.5} ${hy - hr + 2} l2 -5 l3.6 1.6 l1 3 z" fill="${ecol}"/>`;
+  else g += `<path d="M${hx - 1} ${hy - hr + 3} q-4 2 -2.6 9 q2.4 1 4.4 -1 z" fill="${ecol}"/>`;
+  return `<svg class="bp" viewBox="0 0 64 44" width="${sz}" height="${Math.round(sz * 44 / 64)}" aria-hidden="true">${g}</svg>`;
+}
+
+const DOGS = {
+  meshes: {},
+  mesh(R, rec) {
+    const B = dogBreed(rec.breed), key = B.key + ':' + (rec.coat || 0) + ':' + (rec.collar || 0);
+    if (this.meshes[key]) return this.meshes[key];
+    const P = buildFarmDog(B, rec.coat || 0, DOG_COLLARS[rec.collar || 0]), m = { dims: P.dims, fur: DOG_FUR[B.fur] || null };
+    for (const k of ['body', 'head', 'leg', 'legB', 'tail']) if (P[k]) m[k] = R.mesh(P[k]);
+    return (this.meshes[key] = m);
+  },
+  list(F) { return (F && F.dogs) || []; },
+  dayN(F) { return FRIENDS.dayN(F); },
+  // ---- unlocking: every goal ladder at level 2 or higher (see MILESTONES)
+  unlocked(F) { const on = !!(F && ((F.miles && F.miles[2]) || F.unlocked)); if (on && F.dogDay === undefined) F.dogDay = this.dayN(F); return on; },
+  // ---- the seven sale days in a month, spread out: one in each fifth-of-a-week stretch of the month. The month the dogs unlock in,
+  // the unlock day and the next take two of the seven.
+  saleDays(F, year, month) {
+    const R = mulberry(((F.seed || 1) * 131 + year * 977 + month * 61 + 5) | 0), days = [];
+    const bins = [[1, 4], [5, 8], [9, 12], [13, 17], [18, 21], [22, 25], [26, 30]];
+    for (const [a, b] of bins) days.push(a + Math.floor(R() * (b - a + 1)));
+    const u = F.dogDay;
+    if (u !== undefined) {
+      const uy = Math.floor(u / 360), um = Math.floor((u % 360) / 30), ud = (u % 30) + 1;
+      if (uy === year && um === month) {
+        const force = [ud, ud + 1].filter((d) => d <= 30);
+        for (const d of force) { if (days.includes(d)) continue; let bi = 0, bd = 99; days.forEach((x, i) => { const dd = Math.abs(x - d); if (!force.includes(x) && dd < bd) { bd = dd; bi = i; } }); days[bi] = d; }
+      } else if (ud === 30 && ((uy === year && um + 1 === month) || (um === 11 && month === 0 && uy + 1 === year)) && !days.includes(1)) days[0] = 1;   // unlocked on the last day: the morning after is the 1st
+    }
+    return [...new Set(days)].sort((p, q) => p - q);
+  },
+  saleToday(F) { return this.unlocked(F) && this.saleDays(F, F.year, F.month).includes(F.day); },
+  nextSale(F) { for (let k = 1; k <= 40; k++) { const dn = this.dayN(F) + k, y = Math.floor(dn / 360), m = Math.floor((dn % 360) / 30), d = (dn % 30) + 1; if (this.saleDays(F, y, m).includes(d)) return k; } return null; },
+  // the dogs in today: one to three (one or two on the unlock day and the day after), each with a breed, coat, age and price
+  forSale(F) {
+    if (!this.saleToday(F)) return [];
+    const dn = this.dayN(F), R = mulberry(((F.seed || 1) * 389 + dn * 7349 + 3) | 0); for (let i = 0; i < 4; i++) R();
+    const first = F.dogDay !== undefined && (dn === F.dogDay || dn === F.dogDay + 1);
+    const n = first ? 1 + (R() < 0.6 ? 1 : 0) : 1 + Math.floor(R() * 2.4);
+    const pool = DOG_BREEDS.slice(), out = [];
+    for (let i = 0; i < n && pool.length; i++) {
+      const B = pool.splice(Math.floor(R() * pool.length), 1)[0], coat = Math.floor(R() * B.coats.length), sex = R() < 0.5 ? 'f' : 'm';
+      const pup = R() < 0.55, ageD = pup ? 56 + Math.floor(R() * 50) : 240 + Math.floor(R() * 900);
+      const names = DOG_NAMES[sex], name = names[Math.floor(R() * names.length)];
+      const price = Math.round(B.price * (pup ? 1 : 0.85 + R() * 0.3) / 25) * 25;
+      out.push({ id: `dog${dn}-${i}`, breed: B.key, coat, sex, ageD, name, price, collar: Math.floor(R() * DOG_COLLARS.length) });
+    }
+    const sold = (F.dogSold && F.dogSold.dn === dn && F.dogSold.ids) || [];
+    return out.filter((o) => !sold.includes(o.id));
+  },
+  age(F, rec) { return this.dayN(F) - rec.born; },
+  ageText(d) { return d < 120 ? `${Math.max(1, Math.round(d / 7))} weeks` : d < 720 ? `${Math.round(d / 30)} months` : `${Math.floor(d / 360)} years`; },
+  grown(F, rec) { return clamp(0.55 + 0.45 * this.age(F, rec) / 300, 0.55, 1); },
+  buy(F, o) {
+    const B = dogBreed(o.breed);
+    if (!F.kid && !F.unlocked && F.money < o.price) return UI.toast(`${o.name} is ${money(o.price)} and you have ${money(F.money)}.`, true);
+    if (this.list(F).length >= 6) return UI.toast('Six dogs is plenty for one farm!', true);
+    const dn = this.dayN(F);
+    if (!F.kid && !F.unlocked) { F.money -= o.price; F.stats.spent += o.price; }
+    F.dogSold = F.dogSold && F.dogSold.dn === dn ? F.dogSold : { dn, ids: [] }; F.dogSold.ids.push(o.id);
+    const rec = { id: F.nextId++, breed: o.breed, coat: o.coat, collar: o.collar, name: o.name, sex: o.sex, born: dn - o.ageD, job: 'follow' };
+    if (B.role === 'guard') rec.job = this.bestGuardJob(F) || 'follow';
+    else if (B.role === 'ratter') rec.job = 'barn';
+    F.dogs = this.list(F).concat([rec]);
+    tally(F, 'dogs');
+    if (G.view) PETS.sync(G.view);
+    AUDIO.cash && AUDIO.cash(); UI.hudTick && UI.hudTick(0, true);
+    return rec;
+  },
+  // where a new guardian goes: the paddock with the most grazers in it, else the hens
+  bestGuardJob(F) {
+    let best = null, bn = 0;
+    for (const p of F.paddocks) { const n = F.animals.filter((a) => a.pad === p.id && a.sp !== 'chicken' && a.sp !== 'duck').length; if (n > bn) { bn = n; best = p; } }
+    if (best) return 'pad:' + best.id;
+    return F.objs.some((o) => o.t === 'coop' || o.t === 'eggmobile') ? 'hens' : null;
+  },
+  jobName(F, rec) {
+    const j = rec.job || 'follow';
+    if (j === 'follow') return 'Follows you';
+    if (j === 'hens') return 'Guards the hens';
+    if (j === 'barn') return 'Minds the barn and coop';
+    const p = F.paddocks.find((q) => 'pad:' + q.id === j); return p ? `Guards ${p.name}` : 'Follows you';
+  },
+  // perks the rest of the game asks about
+  has(F, role, job) { return this.list(F).some((d) => dogBreed(d.breed).role === role && (!job || (d.job || 'follow') === job) && this.age(F, d) > 90); },
+  guards(F, padId) { return this.list(F).some((d) => dogBreed(d.breed).role === 'guard' && d.job === 'pad:' + padId && this.age(F, d) > 90); },
+  feedK(F) { return this.has(F, 'ratter') ? 0.85 : 1; },
+  layK(F) { return this.list(F).some((d) => dogBreed(d.breed).role === 'guard' && d.job === 'hens' && this.age(F, d) > 90) ? 1.1 : 1; },
+  // ---- the herding dog runs out round the herd when you whistle
+  gather(list) {
+    const V = G.view, Fm = G.Fm; if (!V || !list.length) return null;
+    const p = (V.pets || []).find((q) => q.kind === 'farmdog' && dogBreed(q.rec.breed).role === 'herd' && (q.rec.job || 'follow') === 'follow' && this.age(G.F, q.rec) > 90);
+    if (!p) return null;
+    let cx = 0, cz = 0; for (const a of list) { cx += a.x; cz += a.z; } cx /= list.length; cz /= list.length;
+    const r = Math.max(3, ...list.map((a) => Math.hypot(a.x - cx, a.z - cz))) + 2.2, a0 = Math.atan2(Fm.x - cx, Fm.z - cz);
+    p.gather = { cx, cz, r, a0, t: 0, dir: Math.random() < 0.5 ? 1 : -1 };
+    return p;
+  },
+  // ---- one dog's day: where it wants to be and how fast it goes there
+  think(V, p, dt, Fm, slot) {
+    const F = V.F, rec = p.rec, B = dogBreed(rec.breed), job = rec.job || 'follow', night = F.hour >= 20 || F.hour < 6;
+    let tx, tz, speed = 0;
+    p.size = (B.size || 1) * this.grown(F, rec);
+    const lieTo = (v) => { p.wantLie = v; };
+    // the whistle: out wide round the herd and back to you
+    if (p.gather) {
+      const g = p.gather; g.t += dt;
+      if (g.t < 5.5) { const a = g.a0 + Math.PI * 0.35 * g.dir + g.dir * Math.min(1, g.t / 4.2) * Math.PI * 1.3; tx = g.cx + Math.sin(a) * g.r; tz = g.cz + Math.cos(a) * g.r; speed = 6.2; lieTo(0); }
+      else p.gather = null;
+    }
+    if (tx === undefined && (job === 'follow' || !this.post(F, rec))) {
+      const side = (slot % 2 ? 1 : -1) * (0.95 + 0.55 * Math.floor(slot / 2)), back = 1.25 + 0.45 * Math.floor(slot / 2);
+      const bx = Fm.x - Math.sin(Fm.yaw) * back + Math.cos(Fm.yaw) * side, bz = Fm.z - Math.cos(Fm.yaw) * back - Math.sin(Fm.yaw) * side;
+      const d = Math.hypot(bx - p.x, bz - p.z);
+      if (d > 30) { p.x = bx - Math.sin(Fm.yaw) * 6; p.z = bz - Math.cos(Fm.yaw) * 6; }   // left far behind (a ride, a gate): it catches up out of sight
+      if (d > 1.1) { tx = bx; tz = bz; speed = clamp(d * 1.7, 1.3, 5.6); lieTo(0); p.idleT = 0; }
+      else {
+        p.idleT = (p.idleT || 0) + dt;
+        if (p.st < 0) { p.st = 2 + Math.random() * 3; p.sniff = Math.random() < 0.35 ? [p.x + (Math.random() - 0.5) * 2, p.z + (Math.random() - 0.5) * 2] : null; }
+        if (p.sniff) { tx = p.sniff[0]; tz = p.sniff[1]; speed = 1.1; if (Math.hypot(tx - p.x, tz - p.z) < 0.2) p.sniff = null; }
+        lieTo(p.idleT > 9 && Fm.walk < 0.1 ? 1 : 0);
+        if (!tx) p.yaw += (Math.atan2(Fm.x - p.x, Fm.z - p.z) - p.yaw) * dt * 1.2 * (p.wantLie ? 0.3 : 1);
+      }
+    } else if (tx === undefined) {
+      // a post: wander it, lie down often, walk the fence line at night
+      const P = this.post(F, rec);
+      if (p.st < 0 || !p.goal) {
+        p.st = 5 + Math.random() * 9;
+        const rest = !night && Math.random() < 0.55;
+        p.resting = rest;
+        p.goal = rest && p.goal ? p.goal : P.pick(night);
+      }
+      const d = Math.hypot(p.goal[0] - p.x, p.goal[1] - p.z);
+      if (d > 0.3 && !(p.resting && p.lie > 0.5)) { tx = p.goal[0]; tz = p.goal[1]; speed = d > 8 ? 3.2 : 1.1; lieTo(0); }
+      else lieTo(p.resting ? 1 : 0);
+      if (P.sniffy && !tx) p.nose = 1;
+      if (Math.hypot(Fm.x - p.x, Fm.z - p.z) < 3 && Fm.walk < 0.2 && !tx) p.yaw += (Math.atan2(Fm.x - p.x, Fm.z - p.z) - p.yaw) * dt * 1.5;   // looks round at you
+    }
+    p.head = lerp(p.head || 0, p.nose || p.sniff ? 0.6 : 0, dt * 2); p.nose = 0;   // nose down on a scent
+    return { tx, tz, speed };
+  },
+  // a dog's patch: the paddock it guards, round the coop, or the barn and coop for a ratter
+  post(F, rec) {
+    const job = rec.job || 'follow';
+    if (job.startsWith('pad:')) {
+      const pad = F.paddocks.find((q) => 'pad:' + q.id === job); if (!pad) return null;
+      const [x0, x1, z0, z1] = padRect(pad), c = padCentroid(pad);
+      return { pick: (night) => { for (let i = 0; i < 12; i++) { const x = lerp(x0, x1, Math.random()), z = lerp(z0, z1, Math.random()); if (inPad(pad, x, z) && distToEdges(pad, x, z) > 0.8 && (!night || distToEdges(pad, x, z) < 3)) return [x, z]; } return c; }, pad };
+    }
+    if (job === 'hens' || job === 'barn') {
+      const spots = F.objs.filter((o) => (job === 'hens' ? o.t === 'coop' || o.t === 'eggmobile' : o.t === 'barn' || o.t === 'coop' || o.t === 'woodpile' || o.t === 'eggmobile'));
+      if (!spots.length) return null;
+      return { sniffy: job === 'barn', pick: () => { const o = spots[Math.floor(Math.random() * spots.length)], s = solidOf(o) || { r: 1.5 }, r = Math.max(s.hw || s.r || 1, s.hd || s.r || 1) + 1 + Math.random() * (job === 'hens' ? 3 : 1.5), a = Math.random() * 6.283; return [o.x + Math.sin(a) * r, o.z + Math.cos(a) * r]; } };
+    }
+    return null;
+  },
+  // ---- the card you get when you go up to one of your dogs
+  card(rec) {
+    const F = G.F, B = dogBreed(rec.breed), RL = DOG_ROLES[B.role], self = this;
+    const P = UI.open({ title: rec.name, sub: `${B.name} · ${rec.sex === 'f' ? 'female' : 'male'} · ${this.ageText(this.age(F, rec))}`, icon: '🐕' });
+    const jobs = [{ id: 'follow', text: 'Follow me', small: 'Stays at your heels around the farm' }];
+    if (B.role === 'guard' || B.role === 'comp' || B.role === 'herd' || B.role === 'hunt') for (const p of F.paddocks) jobs.push({ id: 'pad:' + p.id, text: `Guard ${p.name}`, small: `${F.animals.filter((a) => a.pad === p.id).length} animals in there` });
+    if (F.objs.some((o) => o.t === 'coop' || o.t === 'eggmobile')) jobs.push({ id: 'hens', text: 'Guard the hens', small: 'Keeps watch round the coop' });
+    if (F.objs.some((o) => o.t === 'barn' || o.t === 'coop')) jobs.push({ id: 'barn', text: 'Mind the barn and coop', small: 'Patrols for rats and mice' });
+    const cur = rec.job || 'follow';
+    P.body.innerHTML = `<div class="dogHead">${dogPortrait(B, rec.coat || 0, 120)}<div><b>${RL.icon} ${esc(RL.name)}</b><small>${esc(B.note)}</small><small class="dogPerk">${esc(RL.perk)}</small>${this.age(F, rec) <= 90 ? `<small class="dogPerk">Still a pup: ${rec.sex === 'f' ? 'she' : 'he'} starts working at about three months old.</small>` : ''}</div></div>`
+      + `<div class="grp">${esc(rec.name)}'s job</div>` + UI.rows(jobs.map((j) => ({ id: 'job|' + j.id, tap: true, cls: j.id === cur ? 'sel' : '', icon: j.id === cur ? '✅' : j.id === 'follow' ? '👣' : j.id === 'hens' ? '🐔' : j.id === 'barn' ? '🐀' : '🛡️', text: j.text, small: j.small })))
+      + `<div class="grp">With ${rec.sex === 'f' ? 'her' : 'him'}</div>` + UI.rows([{ id: 'pet', tap: true, icon: '🤚', text: `Pet ${rec.name}` }, { id: 'rename', tap: true, icon: '✏️', text: 'Rename' }]);
+    P.body.querySelectorAll('.row').forEach((r) => {
+      r.onclick = () => {
+        const id = r.dataset.id;
+        if (id.startsWith('job|')) { rec.job = id.slice(4); const p = (G.view.pets || []).find((q) => q.rec === rec); if (p) { p.goal = null; p.st = 0; p.wantLie = 0; } UI.toast(`${rec.name}: ${self.jobName(F, rec).toLowerCase()}.`); self.card(rec); return; }
+        if (id === 'pet') { UI.closeAll(); self.pet(rec); return; }
+        if (id === 'rename') { const nm = prompt(`New name for ${rec.name}?`, rec.name); if (nm && nm.trim()) { rec.name = nm.trim().slice(0, 18); } self.card(rec); }
+      };
+    });
+  },
+  pet(rec) {
+    const F = G.F, p = (G.view.pets || []).find((q) => q.rec === rec);
+    act('pet', 1.6, 3, 0, () => {
+      AUDIO.tone(520, 0.08, 'square', 0.05, 0.7); AUDIO.tone(480, 0.1, 'square', 0.05, 0.7, 0.14);
+      const B = dogBreed(rec.breed), big = (B.size || 1) > 1.2;
+      UI.toast(big ? `${rec.name} leans the whole of ${rec.sex === 'f' ? 'her' : 'his'} weight against your legs 🐕` : `${rec.name} wags so hard the whole dog wiggles 🐕`);
+      F.energy = Math.min(100, F.energy + 2);
+      if (p) { p.wantLie = 0; p.idleT = 0; for (let i = 0; i < 3; i++) G.view.puffs.push({ twinkle: true, x: p.x + (Math.random() - 0.5) * 0.4, y: G.view.T.at(p.x, p.z) + 0.6 * p.size + Math.random() * 0.3, z: p.z + (Math.random() - 0.5) * 0.4, t: 0 }); }
+    }, { face: p || G.Fm });
+  },
+  // ---- the dog pen at the livestock barn
+  shopHtml(F) {
+    const list = this.forSale(F);
+    if (!list.length) return '';
+    return `<div class="stTop"><button class="btn" id="stBack">← All animals</button><b>🐕 Farm dogs</b></div><p class="note">Hank only gets dogs in a few days a month. These are in today.</p><div class="stBreeds">`
+      + list.map((o) => { const B = dogBreed(o.breed), C = dogCoat(B, o.coat), RL = DOG_ROLES[B.role]; return `<div class="stBreed">${dogPortrait(B, o.coat, 112)}<b>${esc(o.name)}</b><small><b>${esc(B.name)}</b> · ${esc(C[0].toLowerCase())}</small><small>${o.sex === 'f' ? 'Female' : 'Male'} · ${this.ageText(o.ageD)}${o.ageD < 120 ? ' (a pup)' : ''}</small><small class="dogPerk">${RL.icon} ${esc(RL.name)}: ${esc(RL.perk)}</small><small>${esc(B.note)}</small><button class="stLot dogBuy" data-dog="${o.id}"><span>${F.kid ? 'Take home' : 'Buy'}</span>${F.kid ? '' : `<b>${money(o.price)}</b>`}</button></div>`; }).join('')
+      + `</div>`;
+  },
+  wireShop(b, F, redraw) {
+    const self = this;
+    b.querySelectorAll('[data-dog]').forEach((t) => {
+      t.onclick = () => {
+        const o = self.forSale(F).find((q) => q.id === t.dataset.dog); if (!o) return;
+        const B = dogBreed(o.breed);
+        UI.confirm(`Take ${o.name} home?`, `${F.kid ? '' : money(o.price) + '. '}${o.name} the ${B.name}. ${DOG_ROLES[B.role].perk}`, () => {
+          const rec = self.buy(F, o); if (!rec) return;
+          UI.toast(`${rec.name} is coming home with you! 🐕 Walk up to ${rec.sex === 'f' ? 'her' : 'him'} on the farm to give ${rec.sex === 'f' ? 'her' : 'him'} a job.`);
+          redraw();
+        }, { yes: F.kid ? 'Take home' : `Pay ${money(o.price)}`, icon: '🐕' });
+      };
+    });
+  },
+  // what the dog tile says at the barn
+  tileText(F) {
+    if (!this.unlocked(F)) { const pr = MILESTONES.progress(F, 2); return `🔒 ${pr.n} of ${pr.of} goals at level 2`; }
+    const n = this.forSale(F).length;
+    if (n) return `${n} dog${n === 1 ? '' : 's'} in today`;
+    const k = this.nextSale(F); return k === 1 ? 'Back in tomorrow' : 'None in today';
+  },
+};
+
+// ============================================================================ milestones: every goal at the next level opens something new
+// When every goal ladder in the journal has reached a level, a milestone unlocks. Every third one is a cash prize worth 30% of what
+// all the goals paid out between them for reaching that level, so the prizes grow as the goals do.
+const hasUnlock = (F, key) => !!(F && (F.unlocked || (F.unlocks && F.unlocks[key])));
+const MILESTONES = {
+  list: [
+    { lv: 2, key: 'dogs', icon: '🐕', name: 'Farm dogs', text: 'Working dogs at the livestock barn, a few days each month' },
+    { lv: 3, key: 'heritage', icon: '🐓', name: 'Heritage breeds', text: 'Rare old breeds join the livestock barn: Randall Lineback and Milking Devon cattle, Ossabaw hogs, Navajo-Churro sheep, Dominique and Buckeye hens, Cayuga ducks and the American Cream draft horse' },
+    { lv: 4, cash: true },
+    { lv: 5, key: 'quilt', icon: '🟥', name: 'Barn quilts', text: 'A painted quilt block on both ends of your barn. Walk up to it with the hammer to pick a different block.' },
+    { lv: 6, key: 'heirloom', icon: '🍏', name: 'Heirloom fruit trees', text: 'Old orchard apples and pears at the feed store nursery' },
+    { lv: 7, cash: true },
+    { lv: 8, key: 'vane', icon: '🐓', name: 'Copper weathervane', text: 'A rooster weathervane on your barn roof that swings round with the wind' },
+    { lv: 9, key: 'master', icon: '🏅', name: 'Master Farmer sign', text: 'A Master Farmer plaque hung under the sign at your farm gate' },
+    { lv: 10, cash: true },
+  ],
+  // past the list: a cash prize every third level, and a ribbon for the ones between
+  at(lv) { const m = this.list.find((q) => q.lv === lv); if (m) return m; if (lv > 10 && (lv - 10) % 3 === 0) return { lv, cash: true }; return lv > 10 ? { lv, key: 'ribbon' + lv, icon: '🎀', name: `Level ${lv} ribbon`, text: 'A ribbon for the farm journal' } : null; },
+  // the level of a goal as the journal shows it (a goal climbed to its ceiling counts as every level)
+  goalLevel(F, L) { const i = LADDER.rung(F, L); return LADDER.next(F, L, i) === null ? Infinity : i + 1; },
+  level(F) { let lo = Infinity; for (const L of LADDERS) lo = Math.min(lo, this.goalLevel(F, L)); return lo === Infinity ? 99 : lo; },
+  progress(F, lv) { let n = 0; for (const L of LADDERS) if (this.goalLevel(F, L) >= lv) n++; return { n, of: LADDERS.length }; },
+  // 30% of what every goal paid for reaching level lv (the reward of its rung lv - 2)
+  cash(lv) { let t = 0; for (const L of LADDERS) { const i = lv - 2; if (i < 0) continue; t += LADDER.reward(L, i, LADDER.target(L, i)); } return niceCash(t * 0.3); },
+  check(F) {
+    F.miles = F.miles || {}; F.unlocks = F.unlocks || {};
+    const lv = this.level(F), got = [];
+    for (let k = 2; k <= Math.min(lv, 60); k++) {
+      if (F.miles[k]) continue;
+      const m = this.at(k); if (!m) continue;
+      F.miles[k] = { y: F.year, m: F.month, d: F.day };
+      if (m.cash) { const c = this.cash(k); if (!F.kid) F.money += c; got.push({ icon: '💰', name: `Every goal at level ${k}`, text: F.kid ? 'A big prize for the farm!' : `Prize: ${money(c)}`, cash: c }); }
+      else { F.unlocks[m.key] = true; if (m.key === 'dogs' && F.dogDay === undefined) F.dogDay = FRIENDS.dayN(F); got.push({ icon: m.icon, name: `Every goal at level ${k}: ${m.name} unlocked!`, text: m.text }); }
+    }
+    return got;
+  },
+  // the block at the top of the journal's goals tab
+  html(F) {
+    const lv = this.level(F), next = Math.max(2, Math.min(lv + 1, 60)), m = this.at(next), pr = this.progress(F, next);
+    const rows = [];
+    for (let k = 2; k <= Math.max(next + 2, 10); k++) {
+      const q = this.at(k); if (!q) continue;
+      const done = !!(F.miles && F.miles[k]);
+      rows.push(`<div class="mile${done ? ' done' : k === next ? ' next' : ''}"><span>${done ? '✅' : q.cash ? '💰' : q.icon}</span><b>Level ${k}</b><small>${q.cash ? (F.kid ? 'A big prize' : money(this.cash(k))) : esc(q.name)}</small></div>`);
+      if (rows.length >= 9) break;
+    }
+    return `<div class="miles"><div class="milesTop"><b>🏆 Milestones</b><small>Bring <i>every</i> goal up to level ${next} to unlock ${m && m.cash ? (F.kid ? 'a prize' : `a ${money(this.cash(next))} prize`) : esc(m ? m.name.toLowerCase() : 'the next one')}: ${pr.n} of ${pr.of} there.</small><div class="gbar"><i style="width:${Math.round(pr.n / pr.of * 100)}%"></i></div></div><div class="mileRow">${rows.join('')}</div></div>`;
+  },
 };
 
 // ---------------------------------------------------------------- decorations
@@ -18944,6 +19922,7 @@ function boot() {
   window.addEventListener('resize', resize);
   try { G.R = new Renderer(glc); } catch (e) { document.body.innerHTML = '<p style="padding:20px;font:16px system-ui">Sorry, this device could not start 3D graphics (WebGL). ' + e.message + '</p>'; return; }
   if (G.lowDetail) G.R.shadowOff = true;
+  G.R.setDetail(!G.lowDetail);   // high-definition surfaces everywhere, unless the player chose Low detail
   try { if (document.fonts) document.fonts.load('400 30px "FQ Lilita"'); } catch (e) { /* older browsers */ }
   initInput(); PHOTO.init(); FPV.init(); 
   initPWA();
@@ -19504,7 +20483,8 @@ function findTarget() {
   }
   // pets
   const pet = PETS.near(V, Fm);
-  if (pet && tool === 'hand') push(0.35, { label: `Pet ${PETS.name(F, pet.kind)} ${pet.kind === 'dog' ? '🐕' : '🐈'}`, icon: '🤚', fn: () => act('pet', 1.6, 3, 0, () => { if (pet.kind === 'dog') { AUDIO.tone(520, 0.08, 'square', 0.05, 0.7); AUDIO.tone(480, 0.1, 'square', 0.05, 0.7, 0.14); } else AUDIO.noise(0.8, 120, 0.12, 'lowpass'); UI.toast(pet.kind === 'dog' ? `${PETS.name(F, 'dog')} wags so hard the whole dog wiggles 🐕` : `${PETS.name(F, 'cat')} purrs and headbutts your hand 🐈`); F.energy = Math.min(100, F.energy + 2); }, { face: pet }) });
+  if (pet && pet.kind === 'farmdog') push(0.35, { label: `${pet.rec.name} the ${dogBreed(pet.rec.breed).name}`, icon: '🐕', fn: () => DOGS.card(pet.rec) });
+  else if (pet && tool === 'hand') push(0.35, { label: `Pet ${PETS.name(F, pet.kind)} ${pet.kind === 'dog' ? '🐕' : '🐈'}`, icon: '🤚', fn: () => act('pet', 1.6, 3, 0, () => { if (pet.kind === 'dog') { AUDIO.tone(520, 0.08, 'square', 0.05, 0.7); AUDIO.tone(480, 0.1, 'square', 0.05, 0.7, 0.14); } else AUDIO.noise(0.8, 120, 0.12, 'lowpass'); UI.toast(pet.kind === 'dog' ? `${PETS.name(F, 'dog')} wags so hard the whole dog wiggles 🐕` : `${PETS.name(F, 'cat')} purrs and headbutts your hand 🐈`); F.energy = Math.min(100, F.energy + 2); }, { face: pet }) });
   // animals
   let best = null, bd = 1.9;
   for (const a of V.actors.values()) { if (a.dead || a.inside) continue; const d = Math.min(Math.hypot(a.x - fx, a.z - fz), Math.hypot(a.x - Fm.x, a.z - Fm.z) + 0.3); if (d < bd) { bd = d; best = a; } }
@@ -19565,6 +20545,11 @@ function findTarget() {
   // tool actions on open ground
   const [gx, gz] = forward(Fm, 1.4);
   if (tool === 'shovel') push(5, { label: 'Earthworks…', icon: ICO.shovel, fn: () => UI.earthworks() });
+  if (tool === 'shovel') {   // standing at a pond or on a swale: the shovel offers to fill it back in
+    const pd = pondAt(F, Fm.x, Fm.z), sw = pd ? null : swaleAt(F, Fm.x, Fm.z);
+    if (pd) push(4, { label: 'Fill in this pond', icon: ICO.shovel, fn: () => fillPond(pd), ring: [pd.x, pd.z, Math.max(pd.rx, pd.rz) + 0.8] });
+    else if (sw) push(4, { label: 'Fill in this swale', icon: ICO.shovel, fn: () => fillSwale(sw) });
+  }
   if (tool === 'hoe') {
     // the new bed slides into line with a bed it's lined up close to
     const br = bedRot(), sn = snapBed(gx, gz, br), bx = sn ? sn.x : gx, bz = sn ? sn.z : gz, brr = sn ? sn.r : br, why = bedSpotProblem(bx, bz, brr), BK = BED_KINDS[bedKind(F)];
@@ -19643,7 +20628,7 @@ function setTool(key) {
   if (key === 'hoe') UI.bedPicker();
   G.targetT = 0;
 }
-function checkGoalsToast() { PURSUE.check(G.F); for (const g of checkGoals(G.F)) { setTimeout(() => { UI.toast(G.F.kid ? `🎯 Goal reached: ${g.name}!` : `🎯 Goal reached: ${g.name}! +$${g.reward.toLocaleString()}`); AUDIO.fanfare(); }, 900); SHOP.earn(10, 'goal reached'); } }
+function checkGoalsToast() { PURSUE.check(G.F); const gl = checkGoals(G.F), ms = MILESTONES.check(G.F); ms.forEach((m, i) => setTimeout(() => { UI.toast(`${m.icon} ${m.name} ${m.text}`); AUDIO.fanfare(); if (G.view) { PETS.sync(G.view); G.view.dirtyAll && G.view.dirtyAll(); } }, 2600 + i * 2400)); for (const g of gl) { setTimeout(() => { UI.toast(G.F.kid ? `🎯 Goal reached: ${g.name}!` : `🎯 Goal reached: ${g.name}! +$${g.reward.toLocaleString()}`); AUDIO.fanfare(); }, 900); SHOP.earn(10, 'goal reached'); } }
 
 // ---------------------------------------------------------------- gardening + trees
 // ---------------------------------------------------------------- paint and remodel: every building's colours, style and size
@@ -19988,8 +20973,8 @@ function removeObj(o) { const F = G.F; F.objs = F.objs.filter((q) => q !== o); r
 function refreshAround(x, z, colliders) { G.view.dirtyAt(x, z, 1.5); if (colliders) G.view.rebuildColliders(); }
 
 // ---------------------------------------------------------------- placement (pond, swale, keyline, paddock, buildings)
-function startPlace(p) { G.place = Object.assign({ stage: 0, rot: 0 }, p); $('placeBar').hidden = false; $('placeRot').hidden = p.kind !== 'build' && p.kind !== 'move' && p.kind !== 'vines'; $('placeMinus').hidden = $('placePlus').hidden = p.kind !== 'vines'; UI.closeAll(); G.targetT = 0; }
-function cancelPlace() { G.place = null; $('placeBar').hidden = true; }
+function startPlace(p) { G.place = Object.assign({ stage: 0, rot: 0 }, p); $('placeBar').hidden = false; document.body.classList.add('placing'); $('placeRot').hidden = p.kind !== 'build' && p.kind !== 'move' && p.kind !== 'vines'; $('placeMinus').hidden = $('placePlus').hidden = p.kind !== 'vines'; UI.closeAll(); G.targetT = 0; }
+function cancelPlace() { G.place = null; $('placeBar').hidden = true; document.body.classList.remove('placing'); }
 function placeTarget() {
   const P = G.place, [x, z] = forward(G.Fm, P.kind === 'vines' ? 2.2 : P.kind === 'build' || P.kind === 'move' ? (P.kind === 'move' && P.obj.t === 'bed' ? 1.4 : 2.2 + (P.def ? Math.max(P.def.hw, P.def.hd) : 0)) : P.kind === 'pond' ? 2 + P.rz : 1.4);
   P.cur = [x, z];
@@ -20193,6 +21178,88 @@ function nudgeInside(F, x, z, hw, hd) {
 function swaleClears(F, SH) {
   const FP = swaleFootprint(SH);
   return F.objs.filter((o) => (o.t === 'tree' || o.t === 'brush' || o.t === 'rock' || o.t === 'cactus') && FP.some(([x, z]) => Math.hypot(x - o.x, z - o.z) < 1.1));
+}
+// ---------------------------------------------------------------- filling ponds and swales back in
+// The ground goes back to the land's own lie as fresh raked soil, which greens up over the next few weeks. Grown trees on a swale are cut
+// for firewood; young saplings are lifted with their root ball and go back in your bag to plant somewhere else.
+function swaleSH(F, sw) { return sw.N && sw.N.length === sw.pts.length ? { pts: sw.pts, N: sw.N } : F.terrain.swaleShape(sw.pts, sw.level); }
+function swaleAt(F, x, z, r) {
+  let best = null, bd = r === undefined ? 1.2 : r;
+  for (const sw of F.swales) {
+    if (!sw.pts || sw.pts.length < 2) continue;
+    const SH = swaleSH(F, sw), q = F.terrain.swaleNear(SH.pts, SH.N, x, z); if (!q || q.past > 1.5) continue;
+    const d = Math.max(q.past, q.s < -1.6 ? -1.6 - q.s : q.s > 2.8 ? q.s - 2.8 : 0);
+    if (d < bd) { bd = d; best = sw; }
+  }
+  return best;
+}
+function pondAt(F, x, z) { return F.ponds.find((p) => Math.hypot((x - p.x) / (p.rx + 1.6), (z - p.z) / (p.rz + 1.6)) < 1) || null; }
+// ground that something else still shapes: another pond or swale, or the levelled pad under a building
+function earthKeep(F, self) {
+  const solid = F.objs.filter((o) => { const s = solidOf(o); return s && !['hive', 'trough', 'mailbox', 'tank'].includes(o.t); });
+  return (x, z) => F.ponds.some((p) => p !== self && Math.hypot((x - p.x) / (p.rx * 2 + 0.6), (z - p.z) / (p.rz * 2 + 0.6)) < 1)
+    || F.swales.some((s) => s !== self && (s.pts || []).some((q) => Math.abs(q[0] - x) < 4.5 && Math.abs(q[1] - z) < 4.5 && Math.hypot(q[0] - x, q[1] - z) < 4.2))
+    || solid.some((o) => { const s = solidOf(o); return Math.hypot(o.x - x, o.z - z) < Math.max(s.hw || s.r, s.hd || s.r) + 2.4; });
+}
+const SAPLING_DAYS = 400;   // a planted tree younger than this (about a year in the ground) can still be lifted and moved
+function swaleTrees(F, sw) {
+  const list = swaleClears(F, swaleSH(F, sw)).filter((o) => o.t === 'tree' || o.t === 'brush');
+  const lift = list.filter((o) => { if (o.t !== 'tree' || o.wild || (o.age || 0) >= SAPLING_DAYS) return false; const TR = TREES.find((t) => t.key === o.kind); return TR && ITEMS['sap_' + TR.key]; });
+  return { list, lift, cut: list.filter((o) => !lift.includes(o)) };
+}
+function fillSwale(sw) {
+  const F = G.F, T = F.terrain;
+  const TT = swaleTrees(F, sw), nCut = TT.cut.filter((o) => o.t === 'tree').length, nLift = TT.lift.length;
+  const what = [nCut ? `${nCut} grown tree${nCut === 1 ? '' : 's'} on it will be cut for firewood` : '', nLift ? `${nLift} young sapling${nLift === 1 ? '' : 's'} will be dug up so you can replant ${nLift === 1 ? 'it' : 'them'}` : ''].filter(Boolean).join(', and ');
+  UI.confirm('Fill in this swale?', `The ditch is filled and the berm raked flat, back to the lie of the land. ${what ? what[0].toUpperCase() + what.slice(1) + '.' : ''} It takes about two hours.`, () => {
+    act('dig', 2.6, 120, 10, () => {
+      const SH = swaleSH(F, sw), P = SH.pts, N = SH.N, total = (P.length - 1) * 0.5;
+      const xs = P.map((p) => p[0]), zs = P.map((p) => p[1]), m = 5;
+      // the trees first, while the ground is still where they stand
+      const TT2 = swaleTrees(F, sw), saved = {};
+      let wood = 0;
+      for (const o of TT2.lift) { const key = 'sap_' + o.kind; F.inv[key] = (F.inv[key] || 0) + 1; rootPush(F, key, o.root || ''); const nm = ITEMS[key].name; saved[nm] = (saved[nm] || 0) + 1; }
+      for (const o of TT2.cut) {
+        if (o.t === 'tree') { wood += (o.wild ? 0.6 : 0.3) * treeScale(o); if (G.view && G.view.fellTree) G.view.fellTree(o, G.Fm.x, G.Fm.z); }
+        else wood += 0.08;
+      }
+      F.objs = F.objs.filter((o) => !TT2.list.includes(o));
+      if (wood) F.inv.firewood = (F.inv.firewood || 0) + wood;
+      F.swales = F.swales.filter((s) => s !== sw);
+      const keep = earthKeep(F, sw);
+      T.unDig(Math.min(...xs) - m, Math.min(...zs) - m, Math.max(...xs) + m, Math.max(...zs) + m, (x, z) => {
+        const q = T.swaleNear(P, N, x, z); if (!q || q.past > 1.5) return 0;
+        const e = swaleEnd(q.along, total), sl = q.s / swaleLat(Math.max(e, 0.01));
+        return smooth(-3.6, -2.6, sl) * smooth(4.4, 3.4, sl) * (1 - smooth(0.4, 1.5, q.past));
+      }, keep);
+      T.eachCell(Math.min(...xs) - m, Math.min(...zs) - m, Math.max(...xs) + m, Math.max(...zs) + m, (x, z, k) => {
+        if (T.cover[k] !== COVER.path || keep(x, z)) return;
+        const q = T.swaleNear(P, N, x, z); if (!q || q.past > 0.6) return;
+        const sl = q.s / swaleLat(Math.max(swaleEnd(q.along, total), 0.01));
+        if (sl > -1.4 && sl < 2.9) { T.cover[k] = COVER.bare; T.bio[k] = 0.2; }
+      });
+      T.slopeC = null; G.view.rebuildTerrain(); G.view.dirtyAll(); G.view.rebuildColliders(); G.view.rebuildWater(); G.view.syncActors(false);
+      const sv = Object.entries(saved).map(([n, c]) => `${c} ${n}${c > 1 ? 's' : ''}`).join(', ');
+      UI.toast(`Swale filled in. The soil will green up in a few weeks.${wood ? ` +${fmt1(wood)} firewood.` : ''}${sv ? ` Dug up ${sv}: they're in your bag to replant 🌱` : ''}`);
+      AUDIO.ding();
+    }, { face: { x: G.Fm.x + Math.sin(G.Fm.yaw), z: G.Fm.z + Math.cos(G.Fm.yaw) }, tick: (dt) => { if (Math.random() < dt * 6) G.view.puffs.push({ clod: true, x: G.Fm.x + Math.sin(G.Fm.yaw) * 0.8, y: T.at(G.Fm.x, G.Fm.z) + 0.3, z: G.Fm.z + Math.cos(G.Fm.yaw) * 0.8, vx: (Math.random() - 0.5) * 2, vz: (Math.random() - 0.5) * 2, vy: 2.5, t: 0, tint: [0.45, 0.32, 0.22, 0.9] }); } });
+  }, { icon: '〰️', yes: 'Fill it in', danger: true });
+}
+function fillPond(p) {
+  const F = G.F, T = F.terrain, fish = typeof FISHING !== 'undefined' && FISHING.total ? FISHING.total(p) : 0;
+  UI.confirm('Fill in this pond?', `The water is let out downhill, the hole is filled and the dam ring is raked back to the lie of the land.${fish ? ` The ${fish} fish in it go to the creek.` : ''} It takes about three hours.`, () => {
+    act('dig', 3.0, 180, 12, () => {
+      F.ponds = F.ponds.filter((q) => q !== p);
+      const keep = earthKeep(F, p);
+      T.unDig(p.x - p.rx * 2.2, p.z - p.rz * 2.2, p.x + p.rx * 2.2, p.z + p.rz * 2.2, (x, z) => smooth(2.15, 1.95, Math.hypot((x - p.x) / p.rx, (z - p.z) / p.rz)), keep);
+      T.eachCell(p.x - p.rx * 1.3, p.z - p.rz * 1.3, p.x + p.rx * 1.3, p.z + p.rz * 1.3, (x, z, k) => {
+        if (keep(x, z) || Math.hypot((x - p.x) / p.rx, (z - p.z) / p.rz) > 1.25) return;
+        if (T.cover[k] === COVER.water || T.cover[k] === COVER.bare) { T.cover[k] = COVER.bare; T.bio[k] = 0.2; T.moist[k] = Math.max(T.moist[k], 0.6); }
+      });
+      T.slopeC = null; G.view.rebuildTerrain(); G.view.dirtyAll(); G.view.rebuildColliders(); G.view.rebuildWater(); G.view.syncActors(true);
+      UI.toast('Pond filled in. The soil will green up in a few weeks.'); AUDIO.ding();
+    }, { face: { x: p.x, z: p.z }, tick: (dt) => { if (Math.random() < dt * 6) G.view.puffs.push({ clod: true, x: G.Fm.x + Math.sin(G.Fm.yaw) * 0.8, y: T.at(G.Fm.x, G.Fm.z) + 0.3, z: G.Fm.z + Math.cos(G.Fm.yaw) * 0.8, vx: (Math.random() - 0.5) * 2, vz: (Math.random() - 0.5) * 2, vy: 2.5, t: 0, tint: [0.45, 0.32, 0.22, 0.9] }); } });
+  }, { icon: '💧', yes: 'Fill it in', danger: true });
 }
 function confirmPlace() {
   const P = G.place, F = G.F, T = F.terrain, [x, z] = P.cur;
