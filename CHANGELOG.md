@@ -8,6 +8,14 @@ Publishing: copy `index.html` and `sw.js` into the GitHub repo `silverton777/far
 
 ---
 
+## 1.5.1: pigs, sheep and goats rebuilt
+
+**Why:** the owner asked for the dogs to be made anatomically accurate and "then rework the other animals"; cows and horses were done in 1.4.4, this finishes the farm animals.
+
+- Pigs: a long, deep, straight-sided body with round hams, a gently arched back and a short thick neck into the jowl, on short strong jointed legs with two claws (the Mulefoot keeps its solid hoof). The familiar heads stay.
+- Sheep: a level back, round barrel and the neck rising forward to the head. Fleeced breeds are bigger, blockier and lumpy with wool, with wool on the upper legs; hair sheep are sleek. Slim legs with flat knees and neat cloven hooves.
+- Goats: lean and angular, with hip bones and spine showing, a deep narrow chest, a full round belly, a slim upright neck and long fine legs with knobbly knees and hocks. Dairy goats (Nubian) have an udder; the Boer's red runs down its neck.
+
 ## 1.5.0: a farm that grows outward to 1,000,000 acres
 
 **Why:** the owner asked for plots that keep appearing just outside each one you buy, getting bigger each time, up to 1,000,000 acres, with at least 1,000 acres of farmable land joined to the house.

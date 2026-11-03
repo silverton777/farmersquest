@@ -10,6 +10,14 @@ Publishing: copy `index.html` and `sw.js` into the GitHub repo `silverton777/far
 
 ==========
 
+## 1.5.1: pigs, sheep and goats rebuilt
+
+**Why:** the owner asked for the dogs to be made anatomically accurate and "then rework the other animals"; cows and horses were done in 1.4.4, this finishes the farm animals.
+
+- Pigs: a long, deep, straight-sided body with round hams, a gently arched back and a short thick neck into the jowl, on short strong jointed legs with two claws (the Mulefoot keeps its solid hoof). The familiar heads stay.
+- Sheep: a level back, round barrel and the neck rising forward to the head. Fleeced breeds are bigger, blockier and lumpy with wool, with wool on the upper legs; hair sheep are sleek. Slim legs with flat knees and neat cloven hooves.
+- Goats: lean and angular, with hip bones and spine showing, a deep narrow chest, a full round belly, a slim upright neck and long fine legs with knobbly knees and hocks. Dairy goats (Nubian) have an udder; the Boer's red runs down its neck.
+
 ## 1.5.0: a farm that grows outward to 1,000,000 acres
 
 **Why:** the owner asked for plots that keep appearing just outside each one you buy, getting bigger each time, up to 1,000,000 acres, with at least 1,000 acres of farmable land joined to the house.
@@ -3992,21 +4000,13 @@ function buildPig(br) {
   const P = {};
   const dark = col[0] < 80;
   const bodyCol = br.key === 'kunekune' ? (q) => (patchN([q[0] * 1.6, q[1] * 1.6, q[2] * 1.6], 3) > 0.35 ? [70, 50, 40] : col) : (q) => mixc(col, shade(col, 1.08), smooth(-0.2, -0.9, q[1]) * 0.4);
-  const g = (x) => Math.exp(-x);
-  let m = new MB();
-  m.mat = MAT.hide;
-  m.sel(0, 0, 0, 0.4 * k, 0.37 * k, 0.64 * k, 2.3, col, {
-    lat: 14, lon: 20, colFn: bodyCol,
-    shape: (q) => {
-      let [x, y, z] = q;
-      x *= 1 + 0.08 * smooth(-0.2, -0.9, z) - 0.05 * Math.max(0, z);    // big hams, lighter shoulder
-      if (y > 0) y += 0.06 * g(((z + 0.45) ** 2) * 6 + x * x * 3);       // rounded rump
-      else { y -= 0.06 * g(z * z * 2.5); y += 0.1 * smooth(-0.45, -0.95, z) * -y; }
-      return [x, y, z];
-    },
-  });
-  // jowl / neck
-  m.sel(0, -0.02 * k, 0.5 * k, 0.3 * k, 0.3 * k, 0.22 * k, 2.2, col, { lat: 8, lon: 12, colFn: () => col });
+  // ---- the body, rump to jowl: a long deep barrel with straight sides, round hams, a gently arched back highest over the loin, the
+  // belly hanging a little, heavy shoulders and a short thick neck that runs into the jowl. [z, y, across, up, down, squareness]
+  const Tb = [[-0.69, 0.1, 0.07, 0.07, 0.08, 1], [-0.64, 0.08, 0.23, 0.22, 0.26, 0.85], [-0.52, 0.06, 0.33, 0.32, 0.35, 0.8], [-0.32, 0.06, 0.36, 0.36, 0.37, 0.78],
+    [-0.08, 0.05, 0.37, 0.355, 0.41, 0.78], [0.16, 0.03, 0.36, 0.34, 0.4, 0.8], [0.36, 0.02, 0.34, 0.31, 0.37, 0.82], [0.5, 0.01, 0.29, 0.27, 0.32, 0.86], [0.62, 0.03, 0.22, 0.22, 0.25, 0.9]];
+  const tb = Tb.map((t) => ({ c: [0, t[1] * k, t[0] * k], rx: t[2] * k, ry: t[3] * k, ry2: t[4] * k, pw: t[5] }));
+  let m = new MB(); m.mat = MAT.hide;
+  loftTube(m, tb, (i, cs, sn) => bodyCol([cs, sn, (i / (Tb.length - 1)) * 2 - 1]), { seg: 22 });
   m.mat = 0;
   P.body = m;
   m = new MB();
@@ -4035,13 +4035,17 @@ function buildPig(br) {
   }
   m.mat = 0;
   P.head = m;
-  const lowC = br.key === 'berkshire' ? [235, 225, 220] : col;
-  m = new MB(); hoofLeg(m, 0.32 * k, 0.09 * k, 0.04 * k, col, [62, 52, 52], false, lowC); P.leg = m;
-  m = new MB(); hoofLeg(m, 0.32 * k, 0.11 * k, 0.04 * k, col, [62, 52, 52], true, lowC); P.legB = m;
+  // ---- legs: short and strong. The front leg straight down from the shoulder to a short pastern; the hind leg from the ham, the hock
+  // a little behind it; two claws on each foot. [share of the leg, z, across, front-back]
+  const lowC = br.key === 'berkshire' ? [235, 225, 220] : col, pL = 0.33 * k, hoofP = br.key === 'mulefoot' ? [48, 40, 40] : [70, 58, 58];
+  const PFRONT = [[0.4, 0.0, 0.12, 0.15], [0.0, 0.0, 0.1, 0.12], [-0.3, 0.005, 0.072, 0.078], [-0.46, 0.008, 0.064, 0.066], [-0.58, 0.01, 0.052, 0.055], [-0.76, 0.016, 0.048, 0.052], [-0.86, 0.026, 0.052, 0.056], [-0.94, 0.04, 0.046, 0.05]];
+  const PBACK = [[0.45, 0.0, 0.15, 0.21], [0.05, 0.0, 0.125, 0.17], [-0.26, -0.03, 0.085, 0.105], [-0.46, -0.06, 0.062, 0.068], [-0.58, -0.05, 0.054, 0.057], [-0.76, -0.025, 0.048, 0.052], [-0.86, -0.008, 0.052, 0.056], [-0.94, 0.008, 0.046, 0.05]];
+  m = new MB(); hoofedLeg(m, pL, k, PFRONT, (u) => (u > 0.62 ? lowC : col), hoofP, br.key !== 'mulefoot'); P.leg = m;
+  m = new MB(); hoofedLeg(m, pL, k, PBACK, (u) => (u > 0.62 ? lowC : col), hoofP, br.key !== 'mulefoot'); P.legB = m;
   m = new MB();
   horn(m, [[0, 0, 0], [0, -0.06 * k, -0.05 * k], [0.04 * k, -0.1 * k, -0.04 * k], [0.03 * k, -0.13 * k, 0.01 * k], [-0.02 * k, -0.12 * k, 0]], 0.022 * k, 0.012 * k, br.key === 'berkshire' ? [235, 225, 220] : col);
   P.tail = m;
-  P.dims = { legL: 0.32 * k, legX: 0.22 * k, legZ: 0.38 * k, legY: -0.17 * k, height: 0.5 * k, headY: 0.08 * k, headZ: 0.62 * k, tailZ: -0.64 * k, tailY: 0.16 * k, radius: 0.48 * k, body: [[0.34 * k, 0.4 * k], [-0.3 * k, 0.41 * k], [0.78 * k, 0.24 * k]], mass: 2 };
+  P.dims = { legL: 0.33 * k, legX: 0.2 * k, legZ: 0.36 * k, legZB: 0.44 * k, legY: -0.17 * k, height: 0.5 * k, headY: 0.08 * k, headZ: 0.62 * k, tailZ: -0.66 * k, tailY: 0.17 * k, radius: 0.48 * k, body: [[0.34 * k, 0.4 * k], [-0.3 * k, 0.41 * k], [0.78 * k, 0.24 * k]], mass: 2 };
   return P;
 }
 
@@ -4050,16 +4054,21 @@ function buildSheep(br) {
   const P = {}, wool = br.col, hair = br.hair || br.blackhead;
   const face = br.blackhead ? [32, 30, 32] : br.wool ? br.col2 : [232, 212, 192];
   const disp = (q) => 1 + (hair ? 0.015 : 0.06) * (Math.sin(q[0] * 11) * Math.sin(q[1] * 9 + 1) * Math.sin(q[2] * 10 + 2) * 0.6 + 0.4);
+  // ---- the body, dock to poll: a level back from the dock over the loin to the withers, a deep round barrel, the brisket ahead of the
+  // front legs, then the neck rising forward to the head. A fleeced sheep is bigger and blockier all over, and lumpy with wool.
+  // [z, y, across, up, down]
+  const fl = hair ? 1 : 1.14, sw = br.blackhead ? 1.04 : 1;
+  const Tb = [[-0.55, 0.05, 0.06, 0.06, 0.07], [-0.5, 0.04, 0.2 * fl, 0.2 * fl, 0.22 * fl], [-0.38, 0.03, 0.27 * fl * sw, 0.27 * fl, 0.29 * fl], [-0.15, 0.01, 0.29 * fl * sw, 0.285 * fl, 0.32 * fl],
+    [0.1, 0.0, 0.29 * fl * sw, 0.28 * fl, 0.32 * fl], [0.3, 0.02, 0.255 * fl, 0.27 * fl, 0.29 * fl], [0.42, 0.08, 0.19 * fl, 0.21 * fl, 0.22 * fl], [0.5, 0.16, 0.13 * fl, 0.15 * fl, 0.14 * fl], [0.56, 0.27, 0.1 * fl, 0.11 * fl, 0.1 * fl]];
+  const tb = Tb.map((t) => ({ c: [0, t[1], t[0]], rx: t[2], ry: t[3], ry2: t[4], pw: hair ? 0.95 : 0.9 }));
   let m = new MB();
   m.mat = hair ? MAT.hide : MAT.wool;
-  m.sel(0, 0, 0, 0.35, 0.34, 0.52, 2.3, wool, {
-    lat: 14, lon: 20, disp,
-    colFn: br.blackhead ? (q) => (q[2] > 0.75 ? face : wool) : (q) => shade(wool, 0.94 + 0.1 * hashN(Math.round(q[0] * 6), Math.round(q[1] * 6), Math.round(q[2] * 6))),
-    shape: (q) => [q[0] * (1 + 0.06 * smooth(-0.2, -0.9, q[2])), q[1] < 0 ? q[1] + 0.12 * smooth(-0.4, -0.95, q[2]) * -q[1] : q[1], q[2]],
-  });
-  m.push(M4.trs(0, 0.12, 0.42, 0, -0.6, 0));
-  m.sel(0, 0.06, 0, 0.17, 0.22, 0.18, 2.2, br.blackhead ? face : wool, { lat: 8, lon: 12, disp });
-  m.pop();
+  const fleece = (i, cs, sn) => 1 + (hair ? 0 : 0.05) * (Math.sin(cs * 7 + i * 2.3) * Math.sin(sn * 6 + i * 1.1) * 0.7 + 0.3);
+  loftTube(m, tb, (i, cs, sn) => {
+    const q = [cs, sn, (i / (Tb.length - 1)) * 2 - 1];
+    if (br.blackhead && i >= Tb.length - 2) return face;
+    return hair ? mixc(wool, shade(wool, 1.06), smooth(-0.2, -0.9, sn) * 0.4) : shade(wool, 0.94 + 0.1 * hashN(Math.round(q[0] * 6), Math.round(q[1] * 6), Math.round(q[2] * 6)));
+  }, { seg: 22, bump: fleece });
   m.mat = 0;
   P.body = m;
   m = new MB();
@@ -4071,11 +4080,15 @@ function buildSheep(br) {
   for (const sx of [-1, 1]) flatEye(m, sx, 0.05, 0.2, 0.024, 0.021, [210, 196, 176], 0.005);
   m.ell(0, -0.05, 0.345, 0.04, 0.025, 0.015, br.blackhead ? [60, 55, 58] : [196, 140, 140], { lat: 3, lon: 6 });
   P.head = m;
-  const legC = br.blackhead ? face : [205, 186, 170];
-  m = new MB(); hoofLeg(m, 0.4, 0.06, 0.028, legC, [50, 44, 44], false); if (!hair) { m.mat = MAT.wool; m.sel(0, -0.04, 0, 0.08, 0.1, 0.08, 2, wool, { lat: 5, lon: 8, disp }); m.mat = 0; } P.leg = m;
-  m = new MB(); hoofLeg(m, 0.4, 0.07, 0.028, legC, [50, 44, 44], true); if (!hair) { m.mat = MAT.wool; m.sel(0, -0.05, -0.02, 0.09, 0.12, 0.09, 2, wool, { lat: 5, lon: 8, disp }); m.mat = 0; } P.legB = m;
+  // ---- legs: slim and straight, a flat knee, a fine cannon and small neat cloven hooves; the hind leg angles back to the hock.
+  // Wool covers the top of the leg on a fleeced breed. [share of the leg, z, across, front-back]
+  const legC = br.blackhead ? face : br.wool ? shade(br.col2, 1.04) : [214, 196, 178], hoofS = [56, 48, 46], sL = 0.41;
+  const SFRONT = [[0.3, 0.0, 0.075, 0.1], [0.0, 0.0, 0.062, 0.08], [-0.32, 0.004, 0.042, 0.048], [-0.46, 0.006, 0.038, 0.042], [-0.56, 0.006, 0.03, 0.033], [-0.79, 0.01, 0.028, 0.031], [-0.88, 0.02, 0.032, 0.035], [-0.95, 0.03, 0.028, 0.032]];
+  const SBACK = [[0.35, 0.0, 0.1, 0.15], [0.03, 0.01, 0.085, 0.125], [-0.26, -0.035, 0.055, 0.072], [-0.46, -0.075, 0.038, 0.044], [-0.56, -0.065, 0.031, 0.034], [-0.79, -0.035, 0.028, 0.031], [-0.88, -0.02, 0.032, 0.035], [-0.95, -0.006, 0.028, 0.032]];
+  const sleg = (R, back) => { const g = new MB(); hoofedLeg(g, sL, 1, R, () => legC, hoofS, true); if (!hair) { g.mat = MAT.wool; g.sel(0, (back ? -0.03 : -0.02), back ? -0.01 : 0, back ? 0.1 : 0.085, back ? 0.13 : 0.11, back ? 0.11 : 0.09, 2, wool, { lat: 5, lon: 8, disp }); g.mat = 0; } return g; };
+  P.leg = sleg(SFRONT, false); P.legB = sleg(SBACK, true);
   m = new MB(); m.mat = hair ? MAT.hide : MAT.wool; m.sel(0, -0.08, -0.01, 0.05, 0.1, 0.05, 2, wool, { lat: 5, lon: 8 }); m.mat = 0; P.tail = m;
-  P.dims = { legL: 0.4, legX: 0.17, legZ: 0.3, legY: -0.15, height: 0.56, headY: 0.3, headZ: 0.56, tailZ: -0.5, tailY: 0.12, radius: 0.42, body: [[0.28, 0.36], [-0.24, 0.36], [0.72, 0.2]], mass: 1.2 };
+  P.dims = { legL: 0.41, legX: 0.15, legZ: 0.3, legZB: 0.36, legY: -0.15, height: 0.57, headY: 0.3, headZ: 0.56, tailZ: -0.53, tailY: 0.12, radius: 0.42, body: [[0.28, 0.36], [-0.24, 0.36], [0.72, 0.2]], mass: 1.2 };
   return P;
 }
 
@@ -4084,18 +4097,18 @@ function buildGoat(br) {
   const P = {}, col = br.col, col2 = br.col2 || col;
   const headC = br.key === 'boer' ? col2 : col;
   const bodyCol = br.key === 'nubian' ? (q) => (patchN(q, 5) > 0.25 ? col2 : col) : () => col;
+  // ---- the body, tail to poll: lean and angular. A sloping rump off the hip bones, a straight back with the spine showing, a deep
+  // narrow chest, the belly round and full (the rumen) and tucked up at the flank, then a slim neck carried upright. [z, y, across, up, down, squareness]
+  const dy = br.dairy ? 1 : 0, meat = br.key === 'boer' ? 1 : 0;
+  const Tb = [[-0.57, 0.1, 0.05, 0.05, 0.06, 1], [-0.52, 0.07, 0.16 + 0.03 * meat, 0.17, 0.21, 0.85], [-0.4, 0.04, 0.22 + 0.04 * meat, 0.23, 0.26, 0.82], [-0.18, 0.0, 0.25 + 0.03 * meat, 0.25, 0.34 + 0.02 * dy, 0.9],
+    [0.06, 0.0, 0.255 + 0.03 * meat, 0.26, 0.34, 0.92], [0.28, 0.03, 0.21 + 0.03 * meat, 0.28, 0.31, 0.88], [0.41, 0.12, 0.15 + 0.02 * meat, 0.2, 0.21, 0.92], [0.5, 0.26, 0.1 + 0.01 * meat, 0.12, 0.1, 1], [0.56, 0.42, 0.08, 0.09, 0.08, 1]];
+  const tb = Tb.map((t) => ({ c: [0, t[1], t[0]], rx: t[2], ry: t[3], ry2: t[4], pw: t[5] }));
   let m = new MB();
   m.mat = MAT.hide;
-  m.sel(0, 0, 0, 0.27, 0.31, 0.54, 2.4, col, {
-    lat: 14, lon: 18, colFn: bodyCol,
-    shape: (q) => {
-      let [x, y, z] = q;
-      if (y > 0) y += 0.08 * Math.exp(-(((Math.abs(x) - 0.5) ** 2) * 8 + ((z + 0.6) ** 2) * 8)) + 0.06 * Math.exp(-(((z - 0.5) ** 2) * 10));
-      else { y -= 0.06 * Math.exp(-z * z * 3); y += 0.18 * smooth(-0.35, -0.95, z) * -y; }
-      return [x * (1 - 0.1 * Math.max(0, z)), y, z];
-    },
-  });
-  m.push(M4.trs(0, 0.14, 0.44, 0, -0.65, 0)); m.sel(0, 0.1, 0, 0.12, 0.24, 0.14, 2.2, br.key === 'boer' ? col2 : col, { lat: 8, lon: 10 }); m.pop();
+  // the hip bones and the spine stand up a little under the skin
+  const bones = (i, cs, sn) => 1 + (sn > 0 ? 0.05 * Math.exp(-((Math.abs(cs) - 0.55) ** 2) * 18) * (i === 2 || i === 1 ? 1 : 0) + 0.025 * Math.exp(-cs * cs * 40) * (i >= 2 && i <= 6 ? 1 : 0) : 0);
+  loftTube(m, tb, (i, cs, sn) => (br.key === 'boer' && i >= Tb.length - 2 ? col2 : bodyCol([cs, sn, (i / (Tb.length - 1)) * 2 - 1])), { seg: 22, bump: bones });
+  if (dy) { m.mat = 0; m.sel(0, -0.3, -0.36, 0.1, 0.09, 0.11, 2.2, [222, 180, 170], { lat: 6, lon: 10 }); for (const sx of [-1, 1]) m.cyl(sx * 0.05, -0.42, -0.34, 0.014, 0.02, 0.07, 6, [214, 168, 160]); m.mat = MAT.hide; }   // the udder
   m.mat = 0;
   P.body = m;
   m = new MB();
@@ -4112,10 +4125,15 @@ function buildGoat(br) {
   for (const sx of [-1, 1]) if (br.key !== 'nubian') horn(m, [[sx * 0.05, 0.11, 0.08], [sx * 0.07, 0.23, 0.02], [sx * 0.11, 0.3, -0.09], [sx * 0.15, 0.29, -0.2]], 0.028, 0.009, [126, 110, 92]);
   m.mat = MAT.hide; m.push(M4.trs(0, -0.11, 0.25, 0, Math.PI, 0)); m.cyl(0, -0.14, 0, 0.0, 0.03, 0.14, 6, shade(headC, 0.8)); m.pop(); m.mat = 0;
   P.head = m;
-  m = new MB(); hoofLeg(m, 0.47, 0.055, 0.025, col, [50, 44, 44], false); P.leg = m;
-  m = new MB(); hoofLeg(m, 0.47, 0.065, 0.025, col, [50, 44, 44], true); P.legB = m;
+  // ---- legs: long and fine, with knobbly knees and hocks and small pointed hooves. [share of the leg, z, across, front-back]
+  const gL = 0.48, hoofG = [56, 48, 44];
+  const GFRONT = [[0.25, 0.0, 0.07, 0.095], [0.0, 0.0, 0.058, 0.08], [-0.32, 0.004, 0.04, 0.046], [-0.46, 0.006, 0.037, 0.041], [-0.56, 0.006, 0.028, 0.031], [-0.8, 0.01, 0.026, 0.029], [-0.88, 0.02, 0.03, 0.033], [-0.95, 0.032, 0.026, 0.03]];
+  const GBACK = [[0.3, 0.0, 0.09, 0.14], [0.02, 0.01, 0.075, 0.115], [-0.27, -0.04, 0.05, 0.068], [-0.46, -0.085, 0.036, 0.042], [-0.56, -0.074, 0.029, 0.032], [-0.8, -0.04, 0.026, 0.029], [-0.88, -0.022, 0.03, 0.033], [-0.95, -0.006, 0.026, 0.03]];
+  const lowG = br.key === 'boer' ? col : col;
+  m = new MB(); hoofedLeg(m, gL, 1, GFRONT, (u) => (u > 0.6 ? lowG : col), hoofG, true); P.leg = m;
+  m = new MB(); hoofedLeg(m, gL, 1, GBACK, (u) => (u > 0.6 ? lowG : col), hoofG, true); P.legB = m;
   m = new MB(); m.mat = MAT.hide; m.push(M4.rotX(Math.PI * 0.85)); m.sel(0, 0.08, 0, 0.028, 0.08, 0.028, 2, col, { lat: 4, lon: 6 }); m.pop(); m.mat = 0; P.tail = m;
-  P.dims = { legL: 0.47, legX: 0.14, legZ: 0.34, legY: -0.15, height: 0.63, headY: 0.44, headZ: 0.58, tailZ: -0.52, tailY: 0.2, radius: 0.36, body: [[0.3, 0.3], [-0.26, 0.3], [0.74, 0.18]], mass: 1 };
+  P.dims = { legL: 0.48, legX: 0.13, legZ: 0.3, legZB: 0.38, legY: -0.15, height: 0.64, headY: 0.44, headZ: 0.58, tailZ: -0.56, tailY: 0.22, radius: 0.36, body: [[0.3, 0.3], [-0.26, 0.3], [0.74, 0.18]], mass: 1 };
   return P;
 }
 
@@ -16321,7 +16339,7 @@ function interiorFrame(F0, room) {
 
 'use strict';
 // ============================================================================ profiles + saves (each profile has its own farm save)
-const FQ_VERSION = '1.5.0';
+const FQ_VERSION = '1.5.1';
 const LOOKS = [
   { shirt: [214, 74, 64], hair: [120, 76, 40] }, { shirt: [70, 130, 200], hair: [236, 206, 120] }, { shirt: [240, 170, 60], hair: [80, 50, 30] },
   { shirt: [120, 170, 90], hair: [40, 30, 28] }, { shirt: [170, 100, 190], hair: [200, 110, 60] }, { shirt: [60, 160, 160], hair: [150, 100, 60] },
@@ -18976,7 +18994,9 @@ function loftTube(mb, rings, colFn, opt) {
     const row = [], crow = [];
     for (let j = 0; j < N; j++) {
       const a = (j / N) * Math.PI * 2, cs = Math.cos(a), sn = Math.sin(a), ry = sn >= 0 ? r.ry : (r.ry2 !== undefined ? r.ry2 : r.ry);
-      row.push([r.c[0] + side[0] * cs * r.rx + up[0] * sn * ry, r.c[1] + side[1] * cs * r.rx + up[1] * sn * ry, r.c[2] + side[2] * cs * r.rx + up[2] * sn * ry]);
+      // r.pw < 1 squares the ring off (a pig's deep straight sides); opt.bump(i, cos, sin) swells it in and out (a fleece's lumps)
+      const pw = r.pw || 1, cq = pw === 1 ? cs : Math.sign(cs) * Math.abs(cs) ** pw, sq = pw === 1 ? sn : Math.sign(sn) * Math.abs(sn) ** pw, bm = opt.bump ? opt.bump(i, cs, sn, r) : 1;
+      row.push([r.c[0] + (side[0] * cq * r.rx + up[0] * sq * ry) * bm, r.c[1] + (side[1] * cq * r.rx + up[1] * sq * ry) * bm, r.c[2] + (side[2] * cq * r.rx + up[2] * sq * ry) * bm]);
       crow.push(colFn(i, cs, sn, r));
     }
     P.push(row); CL.push(crow);
