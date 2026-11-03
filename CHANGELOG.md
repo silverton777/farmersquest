@@ -8,6 +8,12 @@ Publishing: copy `index.html` and `sw.js` into the GitHub repo `silverton777/far
 
 ---
 
+## 1.5.2: free land in kid mode
+
+**Why:** "be able to buy land in kid mode - won't let you. just make it free like everything else."
+
+- In kid mode every parcel at the land office is free (it says "free" on the map and in the list, and the button reads Take), the way building, paint and tools already were. Kid farms pay no property tax.
+
 ## 1.5.1: pigs, sheep and goats rebuilt
 
 **Why:** the owner asked for the dogs to be made anatomically accurate and "then rework the other animals"; cows and horses were done in 1.4.4, this finishes the farm animals.

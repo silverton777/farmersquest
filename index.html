@@ -10,6 +10,12 @@ Publishing: copy `index.html` and `sw.js` into the GitHub repo `silverton777/far
 
 ==========
 
+## 1.5.2: free land in kid mode
+
+**Why:** "be able to buy land in kid mode - won't let you. just make it free like everything else."
+
+- In kid mode every parcel at the land office is free (it says "free" on the map and in the list, and the button reads Take), the way building, paint and tools already were. Kid farms pay no property tax.
+
 ## 1.5.1: pigs, sheep and goats rebuilt
 
 **Why:** the owner asked for the dogs to be made anatomically accurate and "then rework the other animals"; cows and horses were done in 1.4.4, this finishes the farm animals.
@@ -9524,7 +9530,7 @@ const LANDUI = {
       if (w / (2 * h) > 0.09) {
         const fs = Math.min(w * 0.17, h * 0.06), cx = r[0] + w / 2, cy = r[2] + w / 2;
         const top = p < NHOME ? plotName(p).replace('Lot ', '') : `${fmtAcres(plotAcres(F, p))} ac`;
-        const sub = mine ? '✓ yours' : buy ? (kid ? 'for sale' : shortMoney(plotPrice(F, p))) : '';
+        const sub = mine ? '✓ yours' : buy ? (kid ? 'free' : shortMoney(plotPrice(F, p))) : '';
         svg += `<text x="${cx}" y="${cy - (sub ? fs * 0.25 : -fs * 0.35)}" font-size="${fs}" text-anchor="middle" font-weight="800" fill="#4a3a22" pointer-events="none">${top}</text>`;
         if (sub) svg += `<text x="${cx}" y="${cy + fs * 0.95}" font-size="${fs * 0.85}" text-anchor="middle" font-weight="700" fill="${mine ? '#3f7a2a' : '#8a5a00'}" pointer-events="none">${sub}</text>`;
       }
@@ -9539,7 +9545,7 @@ const LANDUI = {
       <svg id="landMap" viewBox="${-h} ${-h} ${2 * h} ${2 * h}" style="display:block;width:100%;max-width:440px;aspect-ratio:1;margin:2px auto 6px;border-radius:10px;background:#d9d3c2;touch-action:manipulation">${svg}</svg>
       <div style="display:flex;gap:10px;flex-wrap:wrap;justify-content:center;font-size:12px;font-weight:700;margin:4px 0 6px"><span><i style="display:inline-block;width:12px;height:12px;border-radius:3px;background:#cfe8b4;border:2px solid #6aa04a;vertical-align:-2px"></i> Yours</span><span><i style="display:inline-block;width:12px;height:12px;border-radius:3px;background:#ffe9a8;border:2px solid #d6a21f;vertical-align:-2px"></i> For sale</span><span><i style="display:inline-block;width:12px;height:12px;border-radius:3px;background:#e6e1d4;border:2px dashed #cfc7b3;vertical-align:-2px"></i> Not yet</span><span><i style="display:inline-block;width:10px;height:10px;border-radius:50%;background:#c0392b;vertical-align:-1px"></i> Your house</span></div>
       <div class="grp">For sale now</div>
-      ${list.length ? UI.rows(list.map((p) => ({ id: 'b' + p, tap: true, icon: p < NHOME ? '🏡' : isWalkRing(plotRingOf(p)) ? '🌾' : '🗺️', text: `${plotName(p)} · ${fmtAcres(saleAcres(F, p))} acres`, small: plotWhere(p), right: kid ? '' : money(plotPrice(F, p)) }))) : `<p class="note">${acresLeft(F) < 1 ? 'You own a million acres: every acre the county will sell you. 🏆' : 'Nothing for sale beside your land right now.'}</p>`}
+      ${list.length ? UI.rows(list.map((p) => ({ id: 'b' + p, tap: true, icon: p < NHOME ? '🏡' : isWalkRing(plotRingOf(p)) ? '🌾' : '🗺️', text: `${plotName(p)} · ${fmtAcres(saleAcres(F, p))} acres`, small: plotWhere(p), right: kid ? 'Free' : money(plotPrice(F, p)) }))) : `<p class="note">${acresLeft(F) < 1 ? 'You own a million acres: every acre the county will sell you. 🏆' : 'Nothing for sale beside your land right now.'}</p>`}
       <div id="holdBox"></div>`;
     { const H = HOLD.panel(F, cash, redraw); $('holdBox').innerHTML = H.html; H.wire($('holdBox')); }
     $('lmOut').onclick = () => { this.L = Math.min(RINGS, L + 1); redraw(); };
@@ -9549,35 +9555,38 @@ const LANDUI = {
     b.querySelectorAll('[data-id^="b"]').forEach((r) => { r.onclick = () => go(+r.dataset.id.slice(1)); });
   },
   offer(F, p, cash, redraw) {
-    const price = F.unlocked ? 0 : plotPrice(F, p), acres = saleAcres(F, p), ring = plotRingOf(p), walk = isWalkRing(ring), pay = F.unlocked ? 'Free in unlocked mode' : money(price);
-    if (!F.unlocked && F.money < price) return UI.toast(`That costs ${money(price)}.`, true);
+    // land is free in kid mode, like everything else there (and in unlocked mode)
+    const free = landFree(F), price = free ? 0 : plotPrice(F, p), acres = saleAcres(F, p), ring = plotRingOf(p), walk = isWalkRing(ring), pay = F.kid ? 'free' : F.unlocked ? 'free in unlocked mode' : money(price);
+    if (!free && F.money < price) return UI.toast(`That costs ${money(price)}.`, true);
     const done = (use) => {
       const err = buyParcel(F, p, use); if (err) return UI.toast(err, true);
       AUDIO.fanfare(); UI.closeAll(); cash();
       UI.toast(walk ? `${plotName(p)} is yours! The fence line moves out for you. 🗺️` : `${Math.round(acres).toLocaleString()} acres are yours. ${TRACT_USES[use].icon}`);
       checkGoalsToast(); redraw();
     };
-    if (p < NHOME) return UI.confirm(`Buy ${plotName(p)}?`, `${plotWhere(p)}. ${pay} for about 2.5 more acres. The fence line moves out to take it in, and property tax goes up $350 a year.`, () => done());
+    const cap = (t) => t[0].toUpperCase() + t.slice(1);
+    if (p < NHOME) return UI.confirm(F.kid ? `Take ${plotName(p)}?` : `Buy ${plotName(p)}?`, F.kid ? `${cap(plotWhere(p))}: about 2.5 more acres, free. The fence line moves out to take it in.` : `${cap(plotWhere(p))}. ${cap(pay)} for about 2.5 more acres. The fence line moves out to take it in, and property tax goes up $350 a year.`, () => done());
     if (walk) {
       const tax = Math.round(acres * 20), grow = ring > TIER;
-      return UI.confirm(`Buy the ${plotName(p)}?`, `${fmtAcres(acres)} acres ${plotWhere(p)}, for ${pay}. It's real ground you can walk, build and farm on. The fence line moves out round it, and property tax goes up ${money(tax)} a year.${grow ? ' Your farm grows to take it in, and the neighbours move out past your new land.' : ''}`, () => done());
+      return UI.confirm(F.kid ? `Take the ${plotName(p)}?` : `Buy the ${plotName(p)}?`, `${fmtAcres(acres)} acres ${plotWhere(p)}, ${F.kid ? 'free' : 'for ' + pay}. It's real ground you can walk, build and farm on. The fence line moves out round it${F.kid ? '' : `, and property tax goes up ${money(tax)} a year`}.${grow ? ' Your farm grows to take it in, and the neighbours move out past your new land.' : ''}`, () => done());
     }
     // outlying land: pick what it's for first
-    const P = UI.open({ title: `Buy the ${plotName(p)}`, sub: `${Math.round(acres).toLocaleString()} acres · ${pay}`, icon: '🗺️', foot: true });
+    const P = UI.open({ title: `${F.kid ? 'Take' : 'Buy'} the ${plotName(p)}`, sub: `${Math.round(acres).toLocaleString()} acres · ${cap(pay)}`, icon: '🗺️', foot: true });
     let use = 'lease';
     const draw = () => { P.body.innerHTML = `<p class="note">${plotWhere(p)[0].toUpperCase() + plotWhere(p).slice(1)}. What will the land be used for? You can change it later.</p>` + UI.rows(Object.entries(TRACT_USES).map(([k, u]) => ({ id: k, tap: true, icon: u.icon, text: u.name, small: u.note, cls: use === k ? 'sel' : '' }))); P.body.querySelectorAll('.row').forEach((r) => { r.onclick = () => { use = r.dataset.id; draw(); }; }); };
     draw();
-    P.foot.innerHTML = `<button class="btn" id="lbNo">Not now</button><button class="btn go" id="lbBuy">${F.unlocked ? 'Take it' : 'Buy for ' + money(price)}</button>`;
+    P.foot.innerHTML = `<button class="btn" id="lbNo">Not now</button><button class="btn go" id="lbBuy">${free ? 'Take it' : 'Buy for ' + money(price)}</button>`;
     $('lbNo').onclick = () => UI.closeAll();
     $('lbBuy').onclick = () => done(use);
   },
 };
 // buy a parcel: pay, take it (the last one before the 1,000,000-acre limit is cut to fit), give outlying land its use, and grow the
 // ground grid when it's walking land the farm doesn't reach yet. Returns an error message, or null.
+const landFree = (F) => !!(F.kid || F.unlocked);
 function buyParcel(F, p, use) {
   if (F.owned[p]) return 'You already own it.';
   if (!plotsForSale(F).includes(p)) return 'That land isn\'t for sale yet: buy the land beside it first.';
-  const price = F.unlocked ? 0 : plotPrice(F, p), acres = saleAcres(F, p), ring = plotRingOf(p);
+  const price = landFree(F) ? 0 : plotPrice(F, p), acres = saleAcres(F, p), ring = plotRingOf(p);
   if (acres < 1) return 'You own all the land you can: a million acres.';
   if (F.money < price) return 'Not enough money.';
   F.money -= price; F.stats.spent += price;
@@ -15233,8 +15242,8 @@ function sleepDays(F, n) {
   return notes;
 }
 function yearEnd(F) {
-  const tax = landTax(F);
-  F.money -= tax; F.log.push(`Paid $${tax} property tax for year ${F.year - 1}.`);
+  const tax = F.kid ? 0 : landTax(F);   // nobody sends a kid a tax bill
+  if (tax) { F.money -= tax; F.log.push(`Paid $${tax} property tax for year ${F.year - 1}.`); }
   F.stats.lastYearIncome = F.stats.yearIncome; F.stats.yearIncome = 0;
 }
 
@@ -16339,7 +16348,7 @@ function interiorFrame(F0, room) {
 
 'use strict';
 // ============================================================================ profiles + saves (each profile has its own farm save)
-const FQ_VERSION = '1.5.1';
+const FQ_VERSION = '1.5.2';
 const LOOKS = [
   { shirt: [214, 74, 64], hair: [120, 76, 40] }, { shirt: [70, 130, 200], hair: [236, 206, 120] }, { shirt: [240, 170, 60], hair: [80, 50, 30] },
   { shirt: [120, 170, 90], hair: [40, 30, 28] }, { shirt: [170, 100, 190], hair: [200, 110, 60] }, { shirt: [60, 160, 160], hair: [150, 100, 60] },
