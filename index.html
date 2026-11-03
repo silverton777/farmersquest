@@ -1,4 +1,103 @@
 <!doctype html>
+<!-- FQ-CHANGELOG-BEGIN
+# Farmers Quest: changes since hand-off
+
+The owner uploaded version **1.1.4** on 1 Nov 2026 (commit `d1e4614`). Everything below was changed after that by Claude, in a separate chat, at the owner's request. Each version lists **what** changed and **why** (the request or problem behind it). The newest version is first.
+
+The same log is kept in a comment at the top of `index.html`, so the game file carries its own history.
+
+Publishing: copy `index.html` and `sw.js` into the GitHub repo `silverton777/farmersquest` (served by GitHub Pages). Bump `FQ_VERSION` in `index.html` and the `CACHE` name in `sw.js` on every release so phones pick up the new version.
+
+==========
+
+## 1.5.0: a farm that grows outward to 1,000,000 acres
+
+**Why:** the owner asked for plots that keep appearing just outside each one you buy, getting bigger each time, up to 1,000,000 acres, with at least 1,000 acres of farmable land joined to the house.
+
+- Land is now rings round the homestead. Ring 1 has twelve parcels of about 16 acres, ring 2 twelve of about 62, then 250, 1,000, 4,000, 16,000 and 64,000 acres. Each ring doubles the width of the farm.
+- Any parcel touching your land is for sale, so each one you buy opens up the land just past it. Land across the county road can now be bought too.
+- The homestead and rings 1 and 2 are real ground you walk, build and farm on: 1,000 acres round the house. When you first buy into a ring the ground grows to take it in. The old land keeps everything on it; the new land gets hedgerows along the parcel lines, woodlots, old trees, rocks and brush. The old wooded edge thins to a hedgerow, and the neighbours move out past your land.
+- Rings 3 to 7 are outlying land. Each parcel is put to a use (crop lease, hay, timber or wildlife), pays monthly the way the old tracts did, and shows in the countryside from the farm. Everything you own is capped at exactly 1,000,000 acres; the last parcel is trimmed to fit.
+- The land office has a zoomable map of the rings and a list of everything for sale. The old seasonal tract listings are gone; tracts already bought are kept and count toward the million.
+- Property tax: $350 a homestead lot, $20 an acre of walking land in the rings, $4 an acre of outlying land. Goals: "Own all 25 homestead lots", and the parcel and acre ladders run up to 109 parcels and 1,000,000 acres.
+- Keeping a big farm fast: ground near you is built at full detail and far ground more coarsely, swapping as you move; on a big farm the farm's own trees are drawn out to 150 units and bushes to 70. The ground is always drawn far enough out that no hole shows at a distance.
+- Much smaller saves: the ground is now saved compactly (heights to the centimetre, soil to a thousandth with random rounding so slow changes are never lost). A homestead farm's save shrank from about 520 kB to about 80 kB; a full 1,000-acre farm is about 830 kB instead of 6 MB. Older saves still load.
+
+## 1.4.4: rebuilt cows and horses, flat eyes
+
+**Why:** "cow heads are much worse now than they used to be" and "eyes shouldn't be so buggy, make them flat".
+
+- Cows keep their familiar old head, now on a new smooth body and jointed legs. Cattle hair is slightly coarser and longer.
+- Horses rebuilt: smooth body, arched neck with a mane crest, nose-down head, feathered legs on draft breeds.
+- Eyes on cows, horses, pigs, sheep and goats are painted flat onto the face (they follow the curve of the head) instead of bulging balls. Goats keep amber eyes with a level pupil.
+- Faces carry shorter hair than bodies, so eyes and blazes read clearly.
+
+## 1.4.3: broader dog heads
+
+**Why:** "their heads are too narrow."
+
+- Wider skulls, fuller cheeks, broader muzzles; larger almond eyes set lower and looking forward.
+
+## 1.4.2: dogs rebuilt to real proportions, fine hair
+
+**Why:** "the dogs have balloon-like necks", "front legs are too far back, sticking the chest out", plus 13 photos of Luna and Juneau as reference.
+
+- Each dog is one smooth lofted body from rump to skull, built to breed-standard proportions: deep ribcage, tucked waist, thick neck flowing into the head, front legs under the withers.
+- New heads (stop, drop ears, nose and mouth line), jointed legs with the hock set back, lofted tails.
+- New fine-hair shading for dogs, cats, cattle, horses and goats (asked for "more fine than the cow tufts" and to "revamp the cow hair").
+
+## 1.4.1: Luna and Juneau
+
+**Why:** the owner asked for their two real dogs in the game.
+
+- Luna: a large white Great Pyrenees with a faint dark ring round one eye. Juneau: the same size, a golden Pyrenees x Bernese with a white blaze, socks and chest, a curled plume tail and a pink collar. Both come home with every farm and follow you.
+- Petting sometimes ends in a roll-over belly rub; new Shake (a paw); dogs pant, and you hear it, when you walk up, after a run and while petting.
+
+## 1.4.0: farm dogs, milestones, HD surfaces, fill-in earthworks
+
+**Why:** a batch of requests from the owner.
+
+- Farm dogs: 20 working breeds at the livestock barn once every goal reaches level 2. On sale 7 spread-out days a month (always on the unlock day and the next); "Sorry, no dogs for sale today!" otherwise.
+- Milestones for every goal level; every third one is a cash prize worth 30% of that level's rewards.
+- High-definition surfaces on by default (off with Low detail), now on garden crops too.
+- Fill in ponds and swales with the shovel. Grown trees on a swale are cut for firewood; young saplings go back in the bag.
+- Grass grows on swales like the turf round them.
+- First-person view draws the farm in every direction and far into the distance.
+- Smaller placement bar with a close button; country-style pop-ups.
+
+## 1.3.0: climbing goals, hay, soil care, auto paddocks, fishing, fog, lights
+
+**Why:** owner's requests and fixes found while testing.
+
+- Goals climb: finish one and the next level appears with a bigger target and reward.
+- Square bales you carry out, round bales you unroll; animals walk to the hay.
+- Compost and mulch raise bed fertility and harvests (bed care menu).
+- Any area closed in by fences becomes a paddock; fence posts can be dragged while drawing.
+- Coop upgrades up to 50 hens; new rod-and-line fishing; seasonal fog; lantern, flashlight and spotlight.
+- Fixes: house keeps its look on older saves, log cabin door, porch and woodshed roofs, woodshed clear of the house, first-person look thumb, see-through trough, rain splashes, room ceilings.
+
+## 1.2.1: updates reach phones; paint and remodel; weeds
+
+**Why:** phones kept showing old versions; owner's requests for building choices.
+
+- The service worker fetches the game page fresh whenever online, so new uploads show up on the next open.
+- Paint and Remodel: colours and styles for house (farmhouse, two-story, log cabin, stone cottage, modern), barn (gambrel, gable, steel, bank) and coop (A-frame, hen palace), and small/standard/large sizes.
+- Weeds come up on bare or overgrazed ground; goats, sheep, pigs and poultry eat the ones they like.
+- Town: cobbled main street, boardwalk, gas lamps on the park side, painted sign lettering, shopkeepers greet you.
+
+==========
+
+## Notes for the next developer
+
+- Single file: all game code is in `index.html` (about 22,000 lines). `sw.js` caches it for offline play.
+- Animal bodies use `loftTube()` (smooth tubes through rings). Dogs: `buildFarmDog()`, cows: `buildCow()`, horses: `buildHorse()`. Eyes use `flatEye()`, which drops each vertex onto the head with `surfaceX()`.
+- Hair is drawn as shell layers: grass is kind 0, wool/fur kind 1, fine hair kind 2 (`FURS`, `DOG_FUR`, `furFor()`). Faces get shorter hair through `furHead`.
+- Dogs live in `DOGS` and `F.dogs`; Luna and Juneau are added by `homeDogs()` with `own: true`.
+- Saves are JSON in `localStorage` (and native preferences in the app build). Old saves are upgraded in `migrateFarm()` and `farmFromSave()`. The ground is packed by `GameTerrain.pack()` with the `TERPACK` codec (`fmt: 2`); the old raw-float format is still read by `unpackRaw()`.
+- Land: parcels 0 to 24 are the homestead lots; 25 to 108 are the rings, 12 per ring (`plotRect`, `plotOf`, `plotAdj`, `plotRingOf`). `F.owned` has an entry per parcel, `F.pUse` the use of each outlying parcel and `F.pAcres` a parcel trimmed at the cap.
+- World size: `setWorld(tier)` sets `FARM_HALF`, `THALF`, `TN` (the ground grid) and `WORLD_R` (the countryside) from `F.tier`. `growWorld()` enlarges the grid when walking land is bought; `newLand()` furnishes the new ground. Ground tiles build at two levels of detail (`GameTerrain.build` with a want list, `FarmView.updateTiles`).
+- Neighbour farms sit at `nbX(N)`, just past your land. The land office is `LANDUI`; buying is `buyParcel()`.
+FQ-CHANGELOG-END -->
 <html lang="en">
 <head>
 <meta charset="utf-8">
@@ -6178,33 +6277,123 @@ function cleanName(s) { return String(s || '').replace(/[<>]/g, '').replace(/\s+
 
 'use strict';
 // ============================================================================ the farm: terrain + world state (everything that gets saved)
-// The farm is a 5 × 5 grid of lots, 20 m a side (each is "about 2.5 acres" in the game's own scale). You start on the middle one(s) and buy outwards.
-const PLOT = 20, PN = 5, NPLOTS = PN * PN, FARM_HALF = 50, HOME_PLOT = 12;
-const TN = 116, THALF = 58;   // the ground grid around the farm: cells, and half its extent (a few metres of woods all round)
+// The farm grows outward in rings. In the middle is the homestead: a 5 × 5 grid of lots, 20 units a side (each "about 2.5 acres" in the
+// game's own scale, where a unit is 5 m). Around it, ring after ring of bigger parcels: each ring doubles the width of the farm and is cut
+// into 12 parcels as wide as the ring itself (the 4 × 4 grid of the new square, less the middle 2 × 2 that is the old one). So ring 1's
+// parcels are about 16 acres, ring 2's 62, then 250, 1,000, 4,000, 16,000 and 64,000. Rings 1 and 2 are real ground, walked, built on
+// and farmed: the homestead and those two rings make 1,000 acres round the house. Rings 3 to 7 are outlying land, worked the way tracts are
+// (leased, hayed, timbered or left wild), and everything you own together stops at 1,000,000 acres.
+// Buying a parcel puts the parcels touching it up for sale, so each one you buy opens up the land just beyond it.
+const PLOT = 20, PN = 5, NHOME = PN * PN, HOME_HALF = 50, HOME_PLOT = 12, RINGS = 7, WALK_RINGS = 2, NPLOTS = NHOME + RINGS * 12, MAX_ACRES = 1000000;
+// the ground grid follows the land you've bought: TIER = how many rings of real ground the farm has (0 = just the homestead).
+// FARM_HALF = half the width of that land, THALF/TN = the ground grid (a few units of woods all round), WORLD_R = how far the countryside runs.
+let TIER = 0, FARM_HALF = 50, THALF = 58, TN = 116, WORLD_R = 158;
+function setWorld(t) {
+  TIER = t; FARM_HALF = HOME_HALF * 2 ** t; THALF = FARM_HALF + 8; TN = THALF * 2; WORLD_R = FARM_HALF + 108;
+  CH0 = -(THALF + 2); CHN = Math.ceil(-2 * CH0 / CHUNK);
+  PLOTS_KEY = '';
+}
 const COVER = { grass: 0, bare: 1, forest: 2, bed: 3, water: 4, built: 5, path: 6, road: 7 };
 const LISTING_PLOTS = { worn: [12], woods: [12], creek: [12, 17], prime: [11, 12, 13] };
-function plotOf(x, z) { const px = Math.floor((x + FARM_HALF) / PLOT), pz = Math.floor((z + FARM_HALF) / PLOT); return px < 0 || px >= PN || pz < 0 || pz >= PN ? -1 : pz * PN + px; }
-function plotRect(p) { const px = p % PN, pz = Math.floor(p / PN); return [-FARM_HALF + px * PLOT, -FARM_HALF + (px + 1) * PLOT, -FARM_HALF + pz * PLOT, -FARM_HALF + (pz + 1) * PLOT]; }
+// the 12 parcels of a ring, as cells of its 4 × 4 grid ([column, row], north row first), and the reverse
+const RING_CELLS = [[0, 0], [1, 0], [2, 0], [3, 0], [0, 1], [3, 1], [0, 2], [3, 2], [0, 3], [1, 3], [2, 3], [3, 3]];
+const RING_CELL_AT = [0, 1, 2, 3, 4, -1, -1, 5, 6, -1, -1, 7, 8, 9, 10, 11];
+const ringHalf = (r) => HOME_HALF * 2 ** r;                                // half the width of the farm out to the edge of ring r
+const plotRingOf = (p) => (p < NHOME ? 0 : 1 + Math.floor((p - NHOME) / 12));
+const nPhys = () => NHOME + 12 * Math.min(TIER, WALK_RINGS);               // parcels 0 .. nPhys()-1 are real ground right now
+const isWalkRing = (r) => r <= WALK_RINGS;
+function plotOf(x, z) {
+  if (x >= -HOME_HALF && x < HOME_HALF && z >= -HOME_HALF && z < HOME_HALF) return Math.floor((z + HOME_HALF) / PLOT) * PN + Math.floor((x + HOME_HALF) / PLOT);
+  for (let r = 1; r <= TIER; r++) {
+    const h = ringHalf(r); if (x < -h || x >= h || z < -h || z >= h) continue;
+    const w = h / 2, c = RING_CELL_AT[Math.floor((z + h) / w) * 4 + Math.floor((x + h) / w)];
+    return c < 0 ? -1 : NHOME + (r - 1) * 12 + c;
+  }
+  return -1;
+}
+function plotRect(p) {
+  if (p < NHOME) { const px = p % PN, pz = Math.floor(p / PN); return [-HOME_HALF + px * PLOT, -HOME_HALF + (px + 1) * PLOT, -HOME_HALF + pz * PLOT, -HOME_HALF + (pz + 1) * PLOT]; }
+  const r = plotRingOf(p), h = ringHalf(r), w = h / 2, [i, j] = RING_CELLS[(p - NHOME) % 12];
+  return [-h + i * w, -h + (i + 1) * w, -h + j * w, -h + (j + 1) * w];
+}
 const plotCol = (p) => p % PN, plotRow = (p) => Math.floor(p / PN);
-// the lots that share an edge with this one
-function plotAdj(p) { const c = plotCol(p), r = plotRow(p), o = []; for (const [a, b] of [[c, r - 1], [c, r + 1], [c - 1, r], [c + 1, r]]) if (a >= 0 && a < PN && b >= 0 && b < PN) o.push(b * PN + a); return o; }
-// 0 = the home lot, 1 = the ring around it, 2 = the outer ring
-const plotRing = (p) => Math.max(Math.abs(plotCol(p) - 2), Math.abs(plotRow(p) - 2));
-// "Lot C2": letters run west to east, numbers north to south (the farm map and the land office use the same grid)
-const plotName = (p) => 'Lot ' + 'ABCDE'[plotCol(p)] + (plotRow(p) + 1);
+// the parcels that share a stretch of edge with this one (any ring)
+const PLOT_ADJ = [];
+function plotAdj(p) {
+  if (PLOT_ADJ[p]) return PLOT_ADJ[p];
+  const a = plotRect(p), o = [];
+  for (let q = 0; q < NPLOTS; q++) {
+    if (q === p) continue;
+    const b = plotRect(q), ox = Math.min(a[1], b[1]) - Math.max(a[0], b[0]), oz = Math.min(a[3], b[3]) - Math.max(a[2], b[2]);
+    if ((ox > 0.01 && Math.abs(oz) < 0.01) || (oz > 0.01 && Math.abs(ox) < 0.01)) o.push(q);
+  }
+  return (PLOT_ADJ[p] = o);
+}
+// homestead lots: 0 = the home lot, 1 = the ring around it, 2 = the outer ring
+const plotRing = (p) => (p < NHOME ? Math.max(Math.abs(plotCol(p) - 2), Math.abs(plotRow(p) - 2)) : 2 + plotRingOf(p));
+const RING_NOUN = ['lot', 'field', 'pasture', 'farm', 'ranch', 'holding', 'range', 'spread'];
+const RING_DIR = ['Northwest', 'North', 'North', 'Northeast', 'West', 'East', 'West', 'East', 'Southwest', 'South', 'South', 'Southeast'];
+const RING_SIDE = ['', ' (west)', ' (east)', '', ' (north)', ' (north)', ' (south)', ' (south)', '', ' (west)', ' (east)', ''];
+// "Lot C2" on the homestead (letters west to east, numbers north to south); "North pasture (east)" out in the rings
+function plotName(p) {
+  if (p < NHOME) return 'Lot ' + 'ABCDE'[plotCol(p)] + (plotRow(p) + 1);
+  const r = plotRingOf(p), c = (p - NHOME) % 12;
+  return `${RING_DIR[c]} ${RING_NOUN[r]}${RING_SIDE[c]}`;
+}
+const RING_WHERE = ['', 'just past the home lots', 'in the second ring out', 'in the third ring out, past your walking land', 'four rings out', 'five rings out', 'six rings out', 'on the far edge, seven rings out'];
 function plotWhere(p) {
+  if (p >= NHOME) return RING_WHERE[plotRingOf(p)];
   const dc = plotCol(p) - 2, dr = plotRow(p) - 2; if (!dc && !dr) return 'the home lot';
   const ns = dr < 0 ? 'north' : dr > 0 ? 'south' : '', ew = dc < 0 ? 'west' : dc > 0 ? 'east' : '', far = Math.max(Math.abs(dc), Math.abs(dr));
   return `${far === 1 ? 'next to home, ' : far + ' lots out, '}${ns}${ns && ew ? '-' : ''}${ew}`;
 }
-// the lots you could buy right now: not yours, but touching something that is
-// only land on your own side of the county road is for sale: the lots across the road are not on the market
-function plotBuyable(F, p) { return plotRect(p)[3] <= roadZ(F) + 0.5; }
-function buyablePlots(F) { const o = []; for (let p = 0; p < NPLOTS; p++) if (plotBuyable(F, p)) o.push(p); return o; }
-function plotsForSale(F) { const o = []; for (let p = 0; p < NPLOTS; p++) if (!F.owned[p] && plotBuyable(F, p) && plotAdj(p).some((q) => F.owned[q])) o.push(p); return o; }
+// acres: a homestead lot is 2.5; a ring parcel is (its width)² / 160 (so ring 1 = 15.625, then four times bigger each ring).
+// The last parcel bought before the 1,000,000-acre limit is cut down to fit, and F.pAcres remembers that.
+const plotAcresNominal = (p) => (p < NHOME ? 2.5 : (ringHalf(plotRingOf(p)) / 2) ** 2 / 160);
+const fmtAcres = (a) => (a < 100 ? Math.round(a * 10) / 10 : Math.round(a)).toLocaleString();
+const plotAcres = (F, p) => (F.pAcres && F.pAcres[p] !== undefined ? F.pAcres[p] : plotAcresNominal(p));
+function ownedAcres(F) {
+  let a = 0; for (let p = 0; p < NPLOTS; p++) if (F.owned[p]) a += plotAcres(F, p);
+  return a + (F.tracts || []).reduce((n, t) => n + t.acres, 0);
+}
+// which use an outlying parcel of yours is put to at a point (null if the point isn't on outlying land you own)
+function outUseAt(F, x, z) {
+  if (!F || !F.owned) return null;
+  const m = Math.max(Math.abs(x), Math.abs(z)); if (m < ringHalf(WALK_RINGS)) return null;
+  let r = WALK_RINGS + 1; while (r <= RINGS && m >= ringHalf(r)) r++; if (r > RINGS) return null;
+  const h = ringHalf(r), w = h / 2, c = RING_CELL_AT[clamp(Math.floor((z + h) / w), 0, 3) * 4 + clamp(Math.floor((x + h) / w), 0, 3)];
+  if (c < 0) return null;
+  const p = NHOME + (r - 1) * 12 + c;
+  return F.owned[p] ? (F.pUse && F.pUse[p]) || 'lease' : null;
+}
+const acresLeft = (F) => Math.max(0, MAX_ACRES - ownedAcres(F));
+// how many acres a parcel would add if you bought it now (the last one is trimmed to the limit)
+const saleAcres = (F, p) => Math.min(plotAcresNominal(p), Math.floor(acresLeft(F)));
+// every parcel is for sale once it touches land you own: the homestead lots on both sides of the road, and every ring out to the limit
+function plotBuyable(F, p) { return p >= 0 && p < NPLOTS && saleAcres(F, p) >= 1; }
+function buyablePlots(F) { const o = []; for (let p = 0; p < NPLOTS; p++) if (F.owned[p] || plotBuyable(F, p)) o.push(p); return o; }
+let PLOTS_KEY = '', PLOTS_SALE = [];
+function plotsForSale(F) {
+  const key = F.owned.join('') + ':' + Math.round(ownedAcres(F));
+  if (key === PLOTS_KEY && PLOTS_SALE.F === F) return PLOTS_SALE;
+  const o = []; for (let p = 0; p < NPLOTS; p++) if (!F.owned[p] && plotBuyable(F, p) && plotAdj(p).some((q) => F.owned[q])) o.push(p);
+  PLOTS_KEY = key; PLOTS_SALE = o; o.F = F;
+  return o;
+}
 const ownedCount = (F) => F.owned.filter(Boolean).length;
-// lots further from the house cost more
-function plotPrice(F, p) { return Math.round((LAND_PLOT_PRICE[F.listing] || 25000) * (plotRing(p) >= 2 ? 1.35 : 1) / 500) * 500; }
+const homeCount = (F) => F.owned.slice(0, NHOME).filter(Boolean).length;
+// homestead lots further from the house cost more; ring parcels are priced by the acre, a little cheaper an acre the bigger they get
+const RING_PRICE_K = [1, 1.2, 1.05, 0.9, 0.8, 0.72, 0.66, 0.6];
+function plotPrice(F, p) {
+  if (p < NHOME) return Math.round((LAND_PLOT_PRICE[F.listing] || 25000) * (plotRing(p) >= 2 ? 1.35 : 1) / 500) * 500;
+  const v = saleAcres(F, p) * HOLD.perAcre(F) * RING_PRICE_K[plotRingOf(p)];
+  return v >= 1e6 ? Math.round(v / 1e4) * 1e4 : Math.round(v / 500) * 500;
+}
+// yearly property tax: $350 a homestead lot, $20 an acre of walking land in the rings, $4 an acre further out
+function landTax(F) {
+  let t = 0; for (let p = 0; p < NPLOTS; p++) if (F.owned[p]) t += p < NHOME ? 350 : plotAcres(F, p) * (isWalkRing(plotRingOf(p)) ? 20 : 4);
+  return Math.round(t);
+}
 
 // ---------------------------------------------------------------- terrain with editable heights and per-cell soil
 const SOFT_W = [1, 3, 3, 1];
@@ -6232,6 +6421,9 @@ class GameTerrain {
       h += rough * (fbm(x * 0.15, z * 0.15, seed + 5, 3) - 0.5) * 1.1;
       if (L === 'creek') { const d = z - this.creekZ(x); h -= 1.3 * Math.exp(-(d * d) / 3.5) + 0.4 * Math.exp(-(d * d) / 30); }
       if (L === 'worn') for (let g = 0; g < 8; g++) { const gx = -46 + g * 13 + Math.sin(z * 0.08 + (g - 2)) * 3; h -= 0.55 * Math.exp(-((x - gx) ** 2) / 0.8) * smooth(-28, 0, z); }
+      // past the homestead the land rolls into the bigger hills of the countryside (the same hills the far view shows)
+      const m = Math.max(Math.abs(x), Math.abs(z));
+      if (m > 50) h += smooth(50, 150, m) * T.hills * 9 * fbm(x * 0.01 + 9, z * 0.01 + 3, 7, 3);
       return h;
     };
     this.base = base;
@@ -6435,6 +6627,12 @@ class GameTerrain {
     if (f < 0.12) c = mixc(c, [196, 170, 100], 0.6 * k);                     // hay field
     else if (f < 0.2) c = mixc(c, [120, 90, 60], 0.55 * k);                   // ploughed ground
     else if (f > 0.72) c = mixc(c, P.forest, 0.55);                          // woodland floor
+    // your own outlying land shows in the view from the farm: leased cropland in strips, hay land gold, timber dark, wild land tawny prairie
+    const use = outUseAt(this.farm, x, z);
+    if (use === 'lease') c = mixc(c, (Math.floor((x + z * 0.3) / 6) & 1) ? [128, 156, 74] : [150, 120, 80], 0.7);
+    else if (use === 'hay') c = mixc(c, [200, 180, 104], 0.6);
+    else if (use === 'timber') c = mixc(c, P.forest, 0.7);
+    else if (use === 'wild') c = mixc(c, [176, 160, 98], 0.45);
     if (R.key === 'sonoran') c = mixc(c, R.soil.color, 0.5);
     return shade(c, 0.88 + n * 0.24);
   }
@@ -6446,41 +6644,63 @@ class GameTerrain {
     return 0;
   }
   // the ground, cut into square tiles so only the ones near the camera are drawn (and grown over with grass); each is { mb, cx, cz }
-  build(season, dry) {
-    const W = TN + 1, NC = TN * TN, cc = new Array(NC), gl0 = new Float32Array(NC);
-    for (let k = 0; k < NC; k++) { cc[k] = this.cellColor(k, (k % TN) - THALF + 0.5, Math.floor(k / TN) - THALF + 0.5, season, dry); gl0[k] = this.grassLen(k, season); }
-    const vc = new Array(W * W), vn = new Array(W * W), gl = new Array(W * W);
-    for (let j = 0; j <= TN; j++) for (let i = 0; i <= TN; i++) {
-      const x = i - THALF, z = j - THALF, k = j * W + i;
-      vn[k] = this.normal(x, z);
-      // blend the cells around this corner with a soft tent (1-3-3-1 each way): colour and grass length change over a couple of metres, so a patch of bare ground
-      // or a building's apron never shows the straight, stair-stepped edge of the 1 m cells it is stored in
-      let r = 0, g = 0, b = 0, n = 0, gr = 0, hard = false, nh = 0, wet = false;
+  // the side of a ground tile in cells: the old 29 on a homestead-only farm, and one that divides by 4 on a bigger one (so far tiles
+  // can be drawn with every fourth corner)
+  tileSize() { if (TN === 116) return 29; for (const t of [32, 24, 28, 36, 26, 27, 30]) if (TN % t === 0) return t; return TN; }
+  // want: [[ti, tj, step], ...] = which tiles to build and how finely (1 = every corner, 4 = every fourth); all of them at full detail if left out
+  build(season, dry, want) {
+    const W = TN + 1, NC = TN * TN, TS = this.tileSize(), NT = TN / TS, cc = new Array(NC), gl0 = new Float32Array(NC).fill(-1);
+    // each cell's colour and grass length, worked out only for the cells the asked-for tiles need
+    const cell = (ck) => { if (gl0[ck] < 0) { cc[ck] = this.cellColor(ck, (ck % TN) - THALF + 0.5, Math.floor(ck / TN) - THALF + 0.5, season, dry); gl0[ck] = this.grassLen(ck, season); } };
+    // blend the cells around a corner with a soft tent (1-3-3-1 each way): colour and grass length change over a couple of metres, so a patch of bare ground
+    // or a building's apron never shows the straight, stair-stepped edge of the 1 m cells it is stored in
+    const corner = (i, j) => {
+      let r = 0, g = 0, b = 0, n = 0, gr = 0, nh = 0, wet = false;
       for (let dj = -2; dj <= 1; dj++) for (let di = -2; di <= 1; di++) {
         const ci = i + di, cj = j + dj;
         if (ci < 0 || cj < 0 || ci >= TN || cj >= TN) continue;
-        const ck = cj * TN + ci, c = cc[ck], w = SOFT_W[di + 2] * SOFT_W[dj + 2];
+        const ck = cj * TN + ci; cell(ck); const c = cc[ck], w = SOFT_W[di + 2] * SOFT_W[dj + 2];
         r += c[0] * w; g += c[1] * w; b += c[2] * w; n += w;
         gr += gl0[ck] * w;
         if (di >= -1 && di <= 0 && dj >= -1 && dj <= 0) { const cv = this.cover[ck]; if (cv === COVER.path || cv === COVER.road) nh++; if (cv === COVER.water) wet = true; }   // a corner that touches gravel or water grows no grass at all, so blades never poke up through a path
       }
-      hard = wet || nh >= 2;   // a corner with two or more gravel/road cells round it grows no grass, so the turf runs right up to the edge of the lane
-      vc[k] = [r / n, g / n, b / n]; gl[k] = hard ? 0 : gr / n;
-    }
-    const p = (k) => [(k % W) - THALF, this.h[k], Math.floor(k / W) - THALF];
-    const down = (q) => [q[0], q[1] - 4, q[2]];
-    const TS = 29, NT = TN / TS, tiles = [];
-    for (let tj = 0; tj < NT; tj++) for (let ti = 0; ti < NT; ti++) {
+      const hard = wet || nh >= 2;   // a corner with two or more gravel/road cells round it grows no grass, so the turf runs right up to the edge of the lane
+      return { c: [r / n, g / n, b / n], g: hard ? 0 : gr / n, n: this.normal(i - THALF, j - THALF), p: [i - THALF, this.h[j * W + i], j - THALF] };
+    };
+    const down = (q, d) => [q[0], q[1] - d, q[2]];
+    if (!want) { want = []; for (let tj = 0; tj < NT; tj++) for (let ti = 0; ti < NT; ti++) want.push([ti, tj, 1]); }
+    const tiles = [];
+    for (const [ti, tj, st] of want) {
       const mb = new MB(); mb.mat = MAT.ground;
-      for (let j = tj * TS; j < (tj + 1) * TS; j++) for (let i = ti * TS; i < (ti + 1) * TS; i++) {
-        const k00 = j * W + i, k10 = k00 + 1, k01 = k00 + W, k11 = k01 + 1;
-        for (const q of [k00, k01, k11, k00, k11, k10]) mb.vert(p(q), vn[q], vc[q], 0, [0, gl[q]], MAT.ground);
+      const I0 = ti * TS, J0 = tj * TS, M = TS / st, V = [];
+      for (let b = 0; b <= M; b++) for (let a = 0; a <= M; a++) V.push(corner(I0 + a * st, J0 + b * st));
+      const at = (a, b) => V[b * (M + 1) + a];
+      for (let b = 0; b < M; b++) for (let a = 0; a < M; a++) {
+        const q00 = at(a, b), q10 = at(a + 1, b), q01 = at(a, b + 1), q11 = at(a + 1, b + 1);
+        for (const q of [q00, q01, q11, q00, q11, q10]) mb.vert(q.p, q.n, q.c, 0, [0, q.g], MAT.ground);
       }
-      // a skirt hangs down from the outer edge so no gap ever shows against the land beyond
-      const skirt = (a, b) => { const A = p(a), B = p(b); mb.quad(A, B, down(B), down(A), shade(vc[a], 0.9)); mb.quad(B, A, down(A), down(B), shade(vc[a], 0.9)); };
-      for (let i = ti * TS; i < (ti + 1) * TS; i++) { if (tj === 0) skirt(i, i + 1); if (tj === NT - 1) skirt(TN * W + i + 1, TN * W + i); }
-      for (let i = tj * TS; i < (tj + 1) * TS; i++) { if (ti === NT - 1) skirt(i * W + TN, (i + 1) * W + TN); if (ti === 0) skirt((i + 1) * W, i * W); }
-      tiles.push({ mb, cx: -THALF + (ti + 0.5) * TS, cz: -THALF + (tj + 0.5) * TS, r: TS * 0.5 });
+      // a skirt hangs down from the outer edge so no gap ever shows against the land beyond; on a big farm every tile has a short one,
+      // so a far tile drawn coarsely never shows a crack against a near one drawn finely
+      // (the short inner skirts are lit like the ground beside them, so where a coarse tile meets a fine one no dark line shows)
+      const skirt = (A, B, d) => {
+        if (d > 1) { mb.quad(A.p, B.p, down(B.p, d), down(A.p, d), shade(A.c, 0.9)); mb.quad(B.p, A.p, down(A.p, d), down(B.p, d), shade(A.c, 0.9)); return; }
+        const a2 = down(A.p, d), b2 = down(B.p, d), C = [A.c, B.c, B.c], C2 = [A.c, B.c, A.c];
+        for (const [p0, p1, p2, cc, n0, n1, n2] of [[A.p, B.p, b2, C, A.n, B.n, B.n], [A.p, b2, a2, C2, A.n, B.n, A.n], [B.p, A.p, a2, [B.c, A.c, A.c], B.n, A.n, A.n], [B.p, a2, b2, [B.c, A.c, B.c], B.n, A.n, B.n]]) {
+          mb.vert(p0, n0, cc[0], 0, [0, 0], MAT.ground); mb.vert(p1, n1, cc[1], 0, [0, 0], MAT.ground); mb.vert(p2, n2, cc[2], 0, [0, 0], MAT.ground);
+        }
+      };
+      const inner = TIER > 0 ? 0.7 : 0;
+      for (let a = 0; a < M; a++) {
+        const dN = tj === 0 ? 4 : inner, dS = tj === NT - 1 ? 4 : inner;
+        if (dN) skirt(at(a, 0), at(a + 1, 0), dN);
+        if (dS) skirt(at(a + 1, M), at(a, M), dS);
+      }
+      for (let b = 0; b < M; b++) {
+        const dW = ti === 0 ? 4 : inner, dE = ti === NT - 1 ? 4 : inner;
+        if (dE) skirt(at(M, b), at(M, b + 1), dE);
+        if (dW) skirt(at(0, b + 1), at(0, b), dW);
+      }
+      tiles.push({ mb, cx: -THALF + (ti + 0.5) * TS, cz: -THALF + (tj + 0.5) * TS, r: TS * 0.5, ti, tj, st });
     }
     return tiles;
   }
@@ -6488,7 +6708,7 @@ class GameTerrain {
   buildFar(season, dry) {
     const mb = new MB(), R = this.region, rnd = mulberry(this.farm.seed + 404);
     mb.mat = MAT.ground;
-    const S = 4, N0 = -158, N = 80, hills = R.terrain.hills;
+    const S = 4, N0 = -WORLD_R, N = Math.ceil(2 * WORLD_R / S), hills = R.terrain.hills;
     const F = this.farm, rz = F.roadZ !== undefined ? F.roadZ : 10.4;
     // heights come from the shared countryside grid (so driving matches what you see); neighbours' yards are level
     const H = (x, z) => (Math.abs(x) <= THALF && Math.abs(z) <= THALF ? this.at(x, z) : farHeight(this, F, x, z));
@@ -6514,13 +6734,13 @@ class GameTerrain {
     const nat = (R.nativeTrees || ['oak']).map(nativeKind);
     const leafC = { 0: [120, 172, 82], 1: [76, 128, 62], 2: [200, 124, 56], 3: null }[season];
     const desert = R.key === 'sonoran';
-    for (let q = 0; q < 2600; q++) {
-      const x = (rnd() - 0.5) * 300, z = (rnd() - 0.5) * 300;
+    for (let q = 0, nq = Math.min(3600, Math.round(2600 * ((WORLD_R - 8) ** 2 - THALF ** 2) / (150 ** 2 - 58 ** 2))); q < nq; q++) {
+      const x = (rnd() - 0.5) * (WORLD_R - 8) * 2, z = (rnd() - 0.5) * (WORLD_R - 8) * 2;
       const r = Math.max(Math.abs(x), Math.abs(z));
       if (r < THALF + 1.5 || (z > rz - 2 && z < rz + 5)) continue;
       if (NEIGHBORS.inParcel(x, z, 2.5)) continue;
-      const f = this.fieldAt(x, z), fw = this.fieldWarp(x, z), hedge = Math.abs(((fw[0] + 1000) % 26) - 13) > 12.2 || Math.abs(((fw[1] + 1000) % 22) - 11) > 10.2;
-      if (!(f > 0.72 || (hedge && rnd() < 0.5) || rnd() < 0.04)) continue;
+      const f = this.fieldAt(x, z), fw = this.fieldWarp(x, z), hedge = Math.abs(((fw[0] + 1000) % 26) - 13) > 12.2 || Math.abs(((fw[1] + 1000) % 22) - 11) > 10.2, use = outUseAt(F, x, z);
+      if (use === 'timber' ? rnd() < 0.15 : use === 'lease' || use === 'hay' ? !(hedge && rnd() < 0.3) : !(f > 0.72 || (hedge && rnd() < 0.5) || rnd() < 0.04)) continue;
       if (desert && rnd() < 0.55) continue;
       const y = H(x, z) - 0.1, s = 0.8 + rnd() * 0.7, kind = nat[Math.floor(rnd() * nat.length)];
       const conifer = ['fir', 'hemlock', 'pine', 'cedar', 'spruce', 'longleaf'].includes(kind);
@@ -6567,7 +6787,18 @@ class GameTerrain {
     return n ? s / n : 0;
   }
   // ---------------- save / load
-  pack() { return { h: f32b64(this.h), om: f32b64(this.om), moist: f32b64(this.moist), comp: f32b64(this.comp), bio: f32b64(this.bio), cover: u8b64(this.cover), rip: u8b64(this.rip), tall: f32b64(this.tall), mix: u8b64(this.mix) }; }
+  // The ground is saved compactly (TERPACK below): heights to the centimetre, soil values to a thousandth (rounded at random up or down
+  // in proportion, so slow daily changes such as organic matter building up are never lost to rounding), and every field predicted from
+  // its neighbours so only the small leftovers are written. A 1,000-acre farm's ground fits in a few hundred kB.
+  pack() {
+    const W = TN + 1, NC = TN * TN, P = TERPACK, hq = new Int32Array(W * W);
+    for (let k = 0; k < W * W; k++) hq[k] = Math.round(this.h[k] * 100);
+    const soil = (a) => { const q = new Int32Array(NC); for (let k = 0; k < NC; k++) q[k] = Math.floor(a[k] * 1000 + Math.random()); return q; };
+    return { fmt: 2, n: TN, h: P.enc(hq, W, W, true), om: P.enc(soil(this.om), TN, TN, true), moist: P.enc(soil(this.moist), TN, TN, true), comp: P.enc(soil(this.comp), TN, TN, true),
+      bio: P.enc(soil(this.bio), TN, TN, true), tall: P.enc(soil(this.tall), TN, TN, true), cover: P.enc(this.cover, TN, TN, false), rip: P.enc(this.rip, TN, TN, false), mix: P.enc(this.mix, TN, TN, false) };
+  }
+  // the old way: every value as raw 32-bit floats (still read from older saves)
+  packRaw() { return { h: f32b64(this.h), om: f32b64(this.om), moist: f32b64(this.moist), comp: f32b64(this.comp), bio: f32b64(this.bio), cover: u8b64(this.cover), rip: u8b64(this.rip), tall: f32b64(this.tall), mix: u8b64(this.mix) }; }
   // an old save's ground (n cells across) goes in the middle of the bigger grid. The land the old farm already had keeps its soil, grass and roads;
   // the new lots around it are the freshly made land
   unpackSmall(o, n) {
@@ -6581,19 +6812,99 @@ class GameTerrain {
       if (tall) this.tall[k] = tall[a]; if (mix) this.mix[k] = mix[a];
     }
   }
-  unpack(o) { this.h.set(b64f32(o.h)); this.om.set(b64f32(o.om)); this.moist.set(b64f32(o.moist)); this.comp.set(b64f32(o.comp)); this.bio.set(b64f32(o.bio)); this.cover.set(b64u8(o.cover)); this.rip.set(b64u8(o.rip)); if (o.tall) this.tall.set(b64f32(o.tall)); if (o.mix) this.mix.set(b64u8(o.mix)); }
+  // a farm that has bought into a new ring: the old ground (n0 cells across, its own land h0 units from the middle) goes in the middle of
+  // this bigger grid. Everything on the old land keeps its soil, grass, earthworks and roads; the old wooded margin becomes ordinary
+  // new land, eased into the freshly made ground round it
+  growFrom(T0, n0, h0) {
+    const half = n0 / 2, off = THALF - half, W0 = n0 + 1, W = TN + 1;
+    for (let j = 0; j <= n0; j++) for (let i = 0; i <= n0; i++) {
+      const m = Math.max(Math.abs(i - half), Math.abs(j - half)), k = (j + off) * W + i + off;
+      this.h[k] = lerp(T0.h[j * W0 + i], this.h[k], smooth(h0, h0 + 6, m));
+    }
+    for (let j = 0; j < n0; j++) for (let i = 0; i < n0; i++) {
+      const a = j * n0 + i, k = (j + off) * TN + i + off, cv = T0.cover[a];
+      if (Math.max(Math.abs(i - half + 0.5), Math.abs(j - half + 0.5)) > h0 && cv !== COVER.path && cv !== COVER.road) continue;
+      this.om[k] = T0.om[a]; this.moist[k] = T0.moist[a]; this.comp[k] = T0.comp[a]; this.bio[k] = T0.bio[a]; this.cover[k] = cv; this.rip[k] = T0.rip[a]; this.tall[k] = T0.tall[a]; this.mix[k] = T0.mix[a];
+    }
+  }
+  unpack(o) {
+    if (o.fmt === 2) {
+      const W = TN + 1, NC = TN * TN, P = TERPACK;
+      const h = P.dec(o.h, W, W, true); for (let k = 0; k < W * W; k++) this.h[k] = h[k] / 100;
+      for (const f of ['om', 'moist', 'comp', 'bio', 'tall']) { const q = P.dec(o[f], TN, TN, true), a = this[f]; for (let k = 0; k < NC; k++) a[k] = q[k] / 1000; }
+      for (const f of ['cover', 'rip', 'mix']) { const q = P.dec(o[f], TN, TN, false); this[f].set(q); }
+      return;
+    }
+    this.unpackRaw(o);
+  }
+  unpackRaw(o) { this.h.set(b64f32(o.h)); this.om.set(b64f32(o.om)); this.moist.set(b64f32(o.moist)); this.comp.set(b64f32(o.comp)); this.bio.set(b64f32(o.bio)); this.cover.set(b64u8(o.cover)); this.rip.set(b64u8(o.rip)); if (o.tall) this.tall.set(b64f32(o.tall)); if (o.mix) this.mix.set(b64u8(o.mix)); }
 }
 function u8b64(a) { let s = ''; const CH = 0x8000; for (let i = 0; i < a.length; i += CH) s += String.fromCharCode.apply(null, a.subarray(i, i + CH)); return btoa(s); }
 function b64u8(s) { const b = atob(s), a = new Uint8Array(b.length); for (let i = 0; i < b.length; i++) a[i] = b.charCodeAt(i); return a; }
 const f32b64 = (a) => u8b64(new Uint8Array(a.buffer, a.byteOffset, a.byteLength));
 const b64f32 = (s) => { const u = b64u8(s); return new Float32Array(u.buffer, u.byteOffset, u.byteLength / 4); };
+// ---------------- TERPACK: a small lossless codec for a grid of whole numbers (the saved ground)
+// Each value is predicted from its neighbours: the "median edge" predictor (from the left, above and above-left values) for smooth fields
+// such as heights and soil, or simply the value to the left for fields of kinds (cover, sown mix). What is written is the difference,
+// folded to a positive number and Rice-coded with a step that adapts to how big the differences have been lately; a stretch of zero
+// differences is written as one zero and the length of the run. The bytes go out as base64.
+const TERPACK = {
+  enc(v, W, H, med) {
+    const n = W * H, r = new Int32Array(n);
+    for (let k = 0; k < n; k++) r[k] = v[k] - this.pred(v, k, W, med);
+    const out = [], st = { acc: 0, nb: 0 };
+    const bit = (b) => { st.acc = (st.acc << 1) | b; if (++st.nb === 8) { out.push(st.acc); st.acc = 0; st.nb = 0; } };
+    const bits = (x, k) => { for (let i = k - 1; i >= 0; i--) bit((x >>> i) & 1); };
+    const put = (u, ad) => {   // Rice code with escape for very large values
+      let k = 0; while ((ad.N << k) < ad.A && k < 30) k++;
+      const q = u >>> k;
+      if (q < 24) { for (let i = 0; i < q; i++) bit(1); bit(0); bits(u, k); } else { for (let i = 0; i < 24; i++) bit(1); bits(u, 32); }
+      ad.A += u; if (++ad.N >= 64) { ad.A >>= 1; ad.N >>= 1; }
+    };
+    const av = { A: 4, N: 1 }, ar = { A: 8, N: 1 };
+    for (let k = 0; k < n;) {
+      const x = r[k], u = x >= 0 ? 2 * x : -2 * x - 1;
+      if (u === 0) { let L = 1; while (k + L < n && r[k + L] === 0) L++; put(0, av); put(L - 1, ar); k += L; } else { put(u, av); k++; }
+    }
+    if (st.nb) out.push(st.acc << (8 - st.nb));
+    return u8b64(Uint8Array.from(out));
+  },
+  dec(str, W, H, med) {
+    const by = b64u8(str), n = W * H, v = new Int32Array(n);
+    let pos = 0;
+    const bit = () => { const b = (by[pos >>> 3] >>> (7 - (pos & 7))) & 1; pos++; return b; };
+    const bits = (k) => { let x = 0; for (let i = 0; i < k; i++) x = (x * 2) + bit(); return x >>> 0; };
+    const get = (ad) => {
+      let k = 0; while ((ad.N << k) < ad.A && k < 30) k++;
+      let q = 0; while (q < 24 && bit()) q++;
+      const u = q < 24 ? ((q << k) | bits(k)) >>> 0 : bits(32);
+      ad.A += u; if (++ad.N >= 64) { ad.A >>= 1; ad.N >>= 1; }
+      return u;
+    };
+    const av = { A: 4, N: 1 }, ar = { A: 8, N: 1 };
+    for (let k = 0; k < n;) {
+      const u = get(av);
+      if (u === 0) { const L = get(ar) + 1; for (let i = 0; i < L && k < n; i++, k++) v[k] = this.pred(v, k, W, med); }
+      else { const x = u & 1 ? -((u + 1) >> 1) : u >> 1; v[k] = this.pred(v, k, W, med) + x; k++; }
+    }
+    return v;
+  },
+  pred(v, k, W, med) {
+    const i = k % W, a = i > 0 ? v[k - 1] : k >= W ? v[k - W] : 0;
+    if (!med) return a;
+    if (k < W || i === 0) return a;
+    const b = v[k - W], c = v[k - W - 1];
+    return c >= Math.max(a, b) ? Math.min(a, b) : c <= Math.min(a, b) ? Math.max(a, b) : a + b - c;
+  },
+};
 
 // ---------------------------------------------------------------- new farm
 function newFarm(opt) {
   const seed = opt.seed || ((Math.random() * 1e9) | 0);
   const listing = LISTINGS.find((l) => l.key === opt.listing);
+  setWorld(0);
   const F = {
-    v: 3, name: opt.name || 'My Farm', farmer: opt.farmer || 'Farmer', look: opt.look || 0, kid: !!opt.kid,
+    v: 3, tier: 0, name: opt.name || 'My Farm', farmer: opt.farmer || 'Farmer', look: opt.look || 0, kid: !!opt.kid,
     region: opt.region, listing: opt.listing, seed,
     year: 1, month: 3, day: 1, hour: 7, minute: 0,
     money: START_MONEY - listing.price, energy: 100,
@@ -6664,10 +6975,17 @@ function newFarm(opt) {
 function nativeKind(k) { return { bur: 'oak', mesquite: 'mesquite', paloverde: 'paloverde', saguaro: 'saguaro', pricklypear: 'pricklypear', cottonwood: 'cottonwood', hackberry: 'oak', plum: 'apple', liveoak: 'liveoak', palm: 'palm', magnolia: 'magnolia', longleaf: 'longleaf' }[k] || k; }
 function markBuilt(T, x, z, hw, hd, rot) { T.eachCell(x - hw - 0.5, z - hd - 0.5, x + hw + 0.5, z + hd + 0.5, (cx, cz, k) => { T.cover[k] = COVER.built; T.bio[k] = 0; }); void rot; }
 function mulberry(a) { return () => { a |= 0; a = (a + 0x6d2b79f5) | 0; let t = Math.imul(a ^ (a >>> 15), 1 | a); t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t; return ((t ^ (t >>> 14)) >>> 0) / 4294967296; }; }
-function farmToSave(F) { const o = Object.assign({}, F); delete o.terrain; o.ter = F.terrain.pack(); o.tn = TN; return o; }
+// positions, turns and sizes of things on the farm are saved to the millimetre (plenty, and it keeps a big farm's save small)
+const SAVE_ROUND = ['x', 'z', 'r', 's'];
+function farmToSave(F) {
+  const o = Object.assign({}, F); delete o.terrain; o.ter = F.terrain.pack(); o.tn = TN;
+  o.objs = F.objs.map((q) => { const c = Object.assign({}, q); for (const k of SAVE_ROUND) if (typeof c[k] === 'number' && !Number.isInteger(c[k])) c[k] = Math.round(c[k] * 1000) / 1000; return c; });
+  return o;
+}
 function farmFromSave(o) {
   const F = Object.assign({}, o); delete F.ter;
   migrateFarm(F);
+  setWorld(F.tier || 0);
   F.terrain = new GameTerrain(F); F.terrain.generate();
   if ((o.tn || 76) === TN) F.terrain.unpack(o.ter); else F.terrain.unpackSmall(o.ter, o.tn || 76);   // a save from the 3 × 3 days has a smaller ground grid
   if (!F.roadDone) { roadify(F); makeDriveway(F); }   // farms from before the road was built get one
@@ -6686,6 +7004,59 @@ function farmFromSave(o) {
     }
   }
   return F;
+}
+// buying into a ring of real ground the farm doesn't reach yet: the ground grid grows to take it in. The old ground keeps everything on it,
+// the new land is made fresh (hedgerows along the parcel lines, a few woodlots and old trees, rocks and brush), the neighbours move out
+// past it, and the view is rebuilt round the farmer where they stand
+function growWorld(F, t) {
+  if (t <= (F.tier || 0)) return;
+  const T0 = F.terrain, n0 = TN, h0 = FARM_HALF;
+  setWorld(t); F.tier = t;
+  const T = new GameTerrain(F); T.generate(); T.growFrom(T0, n0, h0);
+  F.terrain = T;
+  roadify(F);
+  newLand(F, h0);
+  T.slopeC = null; T.roadFixed = false;
+  NEIGHBORS.setup(F);
+  if (G.view && G.F === F) { const fm = G.Fm, foc = G.focus; disposeView(); G.focus = foc; G.view = new FarmView(G.R, F); G.Fm = fm; }
+}
+// the trees, rocks and brush on land the grid has just grown to take in (everything more than h0 from the middle)
+function newLand(F, h0) {
+  const T = F.terrain, R = mulberry((F.seed || 1) * 7 + TIER * 1013), nat = (T.region.nativeTrees || ['oak']).map(nativeKind);
+  const desert = T.region.key === 'sonoran', add = (o) => { o.id = F.nextId++; F.objs.push(o); return o; };
+  const m = (x, z) => Math.max(Math.abs(x), Math.abs(z));
+  const clear = (x, z, r) => !roadProblem(F, x, z, r) && !F.ponds.some((p) => Math.hypot((x - p.x) / (p.rx + 1.5), (z - p.z) / (p.rz + 1.5)) < 1) && !(F.creek && Math.abs(z - T.creekZ(x)) < 2);
+  const tree = (x, z, s) => { if (clear(x, z, 1)) add({ t: 'tree', kind: nat[Math.floor(R() * nat.length)], x, z, age: 2000 + R() * 4000, wild: true, s: s || 0.85 + R() * 0.45 }); };
+  // the old wooded margin round the farm thins out to a hedgerow
+  F.objs = F.objs.filter((o) => !(o.wild && o.t === 'tree' && m(o.x, o.z) > h0 - 1 && m(o.x, o.z) < h0 + 9 && R() < 0.6));
+  // hedgerows along the new parcel lines (with gaps for a gate or a tractor), never across the road
+  for (let p = NHOME; p < nPhys(); p++) {
+    if (plotRingOf(p) <= 0) continue;
+    const [x0, x1, z0, z1] = plotRect(p);
+    for (const [ax, az, bx, bz] of [[x0, z0, x1, z0], [x0, z0, x0, z1]]) {
+      if (ax === bx ? Math.abs(ax) >= FARM_HALF - 0.5 : Math.abs(az) >= FARM_HALF - 0.5) continue;   // the outer edge is the woods
+      const L = Math.hypot(bx - ax, bz - az);
+      for (let d = 2 + R() * 4; d < L - 2; d += 5 + R() * 6) {
+        if (R() < 0.35) { d += 8; continue; }
+        const x = lerp(ax, bx, d / L) + (R() - 0.5) * 1.6, z = lerp(az, bz, d / L) + (R() - 0.5) * 1.6;
+        if (m(x, z) > h0 + 1) tree(x, z);
+      }
+    }
+  }
+  // woodlots, lone old trees, rocks and brush across the new land, and the woods past its far edge
+  const span = THALF - 1, area = (2 * span) ** 2 - (2 * (h0 + 1)) ** 2;
+  const shrubs = desert ? ['creosote', 'pricklypear', 'agave'] : T.region.key === 'gulf' ? ['palmetto', 'berry', 'shrub'] : ['shrub', 'berry', 'shrub'];
+  const pick = () => { for (let k = 0; k < 20; k++) { const x = (R() - 0.5) * 2 * span, z = (R() - 0.5) * 2 * span; if (m(x, z) > h0 + 1) return [x, z]; } return null; };
+  for (let i = 0, n = Math.round(area / 9000); i < n; i++) {   // woodlots
+    const c = pick(); if (!c || m(c[0], c[1]) > FARM_HALF - 6) continue;
+    const r = 4 + R() * 6; for (let q = 0, nq = 8 + Math.floor(R() * 12); q < nq; q++) { const a = R() * 6.283, d = Math.sqrt(R()) * r; tree(c[0] + Math.cos(a) * d, c[1] + Math.sin(a) * d); }
+  }
+  for (let i = 0, n = Math.round(area / 900); i < n; i++) { const c = pick(); if (c && m(c[0], c[1]) < FARM_HALF - 2 && R() < 0.7) tree(c[0], c[1], 1 + R() * 0.5); }   // lone old trees in the fields
+  for (let i = 0, n = Math.round((4 * THALF * THALF - 4 * FARM_HALF * FARM_HALF) * 0.025); i < n; i++) {   // the woods past the far edge
+    const x = (R() - 0.5) * 2 * span, z = (R() - 0.5) * 2 * span; if (m(x, z) > FARM_HALF + 0.5) tree(x, z);
+  }
+  for (let i = 0, n = Math.round(area / 700); i < n; i++) { const c = pick(); if (c && clear(c[0], c[1], 0.8)) add({ t: 'rock', x: c[0], z: c[1], s: 0.25 + R() * 0.6 }); }
+  for (let i = 0, n = Math.round(area / 500); i < n; i++) { const c = pick(); if (!c || !clear(c[0], c[1], 0.8)) continue; const kind = shrubs[Math.floor(R() * shrubs.length)]; add({ t: kind === 'pricklypear' || kind === 'agave' ? 'cactus' : 'brush', kind, x: c[0], z: c[1], s: 0.6 + R() * 0.5 }); }
 }
 // older saves get the fields newer versions expect
 const SAVE_VERSION = 5;
@@ -6706,7 +7077,10 @@ function migrateFarm(F) {
     if (!F.unlocked && !F.kid) F.money += 183;
   }
   // the farm used to be a 3 × 3 grid of lots; the old nine now sit in the middle of the 5 × 5 grid
-  if (F.owned && F.owned.length === 9) { const n = new Array(NPLOTS).fill(0); F.owned.forEach((v, p) => { if (v) n[(Math.floor(p / 3) + 1) * PN + (p % 3) + 1] = 1; }); F.owned = n; }
+  if (F.owned && F.owned.length === 9) { const n = new Array(NHOME).fill(0); F.owned.forEach((v, p) => { if (v) n[(Math.floor(p / 3) + 1) * PN + (p % 3) + 1] = 1; }); F.owned = n; }
+  // the land grew rings round the homestead: room in the list for every parcel
+  F.owned = F.owned || []; while (F.owned.length < NPLOTS) F.owned.push(0);
+  F.tier = F.tier || 0;
   F.v = SAVE_VERSION;
   return F;
 }
@@ -6757,7 +7131,7 @@ function roadHeight(F, x) {
   const T = F.terrain;
   if (Math.abs(x) <= THALF - 0.5) return T.at(x, roadCenter(F));
   const hills = T.region.terrain.hills, r = Math.abs(x), cz = roadCenter(F);
-  return T.base(x, cz) + smooth(50, 150, r) * hills * 9 * fbm(x * 0.01 + 9, cz * 0.01 + 3, 7, 3) - 0.05;
+  void hills; void r; return T.base(x, cz) - 0.05;
 }
 // ---------------------------------------------------------------- the driveway: a polyline from the gate at the road to the porch steps
 // F.drive = { pts: [[x, z], ...] (road end first), x / z0 / z1 (gate x, road end, house end: older code reads these), w }
@@ -6907,9 +7281,12 @@ function roadFenceSegs(F, owned) {
   }
   const gaps = { n: [], s: [] };
   if (F.drive) gaps.n.push([F.drive.x - 1.7, F.drive.x + 1.7]);
-  for (let p = 0; p < NPLOTS; p++) { if (!F.owned[p]) continue; const r = plotRect(p); if (r[2] < south && r[3] > south + 1) gaps.s.push([(r[0] + r[1]) / 2 - 1.3, (r[0] + r[1]) / 2 + 1.3]); if (r[3] <= north + 0.01 && r[3] > north - 0.6 && F.drive && (F.drive.x < r[0] || F.drive.x > r[1])) { /* other plots on the road just get fence */ } }
+  const far = [];   // stretches of the far side of the road that are yours
+  for (let p = 0; p < nPhys(); p++) { if (!F.owned[p]) continue; const r = plotRect(p); if (r[2] < south && r[3] > south + 1) { gaps.s.push([(r[0] + r[1]) / 2 - 1.3, (r[0] + r[1]) / 2 + 1.3]); far.push([r[0], r[1]]); } if (r[3] <= north + 0.01 && r[3] > north - 0.6 && F.drive && (F.drive.x < r[0] || F.drive.x > r[1])) { /* other plots on the road just get fence */ } }
   const line = (z, gp) => { let x = -THALF; const cuts = gp.slice().sort((a, b) => a[0] - b[0]); for (const g of cuts) { if (g[0] > x) out.push([x, z, g[0], z]); x = Math.max(x, g[1]); } if (x < THALF) out.push([x, z, THALF, z]); };
-  line(north, gaps.n);   // no fence along the far side of the road
+  line(north, gaps.n);
+  // the far side of the road is fenced only along land you own there (with a field gate in each parcel)
+  for (const [a, b] of far) { let x = a; const cuts = gaps.s.filter((g) => g[1] > a && g[0] < b).sort((g, h) => g[0] - h[0]); for (const g of cuts) { if (g[0] > x) out.push([x, south, g[0], south]); x = Math.max(x, g[1]); } if (x < b) out.push([x, south, b, south]); }
   return { segs: out, gaps };
 }
 // ---------------------------------------------------------------- meshes
@@ -6978,7 +7355,7 @@ function buildRoadMesh(F) {
   // lanes across the road, as [from, to, colour] measured from the road's north edge
   const lanes = [[-0.4, 0, edge], [0, 0.5, dirt], [0.5, 1.05, rut], [1.05, 1.95, crown], [1.95, 2.5, rut], [2.5, ROAD_W, dirt], [ROAD_W, ROAD_W + 0.4, edge]];
   mb.mat = MAT.ground;
-  for (let x = -158; x < 158; x += step(x)) {
+  for (let x = -WORLD_R; x < WORLD_R; x += step(x)) {
     const x2 = x + step(x), y1 = roadHeight(F, x) + 0.06, y2 = roadHeight(F, x2) + 0.06;
     const jit = 0.93 + 0.14 * fbm(x * 0.17, rz * 0.3, 11, 2);     // patchy, never one flat colour
     for (let li = 0; li < lanes.length; li++) {
@@ -7086,18 +7463,27 @@ const BORDER_SNAP = 1.22, BORDER_INSET = 0.03;
 const BORDER_CACHE = new WeakMap();
 // segments [x0, z0, x1, z1] along the edge of the land you own (the line the boundary fence runs along)
 function borderSegs(F) {
-  const key = F.owned.join('');
+  const key = F.owned.join('') + ':' + TIER;
   const c = BORDER_CACHE.get(F); if (c && c.key === key) return c.segs;
-  const segs = [], own = (a, b) => a >= 0 && a < PN && b >= 0 && b < PN && F.owned[b * PN + a];
-  for (let p = 0; p < NPLOTS; p++) {
-    if (!F.owned[p]) continue;
-    const px = p % PN, pz = Math.floor(p / PN), [x0, x1, z0, z1] = plotRect(p);
-    if (!own(px, pz - 1)) segs.push([x0, z0, x1, z0]);
-    if (!own(px, pz + 1)) segs.push([x1, z1, x0, z1]);
-    if (!own(px - 1, pz)) segs.push([x0, z1, x0, z0]);
-    if (!own(px + 1, pz)) segs.push([x1, z0, x1, z1]);
-  }
+  const segs = ownedEdges(F);
   BORDER_CACHE.set(F, { key, segs });
+  return segs;
+}
+// the outline of the real ground you own, as segments that run round it (parcels of any size: each edge of each parcel, less the
+// stretches another parcel you own shares with it)
+function ownedEdges(F) {
+  const R = [], segs = [], E = 0.01;
+  for (let p = 0; p < nPhys(); p++) if (F.owned[p]) R.push(plotRect(p));
+  const cut = (a, b, spans) => { let out = [[a, b]]; for (const [c, d] of spans) out = out.flatMap(([u, v]) => (d <= u + E || c >= v - E ? [[u, v]] : [[u, c], [d, v]].filter((q) => q[1] - q[0] > E))); return out; };
+  for (const A of R) {
+    const [x0, x1, z0, z1] = A;
+    const nb = (test, lo, hi) => R.filter((B) => B !== A && test(B)).map((B) => [Math.max(lo(B), lo(A)), Math.min(hi(B), hi(A))]).filter((q) => q[1] > q[0] + E);
+    const X0 = (q) => q[0], X1 = (q) => q[1], Z0 = (q) => q[2], Z1 = (q) => q[3];
+    for (const [u, v] of cut(x0, x1, nb((B) => Math.abs(B[3] - z0) < E, X0, X1))) segs.push([u, z0, v, z0]);   // north
+    for (const [u, v] of cut(x0, x1, nb((B) => Math.abs(B[2] - z1) < E, X0, X1))) segs.push([v, z1, u, z1]);   // south
+    for (const [u, v] of cut(z0, z1, nb((B) => Math.abs(B[1] - x0) < E, Z0, Z1))) segs.push([x0, v, x0, u]);   // west
+    for (const [u, v] of cut(z0, z1, nb((B) => Math.abs(B[0] - x1) < E, Z0, Z1))) segs.push([x1, u, x1, v]);   // east
+  }
   return segs;
 }
 function ownedAt(F, x, z) { const q = plotOf(x, z); return q >= 0 && !!F.owned[q]; }
@@ -7365,7 +7751,7 @@ const VEH_MESH = {};
 // ---------------------------------------------------------------- ground height anywhere: the farm grid, the road, and the countryside
 function groundAt(F, x, z) {
   const T = F.terrain, rz = roadZ(F);
-  if (z > rz - 0.25 && z < rz + ROAD_W + 0.25 && Math.abs(x) < 158) return (Math.abs(x) <= THALF - 0.5 ? T.at(x, z) : roadHeight(F, x)) + 0.06;
+  if (z > rz - 0.25 && z < rz + ROAD_W + 0.25 && Math.abs(x) < WORLD_R) return (Math.abs(x) <= THALF - 0.5 ? T.at(x, z) : roadHeight(F, x)) + 0.06;
   if (Math.abs(x) <= THALF - 0.5 && Math.abs(z) <= THALF - 0.5) return T.at(x, z);
   return farHeight(T, F, x, z);
 }
@@ -7477,7 +7863,7 @@ const DRIVE = {
     const F = G.F, inFarm = Math.abs(x) < THALF - 1.5 && Math.abs(z) < THALF - 1.5;
     if (inFarm && G.view.col.push(x, z, r, { ignore: this.o ? this.o.id : undefined, hat: 0 })) return true;
     if (NEIGHBORS.col && NEIGHBORS.col.push(x, z, r, {})) return true;
-    if (!walk && (Math.abs(x) > 155 || Math.abs(z) > 150)) return true;
+    if (!walk && (Math.abs(x) > WORLD_R - 3 || Math.abs(z) > WORLD_R - 8)) return true;
     void F;
     return false;
   },
@@ -7547,7 +7933,7 @@ const DRIVE = {
       const inFarm = Math.abs(q[0]) < THALF - 1.5 && Math.abs(q[1]) < THALF - 1.5;
       const p = (inFarm ? G.view.col.push(q[0], q[1], q[2], { ignore: D.o.id, hat: 0, noEll: false }) : null) || (NEIGHBORS.col ? NEIGHBORS.col.push(q[0], q[1], q[2], {}) : null);
       if (p) { hit = true; px += p[0]; pz += p[1]; }
-      if (Math.abs(q[0]) > 156 || Math.abs(q[1]) > 150) { hit = true; px -= Math.sign(q[0]) * 0.05; }
+      if (Math.abs(q[0]) > WORLD_R - 2 || Math.abs(q[1]) > WORLD_R - 8) { hit = true; px -= Math.sign(q[0]) * 0.05; }
     }
     if (hit) {
       const l = Math.hypot(px, pz) || 1, head = -(px * s + pz * c) / l;   // 1 = head-on
@@ -7831,6 +8217,8 @@ const NEIGHBOR_FARMS = [
 ];
 const NB_STYLE_NAME = { dairy: 'Dairy farm', market: 'Market garden', ranch: 'Cattle & horse ranch', orchard: 'Orchard & vineyard', grain: 'Grain farm', bees: 'Bees & flowers', poultry: 'Poultry farm', sanctuary: 'Animal sanctuary', homestead: 'Homestead', permaculture: 'Permaculture food forest' };
 const NB_W = 26, NB_D = 32;
+// where a neighbour's farm sits along the road: just past your own land (they move out as your farm grows)
+const nbX = (N) => N.x + Math.sign(N.x) * (FARM_HALF - HOME_HALF);
 
 const NEIGHBORS = {
   col: null, actors: [], people: [], list: [], flats: [], meshes: null, key: null, view: null,
@@ -7841,7 +8229,7 @@ const NEIGHBORS = {
     this.list = NEIGHBOR_FARMS.map((N) => {
       const north = N.side === 'n', edge = north ? rz - 0.4 : rz + ROAD_W + 0.4;
       const z0 = north ? edge - NB_D : edge, z1 = north ? edge : edge + NB_D;
-      const P = Object.assign({}, N, { north, edge, x0: N.x - NB_W / 2, x1: N.x + NB_W / 2, z0, z1, r0: north ? 0 : Math.PI });
+      const nx = nbX(N), P = Object.assign({}, N, { x: nx, north, edge, x0: nx - NB_W / 2, x1: nx + NB_W / 2, z0, z1, r0: north ? 0 : Math.PI });
       P.toW = (u, v) => [P.x + u, north ? edge - v : edge + v];
       P.driveU = -NB_W / 2 + 4;
       return P;
@@ -7878,7 +8266,7 @@ const NEIGHBORS = {
     for (const side of [-1]) {   // only the home side of the road is fenced: the far side is open country
       const z = side < 0 ? rz - 0.4 : rz + ROAD_W + 0.4;
       for (const dir of [-1, 1]) {
-        const xa = dir * (THALF + 0.5), xb = dir * 152;
+        const xa = dir * (THALF + 0.5), xb = dir * (WORLD_R - 6);
         const gaps = this.list.filter((P) => (side < 0) === P.north && Math.sign(P.x) === dir).map((P) => { const gx = P.toW(P.driveU, 0)[0]; return [gx - 1.7, gx + 1.7]; });
         let segs = [[Math.min(xa, xb), Math.max(xa, xb)]];
         for (const g of gaps) segs = segs.flatMap(([a, b]) => (g[1] < a || g[0] > b ? [[a, b]] : [[a, g[0]], [g[1], b]].filter((q) => q[1] - q[0] > 0.3)));
@@ -7886,10 +8274,10 @@ const NEIGHBORS = {
       }
     }
     // the far ends: road closed to the west, and the edge of town to the east
-    const wy = H(-150, rz + 1.5); road.mat = MAT.boards;
-    for (let i = 0; i < 2; i++) { road.box(-150, wy + 0.4 + i * 0.45, rz + 1.5, 0.12, 0.18, 3.6, i ? [240, 240, 236] : [220, 90, 40]); }
-    for (const dz of [0.1, 2.9]) road.box(-150, wy - 0.1, rz + dz, 0.12, 1.1, 0.12, [240, 240, 236]);
-    road.mat = 0; col.seg(-150, rz - 0.5, -150, rz + ROAD_W + 0.5, 0.2);
+    const ex = -(WORLD_R - 8), wy = H(ex, rz + 1.5); road.mat = MAT.boards;
+    for (let i = 0; i < 2; i++) { road.box(ex, wy + 0.4 + i * 0.45, rz + 1.5, 0.12, 0.18, 3.6, i ? [240, 240, 236] : [220, 90, 40]); }
+    for (const dz of [0.1, 2.9]) road.box(ex, wy - 0.1, rz + dz, 0.12, 1.1, 0.12, [240, 240, 236]);
+    road.mat = 0; col.seg(ex, rz - 0.5, ex, rz + ROAD_W + 0.5, 0.2);
     signPost(road, 132, H(132, rz - 1.6), rz - 1.6, 0, [52, 110, 70], true);
     townSkyline(road, F, H);
     this.meshes.push({ mesh: R.mesh(road), x: 0, z: rz, all: true });
@@ -8109,12 +8497,12 @@ function HORSE_OK() { return typeof BREEDS !== 'undefined' && BREEDS.some((b) =>
 
 // ---------------------------------------------------------------- the countryside height grid (4 units per cell), with neighbours' yards levelled
 function farGridOf(T, F) {
-  if (T._fg && T._fgKey === F.roadZ) return T._fg;
-  const S = 4, N0 = -158, N = 80, W = N + 1, R = T.region, hills = R.terrain.hills, rz = roadZ(F);
+  if (T._fg && T._fgKey === F.roadZ + ':' + WORLD_R) return T._fg;
+  const S = 4, N0 = -WORLD_R, N = Math.ceil(2 * WORLD_R / S), W = N + 1, R = T.region, hills = R.terrain.hills, rz = roadZ(F);
   const H = (x, z) => {
     if (Math.abs(x) <= THALF && Math.abs(z) <= THALF) return T.at(x, z);
     const r = Math.max(Math.abs(x), Math.abs(z));
-    const h = T.base(x, z) + smooth(50, 150, r) * hills * 9 * fbm(x * 0.01 + 9, z * 0.01 + 3, 7, 3);
+    const h = T.base(x, z); void r; void hills;
     const dz = Math.max(rz - z, z - (rz + 3), 0);
     return dz < 3.5 ? lerp(roadHeight(F, x) - 0.12, h, smooth(0, 3.5, dz)) : h;
   };
@@ -8131,11 +8519,11 @@ function farGridOf(T, F) {
       if (d < fl.m) { const k = 1 - smooth(0, fl.m, d), rd = Math.max(rz - 0.4 - z, z - (rz + 3.4), 0); if (rd > 2) g[j * W + i] = lerp(g[j * W + i], h0, k); }
     }
   }
-  T._fg = g; T._fgKey = F.roadZ;
+  T._fg = g; T._fgKey = F.roadZ + ':' + WORLD_R;
   return g;
 }
 function farHeight(T, F, x, z) {
-  const g = farGridOf(T, F), S = 4, N0 = -158, N = 80, W = N + 1;
+  const g = farGridOf(T, F), S = 4, N0 = -WORLD_R, N = Math.ceil(2 * WORLD_R / S), W = N + 1;
   const fx = (x - N0) / S, fz = (z - N0) / S, i = clamp(Math.floor(fx), 0, N - 1), j = clamp(Math.floor(fz), 0, N - 1), u = clamp(fx - i, 0, 1), v = clamp(fz - j, 0, 1);
   const a = g[j * W + i], b = g[j * W + i + 1], c = g[(j + 1) * W + i + 1], d = g[(j + 1) * W + i];
   return v > u ? a + (c - d) * u + (d - a) * v : a + (b - a) * u + (c - b) * v;
@@ -8294,13 +8682,13 @@ function signPost(mb, x, y, z, rot, col, big) {
 function townSkyline(mb, F, H) {
   const rz = roadZ(F), cols = [[176, 66, 50], [120, 190, 196], [150, 74, 58], [238, 234, 222], [210, 180, 120]];
   let i = 0;
-  for (const side of [-1, 1]) for (let x = 146; x < 158; x += 4.2) {
+  for (const side of [-1, 1]) for (let x = WORLD_R - 12; x < WORLD_R; x += 4.2) {
     const z = side < 0 ? rz - 4.5 : rz + ROAD_W + 4.5, y = H(x, z), c = cols[i++ % cols.length], h = 3.4 + (i % 3) * 0.8;
     mb.mat = MAT.siding; mb.box(x, y - 0.2, z, 3.8, h, 4, c); mb.mat = 0;
     mb.box(x, y - 0.2 + h, z - side * 1.9, 3.9, 0.6, 0.2, shade(c, 0.8));
     mb.box(x, y + 0.9, z - side * 2.02, 2.8, 1.0, 0.05, [255, 220, 150]);
   }
-  const tx = 156, tz = rz - 9, ty = H(tx, tz);
+  const tx = WORLD_R - 2, tz = rz - 9, ty = H(tx, tz);
   mb.mat = MAT.metal; for (const [sx, sz] of [[-1, -1], [1, -1], [1, 1], [-1, 1]]) mb.box(tx + sx * 1.2, ty - 0.2, tz + sz * 1.2, 0.18, 7, 0.18, [150, 156, 164]);
   mb.cyl(tx, ty + 6.6, tz, 2.4, 2.4, 2.6, 16, [200, 206, 212], { capCol: [200, 206, 212] }); mb.cyl(tx, ty + 9.2, tz, 2.5, 0.2, 1.2, 16, [180, 186, 194]); mb.mat = 0;
 }
@@ -8915,7 +9303,7 @@ const NBV = {
   },
   free() { const room = this.room; if (!room) return; for (const c of room.chunks) if (c.gl) { G.R.free(c.gl); c.gl = null; } this.room = null; },
   // ---------------------------------------------------------------- going there and back
-  mins(N) { return 8 + Math.round(Math.abs(N.x) / 8); },
+  mins(N) { return 8 + Math.round(Math.abs(nbX(N)) / 8); },
   visit(key, tripMins) {
     const F = G.F, N = NEIGHBOR_FARMS.find((q) => q.key === key);
     if (!N || G.iris) return;
@@ -9102,9 +9490,91 @@ const TRACT_USES = {
   timber: { icon: '🌲', name: 'Managed timber', note: 'A harvest cheque each autumn: about $60 an acre.' },
   wild: { icon: '🦌', name: 'Wildlife land', note: 'Left wild. A small conservation credit each year, and the wildlife is wonderful.' },
 };
+// ---------------------------------------------------------------- the land office: a map of the rings, and buying a parcel
+const LANDUI = {
+  L: null,   // how many rings the map shows (the ring past your outermost land, unless you zoom)
+  render(b, F, cash, redraw) {
+    const sale = plotsForSale(F), have = ownedAcres(F), outer = Math.max(0, ...F.owned.map((v, p) => (v ? plotRingOf(p) : 0)));
+    const L = this.L === null ? clamp(outer + 1, 1, RINGS) : this.L, h = ringHalf(L), kid = F.kid;
+    const shortMoney = (v) => (v >= 1e6 ? '$' + (Math.round(v / 1e5) / 10) + 'M' : v >= 1e3 ? '$' + Math.round(v / 1e3) + 'k' : money(v));
+    const house = F.objs.find((o) => o.t === 'house'), rz = roadZ(F);
+    let svg = '';
+    for (let p = 0; p < NHOME + L * 12; p++) {
+      const r = plotRect(p), mine = !!F.owned[p], buy = !mine && sale.includes(p), w = r[1] - r[0];
+      const fill = mine ? (isWalkRing(plotRingOf(p)) ? '#cfe8b4' : '#b7dba0') : buy ? '#ffe9a8' : '#e6e1d4', bd = mine ? '#6aa04a' : buy ? '#d6a21f' : '#cfc7b3';
+      svg += `<rect x="${r[0]}" y="${r[2]}" width="${w}" height="${w}" fill="${fill}" stroke="${bd}" stroke-width="${buy ? 2 : 1}" vector-effect="non-scaling-stroke"${buy ? ` data-plot="${p}" style="cursor:pointer"` : ''}${mine || buy ? '' : ' stroke-dasharray="3 3"'}/>`;
+      if (w / (2 * h) > 0.09) {
+        const fs = Math.min(w * 0.17, h * 0.06), cx = r[0] + w / 2, cy = r[2] + w / 2;
+        const top = p < NHOME ? plotName(p).replace('Lot ', '') : `${fmtAcres(plotAcres(F, p))} ac`;
+        const sub = mine ? '✓ yours' : buy ? (kid ? 'for sale' : shortMoney(plotPrice(F, p))) : '';
+        svg += `<text x="${cx}" y="${cy - (sub ? fs * 0.25 : -fs * 0.35)}" font-size="${fs}" text-anchor="middle" font-weight="800" fill="#4a3a22" pointer-events="none">${top}</text>`;
+        if (sub) svg += `<text x="${cx}" y="${cy + fs * 0.95}" font-size="${fs * 0.85}" text-anchor="middle" font-weight="700" fill="${mine ? '#3f7a2a' : '#8a5a00'}" pointer-events="none">${sub}</text>`;
+      }
+    }
+    // the county road and the house
+    svg += `<line x1="${-h}" x2="${h}" y1="${rz + ROAD_W / 2}" y2="${rz + ROAD_W / 2}" stroke="#8f6d49" stroke-width="5" vector-effect="non-scaling-stroke" pointer-events="none"/>`;
+    if (house) svg += `<circle cx="${house.x}" cy="${house.z}" r="${Math.max(2.2, h * 0.025)}" fill="#c0392b" stroke="#fff" stroke-width="2" vector-effect="non-scaling-stroke" pointer-events="none"/>`;
+    const list = sale.slice().sort((a, c) => plotPrice(F, a) - plotPrice(F, c));
+    b.innerHTML = `<p class="note">You own <b>${Math.round(have).toLocaleString()} acres</b> of the ${MAX_ACRES.toLocaleString()} you can own. Any parcel that touches your land is for sale, and each one you buy opens up the land just past it. The homestead and the first two rings (1,000 acres) are ground you walk, build and farm on; past them, your land is worked for you.</p>
+      <div style="display:flex;align-items:center;justify-content:center;gap:10px;margin:4px 0"><button class="btn" id="lmOut" style="padding:6px 12px;min-height:0;font-size:13px" ${L >= RINGS ? 'disabled' : ''}>− Out</button><b style="font-size:13px;text-align:center">${L === 0 ? 'Homestead' : `Out to ring ${L}`} · ${(Math.round(4 * h * h / 160)).toLocaleString()} acres shown</b><button class="btn" id="lmIn" style="padding:6px 12px;min-height:0;font-size:13px" ${L <= 1 ? 'disabled' : ''}>+ In</button></div>
+      <div style="text-align:center;font-size:11px;font-weight:800;color:#8a7a5a">NORTH ▲</div>
+      <svg id="landMap" viewBox="${-h} ${-h} ${2 * h} ${2 * h}" style="display:block;width:100%;max-width:440px;aspect-ratio:1;margin:2px auto 6px;border-radius:10px;background:#d9d3c2;touch-action:manipulation">${svg}</svg>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;justify-content:center;font-size:12px;font-weight:700;margin:4px 0 6px"><span><i style="display:inline-block;width:12px;height:12px;border-radius:3px;background:#cfe8b4;border:2px solid #6aa04a;vertical-align:-2px"></i> Yours</span><span><i style="display:inline-block;width:12px;height:12px;border-radius:3px;background:#ffe9a8;border:2px solid #d6a21f;vertical-align:-2px"></i> For sale</span><span><i style="display:inline-block;width:12px;height:12px;border-radius:3px;background:#e6e1d4;border:2px dashed #cfc7b3;vertical-align:-2px"></i> Not yet</span><span><i style="display:inline-block;width:10px;height:10px;border-radius:50%;background:#c0392b;vertical-align:-1px"></i> Your house</span></div>
+      <div class="grp">For sale now</div>
+      ${list.length ? UI.rows(list.map((p) => ({ id: 'b' + p, tap: true, icon: p < NHOME ? '🏡' : isWalkRing(plotRingOf(p)) ? '🌾' : '🗺️', text: `${plotName(p)} · ${fmtAcres(saleAcres(F, p))} acres`, small: plotWhere(p), right: kid ? '' : money(plotPrice(F, p)) }))) : `<p class="note">${acresLeft(F) < 1 ? 'You own a million acres: every acre the county will sell you. 🏆' : 'Nothing for sale beside your land right now.'}</p>`}
+      <div id="holdBox"></div>`;
+    { const H = HOLD.panel(F, cash, redraw); $('holdBox').innerHTML = H.html; H.wire($('holdBox')); }
+    $('lmOut').onclick = () => { this.L = Math.min(RINGS, L + 1); redraw(); };
+    $('lmIn').onclick = () => { this.L = Math.max(1, L - 1); redraw(); };
+    const go = (p) => this.offer(F, p, cash, redraw);
+    b.querySelectorAll('#landMap [data-plot]').forEach((r) => { r.onclick = () => go(+r.dataset.plot); });
+    b.querySelectorAll('[data-id^="b"]').forEach((r) => { r.onclick = () => go(+r.dataset.id.slice(1)); });
+  },
+  offer(F, p, cash, redraw) {
+    const price = F.unlocked ? 0 : plotPrice(F, p), acres = saleAcres(F, p), ring = plotRingOf(p), walk = isWalkRing(ring), pay = F.unlocked ? 'Free in unlocked mode' : money(price);
+    if (!F.unlocked && F.money < price) return UI.toast(`That costs ${money(price)}.`, true);
+    const done = (use) => {
+      const err = buyParcel(F, p, use); if (err) return UI.toast(err, true);
+      AUDIO.fanfare(); UI.closeAll(); cash();
+      UI.toast(walk ? `${plotName(p)} is yours! The fence line moves out for you. 🗺️` : `${Math.round(acres).toLocaleString()} acres are yours. ${TRACT_USES[use].icon}`);
+      checkGoalsToast(); redraw();
+    };
+    if (p < NHOME) return UI.confirm(`Buy ${plotName(p)}?`, `${plotWhere(p)}. ${pay} for about 2.5 more acres. The fence line moves out to take it in, and property tax goes up $350 a year.`, () => done());
+    if (walk) {
+      const tax = Math.round(acres * 20), grow = ring > TIER;
+      return UI.confirm(`Buy the ${plotName(p)}?`, `${fmtAcres(acres)} acres ${plotWhere(p)}, for ${pay}. It's real ground you can walk, build and farm on. The fence line moves out round it, and property tax goes up ${money(tax)} a year.${grow ? ' Your farm grows to take it in, and the neighbours move out past your new land.' : ''}`, () => done());
+    }
+    // outlying land: pick what it's for first
+    const P = UI.open({ title: `Buy the ${plotName(p)}`, sub: `${Math.round(acres).toLocaleString()} acres · ${pay}`, icon: '🗺️', foot: true });
+    let use = 'lease';
+    const draw = () => { P.body.innerHTML = `<p class="note">${plotWhere(p)[0].toUpperCase() + plotWhere(p).slice(1)}. What will the land be used for? You can change it later.</p>` + UI.rows(Object.entries(TRACT_USES).map(([k, u]) => ({ id: k, tap: true, icon: u.icon, text: u.name, small: u.note, cls: use === k ? 'sel' : '' }))); P.body.querySelectorAll('.row').forEach((r) => { r.onclick = () => { use = r.dataset.id; draw(); }; }); };
+    draw();
+    P.foot.innerHTML = `<button class="btn" id="lbNo">Not now</button><button class="btn go" id="lbBuy">${F.unlocked ? 'Take it' : 'Buy for ' + money(price)}</button>`;
+    $('lbNo').onclick = () => UI.closeAll();
+    $('lbBuy').onclick = () => done(use);
+  },
+};
+// buy a parcel: pay, take it (the last one before the 1,000,000-acre limit is cut to fit), give outlying land its use, and grow the
+// ground grid when it's walking land the farm doesn't reach yet. Returns an error message, or null.
+function buyParcel(F, p, use) {
+  if (F.owned[p]) return 'You already own it.';
+  if (!plotsForSale(F).includes(p)) return 'That land isn\'t for sale yet: buy the land beside it first.';
+  const price = F.unlocked ? 0 : plotPrice(F, p), acres = saleAcres(F, p), ring = plotRingOf(p);
+  if (acres < 1) return 'You own all the land you can: a million acres.';
+  if (F.money < price) return 'Not enough money.';
+  F.money -= price; F.stats.spent += price;
+  if (acres < plotAcresNominal(p) - 0.01) { F.pAcres = F.pAcres || {}; F.pAcres[p] = acres; }
+  F.owned[p] = 1;
+  if (!isWalkRing(ring)) { F.pUse = F.pUse || {}; F.pUse[p] = use || 'lease'; if (G.view && G.F === F) G.view.rebuildTerrain(); }
+  if (isWalkRing(ring) && ring > TIER) growWorld(F, ring);
+  else if (isWalkRing(ring) && G.view && G.F === F) { G.view.rebuildTerrain(); G.view.dirtyAll(); G.view.rebuildColliders(); }
+  return null;
+}
 const HOLD = {
   tracts(F) { return F.tracts || (F.tracts = []); },
-  acres(F) { return F.owned.filter(Boolean).length * PLOT_ACRES + this.tracts(F).reduce((n, t) => n + t.acres, 0); },
+  acres(F) { return ownedAcres(F); },
+  // outlying parcels (rings past the walking land) you own, each with its use
+  outParcels(F) { const o = []; for (let p = NHOME + 12 * WALK_RINGS; p < NPLOTS; p++) if (F.owned[p]) o.push({ p, acres: plotAcres(F, p), use: (F.pUse && F.pUse[p]) || 'lease', name: plotName(p) }); return o; },
   // land values creep up about 3% a year
   perAcre(F) { const yrs = Math.max(0, (F.year || 1) - 1 + (F.month || 0) / 12); return Math.round((LAND_PLOT_PRICE[F.listing] || 25000) / PLOT_ACRES * 0.4 * Math.pow(1.03, yrs)); },
   // this season's three listings: sizes step up as years pass and as you own more
@@ -9126,7 +9596,7 @@ const HOLD = {
   },
   // once a month when the calendar turns over (month is the one that just ended)
   monthly(F, month) {
-    const T = this.tracts(F); if (!T.length) return;
+    const T = this.tracts(F).concat(this.outParcels(F)); if (!T.length) return;
     let cash = 0, bales = 0;
     for (const t of T) {
       if (t.use === 'lease') cash += t.acres * 12;
@@ -9141,22 +9611,30 @@ const HOLD = {
   },
   // the block under the plot grid in the town Land tab. redraw() refreshes the whole tab.
   panel(F, cash, redraw) {
-    const have = this.acres(F), L = this.listings(F);
-    let html = `<div class="grp">Outlying land · ${Math.round(have).toLocaleString()} acres in all</div>`;
-    const T = this.tracts(F);
-    if (T.length) html += `<p class="note">Your tracts. Tap one to change what it is used for.</p>` + UI.rows(T.map((t) => ({ id: 't' + t.id, tap: true, icon: TRACT_USES[t.use].icon, text: `${t.name} · ${t.acres.toLocaleString()} acres`, small: TRACT_USES[t.use].note })));
-    html += `<p class="note">For sale this season (${money(this.perAcre(F))} an acre, less in bulk). New listings come up every three months, and bigger tracts come on the market as the years go by and your holdings grow. There's no limit to how much you can own.</p>` + (L.length ? UI.rows(L.map((t) => ({ id: 's' + t.id, tap: true, icon: '🗺️', text: `${t.name[0].toUpperCase() + t.name.slice(1)} · ${t.acres.toLocaleString()} acres`, small: F.unlocked ? 'Free in unlocked mode' : money(this.price(F, t.acres)) }))) : '<p class="note">You bought everything listed this season. Check back next season.</p>');
+    const T = this.tracts(F), O = this.outParcels(F);
+    if (!T.length && !O.length) return { html: '', wire() {} };
+    const acres = T.reduce((n, t) => n + t.acres, 0) + O.reduce((n, t) => n + t.acres, 0);
+    let html = `<div class="grp">Outlying land · ${Math.round(acres).toLocaleString()} acres</div><p class="note">Land past your walking acres is worked for you. Tap a parcel to change what it's used for.</p>`;
+    html += UI.rows(O.map((t) => ({ id: 'o' + t.p, tap: true, icon: TRACT_USES[t.use].icon, text: `${t.name} · ${Math.round(t.acres).toLocaleString()} acres`, small: TRACT_USES[t.use].name + ': ' + TRACT_USES[t.use].note }))
+      .concat(T.map((t) => ({ id: 't' + t.id, tap: true, icon: TRACT_USES[t.use].icon, text: `${t.name} · ${t.acres.toLocaleString()} acres`, small: TRACT_USES[t.use].note }))));
     return {
       html,
       wire(b) {
         b.querySelectorAll('[data-id]').forEach((r) => {
           r.onclick = () => {
             const id = r.dataset.id;
-            if (id[0] === 't') { const t = T.find((q) => 't' + q.id === id); HOLD.useMenu(F, t, redraw); } else if (id[0] === 's') { const t = L.find((q) => 's' + q.id === id); if (t) HOLD.buyMenu(F, t.acres, cash, redraw, t); }
+            if (id[0] === 't') { const t = T.find((q) => 't' + q.id === id); if (t) HOLD.useMenu(F, t, redraw); }
+            else if (id[0] === 'o') { const p = +id.slice(1); HOLD.parcelUseMenu(F, p, redraw); }
           };
         });
       },
     };
+  },
+  parcelUseMenu(F, p, redraw) {
+    const cur = (F.pUse && F.pUse[p]) || 'lease';
+    const P = UI.open({ title: plotName(p), sub: `${Math.round(plotAcres(F, p)).toLocaleString()} acres`, icon: TRACT_USES[cur].icon });
+    P.body.innerHTML = UI.rows(Object.entries(TRACT_USES).map(([k, u]) => ({ id: k, tap: true, icon: u.icon, text: u.name, small: u.note, cls: cur === k ? 'sel' : '' })));
+    P.body.querySelectorAll('.row').forEach((r) => { r.onclick = () => { F.pUse = F.pUse || {}; F.pUse[p] = r.dataset.id; if (G.view && G.F === F) G.view.rebuildTerrain(); UI.closeAll(); redraw(); }; });
   },
   useMenu(F, t, redraw) {
     const P = UI.open({ title: t.name, sub: `${t.acres.toLocaleString()} acres`, icon: TRACT_USES[t.use].icon });
@@ -13321,7 +13799,8 @@ function drawActor(out, a, T, pondLevel) {
 
 'use strict';
 // ============================================================================ FarmView: turns farm state into meshes, colliders and actors
-const CHUNK = 12, CH0 = -60, CHN = 10;
+const CHUNK = 12;
+let CH0 = -60, CHN = 10;   // the chunk grid covers the ground grid (setWorld resizes it)
 const DOORS = { house: [0, 3.0], barn: [0, 2.85], coop: [0, 1.55], greenhouse: [0, 3.3] };
 // a building's collider, scaled by its size (o.sc: small, standard or large from the Remodel menu)
 const SOLID_SC = new Map();
@@ -13393,11 +13872,41 @@ class FarmView {
   rebuildTerrain() {
     roadFixCover(this.F);
     if (this.tiles) for (const t of this.tiles) this.R.free(t.mesh);
-    this.tiles = this.T.build(this.season(), this.dryness()).map((t) => ({ mesh: this.R.mesh(t.mb), cx: t.cx, cz: t.cz, r: t.r }));
-    const key = this.season() + ':' + Math.round(this.dryness() * 4);
+    // a homestead-only farm builds all its ground at full detail. A bigger one builds the ground near you at full detail and the rest
+    // with every fourth corner; as you move about, tiles swap detail a few at a time (updateTiles)
+    const want = TIER ? this.tileWants(true) : undefined;
+    this.tileSD = [this.season(), this.dryness()];
+    this.tiles = this.T.build(this.season(), this.dryness(), want).map((t) => ({ mesh: this.R.mesh(t.mb), cx: t.cx, cz: t.cz, r: t.r, ti: t.ti, tj: t.tj, st: t.st }));
+    const key = this.season() + ':' + Math.round(this.dryness() * 4) + ':' + WORLD_R + ':' + this.F.owned.slice(NHOME + 12 * WALK_RINGS).join('') + JSON.stringify(this.F.pUse || {});
     if (this.farKey !== key) { if (this.farMesh) this.R.free(this.farMesh); this.farMesh = this.R.mesh(this.T.buildFar(this.season(), this.dryness())); this.farKey = key; }
     if (this.roadMesh) this.R.free(this.roadMesh); this.roadMesh = this.R.mesh(buildRoadMesh(this.F));
     if (this.swaleMesh) this.R.free(this.swaleMesh); this.swaleMesh = (this.F.swales || []).length ? this.R.mesh(buildSwaleMesh(this.F, this.season(), this.dryness())) : null;
+  }
+  // the detail each ground tile should have now: full within about 60 units of you (a little more before a fine tile goes coarse again)
+  tileWants(fresh) {
+    const f = G.focus || [G.Fm ? G.Fm.x : 0, 0, G.Fm ? G.Fm.z : 0], TS = this.T.tileSize(), NT = TN / TS, out = [];
+    const have = new Map((this.tiles || []).map((t) => [t.ti + ',' + t.tj, t.st]));
+    for (let tj = 0; tj < NT; tj++) for (let ti = 0; ti < NT; ti++) {
+      const cx = -THALF + (ti + 0.5) * TS, cz = -THALF + (tj + 0.5) * TS, d = Math.max(0, Math.hypot(cx - f[0], cz - f[2]) - TS * 0.71);
+      const cur = fresh ? 4 : have.get(ti + ',' + tj);
+      out.push([ti, tj, d < 58 || (cur === 1 && d < 74) ? 1 : 4]);
+    }
+    return out;
+  }
+  // swap a few tiles to the detail they should have now (nearest first: at most one fine tile and a few coarse ones a frame)
+  updateTiles() {
+    if (!TIER || !this.tiles || !this.tileSD) return;
+    const wants = this.tileWants(false), f = G.focus || [0, 0, 0], todo = [];
+    for (const [ti, tj, st] of wants) { const t = this.tiles.find((q) => q.ti === ti && q.tj === tj); if (t && t.st !== st) todo.push([Math.hypot(t.cx - f[0], t.cz - f[2]), t, st]); }
+    if (!todo.length) return;
+    todo.sort((a, b) => a[0] - b[0]);
+    let fine = 0, coarse = 0;
+    for (const [, t, st] of todo) {
+      if (st === 1 ? fine >= 1 : coarse >= 4) continue;
+      const nt = this.T.build(this.tileSD[0], this.tileSD[1], [[t.ti, t.tj, st]])[0];
+      this.R.free(t.mesh); t.mesh = this.R.mesh(nt.mb); t.st = st;
+      if (st === 1) fine++; else coarse++;
+    }
   }
   chunkOf(x, z) { const i = clamp(Math.floor((x - CH0) / CHUNK), 0, CHN - 1), j = clamp(Math.floor((z - CH0) / CHUNK), 0, CHN - 1); return j * CHN + i; }
   dirtyAt(x, z, r) { r = r || 0; for (const dx of [-r, r]) for (const dz of [-r, r]) this.dirty[this.chunkOf(x + dx, z + dz)] = true; }
@@ -13433,7 +13942,7 @@ class FarmView {
       if (T.cover[k] !== COVER.grass || Math.abs(x) > THALF - 2 || Math.abs(z) > THALF - 2) return;
       const b = T.bio[k];
       const rr = hash2(Math.floor(x * 7), Math.floor(z * 7), F.seed);
-      if (rr > (b * 0.36 + 0.03) * (G.lowDetail ? 0.45 : 1)) return;
+      if (rr > (b * 0.36 + 0.03) * (G.lowDetail ? 0.45 : 1) * (Math.max(Math.abs(x), Math.abs(z)) > 62 ? 0.3 : 1)) return;
       const ox = x + (hash2(k, 1, 3) - 0.5) * 0.8, oz = z + (hash2(k, 2, 5) - 0.5) * 0.8;
       if (this.objNear(ox, oz, 0.6)) return;
       if (F.drive && driveDist(F, ox, oz) < (F.drive.w || DRIVE_W) / 2 + 0.7) return;   // blades lean, so keep them well back from the gravel
@@ -13593,19 +14102,7 @@ class FarmView {
     }
   }
   // edges of the land you own
-  ownedSegs() {
-    const F = this.F, out = [];
-    for (let p = 0; p < NPLOTS; p++) {
-      if (!F.owned[p]) continue;
-      const px = plotCol(p), pz = plotRow(p), [x0, x1, z0, z1] = plotRect(p);
-      const own = (a, b) => a >= 0 && a < PN && b >= 0 && b < PN && F.owned[b * PN + a];
-      if (!own(px, pz - 1)) out.push([x0, z0, x1, z0]);
-      if (!own(px, pz + 1)) out.push([x0, z1, x1, z1]);
-      if (!own(px - 1, pz)) out.push([x0, z0, x0, z1]);
-      if (!own(px + 1, pz)) out.push([x1, z0, x1, z1]);
-    }
-    return out;
-  }
+  ownedSegs() { return borderSegs(this.F); }
   boundarySegs() { return roadFenceSegs(this.F, this.ownedSegs()).segs; }
   // the wooden fence that comes with the land: around what you own and along the road, open at the driveway
   boundaryInto(mb, inC) {
@@ -13751,6 +14248,7 @@ class FarmView {
   }
   update(dt, Fm, t) {
     this.updateChunks(false);
+    this.updateTiles();
     const A = [...this.actors.values()];
     const blocked = (x, z, r) => this.col.blocked(x, z, r, { noFence: true });
     const blockedF = (x, z, r) => this.col.blocked(x, z, r, { noFence: false });
@@ -13845,8 +14343,11 @@ class FarmView {
       vis = (x, z, m) => { const dx = x - Fm.x, dz = z - Fm.z, d = Math.hypot(dx, dz), mm = m || 0; if (d < 24 + mm) return true; if (d > 200 + mm) return false; return dx * fx + dz * fz > d * ch - mm * 1.2; };
     } else vis = wide ? (x, z, m) => Math.hypot(x - focus[0], z - focus[2]) < 70 + (m || 0) : (x, z, m) => Math.abs(x - focus[0]) < 30 + (m || 0) && z - focus[2] < 22 + (m || 0) && focus[2] - z < 40 + (m || 0);
     // the ground in tiles: only the ones the camera can see, and the grass carpet only on those near enough to show it
+    // the ground itself is drawn much further out than things on it, so a big farm never shows a hole in the land at a distance
+    const fx0 = fp ? Math.sin(Fm.yaw) : 0, fz0 = fp ? Math.cos(Fm.yaw) : 0;
+    const visG = fp ? (x, z, m) => { const dx = x - Fm.x, dz = z - Fm.z, d = Math.hypot(dx, dz); return d < 30 + m || (d < 700 && dx * fx0 + dz * fz0 > -m * 1.4); } : wide ? (x, z, m) => Math.hypot(x - focus[0], z - focus[2]) < 340 + m : vis;
     for (const t of this.tiles) {
-      if (!vis(t.cx, t.cz, t.r)) continue;
+      if (!visG(t.cx, t.cz, t.r)) continue;
       // the grass carpet thins out blade by blade between 19 and 33 m from the farmer (in the shaders), so every tile that reaches inside 33 m carries it and there is never a seam
       const d = Math.hypot(t.cx - focus[0], t.cz - focus[2]) - t.r * 1.42;
       out.push({ mesh: t.mesh, shell: d < 33 ? GRASS_SHELL : undefined });
@@ -13861,13 +14362,16 @@ class FarmView {
         out.push({ mesh: this.vaneMesh, model: M4.trs(o.x, this.T.at(o.x, o.z) + top * k, o.z, yaw, 0, 0, k * 1.15), snowK: 0.2 });
       }
     }
-    for (const c of this.chunks) if (c && vis(c.cx, c.cz, 6)) out.push({ mesh: c.mesh, noShadow: Math.hypot(c.cx - focus[0], c.cz - focus[2]) > 24 });
+    for (const c of this.chunks) if (c && c.mesh.count && vis(c.cx, c.cz, 6)) out.push({ mesh: c.mesh, noShadow: Math.hypot(c.cx - focus[0], c.cz - focus[2]) > 24 });
+    // on a farm bigger than the homestead, the farm's own trees are drawn out to 150 units and bushes to 70 (the haze has them by then);
+    // the countryside's simple trees carry on beyond
+    const reach = (x, z, lim) => !TIER || Math.hypot(x - focus[0], z - focus[2]) < lim;
     NEIGHBORS.draws(this, out, focus, wide);
     DRIVE.draws(out, t);
     // living trees: every one sways on its own beat, harder in wind; a struck tree shudders; a new one pops up out of the ground
     const wd = this.windNow;
     for (const tr of this.trees) {
-      if (tr.hidden || !vis(tr.x, tr.z, 3)) continue;
+      if (tr.hidden || !vis(tr.x, tr.z, 3) || !reach(tr.x, tr.z, 150)) continue;
       if (!tr.mesh || tr.stamp !== tr.meshStamp) { const m = this.treeMeshFor(tr); if (m) { tr.mesh = m; tr.meshStamp = tr.stamp; } }
       if (!tr.mesh) continue;
       let ps = 1; if (tr.pop >= 0) { const q = clamp(tr.pop / 0.8, 0, 1), c1 = 1.70158; ps = 1 + (c1 + 1) * Math.pow(q - 1, 3) + c1 * Math.pow(q - 1, 2); }
@@ -13883,7 +14387,7 @@ class FarmView {
       out.push(fd === undefined ? { mesh: f.mesh, model: fellModel(f.x, f.y, f.z, f.s, f.yaw, f.t), noShadow: false } : { mesh: f.mesh, model: fellModel(f.x, f.y, f.z, f.s, f.yaw, f.t), noShadow: true, fade: Math.max(0.005, fd) });
     }
     for (const b of this.brush) {
-      if (!vis(b.x, b.z)) continue;
+      if (!vis(b.x, b.z) || !reach(b.x, b.z, 70)) continue;
       const sh = b.shake * b.shake;
       out.push({ mesh: b.mesh, model: M4.mul(M4.trans(b.x, b.y, b.z), M4.mul(M4.rotZ(Math.sin(t * 21 + b.ph) * 0.16 * sh), M4.rotX(Math.cos(t * 17 + b.ph) * 0.12 * sh))) });
     }
@@ -14273,7 +14777,7 @@ const WEEDS = {
   eats: { goat: ['thistle', 'dandelion', 'burdock', 'pigweed', 'brush'], sheep: ['dandelion', 'burdock', 'pigweed'], pig: ['dandelion', 'burdock', 'pigweed'], chicken: ['dandelion', 'pigweed'], duck: ['dandelion', 'pigweed'], cattle: ['pigweed'] },
   // new weeds each day, on your own land, where the ground is bare or eaten down
   spawn(F) {
-    const T = F.terrain, have = F.objs.filter((o) => o.t === 'weed').length, cap = 40 + ownedCount(F) * 6;
+    const T = F.terrain, have = F.objs.filter((o) => o.t === 'weed').length, cap = 40 + Math.min(60, homeCount(F) + Math.round((ownedAcres(F) - homeCount(F) * 2.5 - HOLD.tracts(F).reduce((n, t) => n + t.acres, 0)) / 40)) * 6;
     if (have >= cap) return;
     const n = Math.min(cap - have, 1 + Math.floor(Math.random() * 3)), keys = Object.keys(this.kinds);
     for (let i = 0, tries = 0; i < n && tries < 60; tries++) {
@@ -14711,7 +15215,7 @@ function sleepDays(F, n) {
   return notes;
 }
 function yearEnd(F) {
-  const tax = ownedCount(F) * 350;
+  const tax = landTax(F);
   F.money -= tax; F.log.push(`Paid $${tax} property tax for year ${F.year - 1}.`);
   F.stats.lastYearIncome = F.stats.yearIncome; F.stats.yearIncome = 0;
 }
@@ -14797,7 +15301,7 @@ const GOALS = [
   { id: 'fruit', cat: 'Trees', icon: '🍎', name: 'Pick your first homegrown fruit', reward: 600, prog: (F) => (F.stats.firstFruit ? 1 : 0) },
   { id: 'barn', cat: 'Buildings', icon: '🏚️', name: 'Raise a barn', reward: 1000, prog: (F) => (F.objs.some((o) => o.t === 'barn') ? 1 : 0) },
   { id: 'coop', cat: 'Buildings', icon: '🐔', name: 'Build a coop and get eggs', reward: 300, prog: (F) => (F.stats.eggs > 0 ? 1 : 0) },
-  { id: 'land25', cat: 'Business', icon: '🗺️', name: 'Own every lot on your side of the road', reward: 40000, prog: (F) => ownedCount(F) / Math.max(1, buyablePlots(F).length) },
+  { id: 'land25', cat: 'Business', icon: '🗺️', name: 'Own all 25 homestead lots', reward: 40000, prog: (F) => homeCount(F) / NHOME },
   { id: 'hand1', cat: 'Business', icon: '🧑‍🌾', name: 'Hire a farmhand', reward: 300, prog: (F) => (F.hand || tallied(F, 'hired') ? 1 : 0) },
   { id: 'ribbon', cat: 'Community', icon: '🥇', name: 'Win a blue ribbon at the County Fair', reward: 1500, prog: (F) => (tallied(F, 'blueRibbons') ? 1 : 0) },
   { id: 'bff', cat: 'Community', icon: '💞', name: 'Reach 10 hearts with someone', reward: 2500, prog: (F) => FRIENDS.count(F, 10) },
@@ -14823,8 +15327,8 @@ const LADDERS = [
   { id: 'om', cat: 'Soil', icon: '🪱', steps: [0.5, 1, 1.5, 2, 2.5, 3, 4, 5, 6, 8], reward: 2000, of: (F) => F.terrain.avgOM(true) - F.stats.startOM, name: (n) => `Raise soil organic matter by ${n}%`, old: { om1: 1, om2: 3 }, frac: true },
   { id: 'market', cat: 'Business', icon: '🏪', base: 5, reward: 600, of: (F) => F.stats.marketVisits || 0, name: (n) => `Sell at ${n} farmers markets`, old: { market: 2 } },
   { id: 'income', cat: 'Business', icon: '💵', base: 25000, reward: 3000, of: (F) => F.stats.income || 0, name: (n) => `Earn $${n.toLocaleString()} from farm sales`, old: { income: 1 } },
-  { id: 'lots', cat: 'Business', icon: '🏡', steps: [2, 3, 4, 5, 6, 8, 10, 13, 16, 20, 25], reward: 1500, of: (F) => ownedCount(F), max: (F) => buyablePlots(F).length, name: (n) => `Own ${n} lots of land`, old: { land: 7 } },
-  { id: 'acres', cat: 'Business', icon: '🏞️', steps: [10, 25, 50, 100, 250, 500, 1000, 2500, 5000, 10000], reward: 1000, of: (F) => HOLD.acres(F), name: (n) => `Own ${n.toLocaleString()} acres`, old: { acres100: 4, acres1000: 7, acres10000: 10 } },
+  { id: 'lots', cat: 'Business', icon: '🏡', steps: [2, 3, 4, 5, 6, 8, 10, 13, 16, 20, 25, 30, 37, 49, 61, 73, 85, 97, 109], reward: 1500, of: (F) => ownedCount(F), max: () => NPLOTS, name: (n) => `Own ${n} parcels of land`, old: { land: 7 } },
+  { id: 'acres', cat: 'Business', icon: '🏞️', steps: [10, 25, 50, 100, 250, 500, 1000, 2500, 5000, 10000, 25000, 50000, 100000, 250000, 500000, 1000000], reward: 1000, of: (F) => HOLD.acres(F), name: (n) => `Own ${n.toLocaleString()} acres`, old: { acres100: 4, acres1000: 7, acres10000: 10 } },
   { id: 'meet', cat: 'Community', icon: '👋', steps: [3, 6, 10, 15, 20, 30], reward: 300, of: (F) => FRIENDS.people(F).filter((p) => FRIENDS.met(F, p.id)).length, max: (F) => FRIENDS.people(F).length, name: (n) => `Meet ${n} people around the county`, old: { meet6: 2 } },
   { id: 'gifts', cat: 'Community', icon: '🎁', base: 10, reward: 400, of: (F) => tallied(F, 'gifts'), name: (n) => `Give ${plural(n, 'gift')}`, old: { gift10: 1 } },
   { id: 'jobs', cat: 'Community', icon: '📌', base: 5, reward: 600, of: (F) => tallied(F, 'jobs'), name: (n) => `Finish ${plural(n, 'job')} from the job board`, old: { jobs5: 1 } },
@@ -15817,7 +16321,7 @@ function interiorFrame(F0, room) {
 
 'use strict';
 // ============================================================================ profiles + saves (each profile has its own farm save)
-const FQ_VERSION = '1.4.4';
+const FQ_VERSION = '1.5.0';
 const LOOKS = [
   { shirt: [214, 74, 64], hair: [120, 76, 40] }, { shirt: [70, 130, 200], hair: [236, 206, 120] }, { shirt: [240, 170, 60], hair: [80, 50, 30] },
   { shirt: [120, 170, 90], hair: [40, 30, 28] }, { shirt: [170, 100, 190], hair: [200, 110, 60] }, { shirt: [60, 160, 160], hair: [150, 100, 60] },
@@ -16440,7 +16944,7 @@ const UI = {
         const plots = F.owned.filter(Boolean).length;
         b.innerHTML = (F.kid ? `<div class="stat">Soil health<b>${om > 4 ? '🌟🌟🌟' : om > 2.5 ? '🌟🌟' : '🌟'}</b></div><div class="stat">Grass<b>${bio / n > 0.6 ? 'Lush' : bio / n > 0.3 ? 'OK' : 'Thin'}</b></div>` :
           `<div class="stat">Soil organic matter<b>${om.toFixed(2)}%</b></div><div class="stat">Change since start<b style="color:${dOM >= 0 ? 'var(--leaf2)' : 'var(--warn)'}">${dOM >= 0 ? '+' : ''}${dOM.toFixed(2)}%</b></div><div class="stat">Soil moisture<b>${Math.round(moist / n * 100)}%</b></div><div class="stat">Pasture cover<b>${Math.round(bio / n * 100)}%</b></div>`) +
-          `<div class="stat">Land owned<b>${plots} of ${buyablePlots(F).length} lots</b></div><div class="stat">Ponds<b>${F.ponds.length}</b></div><div class="stat">Swales<b>${F.swales.length}</b></div><div class="stat">Trees planted<b>${F.stats.treesPlanted}</b></div><div class="stat">Paddocks<b>${F.paddocks.length}</b></div>` +
+          `<div class="stat">Land owned<b>${Math.round(ownedAcres(F)).toLocaleString()} acres (${plots} parcel${plots === 1 ? '' : 's'})</b></div><div class="stat">Ponds<b>${F.ponds.length}</b></div><div class="stat">Swales<b>${F.swales.length}</b></div><div class="stat">Trees planted<b>${F.stats.treesPlanted}</b></div><div class="stat">Paddocks<b>${F.paddocks.length}</b></div>` +
           (F.kid ? '' : `<div class="stat">Sales this year<b>${money(F.stats.yearIncome)}</b></div><div class="stat">All-time sales<b>${money(F.stats.income)}</b></div><div class="stat">Hay made<b>${fmt1(F.stats.bales)} bales</b></div>`) +
           `<p class="note">Soil organic matter is the heart of the farm: every 1% more lets the soil hold far more water. Living roots, rested pasture, manure from moving herds and mulch all build it. Bare soil loses it.</p>`;
       } else if (t === 'animals') {
@@ -16533,23 +17037,7 @@ const UI = {
         b.innerHTML = sell.length ? `<p class="note">${marketDay ? '🎉 Market day! Shoppers pay 15% more.' : 'Prices drop a little as you sell more of the same thing this month.'}</p>` + self.rows(sell.map((k) => ({ id: k, icon: ITEMS[k].icon, text: ITEMS[k].name, small: `${fmt1(F.inv[k])} ${ITEMS[k].unit} · ${money(priceOf(k) * 100 / 100)} per ${ITEMS[k].unit.replace(/s$/, '')}`, right: `<button class="btn" data-s="${k}" data-n="1">Sell 1</button> <button class="btn go" data-s="${k}" data-n="all">All ${money(priceOf(k) * Math.floor(F.inv[k]))}</button>` }))) : '<p class="note">Nothing to sell yet. Harvest crops, collect eggs, pick fruit, or bring meat.</p>';
         b.querySelectorAll('[data-s]').forEach((btn) => { btn.onclick = () => { const k = btn.dataset.s, n = btn.dataset.n === 'all' ? Math.floor(F.inv[k]) : 1, $$ = priceOf(k) * n; F.inv[k] -= n; F.money += $$; F.stats.income += $$; F.stats.yearIncome += $$; F.demand.sold[k] = (F.demand.sold[k] || 0) + n; { const kind = ITEMS[k].kind; tally(F, kind === 'produce' && k.startsWith('fruit_') ? 'soldFruit' : k === 'milk' ? 'soldMilk' : k === 'honey' ? 'soldHoney' : k === 'wool' ? 'soldWool' : 'soldProduce', $$); if (kind === 'produce' && !k.startsWith('fruit_') && k !== 'milk' && k !== 'honey' && k !== 'wool') {} PURSUE.check(F); } if (!F.today.marketCounted) { F.today.marketCounted = true; F.stats.marketVisits++; } AUDIO.cash(); UI.toast(`Sold for ${money($$)}`); cash(); fill('market', b); checkGoalsToast(); }; });
       } else if (t === 'land') {
-        const sale = plotsForSale(F), own = ownedCount(F), roadRow = clamp(Math.floor((roadZ(F) + FARM_HALF) / PLOT), 1, PN - 1);
-        const cheapest = sale.length ? Math.min(...sale.map((p) => plotPrice(F, p))) : 0;
-        let grid = '';
-        for (let r = 0; r < PN; r++) {
-          if (r === roadRow) grid += '<div style="grid-column:1/-1;height:12px;margin:2px 0;border-radius:3px;background:#8f6d49;position:relative"><div style="position:absolute;left:4%;right:4%;top:3px;border-top:2px solid rgba(70,48,30,.3)"></div><div style="position:absolute;left:4%;right:4%;top:7px;border-top:2px solid rgba(70,48,30,.3)"></div><span style="position:absolute;right:6px;top:-1px;font-size:9px;font-weight:800;color:#e8e0c8;letter-spacing:.5px">COUNTY ROAD</span></div>';
-          for (let c = 0; c < PN; c++) {
-            const p = r * PN + c, mine = F.owned[p], buy = !mine && sale.includes(p), home = p === HOME_PLOT;
-            const bg = mine ? '#cfe8b4' : buy ? '#ffe9a8' : '#e6e1d4', bd = mine ? '#6aa04a' : buy ? '#d6a21f' : '#cfc7b3';
-            grid += `<button class="card" style="align-items:center;text-align:center;padding:7px 2px;min-height:64px;background:${bg};border:2px ${mine || buy ? 'solid' : 'dashed'} ${bd};${buy || mine ? '' : 'opacity:.8'}" ${buy ? `data-plot="${p}"` : 'disabled'}><b style="font-size:13px">${home ? '🏠 ' : ''}${'ABCDE'[c]}${r + 1}</b><small style="font-size:11px">${mine ? '✓ Yours' : buy ? money(plotPrice(F, p)) : !plotBuyable(F, p) ? 'not for sale' : '🔒 not yet'}</small></button>`;
-          }
-        }
-        b.innerHTML = `<p class="note">Your side of the county road has <b>${buyablePlots(F).length} lots</b>, each about 2.5 acres. The land across the road is not for sale. You own <b>${own}</b> of them (${fmt1(own * PLOT_ACRES)} acres). You can buy any lot that touches land you already own.</p>
-          <div style="display:flex;gap:10px;flex-wrap:wrap;justify-content:center;font-size:12px;font-weight:700;margin:4px 0 6px"><span><i style="display:inline-block;width:12px;height:12px;border-radius:3px;background:#cfe8b4;border:2px solid #6aa04a;vertical-align:-2px"></i> Yours</span><span><i style="display:inline-block;width:12px;height:12px;border-radius:3px;background:#ffe9a8;border:2px solid #d6a21f;vertical-align:-2px"></i> For sale</span><span><i style="display:inline-block;width:12px;height:12px;border-radius:3px;background:#e6e1d4;border:2px dashed #cfc7b3;vertical-align:-2px"></i> Not yet: buy a lot beside it first</span></div>
-          <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:5px;max-width:420px;margin:6px auto 4px"><div style="grid-column:1/-1;text-align:center;font-size:11px;font-weight:800;color:#8a7a5a">NORTH ▲</div>${grid}</div>
-          <p class="note" style="text-align:center">${sale.length ? `${sale.length} lot${sale.length === 1 ? '' : 's'} for sale, from ${money(cheapest)}. Lots further from the house cost a little more. Every lot adds $350 a year in property tax.` : own >= buyablePlots(F).length ? 'You own every lot on your side of the road. Past it, you can buy whole tracts below.' : 'Nothing for sale beside your land right now.'}</p>`;
-        { const H = HOLD.panel(F, cash, () => self.town('land', opts)); b.insertAdjacentHTML('beforeend', `<div id="holdBox">${H.html}</div>`); H.wire($('holdBox')); }
-        b.querySelectorAll('[data-plot]').forEach((c) => { c.onclick = () => { const p = +c.dataset.plot, price = plotPrice(F, p); if (F.money < price) return UI.toast('Not enough money.', true); UI.confirm(`Buy ${plotName(p)}?`, `${plotWhere(p)}. ${money(price)} for about 2.5 more acres. The fence line moves out to take it in, and property tax goes up $350 a year.`, () => { F.money -= price; F.stats.spent += price; F.owned[p] = 1; G.view.rebuildTerrain(); G.view.dirtyAll(); G.view.rebuildColliders(); AUDIO.fanfare(); UI.toast(`${plotName(p)} is yours! The fence line moves out for you. 🗺️`); checkGoalsToast(); self.town('land', opts); }); }; });
+        LANDUI.render(b, F, cash, () => self.town('land', opts));
       } else if (t === 'merc') {
         const spare = fenceSellValue(F);
         const toolCards = (care) => Object.entries(TOOL_SHOP).filter(([, T]) => !!T.care === care).map(([k, T]) => { const has = ownsTool(F, k); return `<button class="card" data-tool="${k}"><span class="ic">${T.icon}</span><b>${T.name}</b><small>${has ? (care ? 'In your barn' : 'In your shed') : esc(T.note)}</small><span class="pr">${has ? '✓' : money(T.price)}</span></button>`; }).join('');
@@ -17189,7 +17677,8 @@ function nGates(p) { return (p.gates || []).length; }
 // inside a paddock) is a paddock, its outline traced back off the grid. These paddocks follow their fences: change the
 // fences and they're re-traced, or go when they're no longer closed in.
 const ENCLOSE = {
-  S: 0.25,
+  // the grid fences are laid on: fine on a homestead farm, coarser as the farm grows (so it stays about 400 cells a side)
+  get S() { return TIER === 0 ? 0.25 : TIER === 1 ? 0.5 : 1; },
   grid(F) {
     const S = this.S, half = FARM_HALF + 1, N = Math.ceil(half * 2 / S), wall = new Uint8Array(N * N);
     for (let j = 0; j < N; j++) for (let i = 0; i < N; i++) { const x = -half + (i + 0.5) * S, z = -half + (j + 0.5) * S; if (!ownedAt(F, x, z)) wall[j * N + i] = 1; }
@@ -17331,7 +17820,7 @@ const MAP = {
   // fit the land you own (plus a margin) on screen
   fit() {
     const F = G.F; let x0 = 99, x1 = -99, z0 = 99, z1 = -99;
-    const show = ownedCount(F) <= 3 ? [].concat(F.owned.map((v, p) => (v ? p : -1)).filter((p) => p >= 0), plotsForSale(F)) : F.owned.map((v, p) => (v ? p : -1)).filter((p) => p >= 0);   // a small farm is shown with the lots beside it, so you can see what's for sale
+    const mine = F.owned.map((v, p) => (v && p < nPhys() ? p : -1)).filter((p) => p >= 0), show = ownedCount(F) <= 3 ? mine.concat(plotsForSale(F).filter((p) => p < nPhys())) : mine;   // a small farm is shown with the lots beside it, so you can see what's for sale
     for (const p of show) { const r = plotRect(p); x0 = Math.min(x0, r[0]); x1 = Math.max(x1, r[1]); z0 = Math.min(z0, r[2]); z1 = Math.max(z1, r[3]); }
     const pad = 3, top = this.W < 600 ? 110 : 62, bot = this.W < 600 ? 120 : 84;
     this.cx = (x0 + x1) / 2; this.cz = (z0 + z1) / 2;
@@ -17372,9 +17861,9 @@ const MAP = {
       this['base_' + layer] = c;
     }
     // the countryside around, coarser
-    const FN = 80, fc = img(FN), fg = fc.getContext('2d'), fid = fg.createImageData(FN, FN);
+    const FN = Math.ceil(WORLD_R / 2), fc = img(FN), fg = fc.getContext('2d'), fid = fg.createImageData(FN, FN);
     for (let j = 0; j < FN; j++) for (let i = 0; i < FN; i++) {
-      const x = -160 + (i + 0.5) * 4, z = -160 + (j + 0.5) * 4, col = T.farCol(x, z, dry), k = (j * FN + i) * 4;
+      const x = -FN * 2 + (i + 0.5) * 4, z = -FN * 2 + (j + 0.5) * 4, col = T.farCol(x, z, dry), k = (j * FN + i) * 4;
       const sh = 0.9 + 0.12 * (fbm(x * 0.02, z * 0.02, 7, 2) - 0.5);
       fid.data[k] = col[0] * sh; fid.data[k + 1] = col[1] * sh; fid.data[k + 2] = col[2] * sh; fid.data[k + 3] = 255;
     }
@@ -17429,12 +17918,12 @@ const MAP = {
     // world transform
     g.setTransform(d * s, 0, 0, d * s, d * (this.W / 2 - this.cx * s), d * (this.H / 2 - this.cz * s));
     g.imageSmoothingEnabled = true;
-    g.globalAlpha = 0.75; g.drawImage(this.farImg, -160, -160, 320, 320); g.globalAlpha = 1;
+    g.globalAlpha = 0.75; g.drawImage(this.farImg, -this.farImg.width * 2, -this.farImg.width * 2, this.farImg.width * 4, this.farImg.width * 4); g.globalAlpha = 1;
     g.drawImage(this['base_' + this.layer], -THALF, -THALF, TN, TN);
     const px = 1 / s;   // one screen pixel in world units
     // land you don't own yet: a golden wash and dashed edge on what you could buy, a dark wash on what isn't for sale yet
     { const sale = plotsForSale(F);
-      for (let p = 0; p < NPLOTS; p++) {
+      for (let p = 0; p < nPhys(); p++) {
         if (F.owned[p]) continue;
         const r = plotRect(p), fs = sale.includes(p);
         g.fillStyle = fs ? 'rgba(240, 196, 70, 0.16)' : 'rgba(40, 32, 20, 0.32)'; g.fillRect(r[0], r[2], r[1] - r[0], r[3] - r[2]);
@@ -17529,11 +18018,11 @@ const MAP = {
     g.setTransform(d, 0, 0, d, 0, 0);
     g.textAlign = 'center'; g.textBaseline = 'middle';
     const forSale = plotsForSale(F);
-    for (let p = 0; p < NPLOTS; p++) {
+    for (let p = 0; p < nPhys(); p++) {
       if (F.owned[p]) continue;
       const r = plotRect(p), [sx, sy] = this.toS((r[0] + r[1]) / 2, (r[2] + r[3]) / 2);
       if (sy < 78 || sy > this.H - 110 || sx < 60 || sx > this.W - 60 || this.mode !== 'view') continue;
-      const adj = forSale.includes(p), small = PLOT * s < 120, pr = plotPrice(F, p);
+      const adj = forSale.includes(p), small = (r[1] - r[0]) * s < 120, pr = plotPrice(F, p);
       if (!adj) continue;   // lots that aren't for sale yet stay quiet: the darker wash says enough
       this.label(g, sx, sy, small ? plotName(p).replace('Lot ', '') : plotName(p), adj ? (small ? (F.kid ? 'for sale' : '$' + Math.round(pr / 1000) + 'k') : `For sale · ${F.kid ? '' : money(pr)}`) : (small ? '🔒' : 'Not for sale yet'), adj ? 'rgba(255, 240, 190, 0.94)' : 'rgba(255, 248, 230, 0.72)');
     }
@@ -17935,7 +18424,7 @@ const MAP = {
   },
   bar() {
     const B = $('mapBar'), F = G.F;
-    $('mapSub').textContent = `${F.name} · ${ownedCount(F) * PLOT_ACRES} acres · ${F.paddocks.length} paddock${F.paddocks.length === 1 ? '' : 's'}`;
+    $('mapSub').textContent = `${F.name} · ${Math.round(ownedAcres(F)).toLocaleString()} acres · ${F.paddocks.length} paddock${F.paddocks.length === 1 ? '' : 's'}`;
     const stock = Object.keys(FENCES).filter((k) => fenceStock(F, k) > 0.05).map((k) => `${FENCE_ICON[k]} ${meters(fenceStock(F, k))} m`).join(' · ');
     if (this.mode === 'view') {
       B.innerHTML = `<div class="mrow"><span class="mhint">Tap a fence or building to change it.${stock ? ` <small>In stock: ${stock}${F.inv.gate ? ` · 🚪 ${F.inv.gate}` : ''}</small>` : ''}</span></div><div class="mrow mbtns"><button class="btn" id="mapSwale">〰️ Swale</button><button class="btn" id="mapPond">💧 Pond</button><button class="btn go" id="mapNew">${ICO.fence} New fence</button></div>`;
@@ -19747,7 +20236,7 @@ function drawTownLabels(ctx, Fr, w, h, dpr) {
 const UNLOCKED_CASH = 10000000;
 function applyUnlocked(F) {
   F.unlocked = true;
-  F.owned = F.owned.map(() => 1);
+  F.owned = F.owned.map((v, p) => (p < NHOME ? 1 : v));
   F.money = UNLOCKED_CASH; F.energy = 100;
   return F;
 }
@@ -19916,7 +20405,7 @@ function homesiteProblem(F, x, z) {
 }
 function drawHomesite(cv, F, house, why, opts) {
   opts = opts || {};
-  const T = F.terrain, own = []; for (let p = 0; p < NPLOTS; p++) if (F.owned[p]) own.push(plotRect(p));
+  const T = F.terrain, own = []; for (let p = 0; p < nPhys(); p++) if (F.owned[p]) own.push(plotRect(p));
   const rz = roadZ(F);
   let x0 = Math.min(...own.map((r) => r[0])) - 4, x1 = Math.max(...own.map((r) => r[1])) + 4, z0 = Math.min(...own.map((r) => r[2])) - 4, z1 = Math.max(Math.max(...own.map((r) => r[3])), rz + ROAD_W) + 4;
   if (opts.view) ({ x0, x1, z0, z1 } = opts.view);
@@ -19940,14 +20429,14 @@ function drawHomesite(cv, F, house, why, opts) {
   g.imageSmoothingEnabled = true; g.drawImage(small, X(cx0 - THALF), Z(cz0 - THALF), cw * s, ch * s);
   // contours in a single path
   g.strokeStyle = 'rgba(110, 58, 22, 0.55)'; g.lineWidth = Math.max(1, W / 600); g.beginPath();
-  const iv = 0.4;
-  for (let z = z0; z < z1; z += 0.5) for (let x = x0; x < x1; x += 0.5) {
-    const h = [T.at(x, z), T.at(x + 0.5, z), T.at(x + 0.5, z + 0.5), T.at(x, z + 0.5)], lo = Math.min(...h), hi = Math.max(...h);
-    for (let lv = Math.ceil(lo / iv) * iv; lv < hi; lv += iv) { const P = [[x, z], [x + 0.5, z], [x + 0.5, z + 0.5], [x, z + 0.5]], cr = []; for (let e2 = 0; e2 < 4; e2++) { const a = h[e2] - lv, b = h[(e2 + 1) % 4] - lv; if ((a < 0) !== (b < 0)) { const t = a / (a - b); cr.push([lerp(P[e2][0], P[(e2 + 1) % 4][0], t), lerp(P[e2][1], P[(e2 + 1) % 4][1], t)]); } } if (cr.length >= 2) { g.moveTo(X(cr[0][0]), Z(cr[0][1])); g.lineTo(X(cr[1][0]), Z(cr[1][1])); } }
+  const iv = (x1 - x0) > 150 ? 1.2 : 0.4, cs = Math.max(0.5, Math.round((x1 - x0) / 220 * 2) / 2);
+  for (let z = z0; z < z1; z += cs) for (let x = x0; x < x1; x += cs) {
+    const h = [T.at(x, z), T.at(x + cs, z), T.at(x + cs, z + cs), T.at(x, z + cs)], lo = Math.min(...h), hi = Math.max(...h);
+    for (let lv = Math.ceil(lo / iv) * iv; lv < hi; lv += iv) { const P = [[x, z], [x + cs, z], [x + cs, z + cs], [x, z + cs]], cr = []; for (let e2 = 0; e2 < 4; e2++) { const a = h[e2] - lv, b = h[(e2 + 1) % 4] - lv; if ((a < 0) !== (b < 0)) { const t = a / (a - b); cr.push([lerp(P[e2][0], P[(e2 + 1) % 4][0], t), lerp(P[e2][1], P[(e2 + 1) % 4][1], t)]); } } if (cr.length >= 2) { g.moveTo(X(cr[0][0]), Z(cr[0][1])); g.lineTo(X(cr[1][0]), Z(cr[1][1])); } }
   }
   g.stroke();
   // land you don't own, road, pond, barn
-  for (let p = 0; p < NPLOTS; p++) if (!F.owned[p]) { const r = plotRect(p); g.fillStyle = 'rgba(60,45,25,0.35)'; g.fillRect(X(r[0]), Z(r[2]), (r[1] - r[0]) * s, (r[3] - r[2]) * s); }
+  for (let p = 0; p < nPhys(); p++) if (!F.owned[p]) { const r = plotRect(p); g.fillStyle = 'rgba(60,45,25,0.35)'; g.fillRect(X(r[0]), Z(r[2]), (r[1] - r[0]) * s, (r[3] - r[2]) * s); }
   g.fillStyle = '#8f6d49'; g.fillRect(0, Z(rz), W, ROAD_W * s); g.fillStyle = 'rgba(70,48,30,0.28)'; g.fillRect(0, Z(rz + 0.5), W, 0.55 * s); g.fillRect(0, Z(rz + 1.95), W, 0.55 * s);
   for (const p of F.ponds) { g.fillStyle = '#5a9fd6'; g.beginPath(); g.ellipse(X(p.x), Z(p.z), p.rx * s, p.rz * s, 0, 0, 6.3); g.fill(); }
   if (F.creek) { g.strokeStyle = '#4a8fd0'; g.lineWidth = 3; g.beginPath(); for (let x = x0; x <= x1; x += 1) { const z = T.creekZ(x); if (x === x0) g.moveTo(X(x), Z(z)); else g.lineTo(X(x), Z(z)); } g.stroke(); }
