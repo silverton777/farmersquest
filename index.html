@@ -10,6 +10,13 @@ Publishing: copy `index.html` and `sw.js` into the GitHub repo `silverton777/far
 
 ==========
 
+## 1.5.3: neighbour chats answer where you can see them; round bales stop hogging the tap
+
+**Why:** "when you click to chat with neighbors nothing happens when you click on the questions" and "the roll out hay bale is too sensitive. it's not letting me click on my mailbox or garden beds".
+
+- Talking to a neighbour: the questions now sit right under what they say (above the things they sell and buy). Tapping one shows your question as your own speech bubble with their answer under it, and the panel scrolls to it. Before, the answer replaced the greeting at the top of a long panel, out of sight, so tapping seemed to do nothing.
+- "Unroll a round bale" is now an open-ground action: the mailbox, a garden bed, a hive, a tree, a gate or anything else you're standing at wins the tap first. The paddock's own card works the same way. The area round the barnyard where free-roaming animals can be fed by unrolling a bale is a little smaller.
+
 ## 1.5.2: free land in kid mode
 
 **Why:** "be able to buy land in kid mode - won't let you. just make it free like everything else."
@@ -294,6 +301,8 @@ FQ-CHANGELOG-END -->
   #cineHint { position: absolute; right: 16px; bottom: calc(9vh + 10px); color: #f6e8c8; font: 800 12px "FQ Nunito", system-ui, sans-serif; opacity: .8; }
   .row.reply { border: 2px solid #d9c49a; background: #fffdf5; border-radius: 16px 16px 16px 4px; } .row.reply:active { background: #eef7e2; border-color: var(--leaf); }
   .note.speech { background: #fff; border: 2px solid #e4d4b0; border-radius: 16px 16px 16px 4px; padding: 10px 12px; color: var(--ink); }
+  .note.speech.mine { background: #eef7e2; border-color: #b9d79c; border-radius: 16px 16px 4px 16px; margin-left: 18%; font-style: normal; }
+  .note.speech.fresh { animation: speechIn .35s ease-out; } @keyframes speechIn { from { transform: translateY(6px) scale(.97); opacity: .3; } to { transform: none; opacity: 1; } }
   .swatches { display: grid; grid-template-columns: repeat(auto-fill, minmax(42px, 1fr)); gap: 8px; }
   .sw2 { aspect-ratio: 1; border-radius: 12px; border: 3px solid #fffaf0; box-shadow: 0 0 0 1.5px #c9b58e; cursor: pointer; position: relative; display: grid; place-items: center; font-weight: 900; color: #7a6446; background: #fffdf5; }
   .sw2.on { box-shadow: 0 0 0 3px var(--leaf); } .sw2.any input { position: absolute; inset: 0; opacity: 0; width: 100%; height: 100%; cursor: pointer; }
@@ -8485,21 +8494,26 @@ const NEIGHBORS = {
     const nid = 'nb_' + P.key, bday = FRIENDS.isBirthday(F, nid);
     if (bday && !first) greet = 'Well, look who it is, on my birthday of all days!';
     const D = UI.open({ title: P.who, sub: `${NB_STYLE_NAME[P.style]} · the ${P.family} place`, icon: '🙂', foot: true });
-    const draw = () => {
+    const QS = { job: 'What are you working on right now?', adv: 'Any advice for my farm?', tip: `How do you farm here?` };
+    let asked = null;
+    const draw = (fresh) => {
       const sells = P.sells.filter(([k]) => ITEMS[k]), buys = P.buys.filter((k) => ITEMS[k]);
-      D.body.innerHTML = `<p class="note speech">“${esc(greet)}”</p>`
-        + (sells.length ? `<div class="grp">From their farm</div>` + UI.rows(sells.map(([k, pr]) => ({ id: 'b:' + k, tap: true, icon: ITEMS[k].icon, text: ITEMS[k].name, small: `you have ${fmt1(F.inv[k] || 0)}`, right: F.kid ? 'Get 1' : money(pr) }))) : '')
-        + (buys.length ? `<div class="grp">They'd buy</div>` + UI.rows(buys.map((k) => { const have = F.inv[k] || 0, pr = Math.round((ITEMS[k].price || ITEMS[k].buy || 10) * 1.15); return { id: 's:' + k, tap: have >= 1, icon: ITEMS[k].icon, text: ITEMS[k].name, small: have >= 1 ? `you have ${fmt1(have)} · tap to sell one` : 'you have none', right: F.kid ? '' : money(pr), cls: have >= 1 ? '' : 'dim' }; })) : '')
+      D.body.innerHTML = (asked ? `<p class="note speech mine">“${esc(asked)}”</p>` : '') + `<p class="note speech${fresh ? ' fresh' : ''}" id="nbSay">“${esc(greet)}”</p>`
         + (bday ? `<p class="note">🎂 It is their birthday today. A gift they love counts four times over.</p>` : '')
-        + `<div class="grp">Ask about</div>` + UI.rows([TALK.row(F, nid), { id: 'gift', tap: !FRIENDS.giftedToday(F, nid) && FRIENDS.giftable(F).length > 0, cls: !FRIENDS.giftedToday(F, nid) && FRIENDS.giftable(F).length > 0 ? '' : 'dim', icon: '🎁', text: 'Give a gift', small: FRIENDS.giftedToday(F, nid) ? 'You already gave them something today' : 'Something from your farm they might like' }, { id: 'job', tap: true, icon: '🗓️', text: 'What are you working on right now?' }, { id: 'adv', tap: true, icon: '💡', text: 'Any advice for my farm?' }, { id: 'tip', tap: true, icon: '🌱', text: `How they farm (${NB_STYLE_NAME[P.style].toLowerCase()})` }]);
+        + `<div class="grp">Ask about</div>` + UI.rows([TALK.row(F, nid), { id: 'gift', tap: !FRIENDS.giftedToday(F, nid) && FRIENDS.giftable(F).length > 0, cls: !FRIENDS.giftedToday(F, nid) && FRIENDS.giftable(F).length > 0 ? '' : 'dim', icon: '🎁', text: 'Give a gift', small: FRIENDS.giftedToday(F, nid) ? 'You already gave them something today' : 'Something from your farm they might like' }, { id: 'job', tap: true, icon: '🗓️', text: QS.job }, { id: 'adv', tap: true, icon: '💡', text: QS.adv }, { id: 'tip', tap: true, icon: '🌱', text: `How they farm (${NB_STYLE_NAME[P.style].toLowerCase()})` }])
+        + (sells.length ? `<div class="grp">From their farm</div>` + UI.rows(sells.map(([k, pr]) => ({ id: 'b:' + k, tap: true, icon: ITEMS[k].icon, text: ITEMS[k].name, small: `you have ${fmt1(F.inv[k] || 0)}`, right: F.kid ? 'Get 1' : money(pr) }))) : '')
+        + (buys.length ? `<div class="grp">They'd buy</div>` + UI.rows(buys.map((k) => { const have = F.inv[k] || 0, pr = Math.round((ITEMS[k].price || ITEMS[k].buy || 10) * 1.15); return { id: 's:' + k, tap: have >= 1, icon: ITEMS[k].icon, text: ITEMS[k].name, small: have >= 1 ? `you have ${fmt1(have)} · tap to sell one` : 'you have none', right: F.kid ? '' : money(pr), cls: have >= 1 ? '' : 'dim' }; })) : '');
+      // an answer always comes in where you can see it, even if you'd scrolled down to the questions
+      if (fresh) { const say = $('nbSay'); if (say && say.scrollIntoView) say.scrollIntoView({ block: 'nearest', behavior: 'smooth' }); }
       D.body.querySelectorAll('.row.tap').forEach((r) => {
         r.onclick = () => {
           const [t, k] = r.dataset.id.split(':');
           if (t === 'chat') { TALK.open(nid, () => self.talk(n)); return; }
           if (t === 'gift') { FRIENDS.giftMenu(nid, () => self.talk(n)); return; }
-          if (t === 'tip') { greet = P.lines[Math.floor(Math.random() * P.lines.length)]; draw(); return; }
-          if (t === 'job') { greet = NBV.job(P, F); NBV.befriend(F, P, 0.1); draw(); return; }
-          if (t === 'adv') { greet = NBV.advice(P, F); NBV.befriend(F, P, 0.15); draw(); return; }
+          const ask = (q, line) => { asked = q; let g = line; for (let i = 0; i < 4 && g === greet; i++) g = t === 'tip' ? P.lines[Math.floor(Math.random() * P.lines.length)] : line; greet = g; AUDIO.ding(); draw(true); };
+          if (t === 'tip') { ask(QS.tip, P.lines[Math.floor(Math.random() * P.lines.length)]); return; }
+          if (t === 'job') { ask(QS.job, NBV.job(P, F)); NBV.befriend(F, P, 0.1); return; }
+          if (t === 'adv') { ask(QS.adv, NBV.advice(P, F)); NBV.befriend(F, P, 0.15); return; }
           if (t === 'b') { const pr = P.sells.find((q) => q[0] === k)[1]; if (!F.kid && F.money < pr) return UI.toast('Not enough money.', true); if (!F.kid) { F.money -= pr; F.stats.spent += pr; } F.inv[k] = (F.inv[k] || 0) + 1; AUDIO.ding(); UI.hudTick(0, true); UI.toast(`+1 ${ITEMS[k].name.toLowerCase()}`); }
           if (t === 's') { if (!(F.inv[k] >= 1)) return; const pr = Math.round((ITEMS[k].price || ITEMS[k].buy || 10) * 1.15); F.inv[k] -= 1; F.money += pr; F.stats.income += pr; F.stats.yearIncome += pr; AUDIO.cash(); UI.hudTick(0, true); F.friends['nb_' + P.key] = Math.min(10, (F.friends['nb_' + P.key] || 0) + 0.25); }
           draw();
@@ -16348,7 +16362,7 @@ function interiorFrame(F0, room) {
 
 'use strict';
 // ============================================================================ profiles + saves (each profile has its own farm save)
-const FQ_VERSION = '1.5.2';
+const FQ_VERSION = '1.5.3';
 const LOOKS = [
   { shirt: [214, 74, 64], hair: [120, 76, 40] }, { shirt: [70, 130, 200], hair: [236, 206, 120] }, { shirt: [240, 170, 60], hair: [80, 50, 30] },
   { shirt: [120, 170, 90], hair: [40, 30, 28] }, { shirt: [170, 100, 190], hair: [200, 110, 60] }, { shirt: [60, 160, 160], hair: [150, 100, 60] },
@@ -21272,7 +21286,7 @@ function findTarget() {
     if (tool === 'hand' && choreFeed) push(0.2, { label: `Feed hay in ${p.name}`, icon: '🌾', fn: () => act('feed', 1.2, 20, 4, () => { F.today['fed_' + key] = true; doneChore('Hay fed'); }), ring: [cx, cz] });
     else if (tool === 'hand' && pigs && mustOpen('fedPigs')) push(0.2, { label: 'Feed the pigs', icon: '🐖', fn: () => act('feed', 1.2, 15, 3, () => { F.today.fedPigs = true; doneChore('Pigs fed'); }), ring: [cx, cz] });
     else if (tool === 'can' && choreWater) push(0.2, { label: `Carry water to ${p.name}`, icon: '💧', fn: () => act('water', 1.6, 25, 6, () => { F.today['water_' + key] = true; doneChore('Water delivered'); }), ring: [cx, cz] });
-    else if (tool === 'hand') push(2.5, { label: `${p.name} · ${grassWord(F, p)}`, icon: ICO.fence, fn: () => UI.paddockCard(p), ring: [cx, cz] });
+    else if (tool === 'hand') push(2.5, { label: `${p.name} · ${grassWord(F, p)}`, icon: ICO.fence, fn: () => UI.paddockCard(p), ring: [cx, cz], soft: true });
   }
   // barnyard/coop animals without paddocks: feed near the barn
   const yardChore = (F.chores || []).find((c) => c.act === 'feed' && c.gkey && !c.gkey.startsWith('p') && !choreDone(F, c));
@@ -21285,7 +21299,7 @@ function findTarget() {
     // square bales come from the hay stacked against the side of the barn
     const hb = F.objs.find((o) => o.t === 'barn'), hk = hb ? (hb.sc || 1) : 1, hs = hb ? [hb.x + Math.cos(hb.r || 0) * 4.0 * hk, hb.z - Math.sin(hb.r || 0) * 4.0 * hk] : null, atBarn = hs && near(hs[0], hs[1], 2.6);
     const pad = F.paddocks.find((p) => inPad(p, Fm.x, Fm.z)), padKey = pad ? 'p' + pad.id : null;
-    const [yx, yz] = HAYFEED.yardPt(F), inYard = !pad && Math.hypot(Fm.x - yx, Fm.z - yz) < 12;
+    const [yx, yz] = HAYFEED.yardPt(F), inYard = !pad && Math.hypot(Fm.x - yx, Fm.z - yz) < 9;
     const grazersHere = pad ? F.animals.some((a) => a.pad === pad.id && !a.barn && GRAZERS.has(a.sp)) : inYard && F.animals.some((a) => !a.pad && !a.barn && GRAZERS.has(a.sp));
     const fedNote = () => { if (padKey) F.today['fed_' + padKey] = true; else for (const g of animalGroups(F)) if (!g.pad && !g.barn && g.list.some((a) => GRAZERS.has(a.sp))) F.today['fed_' + g.key] = true; UI.choresBadge && UI.choresBadge(); };
     if (G.baleCarry && Fm.carry === 'hay') {
@@ -21297,7 +21311,7 @@ function findTarget() {
       }) });
     } else if (tool === 'hand' && !Fm.carry) {
       if (atBarn && (F.inv.sqbale || 0) >= 1) push(0.5, { label: `Pick up a square bale (${Math.floor(F.inv.sqbale)} in the barn)`, icon: '🟨', fn: () => { Fm.carry = 'hay'; G.baleCarry = true; UI.toast('Carry it out and set it down where you want the animals to eat.'); } });
-      if (grazersHere && (F.inv.hay || 0) >= 1 && ownedAt(F, Fm.x, Fm.z)) push(1.6, { label: `Unroll a round bale this way (${Math.floor(F.inv.hay)} left)`, icon: '🌾', fn: () => {
+      if (grazersHere && (F.inv.hay || 0) >= 1 && ownedAt(F, Fm.x, Fm.z)) push(1.6, { soft: true, label: `Unroll a round bale this way (${Math.floor(F.inv.hay)} left)`, icon: '🌾', fn: () => {
         if (!HAYFEED.unroll(F, Fm.x, Fm.z, Fm.yaw, true)) return UI.toast('Not enough open ground that way to unroll a bale. Face down the pasture and try again.', true);
         act('feed', 2.4, 25, 6, () => { const o = HAYFEED.unroll(F, Fm.x, Fm.z, Fm.yaw); if (!o) return; F.inv.hay = Math.max(0, (F.inv.hay || 0) - 1); fedNote(); G.view.dirtyAt(o.x, o.z, o.len / 2 + 2); UI.toast(`🌾 Unrolled ${Math.round(o.len * 5)} m of hay. What they trample feeds the soil too.`); });
       } });
@@ -21358,6 +21372,9 @@ function findTarget() {
     c.score += (1 - (dx * fwx + dz * fwz) / d) * 0.8 * Math.min(1, d);
   }
   cands.sort((a, b) => a.score - b.score);
+  // open-ground actions (unrolling a round bale, the paddock's own card) only win when nothing you're standing at wants the tap:
+  // the mailbox, a garden bed, a hive, a tree, a gate or anything else close by comes first
+  if (cands[0] && cands[0].soft) { const alt = cands.find((c) => !c.soft && c.score < 5); if (alt) return alt; }
   return cands[0];
 }
 function mustOpen(flag) { return (G.F.chores || []).some((c) => !choreDone(G.F, c) && c.check.toString().includes(flag)); }

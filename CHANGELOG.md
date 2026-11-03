@@ -8,6 +8,13 @@ Publishing: copy `index.html` and `sw.js` into the GitHub repo `silverton777/far
 
 ---
 
+## 1.5.3: neighbour chats answer where you can see them; round bales stop hogging the tap
+
+**Why:** "when you click to chat with neighbors nothing happens when you click on the questions" and "the roll out hay bale is too sensitive. it's not letting me click on my mailbox or garden beds".
+
+- Talking to a neighbour: the questions now sit right under what they say (above the things they sell and buy). Tapping one shows your question as your own speech bubble with their answer under it, and the panel scrolls to it. Before, the answer replaced the greeting at the top of a long panel, out of sight, so tapping seemed to do nothing.
+- "Unroll a round bale" is now an open-ground action: the mailbox, a garden bed, a hive, a tree, a gate or anything else you're standing at wins the tap first. The paddock's own card works the same way. The area round the barnyard where free-roaming animals can be fed by unrolling a bale is a little smaller.
+
 ## 1.5.2: free land in kid mode
 
 **Why:** "be able to buy land in kid mode - won't let you. just make it free like everything else."
