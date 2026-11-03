@@ -15758,7 +15758,7 @@ function interiorFrame(F0, room) {
 
 'use strict';
 // ============================================================================ profiles + saves (each profile has its own farm save)
-const FQ_VERSION = '1.4.2';
+const FQ_VERSION = '1.4.3';
 const LOOKS = [
   { shirt: [214, 74, 64], hair: [120, 76, 40] }, { shirt: [70, 130, 200], hair: [236, 206, 120] }, { shirt: [240, 170, 60], hair: [80, 50, 30] },
   { shirt: [120, 170, 90], hair: [40, 30, 28] }, { shirt: [170, 100, 190], hair: [200, 110, 60] }, { shirt: [60, 160, 160], hair: [150, 100, 60] },
@@ -18485,9 +18485,9 @@ function buildFarmDog(B, c, cc) {
   // ---- head, from the top of the neck: skull, stop, muzzle, nose. [z, y, across, up, down, part]
   const hz = (z) => (z > 0.086 ? 0.086 + (z - 0.086) * mz : z);
   const H = [
-    [-0.058, 0.03, 0.03, 0.03, 0.03, 'head'], [-0.04, 0.036, 0.06, 0.06, 0.056, 'head'], [-0.006, 0.04, 0.077 * (0.95 + 0.05 * bk), 0.07, 0.064, 'head'],
-    [0.03, 0.04, 0.077 * (0.95 + 0.05 * bk), 0.066, 0.062, 'head'], [0.062, 0.03, 0.068, 0.054, 0.058, 'head'], [0.086, 0.012, 0.054, 0.038, 0.051, 'muzzle'],
-    [0.108, 0.004, 0.048, 0.034, 0.045, 'muzzle'], [0.13, -0.001, 0.044, 0.031, 0.041, 'muzzle'], [0.15, -0.003, 0.038, 0.028, 0.035, 'muzzle'], [0.162, -0.001, 0.021, 0.016, 0.02, 'muzzle'],
+    [-0.058, 0.03, 0.036, 0.03, 0.03, 'head'], [-0.04, 0.036, 0.075, 0.06, 0.058, 'head'], [-0.006, 0.04, 0.1 * (0.95 + 0.05 * bk), 0.07, 0.068, 'head'],
+    [0.03, 0.038, 0.101 * (0.95 + 0.05 * bk), 0.066, 0.068, 'head'], [0.062, 0.028, 0.088, 0.054, 0.062, 'head'], [0.086, 0.012, 0.068, 0.038, 0.054, 'muzzle'],
+    [0.108, 0.004, 0.061, 0.034, 0.048, 'muzzle'], [0.13, -0.001, 0.056, 0.031, 0.043, 'muzzle'], [0.15, -0.003, 0.048, 0.028, 0.036, 'muzzle'], [0.162, -0.001, 0.026, 0.016, 0.02, 'muzzle'],
   ];
   const hr = H.map((t) => ({ c: [0, t[1] * hb, hz(t[0]) * hb], rx: t[2] * hb, ry: t[3] * hb, ry2: t[4] * hb, part: t[5] }));
   m = new MB(); m.mat = MAT.hide;
@@ -18500,11 +18500,11 @@ function buildFarmDog(B, c, cc) {
   const blue = C[5], iris = blue ? [124, 170, 210] : [70, 44, 26], er = hr[4];
   for (const sx of [-1, 1]) {
     // on the face itself, just above the stop: a point on the head's own surface between the brow and the stop rings
-    const st = hr[5], t = 0.55, rx = lerp(er.rx, st.rx, t), cy = lerp(er.c[1], st.c[1], t), ry = lerp(er.ry, st.ry, t), cz = lerp(er.c[2], st.c[2], t);
-    const ex = sx * rx * 0.64 * 1.02, ey = cy + ry * 0.77 * 1.02, ez = cz;
-    m.ell(ex, ey, ez, 0.02 * hb, 0.016 * hb, 0.012 * hb, [26, 18, 14], { lat: 5, lon: 8 });   // almond-shaped, dark-rimmed
-    m.ell(ex + sx * 0.002, ey + 0.001, ez + 0.007 * hb, 0.012 * hb, 0.0115 * hb, 0.006 * hb, iris, { lat: 4, lon: 6 });
-    m.ell(ex, ey + 0.005 * hb, ez + 0.011 * hb, 0.0042 * hb, 0.0042 * hb, 0.003, [255, 255, 255], { lat: 3, lon: 4 });
+    const st = hr[5], t = 0.62, rx = lerp(er.rx, st.rx, t), cy = lerp(er.c[1], st.c[1], t), ry = lerp(er.ry, st.ry, t), cz = lerp(er.c[2], st.c[2], t);
+    const ex = sx * rx * 0.6 * 1.03, ey = cy + ry * 0.74 * 1.03, ez = cz + 0.004 * hb;
+    m.ell(ex, ey, ez, 0.025 * hb, 0.019 * hb, 0.013 * hb, [26, 18, 14], { lat: 5, lon: 8 });   // almond-shaped, dark-rimmed
+    m.ell(ex + sx * 0.002, ey + 0.001, ez + 0.008 * hb, 0.015 * hb, 0.014 * hb, 0.0065 * hb, iris, { lat: 4, lon: 6 });
+    m.ell(ex + sx * 0.003, ey + 0.006 * hb, ez + 0.012 * hb, 0.005 * hb, 0.005 * hb, 0.003, [255, 255, 255], { lat: 3, lon: 4 });
     if (B.eyeRing === sx) m.ell(ex, ey + 0.001, ez - 0.003, 0.026 * hb, 0.024 * hb, 0.011 * hb, [62, 54, 50], { lat: 5, lon: 10 });   // a faint dark ring round this eye
   }
   m.mat = MAT.hide;
