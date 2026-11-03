@@ -8,6 +8,13 @@ Publishing: copy `index.html` and `sw.js` into the GitHub repo `silverton777/far
 
 ---
 
+## 1.5.5: a wall calendar in the house
+
+**Why:** "put a calendar in the house you can view and have important dates on there like your friends birthdays, the festival dates, etc".
+
+- A calendar hangs on the right wall of the house, by the firewood. Tap it for a month grid (flip through the year) marking the birthdays of friends you have met, the four festivals and the County Fair, and a "Coming up" list of the next six dates.
+- Not done yet from the same request: interactive festivals (townspeople, games, prizes). The festivals today are still the original table-by-the-fountain version; see `FEST` and `townFest()`.
+
 ## 1.5.4: the map opens again; build with your farmer or on the map; Luna and Juneau for sale; journal goals reworked; $75,000 to start
 
 **Why:** "when opening the map the game freezes and map never loads", "when building or digging anything give a pop up that says select location with character or with map", "Luna and Juneau should not come standard, they should have to be purchased like other dogs. If an existing account has them it should not be taken away", the owner's list of journal changes (new water goals, harder goals at higher levels, new building goals after the barn and coop) and "try starting the game with 75k instead of 60k".

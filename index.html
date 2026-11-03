@@ -10,6 +10,13 @@ Publishing: copy `index.html` and `sw.js` into the GitHub repo `silverton777/far
 
 ==========
 
+## 1.5.5: a wall calendar in the house
+
+**Why:** "put a calendar in the house you can view and have important dates on there like your friends birthdays, the festival dates, etc".
+
+- A calendar hangs on the right wall of the house, by the firewood. Tap it for a month grid (flip through the year) marking the birthdays of friends you have met, the four festivals and the County Fair, and a "Coming up" list of the next six dates.
+- Not done yet from the same request: interactive festivals (townspeople, games, prizes). The festivals today are still the original table-by-the-fountain version; see `FEST` and `townFest()`.
+
 ## 1.5.4: the map opens again; build with your farmer or on the map; Luna and Juneau for sale; journal goals reworked; $75,000 to start
 
 **Why:** "when opening the map the game freezes and map never loads", "when building or digging anything give a pop up that says select location with character or with map", "Luna and Juneau should not come standard, they should have to be purchased like other dogs. If an existing account has them it should not be taken away", the owner's list of journal changes (new water goals, harder goals at higher levels, new building goals after the barn and coop) and "try starting the game with 75k instead of 60k".
@@ -10750,6 +10757,45 @@ const FEST = {
   },
 };
 
+// ============================================================================ the wall calendar in the house
+// A month at a time: birthdays of the friends you have met, the four festivals and the County Fair, with what is coming next below.
+const CALENDAR = {
+  month: 0,
+  events(F, m) {
+    const ev = {}, add = (d, icon, text) => { (ev[d] = ev[d] || []).push({ icon, text }); };
+    FRIENDS.init(F);
+    for (const p of FRIENDS.people(F)) { const b = FR_BDAY[p.id]; if (b && b[0] === m && FRIENDS.met(F, p.id)) add(b[1], '🎂', `${p.name}'s birthday`); }
+    for (const f of FESTIVALS) if (f.month === m) for (let d = f.d0; d <= f.d1; d++) add(d, f.icon, f.name);
+    if (m === 8) for (let d = 20; d <= 22; d++) add(d, '🎪', 'County Fair');
+    return ev;
+  },
+  upcoming(F, n) {
+    const out = [], today = F.month * 30 + F.day;
+    for (let k = 0; k < 360 && out.length < n; k++) {
+      const t = (today + k) % 360, m = Math.floor((t - 1) / 30) % 12, d = ((t - 1) % 30) + 1, ev = (this.events(F, m)[d] || []);
+      for (const e of ev) if (!out.some((o) => o.text === e.text && k - o.k < 3)) out.push({ k, m, d, icon: e.icon, text: e.text });
+    }
+    return out;
+  },
+  open(m0) {
+    const F = G.F, self = this; if (m0 !== undefined) this.month = m0; else this.month = F.month;
+    const m = this.month, ev = this.events(F, m);
+    const D = UI.open({ title: 'Wall calendar', sub: `${MONTHS[m]} · Year ${F.year}`, icon: '📅', foot: true });
+    let cells = '';
+    for (let d = 1; d <= 30; d++) {
+      const e = ev[d] || [], today = m === F.month && d === F.day;
+      cells += `<div style="min-height:44px;padding:3px;border-radius:8px;background:${today ? '#ffe9a8' : '#fffaf0'};border:1px solid ${e.length ? '#d49a4a' : '#e6dcc4'};font-size:11px;text-align:left"><b>${d}</b>${isSundayDay(d) ? '' : ''}<div style="font-size:15px;line-height:1.1">${e.map((x) => x.icon).join('')}</div></div>`;
+    }
+    const up = this.upcoming(F, 6);
+    D.body.innerHTML = `<div style="display:grid;grid-template-columns:repeat(6,1fr);gap:4px">${cells}</div>`
+      + `<div class="grp">Coming up</div>` + UI.rows(up.map((u) => ({ icon: u.icon, text: u.text, small: u.k === 0 ? 'Today!' : `${MONTHS[u.m]} ${u.d} · in ${u.k} day${u.k === 1 ? '' : 's'}` })))
+      + `<p class="note">Birthdays appear once you have met someone. Every business is shut on Sundays (the 7th, 14th, 21st and 28th).</p>`;
+    D.foot.innerHTML = '<button class="btn" id="calPrev">◀</button><button class="btn go" id="calDone">Done</button><button class="btn" id="calNext">▶</button>';
+    $('calPrev').onclick = () => self.open((m + 11) % 12); $('calNext').onclick = () => self.open((m + 1) % 12); $('calDone').onclick = () => UI.closeAll();
+  },
+};
+const isSundayDay = (d) => d % 7 === 0;
+
 // ============================================================================ standing in town
 const STANDING = {
   score(F) {
@@ -15965,6 +16011,14 @@ function furnishHouse(mb, col, inter, F, lightW, x0, x1, z0, z1) {
   mb.mat = 0;
   rect(x1 - 0.32, fz, 0.3, 0.46);
   hfPicture(mb, x1, 1.45, wz, -Math.PI / 2, 0.8, 0.6, 'hills');
+  // a wall calendar by the firewood: tap it to see birthdays, festivals and the fair
+  mb.push(M4.trs(x1, 1.3, 2.35, -Math.PI / 2, 0, 0));
+  mb.mat = MAT.boards; mb.box(0, 0, 0.03, 0.46, 0.62, 0.03, HF.woodD); mb.mat = 0;
+  mb.box(0, 0.02, 0.05, 0.4, 0.56, 0.012, [250, 246, 232], { sharp: true });
+  mb.box(0, 0.4, 0.058, 0.4, 0.17, 0.012, [196, 62, 54], { sharp: true });
+  for (let r = 0; r < 4; r++) for (let c = 0; c < 5; c++) mb.box(-0.15 + c * 0.075, 0.04 + r * 0.085, 0.062, 0.05, 0.05, 0.006, (r * 5 + c) % 7 === 3 ? [232, 150, 70] : [214, 208, 190], { sharp: true });
+  mb.pop();
+  inter.push({ x: x1 - 1.0, z: 2.35, r: 1.1, label: 'Wall calendar', act: 'calendar', icon: '📅' });
 
   // ---------------------------------------------------------------- the dining nook on the left wall: a bench against the wall, the table, two chairs on the open side
   const tz = 1.55, tx = x0 + 1.05;
@@ -16428,7 +16482,7 @@ function interiorFrame(F0, room) {
 
 'use strict';
 // ============================================================================ profiles + saves (each profile has its own farm save)
-const FQ_VERSION = '1.5.4';
+const FQ_VERSION = '1.5.5';
 const LOOKS = [
   { shirt: [214, 74, 64], hair: [120, 76, 40] }, { shirt: [70, 130, 200], hair: [236, 206, 120] }, { shirt: [240, 170, 60], hair: [80, 50, 30] },
   { shirt: [120, 170, 90], hair: [40, 30, 28] }, { shirt: [170, 100, 190], hair: [200, 110, 60] }, { shirt: [60, 160, 160], hair: [150, 100, 60] },
@@ -22398,6 +22452,7 @@ function roomAction(it) {
     case 'cook': UI.cook(); break;
     case 'bag': UI.bag(); break;
     case 'journal': UI.journal('stats'); break;
+    case 'calendar': CALENDAR.open(); break;
     case 'build': setTool('build'); exitRoom(); UI.toast('Choose Build outside to put up a new building.'); break;
     case 'loft': BARN.up(G.roomObj); break;
     case 'barnboard': BARN.menu(G.roomObj); break;
