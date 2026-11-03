@@ -1614,7 +1614,8 @@ void main() { if (cutout(vMat, vUV) < 0.5) discard; gl_FragColor = pack(vZ); }`;
 const VS_SHELL = SH_COMMON + `
 attribute vec3 aPos; attribute vec3 aNrm; attribute vec4 aCol; attribute vec2 aUV; attribute float aMat;
 uniform float uShellH, uShellLen, uShellKind, uSnow;
-varying vec3 vW; varying vec3 vB; varying vec3 vN; varying vec3 vNo; varying vec4 vCol; varying vec3 vP; varying vec4 vL; varying float vH; varying float vMat; varying float vLen; varying vec2 vUV;
+uniform vec3 uComb;
+varying vec3 vW; varying vec3 vB; varying vec3 vN; varying vec3 vNo; varying vec4 vCol; varying vec3 vP; varying vec4 vL; varying float vH; varying float vMat; varying float vLen; varying vec2 vUV; varying vec3 vT;
 void main() {
   float h = uShellH;
   vec3 base = (uModel * vec4(bendPos(aPos), 1.0)).xyz;
@@ -1630,7 +1631,12 @@ void main() {
     ok = step(7.5, aMat) * step(aMat, 9.5);
     len *= (aMat > 8.5 ? 2.4 : 1.0) * length(uModel[0].xyz);
     dir = normalize(nw + vec3(0.0, -0.6, 0.0) * h);
+    if (uShellKind > 1.5) {   // fine hair: each strand rises from the skin and lies back along the comb, a little heavier toward its tip
+      vec3 cw = normalize(mat3(uModel) * uComb);
+      dir = normalize(nw + (cw * 1.7 + vec3(0.0, -0.35, 0.0)) * h);
+    }
   }
+  { vec3 cw = normalize(mat3(uModel) * uComb + vec3(1e-4)); vT = normalize(cw - nw * dot(cw, nw) * 0.85); }
   len *= ok;
   vec3 wp = base + dir * h * len;
   if (uShellKind < 0.5) {   // blades lean and ripple in the wind, more toward the tips
@@ -1647,7 +1653,8 @@ void main() {
 }`;
 const FS_SHELL = `#define STYLE 0
 precision highp float;
-varying vec3 vW; varying vec3 vB; varying vec3 vN; varying vec3 vNo; varying vec4 vCol; varying vec3 vP; varying vec4 vL; varying float vH; varying float vMat; varying float vLen; varying vec2 vUV;
+varying vec3 vW; varying vec3 vB; varying vec3 vN; varying vec3 vNo; varying vec4 vCol; varying vec3 vP; varying vec4 vL; varying float vH; varying float vMat; varying float vLen; varying vec2 vUV; varying vec3 vT;
+uniform vec3 uComb;
 uniform vec3 uSunDir, uSunCol, uSkyCol, uGndCol, uFogCol, uCam;
 uniform vec2 uFog, uCloudMove;
 uniform float uSnow, uWet, uNight, uTime, uCloud, uShadowOn, uFlash, uSnowK, uExposure, uShellKind, uShellDens;
@@ -1683,12 +1690,12 @@ float bladeAt(vec2 p, vec2 off, mat2 rot, float dens, float h, float hs, float f
   return 1.0;
 }
 void main() {
-  if (vLen < 0.01) discard;
+  if (vLen < (uShellKind < 0.5 ? 0.01 : 0.0012)) discard;
   float h = vH, camD = length(uCam - vW);
   float hs = h + (hash(gl_FragCoord.xy) - 0.5) * 0.11;      // break the layer stack into grain so it never bands at low angles
   vec3 V = normalize(uCam - vW);
   vec3 base = vCol.rgb, n;
-  float ao, tone, trans = 0.0, hairRim = 0.0;
+  float ao, tone, trans = 0.0, hairRim = 0.0, aniso = 0.0;
   if (uShellKind < 0.5) {
     // ---- grass: thousands of tapered blades per square metre, each with its own length, lean and tint.
     // Two lattices, turned against each other and each bent by noise, so no grid or rows can show.
@@ -1710,6 +1717,44 @@ void main() {
     n = normalize(vec3(0.0, 1.0, 0.0) * 0.75 + vN * 0.25 + vec3(r3 - 0.5, 0.0, r2 - 0.5) * 0.22 * hh * uGS.x);
     ao = mix(uGS.w, 1.0, pow(hh, 0.8));
     trans = hh * 0.35;
+  } else if (uShellKind > 1.5) {
+    // ---- fine hair: many thin strands per hand's width, combed back along the body and down the legs, gathered into soft locks
+    // of longer and shorter hair, dark at the roots, bright at the tips, with the long glossy sheen that runs along brushed hair
+    vec3 an = abs(normalize(vNo));
+    vec2 c2, cb;
+    if (an.x > an.y && an.x > an.z) { c2 = vP.zy; cb = uComb.zy; }
+    else if (an.y > an.z) { c2 = vP.xz; cb = uComb.xz; }
+    else { c2 = vP.xy; cb = uComb.xy; }
+    cb = length(cb) > 0.05 ? normalize(cb) : vec2(0.0, -1.0);
+    float far = smoothstep(2.2, 9.0, camD);
+    // a strand-aligned grid: fine across the comb, long along it, so every strand is a thin streak lying the way the hair is brushed
+    vec2 ac = vec2(-cb.y, cb.x);
+    vec2 cc = vec2(dot(c2, ac), dot(c2, cb)) * uShellDens;
+    float lock = noise(vec2(cc.x * 0.06, cc.y * 0.02) + 3.0);                                  // soft locks of longer and shorter hair
+    float wave = (noise(vec2(cc.x * 0.035, cc.y * 0.012) + 9.0) - 0.5) * 2.2;                  // and a gentle wave through the coat
+    float hit = 0.0, hh = 0.0; vec3 rr = vec3(0.5);
+    for (int k = 0; k < 2; k++) {
+      vec2 q = vec2(cc.x + wave * hs + float(k) * 0.5, (cc.y + hs * 3.2) * 0.13) + vec2(float(k) * 17.3, float(k) * 9.1);
+      q.y += hash(vec2(floor(q.x), 5.1 + float(k)));   // every strand starts at its own place along the comb, so no rows line up
+      vec2 id = floor(q), f = fract(q) - 0.5;
+      vec3 r = vec3(hash(id), hash(id + 3.7), hash(id + 9.1));
+      float L = 0.52 + 0.3 * r.z + 0.34 * lock;
+      if (hs > L) continue;
+      float t = hs / L;
+      float dx = abs(f.x - (r.x - 0.5) * 0.45), dy = abs(f.y - (r.y - 0.5) * 0.3);
+      if (dx < mix(0.38, 0.1, t) * (1.0 + 1.4 * far) && dy < mix(0.5, 0.22, t)) { hit = 1.0; rr = r; hh = t; break; }
+    }
+    if (hit < 0.5) discard;
+    vec3 hc = base * (0.92 + 0.14 * rr.x) * (0.94 + 0.12 * lock);
+    hc *= mix(0.8, 1.04, smoothstep(0.0, 0.8, hh));                       // a little darker at the roots, catching the light at the tips
+    hc = mix(hc, hc * 1.06 + 0.02, smoothstep(0.7, 1.0, hh) * 0.45);
+    base = hc;
+    n = normalize(vN);
+    ao = mix(0.74, 1.0, pow(h, 0.7));
+    hairRim = 0.6;
+    vec3 Tn = normalize(vT), Hv = normalize(uSunDir + V);
+    float th = dot(Tn, Hv), sn = sqrt(max(0.0, 1.0 - th * th));
+    aniso = (pow(sn, 70.0) * 0.3 + pow(sn, 12.0) * 0.05) * (0.25 + 0.75 * hh) * (1.0 - 0.6 * far);
   } else {
     // ---- fur / wool: strands laid out on the animal's own surface, combed downward
     float wool = step(8.5, vMat);
@@ -1747,6 +1792,7 @@ void main() {
   float rim = pow(1.0 - max(dot(n, V), 0.0), 2.4);
   col += rim * pow(uSkyCol, vec3(2.2)) * (0.1 + 0.5 * hairRim * h) * ao;
   col += hairRim * pow(max(dot(n, normalize(uSunDir + V)), 0.0), 14.0) * 0.16 * (0.4 + h) * sh * uSunCol;
+  col += aniso * sh * uSunCol * (0.35 + 0.65 * sqrt(lin));   // the sheen along combed hair
   col = aces(col * uExposure);
   col = pow(col, vec3(1.0 / 2.2));
   float lum = dot(col, vec3(0.299, 0.587, 0.114));
@@ -2118,8 +2164,10 @@ class Renderer {
         gl.uniform1f(su.uSnowK, d.snowK === undefined ? 1 : d.snowK);
         gl.uniform4fv(su.uBend, d.bend || ZERO4);
         gl.uniform4fv(su.uGS, sp.gs || GS_DEF); gl.uniform1f(su.uShellKind, sp.kind); gl.uniform1f(su.uShellLen, sp.len); gl.uniform1f(su.uShellDens, sp.dens);
+        if (su.uComb) gl.uniform3fv(su.uComb, d.comb || COMB_BODY);
         this.bindMesh(S2, d.mesh);
-        const n = Math.max(3, Math.round(sp.layers * q));
+        const M_ = d.model, far = sp.kind > 1.5 && M_ && F.cam ? Math.hypot(M_[12] - F.cam[0], M_[13] - F.cam[1], M_[14] - F.cam[2]) : 0;
+        const n = Math.max(3, Math.round(sp.layers * q * (far > 18 ? 0.5 : far > 10 ? 0.75 : 1)));   // fine hair far off needs fewer layers
         const lf = d.lift ? 1 : 0;   // a surface laid over the ground (swales) is pulled forward already, so its grass layers start from there
         for (let i = 1; i <= n; i++) { gl.polygonOffset(-2 * lf, -6 * lf - 1.2 * i); gl.uniform1f(su.uShellH, i / n); gl.drawArrays(gl.TRIANGLES, 0, d.mesh.count); }   // each layer pulled a little forward so a 16-bit depth buffer cannot z-fight the stack into rings
       }
@@ -2191,6 +2239,7 @@ class Renderer {
 'use strict';
 // ============================================================================ procedural low-poly geometry
 // art style knobs read while meshes are built and animated (set by the style lab / settings)
+const COMB_BODY = [0, -0.55, -1], COMB_LEG = [0, -1, -0.12], COMB_TAIL = [0, -0.6, -1];   // which way hair lies, in each part's own space
 const GS_DEF = [1, 1, 1, 0.5];   // grass blade speckle, clump pattern, patch colour, root shade (see FS_SHELL)
 const GRASS_SHELL = { kind: 0, len: 0.08, dens: 26, layers: 5, gs: [0.2, 0, 0.5, 0.64], under: 0.75 };   // a soft, even carpet: fine and short enough that no blade pattern reads, with gentle broad colour drift
 const GRASS_SHELL_MID = { kind: 0, len: 0.08, dens: 26, layers: 3, gs: [0.2, 0, 0.5, 0.64], under: 0.75 };   // ground that is some way off needs fewer layers
@@ -3960,10 +4009,10 @@ function buildChicken(br) {
 }
 
 // fur / wool shell settings per species (length in metres, strand density per model unit, layer count)
-const FURS = { cattle: { kind: 1, len: 0.028, dens: 36, layers: 8 }, horse: { kind: 1, len: 0.016, dens: 44, layers: 7 }, goat: { kind: 1, len: 0.028, dens: 38, layers: 8 }, sheep: { kind: 1, len: 0.02, dens: 28, layers: 9 }, pig: { kind: 1, len: 0.008, dens: 46, layers: 4 } };
+const FURS = { cattle: { kind: 2, len: 0.02, dens: 150, layers: 8 }, horse: { kind: 2, len: 0.009, dens: 200, layers: 5 }, goat: { kind: 2, len: 0.026, dens: 140, layers: 8 }, sheep: { kind: 1, len: 0.02, dens: 28, layers: 9 }, pig: { kind: 1, len: 0.008, dens: 46, layers: 4 } };
 function furFor(sp, br) {
   const f = FURS[sp]; if (!f) return null;
-  if (br && (br.shaggy || br.hump)) return Object.assign({}, f, { len: f.len * 1.3, layers: f.layers + 2, dens: f.dens * 0.85 });
+  if (br && (br.shaggy || br.hump)) return f.kind > 1 ? Object.assign({}, f, { len: f.len * 2.8, layers: f.layers + 3, dens: f.dens * 0.62 }) : Object.assign({}, f, { len: f.len * 1.3, layers: f.layers + 2, dens: f.dens * 0.85 });
   return f;
 }
 
@@ -13185,7 +13234,7 @@ function drawActor(out, a, T, pondLevel) {
   const nod = Math.sin(ph * 2 + 0.5) * 0.045 * wk + (hy > 0.4 ? Math.sin(tt * 7) * 0.025 * hy : Math.sin(tt * 0.9) * 0.02) * (1 - wk) + Math.sin(tt * 15) * 0.03 * pant + 0.32 * sit;
   const look = Math.sin(tt * 0.5) * 0.25 * (1 - hy) + Math.sin(ph) * 0.05 * wk;
   const headM = M4.mul(body, M4.mul(M4.trans(0, D.headY - hy * D.height * (D.grazeDrop || 0.55), D.headZ), M4.mul(M4.rotX(hy * 0.9 + nod + (a.sleepy ? 0.25 : 0)), M4.rotY(look))));
-  out.push({ mesh: M.head, model: headM, tint, snowK: 0.1, shell: fur });
+  out.push({ mesh: M.head, model: headM, tint, snowK: 0.1, shell: M.furHead || fur });
   if (M.tongue && pant > 0.03 && D.mouth) out.push({ mesh: M.tongue, model: M4.mul(headM, M4.mul(M4.trans(D.mouth[0], D.mouth[1], D.mouth[2]), M4.mul(M4.rotX(0.12 * Math.sin(tt * 15)), M4.scale(0.6 + 0.4 * pant, 0.3 + 0.7 * pant, 0.6 + 0.4 * pant)))), tint, snowK: 0 });
   if (!a.swim) {
     if (D.two) {
@@ -13201,13 +13250,13 @@ function drawActor(out, a, T, pondLevel) {
         if (front && l[0] > 0 && paw > 0.001) r -= paw * (1.25 + 0.12 * Math.sin(tt * 9));   // shaking hands: the right front paw held up
         const flex = Math.max(0, -l[2] * Math.cos(ph)) * wk;
         const bend = flex > 0.002 ? [flex * (front ? 1.05 : 0.9), -LL * (front ? 0.46 : 0.48), front ? 0.02 : -LL * 0.13, 1] : null;
-        out.push({ mesh: l[1] < 0 && M.legB ? M.legB : M.leg, model: M4.mul(body, M4.mul(M4.trans(l[0] * D.legX, D.legY, l[1] * D.legZ), M4.rotX(r))), tint, snowK: 0, bend, shell: fur });
+        out.push({ mesh: l[1] < 0 && M.legB ? M.legB : M.leg, model: M4.mul(body, M4.mul(M4.trans(l[0] * D.legX, D.legY, l[1] > 0 ? D.legZ : -(D.legZB || D.legZ)), M4.rotX(r))), tint, snowK: 0, bend, shell: M.furLeg || fur, comb: COMB_LEG });
       }
     }
   }
   if (M.tail) {
     const swish = Math.sin(tt * 2.3) * 0.3 + Math.sin(tt * 0.7 + 1) * 0.15 + Math.sin(ph) * 0.25 * wk;
-    out.push({ mesh: M.tail, model: M4.mul(body, M4.mul(M4.trans(0, D.tailY, D.tailZ), M4.mul(M4.rotZ(swish), M4.rotX(0.25 + 0.1 * wk)))), tint, snowK: 0, shell: fur });
+    out.push({ mesh: M.tail, model: M4.mul(body, M4.mul(M4.trans(0, D.tailY, D.tailZ), M4.mul(M4.rotZ(swish), M4.rotX(0.25 + 0.1 * wk)))), tint, snowK: 0, shell: M.furTail || fur, comb: COMB_TAIL });
   }
 }
 
@@ -15709,7 +15758,7 @@ function interiorFrame(F0, room) {
 
 'use strict';
 // ============================================================================ profiles + saves (each profile has its own farm save)
-const FQ_VERSION = '1.4.1';
+const FQ_VERSION = '1.4.2';
 const LOOKS = [
   { shirt: [214, 74, 64], hair: [120, 76, 40] }, { shirt: [70, 130, 200], hair: [236, 206, 120] }, { shirt: [240, 170, 60], hair: [80, 50, 30] },
   { shirt: [120, 170, 90], hair: [40, 30, 28] }, { shirt: [170, 100, 190], hair: [200, 110, 60] }, { shirt: [60, 160, 160], hair: [150, 100, 60] },
@@ -18183,7 +18232,7 @@ const PETS = {
   meshes: {},
   mesh(R, kind) {
     if (this.meshes[kind]) return this.meshes[kind];
-    const P = kind === 'dog' ? buildDog() : buildCat(), m = { dims: P.dims, fur: kind === 'dog' ? { kind: 1, len: 0.03, dens: 44, layers: 6 } : { kind: 1, len: 0.024, dens: 52, layers: 6 } };
+    const P = kind === 'dog' ? buildDog() : buildCat(), m = { dims: P.dims, fur: kind === 'dog' ? { kind: 2, len: 0.018, dens: 200, layers: 7 } : { kind: 2, len: 0.014, dens: 230, layers: 6 } };
     for (const k of ['body', 'head', 'leg', 'tail']) if (P[k]) m[k] = R.mesh(P[k]);
     return (this.meshes[kind] = m);
   },
@@ -18297,7 +18346,8 @@ const DOG_NAMES = { f: ['Belle', 'Daisy', 'Molly', 'Sadie', 'Rosie', 'Ellie', 'P
   m: ['Blue', 'Duke', 'Ranger', 'Bear', 'Rusty', 'Jake', 'Boone', 'Tex', 'Copper', 'Gus', 'Bandit', 'Shep', 'Moose', 'Otis', 'Buck', 'Bo', 'Tucker', 'Jasper', 'Cash', 'Rowdy'] };
 const DOG_COLLARS = [[188, 48, 42], [52, 92, 160], [58, 120, 66], [214, 132, 40], [112, 70, 44], [140, 60, 120]];
 // dogs read best smooth-coated (strand shells make a white coat look like a fleece); long coats get a ruff and feathering instead, and only the shaggy drover's dog keeps a shell
-const DOG_FUR = { short: null, medium: null, long: null, shaggy: { kind: 1, len: 0.014, dens: 60, layers: 5 } };
+const DOG_FUR = { short: { kind: 2, len: 0.005, dens: 250, layers: 4 }, medium: { kind: 2, len: 0.01, dens: 215, layers: 6 }, long: { kind: 2, len: 0.016, dens: 195, layers: 7 }, shaggy: { kind: 2, len: 0.024, dens: 165, layers: 8 } };
+const DOG_FUR_PART = { head: 0.42, leg: 0.6, tail: 1.6 };   // short hair on the face, a little longer down the legs, a full brush on the tail
 const dogBreed = (k) => DOG_BREEDS.find((b) => b.key === k) || DOG_BREEDS[0];
 const dogCoat = (B, i) => B.coats[i] || B.coats[0];
 
@@ -18364,99 +18414,144 @@ function homeDogs(F) {
     { id: F.nextId++, breed: 'juneau', coat: 0, collarCol: [204, 146, 160], name: 'Juneau', sex: 'f', born: dn - 2 * 360, job: 'follow', own: true });
 }
 // a dog of breed B in coat c with collar colour cc: body (with neck), head, front and back legs, tail, and the dims drawActor needs
-function buildFarmDog(B, c, cc) {
-  const C = dogCoat(B, c), bk = B.bulk || 1, LL = 0.29 * (B.leg || 1), BL = B.long || 1, mz = B.muzzle || 1, hb = 0.84 + 0.2 * bk;
-  const fluffy = B.fur === 'long' || B.fur === 'shaggy';
-  const col = (part) => (q) => dogCoatAt(C, part, q), P = {};
-  // body: a deep chest up front, a tucked waist, a level back and a rounded rump
-  let m = new MB(); m.mat = MAT.hide;
-  m.sel(0, 0, 0, 0.11 * bk, 0.125 * bk, 0.3 * BL, 2.2, C[2], {
-    lat: 16, lon: 22, colFn: col('body'),
-    shape: (q) => {
-      let [x, y, z] = q;
-      if (y < 0) y *= 1 + 0.3 * smooth(-0.1, 0.55, z) - 0.3 * smooth(0.05, -0.6, z) * (1 - 0.6 * smooth(-0.7, -0.95, z));
-      x *= 1 - 0.16 * smooth(0.15, -0.45, z) * (1 - smooth(-0.55, -0.9, z)) + 0.06 * smooth(0.2, 0.8, z);
-      if (y > 0) y += 0.08 * smooth(-0.55, -0.85, z) * (1 - smooth(-0.85, -1, z));
-      return [x, y, z];
-    },
-  });
-  // neck, rising up and forward to the head, with the collar round it
-  m.push(M4.trs(0, 0.05 * bk, 0.24 * BL, 0, 0.62, 0));
-  const nk = fluffy || bk > 1.15 ? 0.82 : 1;   // the big, heavy-coated dogs carry their heads on a shorter, thicker neck
-  m.sel(0, 0.085 * nk, 0, 0.066 * bk / nk, 0.125 * nk, 0.074 * bk / nk, 2.2, C[2], { lat: 10, lon: 14, colFn: col('neck') });
-  m.mat = 0; m.cyl(0, 0.09, 0, 0.07 * bk, 0.07 * bk, 0.028, 12, cc || DOG_COLLARS[0]); m.ell(0, 0.1, 0.075 * bk, 0.012, 0.016, 0.006, [214, 190, 90], { lat: 3, lon: 6 }); m.mat = MAT.hide;
-  m.pop();
-  // long coats: a ruff at the chest and britches over the hips
-  if (fluffy) {
-    m.sel(0, -0.035, 0.2 * BL, 0.1 * bk, 0.13 * bk, 0.11, 2.2, dogCoatAt(C, 'neck', [0, -0.5, 0.6]), { lat: 8, lon: 12 });
+// a smooth tube through a chain of rings (a spine, a neck, a leg, a tail). ring: { c: [x, y, z], rx (across), ry (up side), ry2 (down side) }.
+// The ring's "across" axis is opt.side (default x, the animal's left-right); colFn(i, cos, sin, ring) gives each vertex its colour.
+function loftTube(mb, rings, colFn, opt) {
+  opt = opt || {};
+  const N = opt.seg || 16, R = rings.length, P = [], CL = [];
+  const sub = (a, b) => [a[0] - b[0], a[1] - b[1], a[2] - b[2]], dot = (a, b) => a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
+  const crs = (a, b) => [a[1] * b[2] - a[2] * b[1], a[2] * b[0] - a[0] * b[2], a[0] * b[1] - a[1] * b[0]];
+  const nrm = (v) => { const l = Math.hypot(v[0], v[1], v[2]) || 1; return [v[0] / l, v[1] / l, v[2] / l]; };
+  const dirs = rings.map((r, i) => nrm(sub(rings[Math.min(R - 1, i + 1)].c, rings[Math.max(0, i - 1)].c)));
+  for (let i = 0; i < R; i++) {
+    const r = rings[i], d = dirs[i], s0 = opt.side || [1, 0, 0], k = dot(s0, d), side = nrm([s0[0] - d[0] * k, s0[1] - d[1] * k, s0[2] - d[2] * k]), up = nrm(crs(d, side));
+    const row = [], crow = [];
+    for (let j = 0; j < N; j++) {
+      const a = (j / N) * Math.PI * 2, cs = Math.cos(a), sn = Math.sin(a), ry = sn >= 0 ? r.ry : (r.ry2 !== undefined ? r.ry2 : r.ry);
+      row.push([r.c[0] + side[0] * cs * r.rx + up[0] * sn * ry, r.c[1] + side[1] * cs * r.rx + up[1] * sn * ry, r.c[2] + side[2] * cs * r.rx + up[2] * sn * ry]);
+      crow.push(colFn(i, cs, sn, r));
+    }
+    P.push(row); CL.push(crow);
   }
-  m.mat = 0;
-  P.body = m;
-  // head (from the top of the neck): skull, a muzzle with a clear stop, nose, eyes and ears
+  const NM = P.map((row, i) => row.map((p, j) => {
+    const a = P[Math.max(0, i - 1)][j], b = P[Math.min(R - 1, i + 1)][j], c = row[(j + N - 1) % N], e = row[(j + 1) % N];
+    let n = nrm(crs(sub(b, a), sub(e, c))); if (dot(n, sub(p, rings[i].c)) < 0) n = [-n[0], -n[1], -n[2]]; return n;
+  }));
+  const tri = (A, B, Cc, ctr) => {   // wound to face outward
+    const pa = P[A[0]][A[1]], pb = P[B[0]][B[1]], pc = P[Cc[0]][Cc[1]], f = crs(sub(pb, pa), sub(pc, pa));
+    const vs = dot(f, sub(pa, ctr)) >= 0 ? [A, B, Cc] : [A, Cc, B];
+    for (const v of vs) mb.vert(P[v[0]][v[1]], NM[v[0]][v[1]], CL[v[0]][v[1]]);
+  };
+  for (let i = 0; i + 1 < R; i++) {
+    const ctr = [(rings[i].c[0] + rings[i + 1].c[0]) / 2, (rings[i].c[1] + rings[i + 1].c[1]) / 2, (rings[i].c[2] + rings[i + 1].c[2]) / 2];
+    for (let j = 0; j < N; j++) { const j1 = (j + 1) % N; tri([i, j], [i + 1, j], [i + 1, j1], ctr); tri([i, j], [i + 1, j1], [i, j1], ctr); }
+  }
+  for (const [i, sgn] of opt.caps === false ? [] : [[0, -1], [R - 1, 1]]) {
+    const r = rings[i], d = dirs[i], ctr = r.c, n = [d[0] * sgn, d[1] * sgn, d[2] * sgn], cc = CL[i][0];
+    for (let j = 0; j < N; j++) {
+      const p0 = P[i][j], p1 = P[i][(j + 1) % N], f = crs(sub(p1, p0), sub(ctr, p0)), ok = dot(f, n) >= 0;
+      const vs = ok ? [p0, p1, ctr] : [p0, ctr, p1];
+      for (const v of vs) mb.vert(v, n, cc);
+    }
+  }
+}
+// a dog built the way a dog is put together: one smooth torso running from the rump through a deep ribcage and the shoulders up
+// into a neck that tapers into the back of the skull (no separate neck to bulge); a head lofted from skull through the stop to the
+// nose; front legs straight from the elbow to the paw; back legs with a muscled thigh, the stifle forward and the hock set back.
+function buildFarmDog(B, c, cc) {
+  const C = dogCoat(B, c), bk = B.bulk || 1, LL = 0.31 * (B.leg || 1), BL = B.long || 1, mz = B.muzzle || 1, hb = 1.0 + 0.25 * (bk - 1);
+  const fluffy = B.fur === 'long' || B.fur === 'shaggy', fl = fluffy ? 1.2 : 1, P = {};
+  const colQ = (part, q) => dogCoatAt(C, part, q);
+  // ---- torso and neck: [z, y, across, up, down, part]
+  // proportions from the standard: body length (chest to buttock) about 1.05 times the height at the withers; the elbow at about half
+  // that height, straight under the withers; the chest only a hand's width ahead of the front legs; the hock under the point of the buttock
+  const T = [
+    [-0.272, 0.05, 0.03, 0.028, 0.03, 'body'], [-0.258, 0.045, 0.07, 0.066, 0.08, 'body'], [-0.232, 0.038, 0.096, 0.088, 0.104 * (fluffy ? 1.12 : 1), 'body'],
+    [-0.17, 0.032, 0.106, 0.096, 0.112 * (fluffy ? 1.1 : 1), 'body'], [-0.095, 0.03, 0.098, 0.09, 0.085, 'body'], [-0.025, 0.02, 0.106, 0.098, 0.112, 'body'],
+    [0.045, 0.012, 0.113, 0.104, 0.135, 'body'], [0.108, 0.012, 0.116, 0.107, 0.142, 'body'], [0.165, 0.022, 0.11 * (fluffy ? 1.06 : 1), 0.11, 0.135 * (fluffy ? 1.08 : 1), 'body'],
+    [0.21, 0.045, 0.096 * fl, 0.1 * (fluffy ? 1.1 : 1), 0.112 * fl, 'body'],
+    [0.238, 0.092, 0.088 * fl, 0.088 * fl, 0.098 * fl, 'neck'], [0.262, 0.13, 0.082 * fl, 0.08 * fl, 0.086 * fl, 'neck'], [0.282, 0.166, 0.075 * (fluffy ? 1.15 : 1), 0.072 * (fluffy ? 1.12 : 1), 0.077 * (fluffy ? 1.15 : 1), 'neck'],
+    [0.296, 0.196, 0.067, 0.063, 0.065, 'neck'],
+  ];
+  const tr = T.map((t) => ({ c: [0, t[1] * bk, t[0] * BL], rx: t[2] * bk, ry: t[3] * bk, ry2: t[4] * bk, part: t[5] }));
+  let m = new MB(); m.mat = MAT.hide;
+  const nb = T.filter((t) => t[5] === 'body').length;
+  loftTube(m, tr, (i, cs, sn, r) => r.part === 'body' ? colQ('body', [cs, sn, (i / (nb - 1)) * 2 - 1]) : colQ('neck', [cs, sn, 0.5]), { seg: 20 });
+  // the collar, round the middle of the neck
+  { const a = tr[11], b = tr[12], d = [b.c[0] - a.c[0], b.c[1] - a.c[1], b.c[2] - a.c[2]], L = Math.hypot(d[0], d[1], d[2]), u = d.map((v) => v / L), mid = [0, (a.c[1] + b.c[1]) / 2, (a.c[2] + b.c[2]) / 2], r = (a.rx + b.rx) / 2 * 1.04 + 0.004 + ((DOG_FUR[B.fur] || { len: 0 }).len * 0.7), w = 0.014;
+    m.mat = 0; loftTube(m, [{ c: [0, mid[1] - u[1] * w, mid[2] - u[2] * w], rx: r, ry: r, ry2: r * 1.04 }, { c: [0, mid[1] + u[1] * w, mid[2] + u[2] * w], rx: r, ry: r, ry2: r * 1.04 }], () => cc || DOG_COLLARS[0], { seg: 18, caps: false });
+    m.ell(0, mid[1] - r * 1.05 - 0.01, mid[2] + 0.004, 0.012, 0.016, 0.006, [214, 190, 90], { lat: 3, lon: 6 }); m.mat = MAT.hide; }
+  m.mat = 0; P.body = m;
+  // ---- head, from the top of the neck: skull, stop, muzzle, nose. [z, y, across, up, down, part]
+  const hz = (z) => (z > 0.086 ? 0.086 + (z - 0.086) * mz : z);
+  const H = [
+    [-0.058, 0.03, 0.03, 0.03, 0.03, 'head'], [-0.04, 0.036, 0.06, 0.06, 0.056, 'head'], [-0.006, 0.04, 0.077 * (0.95 + 0.05 * bk), 0.07, 0.064, 'head'],
+    [0.03, 0.04, 0.077 * (0.95 + 0.05 * bk), 0.066, 0.062, 'head'], [0.062, 0.03, 0.068, 0.054, 0.058, 'head'], [0.086, 0.012, 0.054, 0.038, 0.051, 'muzzle'],
+    [0.108, 0.004, 0.048, 0.034, 0.045, 'muzzle'], [0.13, -0.001, 0.044, 0.031, 0.041, 'muzzle'], [0.15, -0.003, 0.038, 0.028, 0.035, 'muzzle'], [0.162, -0.001, 0.021, 0.016, 0.02, 'muzzle'],
+  ];
+  const hr = H.map((t) => ({ c: [0, t[1] * hb, hz(t[0]) * hb], rx: t[2] * hb, ry: t[3] * hb, ry2: t[4] * hb, part: t[5] }));
   m = new MB(); m.mat = MAT.hide;
-  const sk = [0.068 * hb * (0.94 + 0.06 * bk), 0.068 * hb, 0.082 * hb];
-  m.sel(0, 0.035, 0.03, sk[0], sk[1], sk[2], 2.2, C[2], { lat: 12, lon: 14, colFn: col('head'), shape: (q) => [q[0] * (1 - 0.12 * Math.max(0, q[2])), q[1], q[2]] });
-  const mzL = 0.085 * mz * hb, mzC = 0.03 + sk[2] * 0.7 + mzL * 0.5;
-  m.mat = B.fur === 'shaggy' ? MAT.hide : 0;   // short hair on the muzzle, whatever the coat
-  m.sel(0, 0.005, mzC, 0.04 * hb * (0.92 + 0.08 * bk), 0.038 * hb, mzL * 0.6, 2.1, C[2], { lat: 8, lon: 10, colFn: col('muzzle'), shape: (q) => [q[0] * (1 - 0.22 * Math.max(0, q[2])), q[1] * (1 - 0.12 * Math.max(0, q[2])) - 0.1 * Math.max(0, q[2]) * Math.max(0, q[1]), q[2]] });
+  loftTube(m, hr, (i, cs, sn, r) => colQ(r.part, [cs, sn, r.part === 'head' ? (i / 4) * 2 - 1 : 0.5]), { seg: 18 });
   m.mat = 0;
-  const noseZ = mzC + mzL * 0.58;
-  m.ell(0, 0.012 * hb, noseZ, 0.02 * hb, 0.016 * hb, 0.014 * hb, [24, 20, 20], { lat: 4, lon: 6 });
-  m.ell(0, -0.022 * hb, mzC + mzL * 0.15, 0.036 * hb, 0.006, mzL * 0.4, [64, 36, 36], { lat: 3, lon: 6 });   // the line of the mouth
-  const blue = C[5], iris = blue ? [124, 170, 210] : [74, 46, 26];
+  const end = hr[hr.length - 1].c, noseZ = end[2] + 0.004 * hb;
+  m.ell(0, end[1] + 0.006 * hb, noseZ, 0.02 * hb, 0.0155 * hb, 0.014 * hb, [24, 20, 20], { lat: 5, lon: 8 }); for (const sx of [-1, 1]) m.ell(sx * 0.007 * hb, end[1] + 0.004 * hb, noseZ + 0.012 * hb, 0.004 * hb, 0.003 * hb, 0.003, [8, 6, 6], { lat: 3, lon: 4 });   // nose and nostrils
+  const mzMid = hr[6].c[2];
+  m.ell(0, hr[6].c[1] - hr[6].ry2 * 0.86, mzMid, hr[6].rx * 0.92, 0.005, (end[2] - hr[5].c[2]) * 0.45, [64, 36, 36], { lat: 3, lon: 8 });   // the line of the mouth
+  const blue = C[5], iris = blue ? [124, 170, 210] : [70, 44, 26], er = hr[4];
   for (const sx of [-1, 1]) {
-    const ex = sx * 0.04 * hb, ey = 0.042 * hb, ez = 0.03 + sk[2] * 0.8;
-    m.ell(ex, ey, ez, 0.017 * hb, 0.016 * hb, 0.01, [28, 20, 16], { lat: 4, lon: 6 });
-    m.ell(ex + sx * 0.002, ey + 0.001, ez + 0.006, 0.011 * hb, 0.011 * hb, 0.005, iris, { lat: 3, lon: 6 });
-    m.ell(ex, ey + 0.006, ez + 0.009, 0.004, 0.004, 0.003, [255, 255, 255], { lat: 3, lon: 4 });
-    if (B.eyeRing === sx) m.ell(ex, ey + 0.002, ez - 0.004, 0.027 * hb, 0.025 * hb, 0.011, [62, 54, 50], { lat: 5, lon: 10 });   // a faint dark ring round this eye
+    // on the face itself, just above the stop: a point on the head's own surface between the brow and the stop rings
+    const st = hr[5], t = 0.55, rx = lerp(er.rx, st.rx, t), cy = lerp(er.c[1], st.c[1], t), ry = lerp(er.ry, st.ry, t), cz = lerp(er.c[2], st.c[2], t);
+    const ex = sx * rx * 0.64 * 1.02, ey = cy + ry * 0.77 * 1.02, ez = cz;
+    m.ell(ex, ey, ez, 0.02 * hb, 0.016 * hb, 0.012 * hb, [26, 18, 14], { lat: 5, lon: 8 });   // almond-shaped, dark-rimmed
+    m.ell(ex + sx * 0.002, ey + 0.001, ez + 0.007 * hb, 0.012 * hb, 0.0115 * hb, 0.006 * hb, iris, { lat: 4, lon: 6 });
+    m.ell(ex, ey + 0.005 * hb, ez + 0.011 * hb, 0.0042 * hb, 0.0042 * hb, 0.003, [255, 255, 255], { lat: 3, lon: 4 });
+    if (B.eyeRing === sx) m.ell(ex, ey + 0.001, ez - 0.003, 0.026 * hb, 0.024 * hb, 0.011 * hb, [62, 54, 50], { lat: 5, lon: 10 });   // a faint dark ring round this eye
   }
   m.mat = MAT.hide;
-  const earC = (q) => dogCoatAt(C, 'ear', q);
+  const earC = (q) => dogCoatAt(C, 'ear', q), sr = hr[2];
   for (const sx of [-1, 1]) {
-    if (B.ears === 'prick') { m.push(M4.trs(sx * 0.042 * hb, 0.088 * hb, 0.01, 0, -0.12, sx * -0.28)); m.sel(0, 0.04 * hb, 0, 0.028 * hb, 0.05 * hb, 0.011, 2, C[2], { lat: 5, lon: 8, colFn: earC, shape: (q) => [q[0] * (1 - 0.7 * Math.max(0, q[1])), q[1], q[2]] }); m.pop(); }
-    else if (B.ears === 'fold') { m.push(M4.trs(sx * 0.044 * hb, 0.088 * hb, 0.015, 0, 0.35, sx * -0.42)); m.sel(0, 0.03 * hb, 0, 0.027 * hb, 0.04 * hb, 0.01, 2, C[2], { lat: 5, lon: 8, colFn: earC, shape: (q) => [q[0] * (1 - 0.45 * Math.max(0, q[1])), q[1], q[2] + 0.9 * Math.max(0, q[1]) ** 2] }); m.pop(); }
-    else { m.push(M4.trs(sx * 0.062 * hb * (0.95 + 0.05 * bk), 0.075 * hb, 0.012, 0, 0.12, sx * 0.18)); m.sel(sx * 0.004, -0.04 * hb, 0, 0.011, 0.055 * hb, 0.034 * hb, 2, C[2], { lat: 5, lon: 8, colFn: earC, shape: (q) => [q[0], q[1], q[2] * (1 - 0.25 * Math.max(0, q[1]))] }); m.pop(); }
+    const ax = sx * sr.rx * 0.82, ay = sr.c[1] + sr.ry * 0.72, az = sr.c[2] + 0.004;
+    if (B.ears === 'prick') { m.push(M4.trs(ax * 0.85, ay, az, 0, -0.12, sx * -0.3)); m.sel(0, 0.04 * hb, 0, 0.028 * hb, 0.052 * hb, 0.011, 2, C[2], { lat: 5, lon: 8, colFn: earC, shape: (q) => [q[0] * (1 - 0.72 * Math.max(0, q[1])), q[1], q[2]] }); m.pop(); }
+    else if (B.ears === 'fold') { m.push(M4.trs(ax * 0.9, ay, az + 0.006, 0, 0.35, sx * -0.42)); m.sel(0, 0.03 * hb, 0, 0.027 * hb, 0.04 * hb, 0.01, 2, C[2], { lat: 5, lon: 8, colFn: earC, shape: (q) => [q[0] * (1 - 0.45 * Math.max(0, q[1])), q[1], q[2] + 0.9 * Math.max(0, q[1]) ** 2] }); m.pop(); }
+    else {   // drop ears: soft V-shaped flaps hanging close against the cheeks, set at eye level
+      m.push(M4.trs(ax + sx * 0.006, ay + 0.002, az - 0.002 * hb, 0, 0.1, sx * 0.16));
+      m.sel(sx * 0.007, -0.054 * hb, 0, 0.012 * hb, 0.066 * hb, 0.046 * hb, 2, C[2], { lat: 6, lon: 9, colFn: earC, shape: (q) => [q[0] * (1 - 0.3 * smooth(0, -1, q[1])), q[1], q[2] * (1 - 0.58 * smooth(0.35, -1, q[1]))] });
+      m.pop();
+    }
   }
-  if (B.fur === 'shaggy') m.sel(0, 0.075 * hb, 0.07, 0.06 * hb, 0.035, 0.05, 2, dogCoatAt(C, 'head', [0, 0.8, 0.4]), { lat: 5, lon: 8 });   // the shaggy fringe over the eyes
-  m.mat = 0;
-  P.head = m;
-  // legs: a slim front leg; a back leg with a muscled thigh and the hock set back. Coat at the top, paws below.
-  const legR = 0.026 * bk;
+  if (B.fur === 'shaggy') m.sel(0, sr.c[1] + sr.ry * 0.8, hr[4].c[2], 0.06 * hb, 0.03, 0.05, 2, dogCoatAt(C, 'head', [0, 0.8, 0.4]), { lat: 5, lon: 8 });   // the shaggy fringe over the eyes
+  m.mat = 0; P.head = m;
+  // ---- legs (from the shoulder or the hip, straight down): [y as a share of the leg, z, across, front-back]
+  const legR = 0.026 * bk, zk = LL / 0.29;
+  const FRONT = [[0.14, 0.0, 1.6, 1.8], [-0.1, -0.012, 1.45, 1.55], [-0.3, -0.018, 1.2, 1.28], [-0.55, -0.008, 1.0, 1.05], [-0.8, 0.0, 0.88, 0.92], [-0.9, 0.006, 0.83, 0.88], [-0.97, 0.012, 0.86, 1.0]];
+  const BACK = [[0.14, 0.0, 2.05, 2.5], [-0.1, 0.012, 2.0, 2.45], [-0.34, 0.03, 1.42, 1.75], [-0.5, 0.004, 1.12, 1.3], [-0.68, -0.05, 0.92, 1.05], [-0.78, -0.068, 0.85, 1.0], [-0.9, -0.056, 0.8, 0.88], [-0.97, -0.046, 0.84, 0.98]];
   const leg = (back) => {
-    const g = new MB(); g.mat = MAT.hide;
-    const z1 = back ? -0.022 : 0.002;   // the back leg's hock sits behind the hip
-    if (back) g.sel(0, -LL * 0.1, -0.008, legR * 1.65, LL * 0.4, legR * 2.3, 2.1, C[2], { lat: 8, lon: 10, colFn: col('leg'), shape: (q) => [q[0] * (1 - 0.35 * smooth(0, -1, q[1])), q[1], q[2] * (1 - 0.3 * smooth(0, -1, q[1])) + 0.25 * smooth(0.2, -1, q[1]) * -1] });
-    else g.sel(0, -LL * 0.16, 0.004, legR * 1.3, LL * 0.36, legR * 1.6, 2.1, C[2], { lat: 8, lon: 10, colFn: col('leg'), shape: (q) => [q[0] * (1 - 0.3 * smooth(0, -1, q[1])), q[1], q[2] * (1 - 0.3 * smooth(0, -1, q[1]))] });
-    g.mat = 0; g.cyl(0, -LL + 0.012, z1, legR * 0.74, legR * 0.98, LL * 0.6, 8, dogCoatAt(C, 'leg', [0, -0.5, 0])); g.mat = MAT.hide;
-    g.sel(0, -LL + 0.014, z1 + 0.016, legR * 1.1, 0.017, legR * 1.42, 2, dogCoatAt(C, 'paw', [0, -1, 0]), { lat: 4, lon: 8 });
-    if (fluffy) g.sel(0, -LL * 0.32, z1 - 0.012, legR * 1.15, LL * 0.24, legR * 1.4, 2, dogCoatAt(C, 'leg', [0, 0, 0]), { lat: 5, lon: 6 });   // feathering
+    const g = new MB(), R0 = back ? BACK : FRONT; g.mat = MAT.hide;
+    const rings = R0.map((t) => ({ c: [0, t[0] * LL, t[1] * zk], rx: legR * t[2] * (fluffy && t[0] < -0.2 && t[0] > -0.75 ? 1.12 : 1), ry: legR * t[3], ry2: legR * t[3] * (fluffy && t[0] < -0.15 && t[0] > -0.75 ? 1.3 : 1) }));
+    loftTube(g, rings, (i, cs, sn) => dogCoatAt(C, 'leg', [cs, 1 - 2 * i / (rings.length - 1), sn]), { seg: 12 });
+    const pz = R0[R0.length - 1][1] * zk;
+    g.sel(0, -LL + 0.016, pz + 0.012, legR * 1.12, 0.018, legR * 1.5, 2, dogCoatAt(C, 'paw', [0, -1, 0]), { lat: 5, lon: 8 });   // the paw, toes forward
     g.mat = 0; return g;
   };
   P.leg = leg(false); P.legB = leg(true);
-  // tail, from its root: plume (hangs low and sweeps up at the end), curl (up over the back), bob, straight, otter (thick)
+  // ---- tail, from its root: [y, z, radius]
+  const TAILS = {
+    plume: [[0, 0, 0.03], [-0.05, -0.05, 0.04], [-0.12, -0.075, 0.048], [-0.2, -0.082, 0.05], [-0.27, -0.064, 0.044], [-0.31, -0.03, 0.033], [-0.322, 0.006, 0.016]],
+    flag: [[0, 0, 0.028], [0.06, -0.06, 0.04], [0.14, -0.082, 0.05], [0.22, -0.062, 0.054], [0.27, 0.0, 0.05], [0.28, 0.06, 0.04], [0.26, 0.1, 0.022]],
+    curl: [[0, 0, 0.026], [0.07, -0.04, 0.03], [0.14, -0.03, 0.03], [0.18, 0.02, 0.026], [0.16, 0.08, 0.02], [0.12, 0.1, 0.012]],
+    straight: [[0, 0, 0.022], [-0.06, -0.09, 0.019], [-0.12, -0.17, 0.016], [-0.16, -0.23, 0.011], [-0.175, -0.255, 0.006]],
+    otter: [[0, 0, 0.034], [-0.06, -0.08, 0.03], [-0.12, -0.15, 0.024], [-0.17, -0.21, 0.016], [-0.19, -0.24, 0.008]],
+  };
   m = new MB(); m.mat = MAT.hide;
-  const tc = (q) => dogCoatAt(C, 'tail', q);
-  if (B.tail === 'flag') {   // the Pyrenees' plume, carried up and curled over the back: a chain of soft tufts
-    for (let i = 0; i <= 12; i++) {
-      const u = i / 12, a = u * 2.3, r = (0.026 + 0.036 * Math.sin(Math.min(1, u * 1.25) * Math.PI * 0.8)) * bk;
-      m.sel(0, 0.13 * (1 - Math.cos(a)) + 0.06 * u, -0.13 * Math.sin(a), r, r * 1.15, r * 1.1, 2, dogCoatAt(C, 'tail', [0, u * 2 - 1, 0]), { lat: 6, lon: 9 });
-    }
-  } else if (B.tail === 'bob') m.sel(0, 0.012, -0.012, 0.03 * bk, 0.03 * bk, 0.026, 2, dogCoatAt(C, 'tail', [0, 0, 0]), { lat: 4, lon: 6 });
-  else if (B.tail === 'curl') { m.push(M4.rotX(-0.35)); horn(m, [[0, 0, 0], [0, 0.08, -0.035], [0, 0.15, -0.02], [0, 0.19, 0.05], [0, 0.165, 0.11]], 0.03 * bk * (fluffy ? 1.4 : 1), 0.016, C[2]); m.pop(); }
-  else {
-    const L = B.tail === 'plume' ? 0.3 : B.tail === 'otter' ? 0.25 : 0.24, r = B.tail === 'plume' ? (fluffy ? 0.045 : 0.034) : B.tail === 'otter' ? 0.034 : 0.019;
-    m.push(M4.rotX(Math.PI * (B.tail === 'plume' ? 0.8 : 0.7)));
-    m.sel(0, L * 0.5, 0, r * bk, L * 0.5, r * bk, 2, C[2], { lat: 6, lon: 8, colFn: tc, shape: (q) => [q[0] * (1 - 0.45 * Math.max(0, q[1])), q[1], q[2] - (B.tail === 'plume' ? 0.5 * Math.max(0, q[1]) ** 2 : 0.1 * Math.max(0, q[1]))] });
-    m.pop();
-  }
+  if (B.tail === 'bob') m.sel(0, 0.008, -0.014, 0.03 * bk, 0.028 * bk, 0.026, 2, dogCoatAt(C, 'tail', [0, 0, 0]), { lat: 5, lon: 8 });
+  else { const path = TAILS[B.tail] || TAILS.straight, tf = fluffy ? 1.25 : 1; loftTube(m, path.map((t) => ({ c: [0, t[0], t[1]], rx: t[2] * bk * tf, ry: t[2] * bk * tf })), (i, cs, sn) => dogCoatAt(C, 'tail', [cs, (i / (path.length - 1)) * 2 - 1, sn]), { seg: 10 }); }
   m.mat = 0; P.tail = m;
   // panting: the open mouth and a tongue hanging out, drawn from the corner of the mouth
   m = new MB(); m.ell(0, 0.004, 0.0, 0.03 * hb, 0.013, 0.034 * hb, [66, 28, 32], { lat: 4, lon: 8 });
   m.ell(0, -0.026 * hb, 0.016, 0.022 * hb, 0.034 * hb, 0.009, [226, 108, 122], { lat: 5, lon: 8 }); m.ell(0, -0.012 * hb, 0.02, 0.003, 0.03 * hb, 0.003, [196, 84, 100], { lat: 3, lon: 4 });
   P.tongue = m;
-  const legY = -0.055 * bk;
-  P.dims = { legL: LL, legX: 0.066 * bk, legZ: 0.19 * BL, legY, height: LL - legY - 0.003, lieY: 0.13 * bk, headY: (fluffy || bk > 1.15 ? 0.155 : 0.185) * bk, headZ: (fluffy || bk > 1.15 ? 0.31 : 0.335) * BL, tailZ: -0.29 * BL, tailY: 0.07 * bk, radius: 0.18 + 0.06 * bk, grazeDrop: 0.45, mouth: [0, -0.03 * hb, mzC + mzL * 0.15] };
+  const legY = -0.055 * bk, top = tr[tr.length - 1].c;
+  P.dims = { legL: LL, legX: 0.068 * bk, legZ: 0.148 * BL, legZB: 0.165 * BL, legY, height: LL - legY - 0.003, lieY: 0.135 * bk, headY: top[1], headZ: top[2], tailZ: -0.265 * BL, tailY: 0.06 * bk, radius: 0.18 + 0.06 * bk, grazeDrop: 0.45, mouth: [0, hr[6].c[1] - hr[6].ry2 * 0.9, mzMid] };
   return P;
 }
 // a little side-on picture of a dog, like the breed portraits at the barn
@@ -18506,7 +18601,8 @@ const DOGS = {
   mesh(R, rec) {
     const B = dogBreed(rec.breed), cc = rec.collarCol || DOG_COLLARS[rec.collar || 0], key = B.key + ':' + (rec.coat || 0) + ':' + cc.join(',');
     if (this.meshes[key]) return this.meshes[key];
-    const P = buildFarmDog(B, rec.coat || 0, cc), m = { dims: P.dims, fur: DOG_FUR[B.fur] || null };
+    const P = buildFarmDog(B, rec.coat || 0, cc), fu = DOG_FUR[B.fur] || null, m = { dims: P.dims, fur: fu };
+    if (fu) for (const k in DOG_FUR_PART) m['fur' + k[0].toUpperCase() + k.slice(1)] = Object.assign({}, fu, { len: fu.len * DOG_FUR_PART[k], layers: Math.max(3, Math.round(fu.layers * Math.min(1.2, DOG_FUR_PART[k] + 0.3))) });
     for (const k of ['body', 'head', 'leg', 'legB', 'tail', 'tongue']) if (P[k]) m[k] = R.mesh(P[k]);
     return (this.meshes[key] = m);
   },
