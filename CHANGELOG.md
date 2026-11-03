@@ -8,6 +8,19 @@ Publishing: copy `index.html` and `sw.js` into the GitHub repo `silverton777/far
 
 ---
 
+## 1.5.4: the map opens again; build with your farmer or on the map; Luna and Juneau for sale; journal goals reworked; $75,000 to start
+
+**Why:** "when opening the map the game freezes and map never loads", "when building or digging anything give a pop up that says select location with character or with map", "Luna and Juneau should not come standard, they should have to be purchased like other dogs. If an existing account has them it should not be taken away", the owner's list of journal changes (new water goals, harder goals at higher levels, new building goals after the barn and coop) and "try starting the game with 75k instead of 60k".
+
+- Map: it opens straight away on any size of farm. The contour lines, which were traced slowly enough to freeze the game on a big farm, are drawn in one quick pass just after the map opens, spaced wider on bigger farms (the scale says how far apart they are).
+- Building, digging and fencing: picking a building, a decoration, a pond, a swale or a fence now asks "With your farmer" (walk to the spot, as before) or "On the map" (tap the spot on the farm map from anywhere on your land, turn it, then Build it). Ripping a keyline stays with the farmer.
+- Luna and Juneau no longer come with a new farm. Once farm dogs unlock they're sometimes in at the livestock barn with the other dogs, at $1,200 and $1,300; farms that already have them keep them.
+- Journal goals: each goal now has a starting level, and every goal counts toward the milestones, the one-off goals as well as the climbing ones. Slow or hard goals start higher, so they only hold back the later prizes: homegrown fruit, all four festivals and 10 hearts at level 4; soil organic matter, the bee tree, odd finds, all 25 homestead lots and the blue ribbon at level 3; every kind of wildlife at level 5. Filling a pond, the first festival and becoming a Local start at level 2. None of these are needed for the farm dogs any more.
+- New water goals once the first pond is dug and filled and two swales are in: dig more ponds, keep several ponds full at once, plant trees along your swales, put up a rain tank.
+- New building goals once the barn and coop are up: a hoop greenhouse, a farm stand, a coop upgrade, painting or remodelling a building, an eggmobile, and a climbing goal for the number of farm buildings.
+- Every goal can be finished: "Raise N kinds of animals" tops out at the nine the barn sells, wild foods, fish and recipes top out at what your region actually has (a desert farm has no maple syrup recipes to cook), the bee tree goal only shows where the woods have one, and the land goals stop at the 1,000,000 acre cap. "Meet N people" counts the 22 townsfolk and neighbours who exist, and the friends list now says where to find anyone you haven't met.
+- New farms start with $75,000 instead of $60,000.
+
 ## 1.5.3: neighbour chats answer where you can see them; round bales stop hogging the tap
 
 **Why:** "when you click to chat with neighbors nothing happens when you click on the questions" and "the roll out hay bale is too sensitive. it's not letting me click on my mailbox or garden beds".
@@ -111,7 +124,10 @@ Publishing: copy `index.html` and `sw.js` into the GitHub repo `silverton777/far
 - Single file: all game code is in `index.html` (about 22,000 lines). `sw.js` caches it for offline play.
 - Animal bodies use `loftTube()` (smooth tubes through rings). Dogs: `buildFarmDog()`, cows: `buildCow()`, horses: `buildHorse()`. Eyes use `flatEye()`, which drops each vertex onto the head with `surfaceX()`.
 - Hair is drawn as shell layers: grass is kind 0, wool/fur kind 1, fine hair kind 2 (`FURS`, `DOG_FUR`, `furFor()`). Faces get shorter hair through `furHead`.
-- Dogs live in `DOGS` and `F.dogs`; Luna and Juneau are added by `homeDogs()` with `own: true`.
+- Dogs live in `DOGS` and `F.dogs`. Luna and Juneau are sold by `DOGS.forSale()` from `DOG_SPECIAL` (since 1.5.4); `homeDogs()` is no longer called for new farms.
+- Goals: one-offs in `GOALS`, climbing goals in `LADDERS`. `lv` is the level a goal starts at and `after(F)` hides a goal until it returns true (`WATER_MORE`, `BUILD_MORE`). `MILESTONES.levels()` collects every visible goal's level; the lowest is the farm's level.
+- Placement: `askPlace()` offers the farmer (`startPlace`) or the map (`MAP.open({ build | dig | draw })`). The map's `place` mode ends in `confirmPlace()`, the same as walking it into place.
+- The map's contours are traced by `MAP.buildContours()`, deferred 40 ms after `MAP.open()`.
 - Saves are JSON in `localStorage` (and native preferences in the app build). Old saves are upgraded in `migrateFarm()` and `farmFromSave()`. The ground is packed by `GameTerrain.pack()` with the `TERPACK` codec (`fmt: 2`); the old raw-float format is still read by `unpackRaw()`.
 - Land: parcels 0 to 24 are the homestead lots; 25 to 108 are the rings, 12 per ring (`plotRect`, `plotOf`, `plotAdj`, `plotRingOf`). `F.owned` has an entry per parcel, `F.pUse` the use of each outlying parcel and `F.pAcres` a parcel trimmed at the cap.
 - World size: `setWorld(tier)` sets `FARM_HALF`, `THALF`, `TN` (the ground grid) and `WORLD_R` (the countryside) from `F.tier`. `growWorld()` enlarges the grid when walking land is bought; `newLand()` furnishes the new ground. Ground tiles build at two levels of detail (`GameTerrain.build` with a want list, `FarmView.updateTiles`).

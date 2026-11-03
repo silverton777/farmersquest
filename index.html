@@ -10,6 +10,19 @@ Publishing: copy `index.html` and `sw.js` into the GitHub repo `silverton777/far
 
 ==========
 
+## 1.5.4: the map opens again; build with your farmer or on the map; Luna and Juneau for sale; journal goals reworked; $75,000 to start
+
+**Why:** "when opening the map the game freezes and map never loads", "when building or digging anything give a pop up that says select location with character or with map", "Luna and Juneau should not come standard, they should have to be purchased like other dogs. If an existing account has them it should not be taken away", the owner's list of journal changes (new water goals, harder goals at higher levels, new building goals after the barn and coop) and "try starting the game with 75k instead of 60k".
+
+- Map: it opens straight away on any size of farm. The contour lines, which were traced slowly enough to freeze the game on a big farm, are drawn in one quick pass just after the map opens, spaced wider on bigger farms (the scale says how far apart they are).
+- Building, digging and fencing: picking a building, a decoration, a pond, a swale or a fence now asks "With your farmer" (walk to the spot, as before) or "On the map" (tap the spot on the farm map from anywhere on your land, turn it, then Build it). Ripping a keyline stays with the farmer.
+- Luna and Juneau no longer come with a new farm. Once farm dogs unlock they're sometimes in at the livestock barn with the other dogs, at $1,200 and $1,300; farms that already have them keep them.
+- Journal goals: each goal now has a starting level, and every goal counts toward the milestones, the one-off goals as well as the climbing ones. Slow or hard goals start higher, so they only hold back the later prizes: homegrown fruit, all four festivals and 10 hearts at level 4; soil organic matter, the bee tree, odd finds, all 25 homestead lots and the blue ribbon at level 3; every kind of wildlife at level 5. Filling a pond, the first festival and becoming a Local start at level 2. None of these are needed for the farm dogs any more.
+- New water goals once the first pond is dug and filled and two swales are in: dig more ponds, keep several ponds full at once, plant trees along your swales, put up a rain tank.
+- New building goals once the barn and coop are up: a hoop greenhouse, a farm stand, a coop upgrade, painting or remodelling a building, an eggmobile, and a climbing goal for the number of farm buildings.
+- Every goal can be finished: "Raise N kinds of animals" tops out at the nine the barn sells, wild foods, fish and recipes top out at what your region actually has (a desert farm has no maple syrup recipes to cook), the bee tree goal only shows where the woods have one, and the land goals stop at the 1,000,000 acre cap. "Meet N people" counts the 22 townsfolk and neighbours who exist, and the friends list now says where to find anyone you haven't met.
+- New farms start with $75,000 instead of $60,000.
+
 ## 1.5.3: neighbour chats answer where you can see them; round bales stop hogging the tap
 
 **Why:** "when you click to chat with neighbors nothing happens when you click on the questions" and "the roll out hay bale is too sensitive. it's not letting me click on my mailbox or garden beds".
@@ -113,7 +126,10 @@ Publishing: copy `index.html` and `sw.js` into the GitHub repo `silverton777/far
 - Single file: all game code is in `index.html` (about 22,000 lines). `sw.js` caches it for offline play.
 - Animal bodies use `loftTube()` (smooth tubes through rings). Dogs: `buildFarmDog()`, cows: `buildCow()`, horses: `buildHorse()`. Eyes use `flatEye()`, which drops each vertex onto the head with `surfaceX()`.
 - Hair is drawn as shell layers: grass is kind 0, wool/fur kind 1, fine hair kind 2 (`FURS`, `DOG_FUR`, `furFor()`). Faces get shorter hair through `furHead`.
-- Dogs live in `DOGS` and `F.dogs`; Luna and Juneau are added by `homeDogs()` with `own: true`.
+- Dogs live in `DOGS` and `F.dogs`. Luna and Juneau are sold by `DOGS.forSale()` from `DOG_SPECIAL` (since 1.5.4); `homeDogs()` is no longer called for new farms.
+- Goals: one-offs in `GOALS`, climbing goals in `LADDERS`. `lv` is the level a goal starts at and `after(F)` hides a goal until it returns true (`WATER_MORE`, `BUILD_MORE`). `MILESTONES.levels()` collects every visible goal's level; the lowest is the farm's level.
+- Placement: `askPlace()` offers the farmer (`startPlace`) or the map (`MAP.open({ build | dig | draw })`). The map's `place` mode ends in `confirmPlace()`, the same as walking it into place.
+- The map's contours are traced by `MAP.buildContours()`, deferred 40 ms after `MAP.open()`.
 - Saves are JSON in `localStorage` (and native preferences in the app build). Old saves are upgraded in `migrateFarm()` and `farmFromSave()`. The ground is packed by `GameTerrain.pack()` with the `TERPACK` codec (`fmt: 2`); the old raw-float format is still read by `unpackRaw()`.
 - Land: parcels 0 to 24 are the homestead lots; 25 to 108 are the rings, 12 per ring (`plotRect`, `plotOf`, `plotAdj`, `plotRingOf`). `F.owned` has an entry per parcel, `F.pUse` the use of each outlying parcel and `F.pAcres` a parcel trimmed at the cap.
 - World size: `setWorld(tier)` sets `FARM_HALF`, `THALF`, `TN` (the ground grid) and `WORLD_R` (the countryside) from `F.tier`. `growWorld()` enlarges the grid when walking land is bought; `newLand()` furnishes the new ground. Ground tiles build at two levels of detail (`GameTerrain.build` with a want list, `FarmView.updateTiles`).
@@ -823,7 +839,7 @@ const LISTINGS = [
   { key: 'creek', name: 'Creek-bottom pasture', plots: 2, price: 40000, om: +0.2, cover: 'pasture', water: 1, desc: 'A seasonal creek and tired pasture. Floods in big storms.' },
   { key: 'prime', name: 'Established farm', plots: 3, price: 55000, om: +0.9, cover: 'pasture', water: 2, desc: 'Good grass, an old pond and a barn. Little money left over.' },
 ];
-const START_MONEY = 60000;
+const START_MONEY = 75000;   // the owner's call (1.5.4): a little more to get going on
 
 // ------------------------------------------------------------------ crops (months to harvest, seasons ok, yield per bed, sale price per unit)
 const CROPS = [
@@ -9879,6 +9895,13 @@ const FRIENDS = {
     if (Array.isArray(g)) { const [k, n] = g[Math.floor(R() * g.length)]; if (ITEMS[k]) return { item: k, n }; }
     return { cash: 10 + 5 * h };
   },
+  // where to look for someone you haven't met yet
+  findHint(p) {
+    if (p.nb) return 'visit their farm: driveway gate, then Visit a neighbor';
+    const S = TOWN_SHOPS.find((q) => q.keeper === p.id) || (p.id === 'mabel' ? TOWN_SHOPS.find((q) => q.key === 'feed') : p.id === 'lin' ? TOWN_SHOPS.find((q) => q.key === 'merc') : p.id === 'dot' ? TOWN_SHOPS.find((q) => q.key === 'diner') : null);
+    if (S) return `find them at the ${S.name} in town`;
+    return 'out and about: Main Street, the shops or the woods (everyone comes to the park on festival days)';
+  },
   // ---------------------------------------------------------------- the journal tab
   panel(b) {
     const F = G.F, self = this; this.init(F);
@@ -9886,7 +9909,7 @@ const FRIENDS = {
     const soon = met.filter((p) => FR_BDAY[p.id]).sort((a, c) => this.daysUntilBday(F, a.id) - this.daysUntilBday(F, c.id)).slice(0, 3);
     const row = (p) => {
       const m = this.met(F, p.id), h = this.hearts(F, p.id);
-      if (!m) return { id: p.id, icon: '❔', text: p.name, small: `${p.role} · not met yet`, cls: 'dim' };
+      if (!m) return { id: p.id, icon: '❔', text: p.name, small: `${p.role} · not met yet · ${self.findHint(p)}`, cls: 'dim' };
       return { id: p.id, tap: true, icon: p.icon, html: `${esc(p.name)}<small>${esc(p.role)} · 📍 ${esc(WHERE.text(F, p.id))}</small><div style="font-size:12px;letter-spacing:1px;margin-top:2px">${this.heartRow(F, p.id)}</div>`, right: this.isBirthday(F, p.id) ? '🎂' : `${h}❤` };
     };
     b.innerHTML = `<p class="note">Hearts grow when you chat, give a gift they like (one a day), bring them what they ask for and help out on the job board in town. Tap a friend to see what you have learned about them.</p>`
@@ -15336,20 +15359,57 @@ function mustLeft(F) { return (F.chores || []).filter((c) => c.group === 'must' 
 // ---------------------------------------------------------------- long-term goals (Yeomans scale of permanence order)
 // One-off milestones, plus "ladders": goals that climb. Finish one rung and the next one appears with a bigger target and a
 // bigger reward (catch 5 fish, then 10, 20, 35, 50 ...). Ladders with a natural ceiling (kinds of fish, recipes) stop there.
+// the next water goals show up once the first pond is dug and filled and two swales are in; the next building goals once the
+// barn and the coop are up
+function WATER_MORE(F) { return !!(F.goals && F.goals.pond && F.goals.water) && F.swales.length >= 2; }
+function BUILD_MORE(F) { return !!(F.goals && F.goals.barn && F.goals.coop); }
+// what your own region can give you, so no goal asks for more kinds than there are
+const WILD_KINDS = (F) => { const P = WOODS.prof(F), out = new Set(); for (const g of Object.keys(P.forage || {})) for (const s of P.forage[g]) for (const k of s) if (['mush', 'berry', 'fruit', 'nut', 'green', 'flower'].includes(WOOD_GROUP[k])) out.add(k); return out; };
+const FISH_KINDS = (F) => { const out = new Set(FISHING.species(F).map((f) => f.key)); for (const pd of [false, true]) { try { for (const q of WOODS.fishPool(F, pd) || []) out.add((q[0] && q[0].key) || q[0]); } catch (e) { /* no woods water */ } } for (const k of Object.keys(F.fishLog || {})) out.add(k); return out; };
+function recipeHere(F, r) {
+  const wild = WILD_KINDS(F), P = WOODS.prof(F);
+  return r.need.every(([what]) => {
+    if (what === 'syrup') return !!P.sap;
+    if (CGROUP[what]) return Object.keys(ITEMS).some((k) => ITEMS[k].group === CGROUP[what] && (!WOOD_GROUP[k] || wild.has(k)));
+    if (what[0] === '@') return true;
+    const ks = what.split('|').filter((k) => ITEMS[k]);
+    return ks.some((k) => !WOOD_GROUP[k] || wild.has(k));
+  }) || !!(F.cooked && F.cooked[r.id]);
+}
+const FARM_BLDG = new Set(['barn', 'coop', 'eggmobile', 'greenhouse', 'tank', 'stand', 'woodpile']);
+const goalShown = (F, g) => !g.after || !F || g.after(F);
+// trees you planted along a swale (counted again only when the trees or swales change)
+const SWT = new WeakMap();
+function treesOnSwales(F) {
+  if (!F.swales.length) return 0;
+  let np = 0; for (const sw of F.swales) np += (sw.pts || []).length;
+  const key = F.objs.length + ':' + F.swales.length + ':' + np + ':' + (F.nextId || 0), c = SWT.get(F);
+  if (c && c.key === key) return c.n;
+  const n = F.objs.filter((o) => o.t === 'tree' && !o.wild && swaleAt(F, o.x, o.z, 2.2)).length;
+  SWT.set(F, { key, n }); return n;
+}
+// lv: the level a goal starts at. A hard or slow goal starts higher, so it holds back only the higher milestone prizes (a goal at
+// level 3 is needed for the level-4 prize, not for the farm dogs at level 2). after: a goal that only shows up once others are done.
 const GOALS = [
   { id: 'pond', cat: 'Water', icon: '💧', name: 'Dig your first pond', reward: 500, prog: (F) => (F.ponds.length ? 1 : 0) },
-  { id: 'water', cat: 'Water', icon: '🌊', name: 'Fill a pond to the brim', reward: 1000, prog: (F) => Math.max(0, ...F.ponds.map((p) => p.vol)) },
-  { id: 'fruit', cat: 'Trees', icon: '🍎', name: 'Pick your first homegrown fruit', reward: 600, prog: (F) => (F.stats.firstFruit ? 1 : 0) },
+  { id: 'water', cat: 'Water', icon: '🌊', name: 'Fill a pond to the brim', reward: 1000, lv: 2, prog: (F) => Math.max(0, ...F.ponds.map((p) => p.vol)) },
+  { id: 'tank', cat: 'Water', icon: '🛢️', name: 'Put up a rain tank by a building', reward: 600, lv: 2, after: WATER_MORE, prog: (F) => (F.objs.some((o) => o.t === 'tank') ? 1 : 0) },
+  { id: 'fruit', cat: 'Trees', icon: '🍎', name: 'Pick your first homegrown fruit', reward: 600, lv: 4, prog: (F) => (F.stats.firstFruit ? 1 : 0) },
   { id: 'barn', cat: 'Buildings', icon: '🏚️', name: 'Raise a barn', reward: 1000, prog: (F) => (F.objs.some((o) => o.t === 'barn') ? 1 : 0) },
   { id: 'coop', cat: 'Buildings', icon: '🐔', name: 'Build a coop and get eggs', reward: 300, prog: (F) => (F.stats.eggs > 0 ? 1 : 0) },
-  { id: 'land25', cat: 'Business', icon: '🗺️', name: 'Own all 25 homestead lots', reward: 40000, prog: (F) => homeCount(F) / NHOME },
+  { id: 'greenhouse', cat: 'Buildings', icon: '🏡', name: 'Put up a hoop greenhouse', reward: 1200, lv: 2, after: BUILD_MORE, prog: (F) => (F.objs.some((o) => o.t === 'greenhouse') ? 1 : 0) },
+  { id: 'stand', cat: 'Buildings', icon: '🏪', name: 'Open a farm stand at the gate', reward: 800, lv: 2, after: BUILD_MORE, prog: (F) => (F.objs.some((o) => o.t === 'stand') ? 1 : 0) },
+  { id: 'coopup', cat: 'Buildings', icon: '⬆️', name: 'Upgrade a chicken coop', reward: 700, lv: 2, after: BUILD_MORE, prog: (F) => (F.objs.some((o) => o.t === 'coop' && (o.upg || 0) >= 1) ? 1 : 0) },
+  { id: 'paint', cat: 'Buildings', icon: '🎨', name: 'Paint or remodel a building', reward: 500, lv: 2, after: BUILD_MORE, prog: (F) => (F.objs.some((o) => o.paint || o.hstyle || (o.sc && o.sc !== 1)) ? 1 : 0) },
+  { id: 'eggmobile', cat: 'Buildings', icon: '🚚', name: 'Build an eggmobile to follow the herd', reward: 1500, lv: 3, after: BUILD_MORE, prog: (F) => (F.objs.some((o) => o.t === 'eggmobile') ? 1 : 0) },
+  { id: 'land25', cat: 'Business', icon: '🗺️', name: 'Own all 25 homestead lots', reward: 40000, lv: 3, prog: (F) => homeCount(F) / NHOME },
   { id: 'hand1', cat: 'Business', icon: '🧑‍🌾', name: 'Hire a farmhand', reward: 300, prog: (F) => (F.hand || tallied(F, 'hired') ? 1 : 0) },
-  { id: 'ribbon', cat: 'Community', icon: '🥇', name: 'Win a blue ribbon at the County Fair', reward: 1500, prog: (F) => (tallied(F, 'blueRibbons') ? 1 : 0) },
-  { id: 'bff', cat: 'Community', icon: '💞', name: 'Reach 10 hearts with someone', reward: 2500, prog: (F) => FRIENDS.count(F, 10) },
-  { id: 'fest1', cat: 'Community', icon: '🎉', name: 'Join in at a festival', reward: 300, prog: (F) => tallied(F, 'fests') },
-  { id: 'fest4', cat: 'Community', icon: '🕯️', name: 'Take part in all four festivals', reward: 1500, prog: (F) => Object.keys(F.festLog || {}).length / 4 },
-  { id: 'local', cat: 'Community', icon: '🏅', name: 'Become a Local in town', reward: 1200, prog: (F) => STANDING.score(F) / 90 },
-  { id: 'wildall', cat: 'The woods', icon: '🦉', name: 'Spot every kind of wildlife in your woods', reward: 2500, prog: (F) => { const P = WOODS.prof(F), W = (F.woods || {}).wild || {}; return P.wild.filter((q) => W[q[0]]).length / P.wild.length; } },
+  { id: 'ribbon', cat: 'Community', icon: '🥇', name: 'Win a blue ribbon at the County Fair', reward: 1500, lv: 3, prog: (F) => (tallied(F, 'blueRibbons') ? 1 : 0) },
+  { id: 'bff', cat: 'Community', icon: '💞', name: 'Reach 10 hearts with someone', reward: 2500, lv: 4, prog: (F) => FRIENDS.count(F, 10) },
+  { id: 'fest1', cat: 'Community', icon: '🎉', name: 'Join in at a festival', reward: 300, lv: 2, prog: (F) => tallied(F, 'fests') },
+  { id: 'fest4', cat: 'Community', icon: '🕯️', name: 'Take part in all four festivals', reward: 1500, lv: 4, prog: (F) => Object.keys(F.festLog || {}).length / 4 },
+  { id: 'local', cat: 'Community', icon: '🏅', name: 'Become a Local in town', reward: 1200, lv: 2, prog: (F) => STANDING.score(F) / 90 },
+  { id: 'wildall', cat: 'The woods', icon: '🦉', name: 'Spot every kind of wildlife in your woods', reward: 2500, lv: 5, prog: (F) => { const P = WOODS.prof(F), W = (F.woods || {}).wild || {}; return P.wild.filter((q) => W[q[0]]).length / P.wild.length; } },
 ];
 const GOAL_CATS = ['Water', 'Trees', 'Buildings', 'Animals', 'Soil', 'Business', 'Community', 'The woods', 'Kitchen', 'Memories'];
 const LADDER_MULT = [1, 2, 4, 7, 10, 15, 20, 30, 40, 60, 80, 100, 150, 200, 300, 400, 600, 800, 1000];
@@ -15358,18 +15418,22 @@ const plural = (n, one, many) => `${n.toLocaleString()} ${n === 1 ? one : (many 
 // reward: the first rung's prize; max: a natural ceiling; old: earlier one-off goals -> how many rungs they already cover
 const LADDERS = [
   { id: 'swales', cat: 'Water', icon: '〰️', base: 3, reward: 800, of: (F) => F.swales.length, name: (n) => `Build ${plural(n, 'swale')} on contour`, old: { swale3: 1 } },
+  { id: 'ponds', cat: 'Water', icon: '💧', steps: [2, 3, 4, 6, 8, 10, 15, 20], reward: 900, lv: 2, after: WATER_MORE, of: (F) => F.ponds.length, name: (n) => `Dig ${plural(n, 'pond')}` },
+  { id: 'fullponds', cat: 'Water', icon: '🌊', steps: [2, 3, 5, 8, 12], reward: 1200, lv: 3, after: WATER_MORE, of: (F) => F.ponds.filter((p) => p.vol >= 0.95).length, name: (n) => `Have ${n} ponds full at once` },
+  { id: 'swaletrees', cat: 'Water', icon: '🌱', steps: [5, 15, 30, 60, 100, 150, 200, 300], reward: 600, lv: 2, after: WATER_MORE, of: (F) => treesOnSwales(F), name: (n) => `Plant ${plural(n, 'tree')} along your swales` },
   { id: 'trees', cat: 'Trees', icon: '🌳', steps: [10, 25, 40, 60, 100, 150, 200, 300, 400, 600, 800, 1000], reward: 400, of: (F) => F.stats.treesPlanted, name: (n) => `Plant ${plural(n, 'tree')}`, old: { trees10: 1, trees40: 3 } },
-  { id: 'species', cat: 'Animals', icon: '🐄', steps: [2, 3, 4, 5, 6, 7, 8, 9, 10], reward: 600, of: (F) => new Set(F.animals.map((a) => a.sp)).size, max: () => Object.keys(SPECIES).length, name: (n) => `Raise ${n} kinds of animals`, old: { species3: 2 } },
+  { id: 'species', cat: 'Animals', icon: '🐄', steps: [2, 3, 4, 5, 6, 7, 8, 9, 10], reward: 600, of: (F) => new Set(F.animals.map((a) => a.sp)).size, max: () => Object.keys(SPECIES_EXTRA).length, name: (n) => `Raise ${n} kinds of animals`, old: { species3: 2 } },
   { id: 'births', cat: 'Animals', icon: '🍼', steps: [1, 5, 10, 25, 50, 75, 100, 150, 200, 300], reward: 800, of: (F) => F.stats.births || 0, name: (n) => (n === 1 ? 'Welcome your first newborn' : `Welcome ${n} newborns`), old: { birth: 1 } },
+  { id: 'buildings', cat: 'Buildings', icon: '🏗️', steps: [3, 5, 8, 12, 16, 20, 30, 40], reward: 800, lv: 2, after: BUILD_MORE, of: (F) => F.objs.filter((o) => FARM_BLDG.has(o.t)).length, name: (n) => `Have ${n} farm buildings up` },
   { id: 'paddocks', cat: 'Animals', icon: '🔁', steps: [2, 4, 6, 10, 15, 20, 30, 40, 60], reward: 500, of: (F) => F.paddocks.length, name: (n) => `Set up ${n} paddocks for rotational grazing`, old: { paddock6: 3 } },
   { id: 'hay', cat: 'Animals', icon: '🌾', base: 10, reward: 700, of: (F) => Math.floor(F.stats.bales || 0), name: (n) => `Cut ${plural(n, 'bale')} of your own hay`, old: { hay: 1 } },
   { id: 'bidwon', cat: 'Animals', icon: '🔨', base: 1, reward: 400, of: (F) => tallied(F, 'auctionWon'), name: (n) => (n === 1 ? 'Win a lot at the Saturday auction' : `Win ${n} lots at the Saturday auction`), old: { bid1: 1 } },
   { id: 'bidsold', cat: 'Animals', icon: '💰', base: 3, reward: 700, of: (F) => tallied(F, 'auctionSold'), name: (n) => `Sell ${plural(n, 'animal')} in the auction ring`, old: { bid3: 1 } },
-  { id: 'om', cat: 'Soil', icon: '🪱', steps: [0.5, 1, 1.5, 2, 2.5, 3, 4, 5, 6, 8], reward: 2000, of: (F) => F.terrain.avgOM(true) - F.stats.startOM, name: (n) => `Raise soil organic matter by ${n}%`, old: { om1: 1, om2: 3 }, frac: true },
+  { id: 'om', cat: 'Soil', icon: '🪱', steps: [0.5, 1, 1.5, 2, 2.5, 3, 4, 5, 6, 8], reward: 2000, of: (F) => F.terrain.avgOM(true) - F.stats.startOM, name: (n) => `Raise soil organic matter by ${n}%`, old: { om1: 1, om2: 3 }, frac: true, lv: 3 },
   { id: 'market', cat: 'Business', icon: '🏪', base: 5, reward: 600, of: (F) => F.stats.marketVisits || 0, name: (n) => `Sell at ${n} farmers markets`, old: { market: 2 } },
   { id: 'income', cat: 'Business', icon: '💵', base: 25000, reward: 3000, of: (F) => F.stats.income || 0, name: (n) => `Earn $${n.toLocaleString()} from farm sales`, old: { income: 1 } },
-  { id: 'lots', cat: 'Business', icon: '🏡', steps: [2, 3, 4, 5, 6, 8, 10, 13, 16, 20, 25, 30, 37, 49, 61, 73, 85, 97, 109], reward: 1500, of: (F) => ownedCount(F), max: () => NPLOTS, name: (n) => `Own ${n} parcels of land`, old: { land: 7 } },
-  { id: 'acres', cat: 'Business', icon: '🏞️', steps: [10, 25, 50, 100, 250, 500, 1000, 2500, 5000, 10000, 25000, 50000, 100000, 250000, 500000, 1000000], reward: 1000, of: (F) => HOLD.acres(F), name: (n) => `Own ${n.toLocaleString()} acres`, old: { acres100: 4, acres1000: 7, acres10000: 10 } },
+  { id: 'lots', cat: 'Business', icon: '🏡', steps: [2, 3, 4, 5, 6, 8, 10, 13, 16, 20, 25, 30, 37, 49, 61, 73, 85, 97, 109], reward: 1500, of: (F) => ownedCount(F), max: (F) => (F && HOLD.acres(F) >= MAX_ACRES - 1 ? ownedCount(F) : NPLOTS), name: (n) => `Own ${n} parcels of land`, old: { land: 7 } },
+  { id: 'acres', cat: 'Business', icon: '🏞️', steps: [10, 25, 50, 100, 250, 500, 1000, 2500, 5000, 10000, 25000, 50000, 100000, 250000, 500000, 1000000], reward: 1000, of: (F) => { const a = HOLD.acres(F); return a >= MAX_ACRES - 1 ? MAX_ACRES : a; }, max: () => MAX_ACRES, name: (n) => `Own ${n.toLocaleString()} acres`, old: { acres100: 4, acres1000: 7, acres10000: 10 } },
   { id: 'meet', cat: 'Community', icon: '👋', steps: [3, 6, 10, 15, 20, 30], reward: 300, of: (F) => FRIENDS.people(F).filter((p) => FRIENDS.met(F, p.id)).length, max: (F) => FRIENDS.people(F).length, name: (n) => `Meet ${n} people around the county`, old: { meet6: 2 } },
   { id: 'gifts', cat: 'Community', icon: '🎁', base: 10, reward: 400, of: (F) => tallied(F, 'gifts'), name: (n) => `Give ${plural(n, 'gift')}`, old: { gift10: 1 } },
   { id: 'jobs', cat: 'Community', icon: '📌', base: 5, reward: 600, of: (F) => tallied(F, 'jobs'), name: (n) => `Finish ${plural(n, 'job')} from the job board`, old: { jobs5: 1 } },
@@ -15377,17 +15441,17 @@ const LADDERS = [
   { id: 'talks', cat: 'Community', icon: '💬', base: 10, reward: 300, of: (F) => tallied(F, 'talks'), name: (n) => `Have ${n} proper chats`, old: { talk10: 1 } },
   { id: 'visits', cat: 'Community', icon: '🏠', base: 3, reward: 400, of: (F) => tallied(F, 'visits'), name: (n) => `Have ${plural(n, 'friend')} visit your farm`, old: { visit3: 1 } },
   { id: 'forage', cat: 'The woods', icon: '🍄', steps: [1, 10, 25, 50, 100, 200, 350, 500, 750, 1000], reward: 150, of: (F) => tallied(F, 'forage'), name: (n) => (n === 1 ? 'Pick your first wild food' : `Pick wild food ${n} times`), old: { forage1: 1, forage25: 3 } },
-  { id: 'wildkinds', cat: 'The woods', icon: '🫐', steps: [5, 10, 15, 20, 25, 30, 40], reward: 500, of: (F) => Object.keys((F.woods || {}).log || {}).filter((k) => typeof WOOD_GROUP !== 'undefined' && ['mush', 'berry', 'fruit', 'nut', 'green', 'flower'].includes(WOOD_GROUP[k])).length, max: () => (typeof WOOD_GROUP === 'undefined' ? 10 : Object.keys(WOOD_GROUP).filter((k) => ['mush', 'berry', 'fruit', 'nut', 'green', 'flower'].includes(WOOD_GROUP[k])).length), name: (n) => `Find ${n} different wild foods`, old: { forage10k: 2 } },
+  { id: 'wildkinds', cat: 'The woods', icon: '🫐', steps: [5, 10, 15, 20, 25, 30, 40], reward: 500, of: (F) => Object.keys((F.woods || {}).log || {}).filter((k) => typeof WOOD_GROUP !== 'undefined' && ['mush', 'berry', 'fruit', 'nut', 'green', 'flower'].includes(WOOD_GROUP[k])).length, max: (F) => WILD_KINDS(F).size, name: (n) => `Find ${n} different wild foods`, old: { forage10k: 2 } },
   { id: 'chop', cat: 'The woods', icon: '🪓', base: 10, reward: 400, of: (F) => tallied(F, 'chopped'), name: (n) => `Chop ${plural(n, 'tree')} in the woods`, old: { chop10: 1 } },
   { id: 'creekfish', cat: 'The woods', icon: '🎣', base: 5, reward: 300, of: (F) => tallied(F, 'creekfish'), name: (n) => `Catch ${plural(n, 'fish', 'fish')} from the creek`, old: { creekfish: 1 } },
-  { id: 'beetree', cat: 'The woods', icon: '🍯', base: 1, reward: 300, of: (F) => tallied(F, 'beetree'), name: (n) => (n === 1 ? 'Take honey from a bee tree' : `Take honey from bee trees ${n} times`), old: { beetree1: 1 } },
+  { id: 'beetree', cat: 'The woods', icon: '🍯', base: 1, reward: 300, of: (F) => tallied(F, 'beetree'), name: (n) => (n === 1 ? 'Take honey from a bee tree' : `Take honey from bee trees ${n} times`), old: { beetree1: 1 }, lv: 3, after: (F) => !!WOODS.prof(F).bee },
   { id: 'wildlife', cat: 'The woods', icon: '🦌', steps: [3, 5, 8, 12, 16, 20, 25, 30], reward: 400, of: (F) => Object.keys((F.woods || {}).wild || {}).length, max: (F) => WOODS.prof(F).wild.length, name: (n) => `Spot ${n} kinds of wildlife`, old: { wild5: 2 } },
-  { id: 'finds', cat: 'The woods', icon: '✨', base: 5, reward: 400, of: (F) => tallied(F, 'finds'), name: (n) => `Dig up ${plural(n, 'odd find')}`, old: { finds5: 1 } },
+  { id: 'finds', cat: 'The woods', icon: '✨', base: 5, reward: 400, of: (F) => tallied(F, 'finds'), name: (n) => `Dig up ${plural(n, 'odd find')}`, old: { finds5: 1 }, lv: 3 },
   { id: 'bouquets', cat: 'The woods', icon: '💐', base: 1, reward: 150, of: (F) => tallied(F, 'bouquets'), name: (n) => (n === 1 ? 'Tie a wild bouquet' : `Tie ${n} wild bouquets`), old: { bouquet1: 1 } },
   { id: 'cooked', cat: 'Kitchen', icon: '🍳', steps: [1, 10, 25, 50, 100, 200, 350, 500, 750, 1000], reward: 200, of: (F) => tallied(F, 'cooked'), name: (n) => (n === 1 ? 'Cook your first dish' : `Cook ${n} dishes`), old: { cook1: 1, cook25: 3 } },
-  { id: 'recipes', cat: 'Kitchen', icon: '🥧', steps: [3, 6, 10, 15, 20, 25, 30, 40], reward: 500, of: (F) => Object.keys(F.cooked || {}).length, max: () => RECIPES.length, name: (n) => `Cook ${n} different recipes`, old: { cook6: 2 } },
+  { id: 'recipes', cat: 'Kitchen', icon: '🥧', steps: [3, 6, 10, 15, 20, 25, 30, 40], reward: 500, of: (F) => Object.keys(F.cooked || {}).length, max: (F) => RECIPES.filter((r) => recipeHere(F, r)).length, name: (n) => `Cook ${n} different recipes`, old: { cook6: 2 } },
   { id: 'fish', cat: 'Kitchen', icon: '🎣', steps: [1, 5, 10, 20, 35, 50, 75, 100, 150, 200, 300], reward: 250, of: (F) => tallied(F, 'fish'), name: (n) => (n === 1 ? 'Catch your first fish' : `Catch ${n} fish`), old: { fish1: 1 } },
-  { id: 'fishkinds', cat: 'Kitchen', icon: '🐟', steps: [3, 5, 8, 12, 16, 20], reward: 600, of: (F) => Object.keys(F.fishLog || {}).length, max: () => FISH.length, name: (n) => `Catch ${n} kinds of fish`, old: { fish5k: 2 } },
+  { id: 'fishkinds', cat: 'Kitchen', icon: '🐟', steps: [3, 5, 8, 12, 16, 20], reward: 600, of: (F) => Object.keys(F.fishLog || {}).length, max: (F) => FISH_KINDS(F).size, name: (n) => `Catch ${n} kinds of fish`, old: { fish5k: 2 } },
   { id: 'photos', cat: 'Memories', icon: '📷', steps: [1, 10, 25, 50, 100, 200, 350, 500], reward: 100, of: (F) => tallied(F, 'photos'), name: (n) => (n === 1 ? 'Take a photo in photo mode' : `Take ${n} photos`), old: { photo1: 1, photo10: 2 } },
 ];
 const niceCount = (v) => { const m = v < 20 ? 1 : v < 100 ? 5 : v < 1000 ? 10 : v < 10000 ? 50 : v < 100000 ? 500 : 5000; return Math.round(v / m) * m; };
@@ -15414,21 +15478,23 @@ const LADDER = {
 function goalView(F) {
   const out = [];
   for (const cat of GOAL_CATS) {
-    for (const g of GOALS) if (g.cat === cat) out.push({ id: g.id, cat, icon: g.icon, name: g.name, reward: g.reward, done: !!(F && F.goals[g.id]), prog: F ? g.prog(F) : 0 });
+    for (const g of GOALS) if (g.cat === cat && goalShown(F, g)) { let pr = 0; try { pr = F ? g.prog(F) : 0; } catch (e) { pr = 0; } out.push({ id: g.id, cat, icon: g.icon, name: g.name, reward: g.reward, done: !!(F && F.goals[g.id]), prog: pr, level: (g.lv || 1) - 1 }); }
     for (const L of LADDERS) {
-      if (L.cat !== cat) continue;
-      const i = LADDER.rung(F, L), t = LADDER.next(F, L, i);
-      if (t === null) { const last = Math.min(LADDER.target(L, Math.max(0, i - 1)), L.max ? L.max(F) : Infinity); out.push({ id: L.id, cat, icon: L.icon, name: L.name(last), reward: 0, done: true, prog: 1, level: i, top: true }); continue; }
-      out.push({ id: L.id, cat, icon: L.icon, name: L.name(t), reward: LADDER.reward(L, i, t), done: false, prog: F ? L.of(F) / t : 0, level: i });
+      if (L.cat !== cat || !goalShown(F, L)) continue;
+      const i = LADDER.rung(F, L), t = LADDER.next(F, L, i), o = (L.lv || 1) - 1;
+      if (t === null) { const last = Math.min(LADDER.target(L, Math.max(0, i - 1)), L.max ? L.max(F) : Infinity); out.push({ id: L.id, cat, icon: L.icon, name: L.name(last), reward: 0, done: true, prog: 1, level: i + o, top: true }); continue; }
+      let v = 0; try { v = F ? L.of(F) : 0; } catch (e) { v = 0; }
+      out.push({ id: L.id, cat, icon: L.icon, name: L.name(t), reward: LADDER.reward(L, i, t), done: false, prog: v / t, level: i + o });
     }
   }
   return out;
 }
 function checkGoals(F) {
   const done = [];
-  for (const g of GOALS) if (!F.goals[g.id] && g.prog(F) >= 1) { F.goals[g.id] = { y: F.year, m: F.month }; F.money += g.reward; done.push(g); }
+  for (const g of GOALS) { if (F.goals[g.id] || !goalShown(F, g)) continue; let pr = 0; try { pr = g.prog(F); } catch (e) { continue; } if (pr >= 1) { F.goals[g.id] = { y: F.year, m: F.month }; F.money += g.reward; done.push(g); } }
   const R = LADDER.init(F);
   for (const L of LADDERS) {
+    if (!goalShown(F, L)) continue;
     let v; try { v = L.of(F); } catch (e) { continue; }
     for (let guard = 0; guard < 12; guard++) {
       const i = R[L.id] || 0, t = LADDER.next(F, L, i);
@@ -16362,7 +16428,7 @@ function interiorFrame(F0, room) {
 
 'use strict';
 // ============================================================================ profiles + saves (each profile has its own farm save)
-const FQ_VERSION = '1.5.3';
+const FQ_VERSION = '1.5.4';
 const LOOKS = [
   { shirt: [214, 74, 64], hair: [120, 76, 40] }, { shirt: [70, 130, 200], hair: [236, 206, 120] }, { shirt: [240, 170, 60], hair: [80, 50, 30] },
   { shirt: [120, 170, 90], hair: [40, 30, 28] }, { shirt: [170, 100, 190], hair: [200, 110, 60] }, { shirt: [60, 160, 160], hair: [150, 100, 60] },
@@ -16927,7 +16993,8 @@ const UI = {
       r.onclick = () => {
         const id = r.dataset.id;
         if (id === 'fill') { if (!here) { UI.toast('Walk onto the pond bank or the swale first, then choose Fill in.'); return; } this.closeAll(); if (F.ponds.includes(here)) fillPond(here); else fillSwale(here); return; }
-        if (id.startsWith('pond')) { const s = { pond_s: [2.8, 2.1, 3000, 'Small'], pond_m: [3.8, 2.8, 6500, 'Medium'], pond_l: [5.0, 3.6, 12000, 'Large'] }[id]; startPlace({ kind: 'pond', rx: s[0], rz: s[1], price: s[2], label: s[3] }); }
+        if (id.startsWith('pond')) { const s = { pond_s: [2.8, 2.1, 3000, 'Small'], pond_m: [3.8, 2.8, 6500, 'Medium'], pond_l: [5.0, 3.6, 12000, 'Large'] }[id]; if (!ownsTool(F, 'shovel')) { toolLocked('shovel'); return; } askPlace({ kind: 'pond', rx: s[0], rz: s[1], price: s[2], label: s[3] }, { dig: 'pond', size: id }); }
+        else if (id === 'swale') { if (!ownsTool(F, 'shovel')) { toolLocked('shovel'); return; } askPlace({ kind: 'swale' }, { dig: 'swale' }); }
         else startPlace({ kind: id });
       };
     });
@@ -16939,7 +17006,7 @@ const UI = {
       this.rows(Object.entries(FENCES).map(([k, f]) => ({ id: k, tap: true, icon: FENCE_ICON[k], text: f.name, small: f.desc + (fenceStock(F, k) > 0.05 ? ` · you have ${meters(fenceStock(F, k))} m` : ''), right: F.kid ? '' : `$${f.perUnit} / 5 m` }))) +
       (allFences(F).length ? this.rows([{ id: 'edit', tap: true, icon: '✏️', text: 'Move, resize or take down a fence', small: 'Fence you take down is kept, so you never pay for it twice' }]) : '') +
       '<p class="note">Paddocks are how you do rotational grazing: graze one, let the others rest and regrow.</p>';
-    P.body.querySelectorAll('.row').forEach((r) => { r.onclick = () => { const id = r.dataset.id; if (id === 'map') MAP.open({ draw: 'poly' }); else if (id === 'edit') MAP.open(); else startPlace({ kind: 'paddock', fence: id }); }; });
+    P.body.querySelectorAll('.row').forEach((r) => { r.onclick = () => { const id = r.dataset.id; if (id === 'map') MAP.open({ draw: 'poly' }); else if (id === 'edit') MAP.open(); else askPlace({ kind: 'paddock', fence: id }, { draw: 'poly' }); }; });
   },
   buildMenu() {
     const F = G.F, P = this.open({ title: 'Build', icon: '🔨' });
@@ -16947,8 +17014,8 @@ const UI = {
     P.body.innerHTML = `<div class="grid">${BUILD_LIST.map((b) => `<button class="card${F.money < b.price ? ' bad' : ''}" data-k="${b.key}"><span class="ic">${{ barn: '🏚️', coop: '🐔', eggmobile: '🚚', greenhouse: '🏡', hive: '🐝', trough: '🛁', tank: '🛢️', stand: '🏪', woodpile: '🪵' }[b.key]}</span><b>${b.name}</b><small>${b.note}</small><span class="pr">${money(b.price)}</span></button>`).join('')}</div>
       <div class="grp">Decorations</div><div class="grid">${decor.map((d) => { const own = SHOP.owned('decor', d.key); return `<button class="card${own ? '' : ' bad'}" data-d="${d.key}"><span class="ic">${{ planter: '🌷', picnic: '🧺', scarecrow: '🎃', windmill: '🌬️' }[d.key]}</span><b>${d.name}</b><small>${own ? d.desc : 'Unlock in the Farm shop'}</small><span class="pr">${own ? money(d.cash) : d.cost + ' 🌰'}</span></button>`; }).join('')}</div>
       <p class="note">Tip: walk up to a building with the hammer to move it.</p>`;
-    P.body.querySelectorAll('[data-k]').forEach((c) => { c.onclick = () => { const def = BUILD_LIST.find((b) => b.key === c.dataset.k); if (F.money < def.price) return UI.toast(`You need ${money(def.price)}.`, true); startPlace({ kind: 'build', def }); }; });
-    P.body.querySelectorAll('[data-d]').forEach((c) => { c.onclick = () => { const d = decor.find((q) => q.key === c.dataset.d); if (!SHOP.owned('decor', d.key)) return SHOP.open('decor'); if (F.money < d.cash) return UI.toast(`You need ${money(d.cash)}.`, true); startPlace({ kind: 'build', def: { key: d.key, name: d.name, price: d.cash, hw: d.hw, hd: d.hd } }); }; });
+    P.body.querySelectorAll('[data-k]').forEach((c) => { c.onclick = () => { const def = BUILD_LIST.find((b) => b.key === c.dataset.k); if (F.money < def.price) return UI.toast(`You need ${money(def.price)}.`, true); askPlace({ kind: 'build', def }, { build: def }); }; });
+    P.body.querySelectorAll('[data-d]').forEach((c) => { c.onclick = () => { const d = decor.find((q) => q.key === c.dataset.d); if (!SHOP.owned('decor', d.key)) return SHOP.open('decor'); if (F.money < d.cash) return UI.toast(`You need ${money(d.cash)}.`, true); { const def = { key: d.key, name: d.name, price: d.cash, hw: d.hw, hd: d.hd }; askPlace({ kind: 'build', def }, { build: def }); } }; });
   },
   // ---------------- bag
   bag() {
@@ -16978,7 +17045,7 @@ const UI = {
           const p = clamp(g.prog, 0, 1), done = g.done;
           html += `<div class="row${done ? '' : ''}"><span class="ic">${done ? '✅' : g.icon}</span><span class="tx">${esc(g.name)}${g.level ? `<small style="opacity:.65"> · level ${g.level + (g.top ? 0 : 1)}${g.top ? ', all done' : ''}</small>` : ''}<div class="gbar"><i style="width:${Math.round(p * 100)}%"></i></div></span><span class="amt">${done ? 'Done' : F.kid ? '' : '+' + money(g.reward)}</span></div>`;
         }
-        b.innerHTML = MILESTONES.html(F) + `<p class="note">Goals follow the permaculture order of permanence: water first, then access and trees, buildings, fences, and soil. Finish one and the next level appears with a bigger target and a bigger reward.</p>${html}`;
+        b.innerHTML = MILESTONES.html(F) + `<p class="note">Goals follow the permaculture order of permanence: water first, then access and trees, buildings, fences, and soil. Finish one and the next level appears with a bigger target and a bigger reward. Slow or hard goals start at a higher level, so they only hold back the later milestones. New goals appear as you go.</p>${html}`;
       } else if (t === 'stats') {
         const T = F.terrain, om = T.avgOM(true), dOM = om - F.stats.startOM;
         let moist = 0, bio = 0, n = 0; for (let k = 0; k < TN * TN; k++) { const x = (k % TN) - THALF + 0.5, z = Math.floor(k / TN) - THALF + 0.5, p = plotOf(x, z); if (p >= 0 && F.owned[p]) { moist += T.moist[k]; bio += T.bio[k]; n++; } }
@@ -17821,10 +17888,14 @@ const MAP = {
     glc.style.visibility = 'hidden'; fxc.style.visibility = 'hidden';   // the 3D view rests while the map is up
     if (!this.inited) this.init();
     this.size();
-    this.buildBase();
+    try { this.buildBase(); } catch (e) { console.error(e); }
+    const FF = G.F; this.cont = this.cont && this.contFor === FF ? this.cont : []; if (!this.contRange) this.contRange = [0, 0];
+    clearTimeout(this.contT); this.contT = setTimeout(() => { if (!this.on) return; try { this.buildContours(); this.contFor = FF; } catch (e) { console.error(e); this.cont = []; } this.dirty = true; }, 40);
     this.fit();
     this.mode = 'view'; this.draft = null; this.selId = null; this.tip = null;
     if (opt.edit) this.select(opt.edit);
+    else if (opt.build) this.startNewBuild(opt.build);
+    else if (opt.dig) { this.startDig(opt.dig); if (opt.size && this.dig) this.dig.size = opt.size; }
     else if (opt.draw) this.startDraw(opt.draw);
     else if (opt.move) this.selectObj(opt.move);
     this.bar(); this.layersUI(); this.dirty = true;
@@ -17909,42 +17980,51 @@ const MAP = {
       fid.data[k] = col[0] * sh; fid.data[k + 1] = col[1] * sh; fid.data[k + 2] = col[2] * sh; fid.data[k + 3] = 255;
     }
     fg.putImageData(fid, 0, 0); this.farImg = fc;
-    // contour lines every 0.4 height units (2 m at the map's 5 m-per-unit scale); every 5th is a heavier index line.
-    // Traced on the exact triangles the 3D ground is built from, so the lines sit precisely on the hills you see.
-    const W = TN + 1, iv = 0.4, Hh = T.h, lines = [];
+  },
+  // the contour lines: worked out just after the map first shows, so a big farm's map opens straight away and the lines follow a moment later
+  buildContours() {
+    const F = G.F, T = F.terrain;
+    // contour lines every 0.4 height units (2 m at the map's 5 m-per-unit scale) on a homestead farm, wider apart on a bigger one;
+    // every 5th is a heavier index line. Traced on the triangles the 3D ground is built from (every corner on a homestead farm, every
+    // second one on the biggest), in one pass over the ground: each triangle adds a piece to every level that crosses it.
+    const W = TN + 1, Hh = T.h, lines = [], iv = TIER >= 2 ? 1.2 : TIER === 1 ? 0.8 : 0.4, st = TN > 300 ? 2 : 1, M = Math.floor(TN / st);
+    this.contIv = iv;
     let lo = 1e9, hi = -1e9; for (let k = 0; k < W * W; k++) { lo = Math.min(lo, Hh[k]); hi = Math.max(hi, Hh[k]); }
-    const vx = (k) => (k % W) - THALF, vz = (k) => Math.floor(k / W) - THALF;
-    const key = (q) => Math.round(q[0] * 512) + ',' + Math.round(q[1] * 512);
-    for (let lv = Math.ceil(lo / iv) * iv; lv <= hi; lv += iv) {
-      const segs = [];
-      for (let j2 = 0; j2 < TN; j2++) for (let i2 = 0; i2 < TN; i2++) {
-        const k00 = j2 * W + i2, k10 = k00 + 1, k01 = k00 + W, k11 = k01 + 1;
-        for (const tri of [[k00, k01, k11], [k00, k11, k10]]) {
-          const cr = [];
+    const byLv = new Map();
+    const P = (a, b) => [a * st - THALF, b * st - THALF], HV = (a, b) => Hh[(b * st) * W + a * st];
+    for (let b = 0; b < M; b++) for (let a = 0; a < M; a++) {
+      const C = [[a, b], [a, b + 1], [a + 1, b + 1], [a + 1, b]], H4 = C.map((q) => HV(q[0], q[1]));
+      for (const tri of [[0, 1, 2], [0, 2, 3]]) {
+        const h0 = H4[tri[0]], h1 = H4[tri[1]], h2 = H4[tri[2]], tl = Math.min(h0, h1, h2), th = Math.max(h0, h1, h2);
+        for (let li = Math.ceil(tl / iv); li * iv < th; li++) {
+          const lv = li * iv, cr = [];
           for (let e = 0; e < 3; e++) {
-            const A = tri[e], B = tri[(e + 1) % 3], ha = Hh[A] - lv, hb = Hh[B] - lv;
-            if ((ha < 0) !== (hb < 0)) { const t = ha / (ha - hb); cr.push([lerp(vx(A), vx(B), t), lerp(vz(A), vz(B), t)]); }
+            const A = tri[e], B = tri[(e + 1) % 3], ha = H4[A] - lv, hb = H4[B] - lv;
+            if ((ha < 0) !== (hb < 0)) { const t = ha / (ha - hb), pa = P(C[A][0], C[A][1]), pb = P(C[B][0], C[B][1]); cr.push([lerp(pa[0], pb[0], t), lerp(pa[1], pb[1], t)]); }
           }
-          if (cr.length === 2) segs.push(cr);
+          if (cr.length === 2) { let L = byLv.get(li); if (!L) byLv.set(li, (L = [])); L.push(cr); }
         }
       }
+    }
+    const key = (q) => Math.round(q[0] * 512) + ',' + Math.round(q[1] * 512);
+    for (const [li, segs] of byLv) {
       // join the little pieces into long smooth lines
-      const ends = new Map();
+      const lv = li * iv, ends = new Map();
       segs.forEach((sg, idx) => { for (let e = 0; e < 2; e++) { const k = key(sg[e]); if (!ends.has(k)) ends.set(k, []); ends.get(k).push([idx, e]); } });
-      const used = new Uint8Array(segs.length), major = Math.abs(Math.round(lv / iv) % 5) === 0;
+      const used = new Uint8Array(segs.length), major = Math.abs(li % 5) === 0;
       for (let s0 = 0; s0 < segs.length; s0++) {
         if (used[s0]) continue; used[s0] = 1;
-        const line = [segs[s0][0], segs[s0][1]];
-        for (const atEnd of [true, false]) {
-          let cur = atEnd ? line[line.length - 1] : line[0];
-          for (let guard = 0; guard < 20000; guard++) {
+        const fwd = [segs[s0][1]], back = [];
+        for (const out of [fwd, back]) {
+          let cur = out === fwd ? segs[s0][1] : segs[s0][0];
+          for (let guard = 0; guard < 40000; guard++) {
             const nx = (ends.get(key(cur)) || []).find((c) => !used[c[0]]); if (!nx) break;
             used[nx[0]] = 1; const other = segs[nx[0]][1 - nx[1]];
-            if (atEnd) line.push(other); else line.unshift(other);
-            cur = other;
+            out.push(other); cur = other;
           }
         }
-        lines.push({ lv, major, pts: simplifyLine(line, 0.06) });
+        const line = back.reverse().concat([segs[s0][0]], fwd);
+        lines.push({ lv, major, pts: simplifyLine(line, 0.06 * st) });
       }
     }
     this.cont = lines; this.contRange = [lo, hi];
@@ -18050,6 +18130,7 @@ const MAP = {
     if (this.draft) this.drawPad(g, this.draft, true);
     if (this.mode === 'obj' && this.objDraft) this.drawObjDraft(g);
     if (this.mode === 'dig') this.drawDig(g);
+    if (this.mode === 'place') this.drawPl(g);
     // you are here
     const Fm = G.Fm, fr = Math.max(0.5, 7 * px);
     g.save(); g.translate(Fm.x, Fm.z); g.rotate(-Fm.yaw + Math.PI);
@@ -18107,7 +18188,7 @@ const MAP = {
     const len = m / 5 * s, x = 14, y = this.H - 112;
     g.fillStyle = 'rgba(255, 248, 230, 0.9)'; g.fillRect(x - 6, y - 16, len + 12, 26);
     g.fillStyle = '#3d2d1c'; g.fillRect(x, y + 2, len, 4); g.fillRect(x, y - 2, 2, 8); g.fillRect(x + len - 2, y - 2, 2, 8);
-    g.font = '800 11px "FQ Nunito", system-ui'; g.textAlign = 'left'; g.fillText(`${m} m${this.contours ? ' · contours 2 m' : ''}`, x, y - 7); g.textAlign = 'center';
+    g.font = '800 11px "FQ Nunito", system-ui'; g.textAlign = 'left'; g.fillText(`${m} m${this.contours ? ` · contours ${Math.round((this.contIv || 0.4) * 5)} m` : ''}`, x, y - 7); g.textAlign = 'center';
   },
   drawPad(g, p, editing) {
     const F = G.F, px = 1 / this.s, P = padPts(p);
@@ -18247,7 +18328,7 @@ const MAP = {
     if (D.t === 'box') { const [a, , b] = this.drawPts; if (Math.abs(b[0] - a[0]) < 3 || Math.abs(b[1] - a[1]) < 3) { this.drawPts = []; UI.toast('Drag out a bigger box, or tap corner points one by one.', true); this.dirty = true; return; } this.finishDraw(); return; }
     if (D.t === 'v' && !D.moved) { this.selV = this.selV === D.i ? null : D.i; this.selG = null; this.bar(); this.dirty = true; return; }
     if (D.t === 'g' && !D.moved) { this.selG = this.selG === D.i ? null : D.i; this.selV = null; this.bar(); this.dirty = true; return; }
-    if (D.t === 'pan' && !D.moved) { if (this.mode === 'dig') this.digTap(this.toW(e.clientX, e.clientY)); else this.tap(this.toW(e.clientX, e.clientY)); }
+    if (D.t === 'pan' && !D.moved) { if (this.mode === 'dig') this.digTap(this.toW(e.clientX, e.clientY)); else if (this.mode === 'place') this.placeTap(this.toW(e.clientX, e.clientY)); else this.tap(this.toW(e.clientX, e.clientY)); }
     this.dirty = true;
   },
   // open = finish as a run of fence that doesn't close on itself. You put the gates in yourself afterwards.
@@ -18337,8 +18418,35 @@ const MAP = {
     else relocateObj(o, d.x, d.z, d.r, `The ${objName(o)} is in its new spot.`);
     spendTime(mins, energy);
     this.mode = 'view'; this.objSel = null; this.objDraft = null; this.err = null;
-    this.buildBase(); this.bar(); this.dirty = true;
+    this.buildBase(); this.buildContours(); this.bar(); this.dirty = true;
     if (G.iris || G.F.hour >= 24) this.close();
+  },
+  // ---- putting up a new building (or a decoration) on the map: tap where it goes, turn it, build it
+  startNewBuild(def) {
+    this.mode = 'place'; this.draft = null; this.selId = null; this.objSel = null; this.objDraft = null;
+    this.pl = { def, at: null, rot: 0, P: null, v: null };
+    this.bar(); this.dirty = true;
+  },
+  placeTap(w) { const L = this.pl; if (!L) return; L.at = w; this.validatePl(); this.bar(); this.dirty = true; },
+  validatePl() {
+    const L = this.pl; if (!L || !L.at) { if (L) { L.P = null; L.v = null; } return; }
+    const P = { kind: 'build', def: L.def, rot: L.rot, cur: L.at.slice(), stage: 0 };
+    L.v = validatePlace(P); L.P = P; if (P.nudged) L.at = P.cur.slice();
+  },
+  drawPl(g) {
+    const L = this.pl; if (!L || !L.at) return;
+    const px = 1 / this.s, d = L.def, hw = d.hw || 1, hd = d.hd || 1, bad = L.v && L.v.err;
+    g.save(); g.translate(L.at[0], L.at[1]); g.rotate(-L.rot);
+    g.fillStyle = bad ? 'rgba(220, 70, 50, 0.4)' : 'rgba(255, 236, 120, 0.5)'; g.fillRect(-hw, -hd, hw * 2, hd * 2);
+    g.strokeStyle = bad ? '#e04a36' : '#c99a1a'; g.lineWidth = 3 * px; g.strokeRect(-hw, -hd, hw * 2, hd * 2);
+    g.beginPath(); g.moveTo(0, hd); g.lineTo(0, hd + 1.2); g.stroke();   // the front (the side with the door)
+    g.restore();
+  },
+  commitPl() {
+    const L = this.pl; if (!L || !L.P || !L.v || L.v.err) return;
+    const P = Object.assign(L.P, { cost: L.v.cost });
+    this.cancelEdit(); this.close();
+    G.place = P; confirmPlace();
   },
   // ---- laying out a swale or a pond on the map
   startDig(kind) {
@@ -18399,7 +18507,7 @@ const MAP = {
     UI.toast('Tap the fence where you want a gate. Add as many as you like.');
   },
   startDraw(kind) { this.mode = 'draw'; this.drawKind = kind || this.drawKind; this.draft = null; this.selId = null; this.drawPts = []; this.hover = null; this.bar(); this.dirty = true; },
-  cancelEdit() { this.mode = 'view'; this.draft = null; this.selId = null; this.objSel = null; this.objDraft = null; this.drawPts = []; this.err = null; this.selV = null; this.selG = null; this.addGate = false; this.bar(); this.dirty = true; },
+  cancelEdit() { this.pl = null; this.mode = 'view'; this.draft = null; this.selId = null; this.objSel = null; this.objDraft = null; this.drawPts = []; this.err = null; this.selV = null; this.selG = null; this.addGate = false; this.bar(); this.dirty = true; },
   validate() {
     const F = G.F; if (!this.draft) { this.err = null; return; }
     this.err = checkPaddock(F, this.draft, this.selId);
@@ -18423,7 +18531,7 @@ const MAP = {
     if (this.err || !to) return;
     if (applyFence(F, from, to)) {
       this.mode = 'view'; this.draft = null; this.selId = null; this.err = null;
-      this.buildBase(); this.bar(); this.dirty = true;
+      this.buildBase(); this.buildContours(); this.bar(); this.dirty = true;
       if (G.iris || G.F.hour >= 24) this.close();
     }
   },
@@ -18431,7 +18539,7 @@ const MAP = {
     const F = G.F, p = this.current(); if (!p) return;
     const n = F.animals.filter((a) => a.pad === p.id).length, b = fenceBill(F, p, null);
     UI.confirm(`Take down ${p.name}?`, `The ${meters(b.returned)} m of ${FENCES[p.kind].name.toLowerCase()} and ${nGates(p) === 1 ? 'the gate' : `all ${nGates(p)} gates`} go back into your stock, so you can put them up again somewhere else for free.${n ? ` The ${n} animals inside move to the barnyard.` : ''}`, () => {
-      if (applyFence(F, p, null)) { this.mode = 'view'; this.draft = null; this.selId = null; this.buildBase(); this.bar(); this.dirty = true; }
+      if (applyFence(F, p, null)) { this.mode = 'view'; this.draft = null; this.selId = null; this.buildBase(); this.buildContours(); this.bar(); this.dirty = true; }
     }, { yes: 'Take it down', icon: ICO.fence });
   },
   // ---------------- toolbar + bottom bar
@@ -18472,6 +18580,13 @@ const MAP = {
       $('mapNew').onclick = () => this.startDraw(this.drawKind);
       $('mapSwale').onclick = () => this.startDig('swale');
       $('mapPond').onclick = () => this.startDig('pond');
+    } else if (this.mode === 'place') {
+      const L = this.pl, v = L.v, ok = L.P && v && !v.err;
+      const hint = !L.at ? `<b>Tap where the ${esc(L.def.name.toLowerCase())} should go.</b> The line on its outline marks the front.` : (v.err ? `⚠️ ${esc(v.err)}` : esc((v.text || '').replace(/\s*Walk to move, ⟳ to turn\.?/, ''))) + ' <small>Tap again to move it.</small>';
+      B.innerHTML = `<div class="mrow"><span class="mhint">${hint}</span><button class="btn" id="mapTurn">⟳ Turn</button><button class="btn" id="mapCancel">Cancel</button><button class="btn go" id="mapBuild"${ok ? '' : ' disabled'}>🔨 Build it${ok && v.cost && !G.F.kid ? ` (${money(v.cost)})` : ''}</button></div>`;
+      $('mapCancel').onclick = () => this.cancelEdit();
+      $('mapBuild').onclick = () => this.commitPl();
+      $('mapTurn').onclick = () => { L.rot = (L.rot + Math.PI / 2) % (Math.PI * 2); this.validatePl(); this.bar(); this.dirty = true; };
     } else if (this.mode === 'dig') {
       const D = this.dig, v = D.v, P = D.P;
       const hint = D.kind === 'swale' ? (!D.a ? '<b>Tap where the swale starts.</b> It runs along the level line, with the ditch uphill and the berm below it.' : !D.b ? '<b>Tap where it should end.</b> The line follows the contour for you.' : (v.err ? `⚠️ ${esc(v.err)}` : esc(v.text)) + ' <small>Tap again to move the end.</small>')
@@ -18993,6 +19108,11 @@ function dogCoatAt(C, part, q) {
   }
 }
 // Luna and Juneau, the farm's own dogs: they're there from the first day on every farm, and follow you about
+// the owner's two dogs, for sale by name at the dog seller: Luna (white Great Pyrenees) and Juneau (Pyrenees × Bernese)
+const DOG_SPECIAL = [
+  { breed: 'luna', name: 'Luna', ageD: 2 * 360, price: 1200, collarCol: [140, 104, 74] },
+  { breed: 'juneau', name: 'Juneau', ageD: 360, price: 1300, collarCol: [204, 146, 160] },
+];
 function homeDogs(F) {
   F.dogs = F.dogs || [];
   if (F.homeDogs) return;
@@ -19233,6 +19353,11 @@ const DOGS = {
       const price = Math.round(B.price * (pup ? 1 : 0.85 + R() * 0.3) / 25) * 25;
       out.push({ id: `dog${dn}-${i}`, breed: B.key, coat, sex, ageD, name, price, collar: Math.floor(R() * DOG_COLLARS.length) });
     }
+    // Luna and Juneau, the owner's own two, turn up now and then until they've found a home on this farm
+    for (const S of DOG_SPECIAL) {
+      if (this.list(F).some((d) => d.breed === S.breed) || R() > 0.35) continue;
+      out.push({ id: `dog${dn}-${S.breed}`, breed: S.breed, coat: 0, sex: 'f', ageD: S.ageD, name: S.name, price: S.price, collar: 0, collarCol: S.collarCol, special: true });
+    }
     const sold = (F.dogSold && F.dogSold.dn === dn && F.dogSold.ids) || [];
     return out.filter((o) => !sold.includes(o.id));
   },
@@ -19247,6 +19372,7 @@ const DOGS = {
     if (!F.kid && !F.unlocked) { F.money -= o.price; F.stats.spent += o.price; }
     F.dogSold = F.dogSold && F.dogSold.dn === dn ? F.dogSold : { dn, ids: [] }; F.dogSold.ids.push(o.id);
     const rec = { id: F.nextId++, breed: o.breed, coat: o.coat, collar: o.collar, name: o.name, sex: o.sex, born: dn - o.ageD, job: 'follow' };
+    if (o.collarCol) rec.collarCol = o.collarCol;
     if (B.role === 'guard') rec.job = this.bestGuardJob(F) || 'follow';
     else if (B.role === 'ratter') rec.job = 'barn';
     F.dogs = this.list(F).concat([rec]);
@@ -19456,11 +19582,18 @@ const MILESTONES = {
   // past the list: a cash prize every third level, and a ribbon for the ones between
   at(lv) { const m = this.list.find((q) => q.lv === lv); if (m) return m; if (lv > 10 && (lv - 10) % 3 === 0) return { lv, cash: true }; return lv > 10 ? { lv, key: 'ribbon' + lv, icon: '🎀', name: `Level ${lv} ribbon`, text: 'A ribbon for the farm journal' } : null; },
   // the level of a goal as the journal shows it (a goal climbed to its ceiling counts as every level)
-  goalLevel(F, L) { const i = LADDER.rung(F, L); return LADDER.next(F, L, i) === null ? Infinity : i + 1; },
-  level(F) { let lo = Infinity; for (const L of LADDERS) lo = Math.min(lo, this.goalLevel(F, L)); return lo === Infinity ? 99 : lo; },
-  progress(F, lv) { let n = 0; for (const L of LADDERS) if (this.goalLevel(F, L) >= lv) n++; return { n, of: LADDERS.length }; },
-  // 30% of what every goal paid for reaching level lv (the reward of its rung lv - 2)
-  cash(lv) { let t = 0; for (const L of LADDERS) { const i = lv - 2; if (i < 0) continue; t += LADDER.reward(L, i, LADDER.target(L, i)); } return niceCash(t * 0.3); },
+  goalLevel(F, L) { const i = LADDER.rung(F, L); return LADDER.next(F, L, i) === null ? Infinity : i + (L.lv || 1); },
+  // every goal the journal shows, ladders and one-offs alike, each at its level (a one-off that's done counts as every level)
+  levels(F) {
+    const out = [];
+    for (const L of LADDERS) if (goalShown(F, L)) out.push(this.goalLevel(F, L));
+    for (const g of GOALS) if (goalShown(F, g)) out.push(F.goals && F.goals[g.id] ? Infinity : (g.lv || 1));
+    return out;
+  },
+  level(F) { const ls = this.levels(F); let lo = Infinity; for (const v of ls) lo = Math.min(lo, v); return lo === Infinity ? 99 : lo; },
+  progress(F, lv) { const ls = this.levels(F); return { n: ls.filter((v) => v >= lv).length, of: ls.length }; },
+  // 30% of what every goal paid for reaching level lv (the rung that takes it from lv - 1 to lv)
+  cash(lv) { let t = 0; for (const L of LADDERS) { const i = lv - 1 - (L.lv || 1); if (i < 0) continue; t += LADDER.reward(L, i, LADDER.target(L, i)); } return niceCash(t * 0.3); },
   check(F) {
     F.miles = F.miles || {}; F.unlocks = F.unlocks || {};
     const lv = this.level(F), got = [];
@@ -20768,7 +20901,8 @@ function facade() {
 // ---------------------------------------------------------------- starting / loading a farm
 function startFarm(F, profile) {
   G.F = F; G.profile = profile;
-  homeDogs(F);
+  // Luna and Juneau used to come home with every farm (1.4.1 to 1.5.3); farms that have them keep them, and new farms buy them
+  // from the dog seller like any other dog (DOGS.forSale offers them)
   if (!F.weather) planMonth(F);
   NEIGHBORS.setup(F);
   if (G.view) disposeView();
@@ -21758,6 +21892,16 @@ function removeObj(o) { const F = G.F; F.objs = F.objs.filter((q) => q !== o); r
 function refreshAround(x, z, colliders) { G.view.dirtyAt(x, z, 1.5); if (colliders) G.view.rebuildColliders(); }
 
 // ---------------------------------------------------------------- placement (pond, swale, keyline, paddock, buildings)
+// building or digging: put it where you stand with your farmer, or pick the spot on the farm map
+function askPlace(p, mapOpt) {
+  const what = p.kind === 'build' ? `the ${p.def.name.toLowerCase()}` : p.kind === 'pond' ? `the ${(p.label || '').toLowerCase()} pond` : p.kind === 'swale' ? 'the swale' : p.kind === 'paddock' ? 'the fence' : 'it';
+  const P = UI.open({ title: 'Where should it go?', sub: `Choose how to place ${what}`, icon: '📍' });
+  P.body.innerHTML = UI.rows([
+    { id: 'me', tap: true, icon: '🧑‍🌾', text: 'With your farmer', small: 'Walk to the spot: it goes just in front of you, and you can turn it before you build' },
+    { id: 'map', tap: true, icon: '🗺️', text: 'On the map', small: 'Tap the spot on the farm map, from anywhere on your land' },
+  ]);
+  P.body.querySelectorAll('.row').forEach((r) => { r.onclick = () => { if (r.dataset.id === 'me') startPlace(p); else { UI.closeAll(); MAP.open(mapOpt); } }; });
+}
 function startPlace(p) { G.place = Object.assign({ stage: 0, rot: 0 }, p); $('placeBar').hidden = false; document.body.classList.add('placing'); $('placeRot').hidden = p.kind !== 'build' && p.kind !== 'move' && p.kind !== 'vines'; $('placeMinus').hidden = $('placePlus').hidden = p.kind !== 'vines'; UI.closeAll(); G.targetT = 0; }
 function cancelPlace() { G.place = null; $('placeBar').hidden = true; document.body.classList.remove('placing'); }
 function placeTarget() {
