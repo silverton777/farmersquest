@@ -10,6 +10,15 @@ Publishing: copy `index.html` and `sw.js` into the GitHub repo `silverton777/far
 
 ==========
 
+## 1.5.10: choose what the farm stand sells
+
+**Why:** "What goes to my farm stand? I never have eggs in my backpack. can i control what goes to the farm stand and stays with me?"
+
+- Before: every night the stand sold up to 2 dozen of each kind of egg and 1 of honey, milk and every vegetable you had, with no say in it. A dozen hens lay less than 2 dozen a day, so it took every egg.
+- Now walk up to the stand ("Farm stand: what it sells") for its own screen: each egg, honey, milk and every vegetable you have, with Selling / Keeping, and a − / ＋ for how much the stand always leaves you. "Keep everything" turns it all off.
+- Out of the box (and on farms that already have a stand) it now leaves you a dozen of each kind of egg, a gallon of milk and a pound of honey; vegetables keep none back until you set it.
+- The morning report says what the stand sold, not just the money.
+
 ## 1.5.9: paddocks always numbered 1, 2, 3... and keep their animals
 
 **Why:** "when farmers rework fences the paddocks get messed up. there are now 2 paddock 5's, a paddock not named and no paddock 1, 2 or 3 ... if i take down the fence for paddock 1 then paddock 2 becomes paddock 1 and so on and if i build the new one that becomes the latest numbered paddock."
@@ -6198,7 +6207,7 @@ const BUILD_LIST = [
   { key: 'hive', name: 'Bee hive', price: 400, hw: 0.32, hd: 0.32, note: 'Pollinates your orchard and makes honey from late spring to fall.' },
   { key: 'trough', name: 'Water trough', price: 250, hw: 1.22, hd: 0.44, note: 'Water for the animals in a paddock.' },
   { key: 'tank', name: 'Rain tank', price: 1200, hw: 0.75, hd: 0.75, note: 'Catches roof water for the garden. Put it next to a building.' },
-  { key: 'stand', name: 'Farm stand', price: 1200, hw: 1.2, hd: 0.6, note: 'Sells some eggs and produce from the farm gate every month.' },
+  { key: 'stand', name: 'Farm stand', price: 1200, hw: 1.2, hd: 0.6, note: 'Sells a little of your eggs and produce every night. Walk up to it to choose what it sells and what it keeps for you.' },
   { key: 'woodpile', name: 'Woodshed', price: 600, hw: 1.0, hd: 0.55, note: 'Stores firewood. Shows how much you have stacked.' },
 ];
 
@@ -16949,19 +16958,53 @@ function simDay(F, auto, rep) {
   if (F.weather.lateFrost && w.t < -1 && (F.month === 2 || F.month === 3)) F.weather.lateFrostYear = F.year;
   // ---- house heating
   if (t < 8) { const use = 0.035 * (8 - t) / 8 * 1.6; if ((F.inv.firewood || 0) >= use) F.inv.firewood -= use; else { F.cold = true; if (rep) rep.cold = true; } } else F.cold = false;
-  // ---- farm stand sells a little every day
-  if (F.objs.some((o) => o.t === 'stand')) {
-    for (const key of ['eggs', 'blueeggs', 'duckeggs', 'honey', 'milk', ...CROPS.map((c) => c.key)]) {
-      const have = F.inv[key] || 0; if (have < 1) continue;
-      const n = Math.min(have, key === 'eggs' || key === 'blueeggs' ? 2 : 1);
-      F.inv[key] -= n; const $ = n * ITEMS[key].price * 0.85; F.money += $; F.stats.income += $; F.stats.yearIncome += $; if (rep) rep.stand = (rep.stand || 0) + $;
-    }
-  }
+  // ---- farm stand sells a little every day: only what you've put out for it, and never what you've kept back (1.5.10)
+  if (F.objs.some((o) => o.t === 'stand')) STAND.sellDay(F, rep);
   if (auto) collectEggs(F, rep);
   BARN.nightly(F);
   // paddock rest counters
   for (const p of F.paddocks) p.rest = (p.rest || 0) + 1;
 }
+// ---------------------------------------------------------------- the farm stand (1.5.10)
+// Each night it sells a little of each thing you've put out for it (a couple of dozen eggs, one of anything else). You choose what
+// goes out, and how much it always leaves you: F.stand = { off: { key: true }, keep: { key: n } }. Out of the box it leaves you a
+// dozen of each kind of egg, a gallon of milk and a pound of honey.
+const STAND = {
+  KEYS() { return ['eggs', 'blueeggs', 'duckeggs', 'honey', 'milk', ...CROPS.filter((c) => !c.cover && ITEMS[c.key]).map((c) => c.key)]; },
+  DEF_KEEP: { eggs: 1, blueeggs: 1, duckeggs: 1, milk: 1, honey: 1 },
+  st(F) { F.stand = F.stand || { off: {}, keep: Object.assign({}, this.DEF_KEEP) }; F.stand.off = F.stand.off || {}; F.stand.keep = F.stand.keep || {}; return F.stand; },
+  on(F, k) { return !this.st(F).off[k]; },
+  keep(F, k) { const v = this.st(F).keep[k]; return v === undefined ? 0 : v; },
+  perDay(k) { return k === 'eggs' || k === 'blueeggs' || k === 'duckeggs' ? 2 : 1; },
+  sellDay(F, rep) {
+    for (const key of this.KEYS()) {
+      if (!ITEMS[key] || !this.on(F, key)) continue;
+      const spare = (F.inv[key] || 0) - this.keep(F, key); if (spare < 1) continue;
+      const n = Math.min(spare, this.perDay(key));
+      F.inv[key] -= n; const $ = n * ITEMS[key].price * 0.85; F.money += $; F.stats.income += $; F.stats.yearIncome += $;
+      if (rep) { rep.stand = (rep.stand || 0) + $; rep.standItems = rep.standItems || {}; rep.standItems[key] = (rep.standItems[key] || 0) + n; }
+    }
+  },
+  // the stand's own screen: what goes out, and how much stays with you
+  card() {
+    const F = G.F, st = this.st(F), self = this;
+    const P = UI.open({ title: 'Farm stand', sub: 'Sells a little each night from your stores', icon: '🏪', foot: true });
+    const draw = () => {
+      const keys = this.KEYS().filter((k) => (F.inv[k] || 0) > 0 || st.off[k] || st.keep[k] !== undefined || ['eggs', 'honey', 'milk'].includes(k));
+      P.body.innerHTML = `<p class="note">Each night the stand sells up to ${this.perDay('eggs')} dozen of each kind of egg and 1 of anything else you've put out, at 85% of the market price. Turn things off to keep them all, or set how much it always leaves you.</p>`
+        + keys.map((k) => { const it = ITEMS[k], on = this.on(F, k), kp = this.keep(F, k), have = F.inv[k] || 0;
+          return `<div class="row"><span class="ic">${it.icon}</span><span class="tx">${esc(it.name)}<small>You have ${fmt1(have)} ${esc(it.unit)} · ${on ? `keeps ${kp ? `${fmt1(kp)} ${esc(it.unit)} for you` : 'none back'}` : 'not for sale'}</small></span>`
+            + `<span style="display:flex;gap:4px;align-items:center;flex-wrap:wrap;justify-content:flex-end">${on ? `<button class="btn" data-m="${k}" style="padding:4px 10px">−</button><b style="min-width:22px;text-align:center">${fmt1(kp)}</b><button class="btn" data-p="${k}" style="padding:4px 10px">＋</button>` : ''}<button class="btn${on ? ' go' : ''}" data-t="${k}" style="padding:4px 10px">${on ? 'Selling' : 'Keeping'}</button></span></div>`; }).join('');
+      P.body.querySelectorAll('[data-t]').forEach((b) => { b.onclick = () => { const k = b.dataset.t; if (st.off[k]) delete st.off[k]; else st.off[k] = true; draw(); }; });
+      P.body.querySelectorAll('[data-p]').forEach((b) => { b.onclick = () => { const k = b.dataset.p; st.keep[k] = self.keep(F, k) + 1; draw(); }; });
+      P.body.querySelectorAll('[data-m]').forEach((b) => { b.onclick = () => { const k = b.dataset.m; st.keep[k] = Math.max(0, self.keep(F, k) - 1); draw(); }; });
+    };
+    draw();
+    P.foot.innerHTML = `<button class="btn" id="stAll">Keep everything</button><button class="btn go" id="stOk">Done</button>`;
+    $('stAll').onclick = () => { for (const k of this.KEYS()) st.off[k] = true; draw(); };
+    $('stOk').onclick = () => UI.closeAll();
+  },
+};
 function giveBirth(F, mom, rep) {
   const SP = SPECIES[mom.sp], SX = SPECIES_EXTRA[mom.sp];
   let n = mom.sp === 'cattle' ? 1 : mom.sp === 'pig' ? 6 + Math.floor(Math.random() * 5) : mom.sp === 'chicken' || mom.sp === 'duck' ? 4 + Math.floor(Math.random() * 5) : 1 + (Math.random() < 0.55 ? 1 : 0) + (mom.sp === 'goat' && Math.random() < 0.2 ? 1 : 0);
@@ -18265,7 +18308,7 @@ function interiorFrame(F0, room) {
 
 'use strict';
 // ============================================================================ profiles + saves (each profile has its own farm save)
-const FQ_VERSION = '1.5.9';
+const FQ_VERSION = '1.5.10';
 const LOOKS = [
   { shirt: [214, 74, 64], hair: [120, 76, 40] }, { shirt: [70, 130, 200], hair: [236, 206, 120] }, { shirt: [240, 170, 60], hair: [80, 50, 30] },
   { shirt: [120, 170, 90], hair: [40, 30, 28] }, { shirt: [170, 100, 190], hair: [200, 110, 60] }, { shirt: [60, 160, 160], hair: [150, 100, 60] },
@@ -19354,7 +19397,7 @@ const UI = {
     if (rep.milk) lines.push(['🥛', `${Math.round(rep.milk)} gallons of milk`]);
     if (harvest) lines.push(['🧺', `Harvested ${harvest}`]);
     if (rep.ripe) lines.push(['🍎', `${rep.ripe} trees came ripe`]);
-    if (rep.stand) lines.push(['🏪', `Farm stand sold ${money(rep.stand)}`]);
+    if (rep.stand) lines.push(['🏪', `Farm stand sold ${money(rep.stand)}${rep.standItems ? `: ${Object.entries(rep.standItems).map(([k, n]) => `${fmt1(n)} ${ITEMS[k].unit} ${ITEMS[k].name.toLowerCase()}`).join(', ')}` : ''}`]);
     if (rep.swaleFull) lines.push(['〰️', 'Your swales filled up in a storm and soaked it all in']);
     if (rep.pondSpill) lines.push(['🌊', 'A pond filled to the brim and spilled over']);
     if (rep.frostKilled) lines.push(['🥶', `Frost killed ${rep.frostKilled} garden beds`]);
@@ -23417,6 +23460,7 @@ function findTarget() {
     if (o.t === 'hive' && near(o.x, o.z, 1.4) && tool === 'hand') push(2, (o.honey || 0) >= 3 ? { label: `Harvest honey (${Math.floor(o.honey)} lbs)`, icon: '🍯', fn: () => act('collect', 1.6, 30, 3, () => { const n = Math.floor(o.honey); F.inv.honey = (F.inv.honey || 0) + n; tally(F, 'honey', n); o.honey -= n; UI.toast(`+${n} lbs honey 🍯`); AUDIO.ding(); }), face: o } : { label: 'Bees are busy', icon: '🐝', fn: () => UI.toast('The bees are building up honey. Check back in summer.') });
     if (o.t === 'eggmobile' && near(o.x, o.z, 2.0) && tool === 'hand') push(2, { label: 'Eggmobile', icon: '🚚', fn: () => UI.eggmobile(o) });
     if ((o.t === 'coop' || o.t === 'eggmobile') && near(o.x, o.z, 2.4) && tool === 'hand' && F.objs.filter((q) => q.t === 'coop' || q.t === 'eggmobile').length > 1) push(2.2, { label: `${coopName(F, o.id)}: ${coopLoad(F, o)}/${coopCap(o)} hens · move some`, icon: '🐔', fn: () => UI.moveHens(o) });
+    if (o.t === 'stand' && near(o.x, o.z, 2.2) && tool === 'hand') push(2.0, { label: 'Farm stand: what it sells', icon: '🏪', fn: () => STAND.card(), ring: [o.x, o.z, 1.4] });
     if (o.t === 'trough' && near(o.x, o.z, 2.3) && tool === 'hand') push(3.2, { label: 'Move the water trough', icon: '🛁', fn: () => UI.objMenu(o), ring: [o.x, o.z, 1.5] });
     if ((o.t === 'coop' || o.t === 'eggmobile') && near(o.x, o.z, 2.3) && tool === 'hand' && mustOpen('fedPoultry') && F.animals.some((a) => a.home === o.id)) push(1.5, { label: 'Feed the hens', icon: '🐔', fn: () => act('feed', 1.2, 10, 2, () => { F.today.fedPoultry = true; doneChore('Hens fed'); }), face: o });
     if (tool === 'build' && MOVABLE[o.t] && near(o.x, o.z, (solidOf(o).hw || solidOf(o).r) + 1.6)) push(1.2, { label: `Move the ${objName(o)}`, icon: '🏗️', fn: () => UI.objMenu(o), ring: [o.x, o.z, 1.4] });

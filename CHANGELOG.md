@@ -8,6 +8,15 @@ Publishing: copy `index.html` and `sw.js` into the GitHub repo `silverton777/far
 
 ---
 
+## 1.5.10: choose what the farm stand sells
+
+**Why:** "What goes to my farm stand? I never have eggs in my backpack. can i control what goes to the farm stand and stays with me?"
+
+- Before: every night the stand sold up to 2 dozen of each kind of egg and 1 of honey, milk and every vegetable you had, with no say in it. A dozen hens lay less than 2 dozen a day, so it took every egg.
+- Now walk up to the stand ("Farm stand: what it sells") for its own screen: each egg, honey, milk and every vegetable you have, with Selling / Keeping, and a − / ＋ for how much the stand always leaves you. "Keep everything" turns it all off.
+- Out of the box (and on farms that already have a stand) it now leaves you a dozen of each kind of egg, a gallon of milk and a pound of honey; vegetables keep none back until you set it.
+- The morning report says what the stand sold, not just the money.
+
 ## 1.5.9: paddocks always numbered 1, 2, 3... and keep their animals
 
 **Why:** "when farmers rework fences the paddocks get messed up. there are now 2 paddock 5's, a paddock not named and no paddock 1, 2 or 3 ... if i take down the fence for paddock 1 then paddock 2 becomes paddock 1 and so on and if i build the new one that becomes the latest numbered paddock."
