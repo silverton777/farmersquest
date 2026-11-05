@@ -8,6 +8,14 @@ Publishing: copy `index.html` and `sw.js` into the GitHub repo `silverton777/far
 
 ---
 
+## 1.5.15: barn cat kittens
+
+**Why:** the owner picked "barn cat kittens" from the list of new ideas: "your barn cat has a litter now and then, and you can find homes for the kittens with townsfolk".
+
+- If you have the barn cat, she has a litter of 2 to 4 kittens some time in spring or early summer (once a year at most). The morning report tells you, and the kittens tumble about after her, darting off to pounce on things and scampering back, growing as the weeks go by.
+- Walk up to them for their card: each kitten's name and age. From eight weeks old a kitten can go to a new home with someone you've met (14 townsfolk and neighbours would love one, each with their own thank-you): it's worth a whole heart of friendship. You can also keep up to two as barn cats of your own; they grow up and roam the yard like their mother.
+- A kitten still with you at five months and not kept goes to Ruth Carter's sanctuary (she's glad of the mousers, and a little fonder of you for it).
+
 ## 1.5.14: easy horse riding: drag to ride, tap to go there
 
 **Why:** "its too hard to ride the horse. simplify riding so maybe its just your finger dragging around the screen and the horse goes there", then "1 and 2 together with option 3 available after more acreage".

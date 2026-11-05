@@ -10,6 +10,14 @@ Publishing: copy `index.html` and `sw.js` into the GitHub repo `silverton777/far
 
 ==========
 
+## 1.5.15: barn cat kittens
+
+**Why:** the owner picked "barn cat kittens" from the list of new ideas: "your barn cat has a litter now and then, and you can find homes for the kittens with townsfolk".
+
+- If you have the barn cat, she has a litter of 2 to 4 kittens some time in spring or early summer (once a year at most). The morning report tells you, and the kittens tumble about after her, darting off to pounce on things and scampering back, growing as the weeks go by.
+- Walk up to them for their card: each kitten's name and age. From eight weeks old a kitten can go to a new home with someone you've met (14 townsfolk and neighbours would love one, each with their own thank-you): it's worth a whole heart of friendship. You can also keep up to two as barn cats of your own; they grow up and roam the yard like their mother.
+- A kitten still with you at five months and not kept goes to Ruth Carter's sanctuary (she's glad of the mousers, and a little fonder of you for it).
+
 ## 1.5.14: easy horse riding: drag to ride, tap to go there
 
 **Why:** "its too hard to ride the horse. simplify riding so maybe its just your finger dragging around the screen and the horse goes there", then "1 and 2 together with option 3 available after more acreage".
@@ -17101,6 +17109,7 @@ function simDay(F, auto, rep) {
   // ---- farm stand sells a little every day: only what you've put out for it, and never what you've kept back (1.5.10)
   if (F.objs.some((o) => o.t === 'stand')) STAND.sellDay(F, rep);
   if (auto) collectEggs(F, rep);
+  try { KITTENS.daily(F, rep); } catch (e) { console.warn('kittens', e); }
   BARN.nightly(F);
   // paddock rest counters
   for (const p of F.paddocks) p.rest = (p.rest || 0) + 1;
@@ -18448,7 +18457,7 @@ function interiorFrame(F0, room) {
 
 'use strict';
 // ============================================================================ profiles + saves (each profile has its own farm save)
-const FQ_VERSION = '1.5.14';
+const FQ_VERSION = '1.5.15';
 const LOOKS = [
   { shirt: [214, 74, 64], hair: [120, 76, 40] }, { shirt: [70, 130, 200], hair: [236, 206, 120] }, { shirt: [240, 170, 60], hair: [80, 50, 30] },
   { shirt: [120, 170, 90], hair: [40, 30, 28] }, { shirt: [170, 100, 190], hair: [200, 110, 60] }, { shirt: [60, 160, 160], hair: [150, 100, 60] },
@@ -19537,6 +19546,8 @@ const UI = {
     if (rep.milk) lines.push(['🥛', `${Math.round(rep.milk)} gallons of milk`]);
     if (harvest) lines.push(['🧺', `Harvested ${harvest}`]);
     if (rep.ripe) lines.push(['🍎', `${rep.ripe} trees came ripe`]);
+    if (rep.kittens) lines.push(['🐱', `${PETS.name(G.F, 'cat')} had ${rep.kittens} kittens in the barn! Walk up to them to say hello.`]);
+    if (rep.kitGone) lines.push(['🐈', `${rep.kitGone.join(' and ')} went to live at Ruth Carter's sanctuary, where there are always mice to catch.`]);
     if (rep.stand) lines.push(['🏪', `Farm stand sold ${money(rep.stand)}${rep.standItems ? `: ${Object.entries(rep.standItems).map(([k, n]) => `${fmt1(n)} ${ITEMS[k].unit} ${ITEMS[k].name.toLowerCase()}`).join(', ')}` : ''}`]);
     if (rep.swaleFull) lines.push(['〰️', 'Your swales filled up in a storm and soaked it all in']);
     if (rep.pondSpill) lines.push(['🌊', 'A pond filled to the brim and spilled over']);
@@ -21106,6 +21117,88 @@ const SHOP = {
   },
 };
 
+// ---------------------------------------------------------------- barn cat kittens (1.5.15)
+// Now and then in spring the barn cat has a litter. The kittens tumble about after her; from eight weeks old they can go to a good
+// home with someone in the county (which they'll be thrilled about: a whole heart of friendship) or you can keep a couple as barn
+// cats of your own. Any still with you at five months and not kept go to Ruth's sanctuary, who's always glad of a mouser.
+//   F.kittens = [{ id, name, born, keep }]   F.litterYear   F.adopted = { personId: kittenName }
+const KIT_NAMES = ['Biscuit', 'Pepper', 'Socks', 'Clover', 'Pumpkin', 'Muffin', 'Tater', 'Hazel', 'Pippin', 'Marble', 'Smudge', 'Juniper', 'Bramble', 'Nutmeg', 'Wren', 'Thimble', 'Fig', 'Dumpling', 'Sprout', 'Maple'];
+const KIT_HOMES = {
+  junie: 'I\'ll love her forever and ever! I\'m calling her Pickles. No, wait, Moonpie. No, Pickles.',
+  gus: 'A barn\'s not a barn without a cat. Margaret always had one on the porch rail. Thank you.',
+  tilly: 'Clover the goat is going to be SO jealous. Come here, little one.',
+  mabel: 'Oh, the store could use a mouser. And a little company behind the counter.',
+  sam: 'She can ride along on the route. Every mail truck needs a co-pilot.',
+  dot: 'A diner cat! Don\'t tell the health inspector. She\'ll live upstairs, I promise.',
+  patel: 'I\'ll give her all her shots myself. Lucky kitten, having a vet for a mum.',
+  rosa: 'She can sit on the flower stall and charm the customers. Thank you!',
+  lin: 'There are mice in the back room who are about to have a very bad week.',
+  nb_okafor: 'The dairy barn could always use another cat. They keep the grain clean.',
+  nb_brennan: 'The kids are going to lose their minds. In a good way.',
+  nb_abebe: 'Every animal deserves a good home. This one\'s found one.',
+  nb_hollis: 'She can nap in the honey house. It\'s the warmest room on the farm.',
+  nb_reyes: 'A cat in the food forest keeps the voles off the young trees. Welcome aboard.',
+};
+const KITTENS = {
+  hasCat(F) { const st = SHOP.style(F); return !!(st.pets && st.pets.cat && SHOP.owned('pet', 'cat')); },
+  age(F, k) { return FRIENDS.dayN(F) - k.born; },
+  size(F, k) { return 0.42 + 0.5 * Math.min(1, this.age(F, k) / 120); },
+  ageText(F, k) { const d = this.age(F, k); return d < 14 ? `${Math.max(1, d)} day${d === 1 ? '' : 's'} old` : d < 63 ? `${Math.floor(d / 7)} weeks old` : `${Math.floor(d / 30)} months old`; },
+  daily(F, rep) {
+    if (!this.hasCat(F)) return;
+    F.kittens = F.kittens || [];
+    // a litter: spring into early summer, once a year at most
+    if (F.month >= 2 && F.month <= 5 && F.litterYear !== F.year && Math.random() < 1 / 22) {
+      F.litterYear = F.year;
+      const n = 2 + Math.floor(Math.random() * 3), used = new Set(F.kittens.map((k) => k.name).concat(Object.values(F.adopted || {})));
+      const names = KIT_NAMES.filter((q) => !used.has(q)).sort(() => Math.random() - 0.5);
+      for (let i = 0; i < n; i++) F.kittens.push({ id: F.nextId++, name: names[i] || 'Kitten ' + (i + 1), born: FRIENDS.dayN(F), keep: false });
+      if (rep) rep.kittens = n;
+      if (G.view) PETS.sync(G.view);
+    }
+    // grown and not kept: off to Ruth's sanctuary
+    const gone = F.kittens.filter((k) => !k.keep && this.age(F, k) >= 150);
+    if (gone.length) {
+      F.kittens = F.kittens.filter((k) => !gone.includes(k));
+      FRIENDS.grow(F, 'nb_abebe', 0.3, true);
+      if (rep) rep.kitGone = gone.map((k) => k.name);
+      if (G.view) PETS.sync(G.view);
+    }
+  },
+  // the kittens' card: each one, how old, and a home for it
+  card() {
+    const F = G.F, self = this, cat = PETS.name(F, 'cat');
+    const P = UI.open({ title: 'Kittens', sub: `${cat}'s litter`, icon: '🐱', foot: true });
+    const draw = () => {
+      const L = (F.kittens || []);
+      const kept = L.filter((k) => k.keep).length;
+      P.body.innerHTML = L.length ? `<p class="note">From eight weeks old a kitten can go to a new home: anyone in the county you've met would love one, and it means a lot to them. Or keep a couple as barn cats of your own.</p>` + L.map((k) => {
+        const ready = this.age(F, k) >= 56;
+        return `<div class="row"><span class="ic">🐱</span><span class="tx">${esc(k.name)}<small>${this.ageText(F, k)}${k.keep ? ' · staying with you' : ready ? ' · ready for a new home' : ' · still with her mother'}</small></span><span style="display:flex;gap:6px">${!k.keep && ready ? `<button class="btn go" data-home="${k.id}" style="padding:4px 10px">Find a home</button>` : ''}${!k.keep && kept < 2 ? `<button class="btn" data-keep="${k.id}" style="padding:4px 10px">Keep</button>` : ''}</span></div>`;
+      }).join('') : '<p class="note">No kittens right now. The barn cat sometimes has a litter in spring.</p>';
+      P.body.querySelectorAll('[data-keep]').forEach((b) => { b.onclick = () => { const k = L.find((q) => q.id === +b.dataset.keep); if (k) { k.keep = true; UI.toast(`${k.name} is staying on as a barn cat. 🐈`); } draw(); }; });
+      P.body.querySelectorAll('[data-home]').forEach((b) => { b.onclick = () => self.homes(L.find((q) => q.id === +b.dataset.home), () => self.card()); });
+    };
+    draw();
+    P.foot.innerHTML = '<button class="btn go" id="kitOk">Done</button>'; $('kitOk').onclick = () => UI.closeAll();
+  },
+  homes(k, back) {
+    const F = G.F; if (!k) return back();
+    F.adopted = F.adopted || {};
+    const who = Object.keys(KIT_HOMES).filter((id) => FRIENDS.met(F, id) && !F.adopted[id]);
+    const P = UI.open({ title: `A home for ${k.name}`, sub: 'Who would you like to give the kitten to?', icon: '🏡', foot: true });
+    P.body.innerHTML = who.length ? UI.rows(who.map((id) => { const I = FRIENDS.info(id); return { id, tap: true, icon: I.icon, text: I.name, small: `${I.role} · ${FRIENDS.heartRow(F, id)}` }; })) : '<p class="note">Get to know a few more people first: everyone you\'ve met already has a kitten, or you haven\'t met anyone who\'d take one yet. Ruth at the sanctuary takes any kitten still with you at five months.</p>';
+    P.body.querySelectorAll('.row.tap').forEach((r) => { r.onclick = () => {
+      const id = r.dataset.id, I = FRIENDS.info(id);
+      F.kittens = F.kittens.filter((q) => q !== k); F.adopted[id] = k.name;
+      FRIENDS.grow(F, id, 1, true); tally(F, 'kittensHomed');
+      if (G.view) PETS.sync(G.view);
+      AUDIO.ding(); UI.closeAll();
+      UI.toast(`${I.first}: “${KIT_HOMES[id]}” ❤️`);
+    }; });
+    P.foot.innerHTML = '<button class="btn" id="khBack">Back</button>'; $('khBack').onclick = back;
+  },
+};
 // ---------------------------------------------------------------- pets: a dog that follows you, a cat that naps on the porch
 const PETS = {
   meshes: {},
@@ -21119,7 +21212,13 @@ const PETS = {
   sync(V) {
     const F = V.F, st = SHOP.style(F);
     const dogs = DOGS.list(F);
-    V.pets = (V.pets || []).filter((p) => (p.kind === 'farmdog' ? dogs.includes(p.rec) : st.pets[p.kind] && SHOP.owned('pet', p.kind)));
+    const kits = F.kittens || [];
+    V.pets = (V.pets || []).filter((p) => (p.kind === 'farmdog' ? dogs.includes(p.rec) : p.kind === 'kitten' ? kits.includes(p.kit) : st.pets[p.kind] && SHOP.owned('pet', p.kind)));
+    for (const kit of kits) {
+      if (V.pets.some((p) => p.kit === kit)) continue;
+      const mom = V.pets.find((p) => p.kind === 'cat'), house = F.objs.find((o) => o.t === 'house') || { x: 0, z: 0 };
+      V.pets.push({ kind: 'kitten', sp: 'cat', kit, mesh: this.mesh(V.R, 'cat'), x: (mom ? mom.x : house.x - 1.6) + (Math.random() - 0.5), z: (mom ? mom.z : house.z + 3.6) + (Math.random() - 0.5), yaw: Math.random() * 6, size: KITTENS.size(F, kit), state: 'idle', st: Math.random(), phase: Math.random() * 6, walkPh: 0, head: 0, tx: 0, tz: 0, rad: 0.1 });
+    }
     for (const rec of dogs) {
       const have = V.pets.find((p) => p.rec === rec), mesh = DOGS.mesh(V.R, rec);
       if (have) { have.mesh = mesh; continue; }
@@ -21174,7 +21273,15 @@ const PETS = {
         else if (p.st < 0) { p.st = 2 + Math.random() * 3; p.sniff = Math.random() < 0.4 ? [p.x + (Math.random() - 0.5) * 2, p.z + (Math.random() - 0.5) * 2] : null; }
         if (!tx && p.sniff) { tx = p.sniff[0]; tz = p.sniff[1]; speed = 1.2; if (Math.hypot(tx - p.x, tz - p.z) < 0.2) p.sniff = null; }
         if (p.callT <= 0) { p.goal = null; p.st = 2 + Math.random() * 4; }
+      } else if (p.kind === 'kitten' && !(p.kit.keep && KITTENS.age(F, p.kit) >= 90)) {
+        // kittens (1.5.15) stay close to their mother, darting off to pounce on something and scampering back
+        p.size = KITTENS.size(F, p.kit);
+        const mom = V.pets.find((q) => q.kind === 'cat'), cx = mom ? mom.x : house.x - 1.4, cz = mom ? mom.z : house.z + 3.3;
+        if (p.st < 0) { p.st = 1.5 + Math.random() * 3; const a = Math.random() * 6.283, r = Math.random() < 0.3 ? 1.6 + Math.random() : 0.5 + Math.random() * 0.6; p.goal = [cx + Math.cos(a) * r, cz + Math.sin(a) * r]; p.dash = r > 1.5; }
+        if (p.goal && Math.hypot(p.goal[0] - p.x, p.goal[1] - p.z) > 0.12) { tx = p.goal[0]; tz = p.goal[1]; speed = p.dash ? 2.4 : 1.1; }
+        if (Math.hypot(cx - p.x, cz - p.z) > 3) { tx = cx; tz = cz; speed = 2.6; }
       } else {
+        if (p.kind === 'kitten') p.size = KITTENS.size(F, p.kit);
         const night = F.hour >= 20 || F.hour < 6, hx = house.x - 1.4, hz = house.z + 3.3;
         if (p.st < 0) { p.st = 4 + Math.random() * 6; const r = night ? 0.6 : 3.5, a = Math.random() * 6.28; p.goal = Math.random() < 0.5 ? [hx, hz] : [hx + Math.cos(a) * r, hz + Math.sin(a) * r]; }
         if (p.goal && Math.hypot(p.goal[0] - p.x, p.goal[1] - p.z) > 0.15) { tx = p.goal[0]; tz = p.goal[1]; speed = 0.8; }
@@ -23650,8 +23757,10 @@ function findTarget() {
   }
   // pets
   const pet = PETS.near(V, Fm);
-  if (pet && pet.kind === 'farmdog') push(0.35, { label: `${pet.rec.name} the ${dogBreed(pet.rec.breed).name}`, icon: '🐕', fn: () => DOGS.card(pet.rec) });
-  else if (pet && tool === 'hand') push(0.35, { label: `Pet ${PETS.name(F, pet.kind)} ${pet.kind === 'dog' ? '🐕' : '🐈'}`, icon: '🤚', fn: () => act('pet', 1.6, 3, 0, () => { if (pet.kind === 'dog') { AUDIO.tone(520, 0.08, 'square', 0.05, 0.7); AUDIO.tone(480, 0.1, 'square', 0.05, 0.7, 0.14); } else AUDIO.noise(0.8, 120, 0.12, 'lowpass'); UI.toast(pet.kind === 'dog' ? `${PETS.name(F, 'dog')} wags so hard the whole dog wiggles 🐕` : `${PETS.name(F, 'cat')} purrs and headbutts your hand 🐈`); F.energy = Math.min(100, F.energy + 2); }, { face: pet }) });
+  if (pet && pet.kind === 'kitten' && tool === 'hand') push(0.35, { label: `${pet.kit.name} the kitten 🐱`, icon: '🐾', fn: () => KITTENS.card() });
+  else if (pet && pet.kind === 'farmdog') push(0.35, { label: `${pet.rec.name} the ${dogBreed(pet.rec.breed).name}`, icon: '🐕', fn: () => DOGS.card(pet.rec) });
+  else if (pet && pet.kind === 'cat' && tool === 'hand' && (F.kittens || []).some((k) => !k.keep)) push(0.35, { label: `${PETS.name(F, 'cat')} and her kittens 🐈`, icon: '🐾', fn: () => KITTENS.card() });
+  else if (pet && pet.kind !== 'kitten' && tool === 'hand') push(0.35, { label: `Pet ${PETS.name(F, pet.kind)} ${pet.kind === 'dog' ? '🐕' : '🐈'}`, icon: '🤚', fn: () => act('pet', 1.6, 3, 0, () => { if (pet.kind === 'dog') { AUDIO.tone(520, 0.08, 'square', 0.05, 0.7); AUDIO.tone(480, 0.1, 'square', 0.05, 0.7, 0.14); } else AUDIO.noise(0.8, 120, 0.12, 'lowpass'); UI.toast(pet.kind === 'dog' ? `${PETS.name(F, 'dog')} wags so hard the whole dog wiggles 🐕` : `${PETS.name(F, 'cat')} purrs and headbutts your hand 🐈`); F.energy = Math.min(100, F.energy + 2); }, { face: pet }) });
   // animals
   let best = null, bd = 1.9;
   for (const a of V.actors.values()) { if (a.dead || a.inside) continue; const d = Math.min(Math.hypot(a.x - fx, a.z - fz), Math.hypot(a.x - Fm.x, a.z - Fm.z) + 0.3); if (d < bd) { bd = d; best = a; } }
