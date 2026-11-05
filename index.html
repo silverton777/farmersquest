@@ -10,6 +10,21 @@ Publishing: copy `index.html` and `sw.js` into the GitHub repo `silverton777/far
 
 ==========
 
+## 1.5.18: festivals you can play, soil tips, pond and worm farm fixes
+
+**Why:** "Yes add festivals you can play - all those things."
+
+- Each festival panel now opens with a game. The prize (money, Golden Acorns and the host's goodwill) is paid the first time you win each year. You can play again any time the festival is on, just for fun. In kid mode the prize is acorns only.
+- Spring Seed Swap, "Guess the seed" with Mabel: she describes five seeds, three guesses each. 5/5 wins $80, 25 🌰 and three seed packets. 3 or 4 wins $30, 10 🌰 and a packet.
+- Midsummer Potluck, the pie & dish contest: enter something you cooked. Dot, Marco and Rosa each score it and comment, against five neighbours' entries. Pies and bakes do best, and so do better dishes. Blue ribbon $150 + 30 🌰, red $75 + 15 🌰, white $40 + 8 🌰. Your entry stays on the judging table.
+- County Fair, the pig race: pick one of four pigs, then tap Cheer when your pig looks back (👀) for a burst of speed. A win pays $100 + 20 🌰.
+- Harvest Supper, apple bobbing: 20 seconds to tap Dunk when the marker is over a bobbing apple. 5 or more wins $60 + 15 🌰, 3 or 4 wins $20 + 6 🌰. You keep the apples you catch.
+- Candle Night, the lantern walk: eight lanterns stand round the park. From 5 pm, walk up to each one and light it, and it glows. Light all eight for $100 + 25 🌰 and a thank-you from Sam.
+- How to build better soil (owner: "also give tips on how to improve soil. most people dont always know"): twelve plain-language tips, each with what it means in the game (keep something growing, mulch, compost, worm castings, cover crops, dig less, move the animals and rest the grass, hens behind the herd, slow the water, trees, mix it up, be patient). Open it from any garden bed's card or the journal's Land & soil tab. Every few days one tip appears in the morning report.
+- Filling in a pond (owner: "i filled in a pond and there is still a large hole and the game says water is in the way"): the hole is now always filled right up, even with a swale, another pond or a building nearby. Before, anything close by kept part of the hole dug and still counted as water. Farms that already have a hole left behind get it filled in when they load.
+- Weeds no longer stop a swale or pond (owner: "weeds shouldnt be considered in the way"). They're pulled up as it's dug.
+- Worm farm (owner: "there was no options to do anything to my worm farm"): walk up to it with any tool in hand (before, only the bare hand worked) and the action button says "Worm farm: feed the worms". It now wins over weeds and beds nearby. You can also just tap the bin, or the cider press, on screen from up to a dozen steps away and your farmer walks over and opens it.
+
 ## 1.5.17: night life: stargazing, fireflies, owls and full-moon walks
 
 **Why:** the owner picked "night life" from the list of new ideas: "fireflies, stargazing from the porch, owls, and a full-moon walk in the woods to find rare night animals".
@@ -131,7 +146,7 @@ Publishing: copy `index.html` and `sw.js` into the GitHub repo `silverton777/far
 **Why:** "put a calendar in the house you can view and have important dates on there like your friends birthdays, the festival dates, etc".
 
 - A calendar hangs on the right wall of the house, by the firewood. Tap it for a month grid (flip through the year) marking the birthdays of friends you have met, the four festivals and the County Fair, and a "Coming up" list of the next six dates.
-- Not done yet from the same request: interactive festivals (townspeople, games, prizes). The festivals today are still the original table-by-the-fountain version; see `FEST` and `townFest()`.
+- Not done yet from the same request: interactive festivals (townspeople, games, prizes). Games and prizes came in 1.5.18 (`FESTGAME`).
 
 ## 1.5.4: the map opens again; build with your farmer or on the map; Luna and Juneau for sale; journal goals reworked; $75,000 to start
 
@@ -10765,6 +10780,7 @@ const FAIR = {
         return { id: c.id, tap: !done, cls: done ? 'dim' : n ? '' : 'dim', icon: c.icon, text: c.name, small: done ? `Entered: ${FAIR_PRIZE[Math.min(3, done - 1)].name}` : n ? `${n} thing${n === 1 ? '' : 's'} you could enter` : c.id === 'kitchen' ? 'Cook something first (the kitchen is at home)' : 'You have nothing to enter yet', right: done ? FAIR_PRIZE[Math.min(3, done - 1)].ribbon : '' };
       }));
     D.body.querySelectorAll('.row.tap').forEach((r) => { r.onclick = () => self.pick(FAIR_CATS.find((c) => c.id === r.dataset.id)); });
+    { const won = FESTGAME.st(F).won_pig, el = document.createElement('div'); el.className = 'row tap'; el.style.background = 'rgba(255,236,170,.45)'; el.innerHTML = `<span class="ic">🐖</span><span class="tx">The pig race<small>Pick a pig and cheer it home${won ? ' · prize won this year, race again for fun' : ' · prize for the winner'}</small></span><span class="chev">›</span>`; el.onclick = () => FESTGAME.pig({ name: 'County Fair', icon: '🎪' }); D.body.insertBefore(el, D.body.firstChild); }
   },
   pick(cat) {
     const F = G.F, self = this, list = this.entries(F, cat);
@@ -10931,6 +10947,7 @@ const FEST = {
     else if (f.id === 'potluck') this.potluck(f, st);
     else if (f.id === 'supper') this.supper(f, st);
     else this.candle(f, st);
+    try { FESTGAME.inject(f); } catch (e) { console.warn('festgame', e); }
   },
   addItem(F, k, n) { F.inv[k] = (F.inv[k] || 0) + n; },
   // ---------------------------------------------------------------- spring seed swap
@@ -11184,6 +11201,7 @@ function townFest(mb, col, inter, signs, f) {
   mb.mat = MAT.boards; mb.box(-6, 0, 10.4, 2.8, 0.9, 0.9, [150, 106, 70]); mb.mat = 0; mb.box(-6, 0.9, 10.4, 2.9, 0.06, 1.0, shade(f.col, 1.1));
   col.rect(-6, 10.4, 1.4, 0.45, 0, 0, 0, true);
   inter.push({ x: -6, z: 9.2, r: 1.6, label: f.name, act: 'fest', icon: f.icon });
+  if (f.id === 'candle') LANTERN_SPOTS.forEach(([x, z], i) => { col.circle(x, z, 0.12); inter.push({ x, z: z - 0.7, r: 1.1, label: 'Light the lantern', act: 'lantern', idx: i, icon: '🏮', off: () => G.F.hour < 17 || (FESTGAME.st(G.F).lit || []).includes(i) }); });
   signs.push({ x: 2, y: 4.1, z: 6.6, text: f.name, icon: f.icon });
   if (f.id === 'seedswap') {
     for (let i = 0; i < 6; i++) { const x = -6.9 + i * 0.36; mb.box(x, 0.96, 10.4, 0.3, 0.12, 0.5, [150, 110, 70]); for (let k = 0; k < 3; k++) mb.ell(x - 0.07 + k * 0.07, 1.14, 10.4 + (k - 1) * 0.1, 0.07, 0.1, 0.07, [90 + i * 12, 170 - i * 6, 80], { lat: 3, lon: 5 }); }
@@ -17175,7 +17193,7 @@ function simDay(F, auto, rep) {
   if (F.objs.some((o) => o.t === 'stand')) STAND.sellDay(F, rep);
   if (auto) collectEggs(F, rep);
   try { KITTENS.daily(F, rep); } catch (e) { console.warn('kittens', e); }
-  try { MAPLE.daily(F, rep); WORMS.daily(F); } catch (e) { console.warn('maple/worms', e); }
+  try { MAPLE.daily(F, rep); WORMS.daily(F); SOILTIPS.daily(F, rep); } catch (e) { console.warn('maple/worms', e); }
   BARN.nightly(F);
   // paddock rest counters
   for (const p of F.paddocks) p.rest = (p.rest || 0) + 1;
@@ -18523,7 +18541,7 @@ function interiorFrame(F0, room) {
 
 'use strict';
 // ============================================================================ profiles + saves (each profile has its own farm save)
-const FQ_VERSION = '1.5.17';
+const FQ_VERSION = '1.5.18';
 const LOOKS = [
   { shirt: [214, 74, 64], hair: [120, 76, 40] }, { shirt: [70, 130, 200], hair: [236, 206, 120] }, { shirt: [240, 170, 60], hair: [80, 50, 30] },
   { shirt: [120, 170, 90], hair: [40, 30, 28] }, { shirt: [170, 100, 190], hair: [200, 110, 60] }, { shirt: [60, 160, 160], hair: [150, 100, 60] },
@@ -19150,7 +19168,8 @@ const UI = {
           `<div class="stat">Soil organic matter<b>${om.toFixed(2)}%</b></div><div class="stat">Change since start<b style="color:${dOM >= 0 ? 'var(--leaf2)' : 'var(--warn)'}">${dOM >= 0 ? '+' : ''}${dOM.toFixed(2)}%</b></div><div class="stat">Soil moisture<b>${Math.round(moist / n * 100)}%</b></div><div class="stat">Pasture cover<b>${Math.round(bio / n * 100)}%</b></div>`) +
           `<div class="stat">Land owned<b>${Math.round(ownedAcres(F)).toLocaleString()} acres (${plots} parcel${plots === 1 ? '' : 's'})</b></div><div class="stat">Ponds<b>${F.ponds.length}</b></div><div class="stat">Swales<b>${F.swales.length}</b></div><div class="stat">Trees planted<b>${F.stats.treesPlanted}</b></div><div class="stat">Paddocks<b>${F.paddocks.length}</b></div>` +
           (F.kid ? '' : `<div class="stat">Sales this year<b>${money(F.stats.yearIncome)}</b></div><div class="stat">All-time sales<b>${money(F.stats.income)}</b></div><div class="stat">Hay made<b>${fmt1(F.stats.bales)} bales</b></div>`) +
-          `<p class="note">Soil organic matter is the heart of the farm: every 1% more lets the soil hold far more water. Living roots, rested pasture, manure from moving herds and mulch all build it. Bare soil loses it.</p>`;
+          `<p class="note">Soil organic matter is the heart of the farm: every 1% more lets the soil hold far more water. Living roots, rested pasture, manure from moving herds and mulch all build it. Bare soil loses it.</p><button class="btn" id="soilTips" style="width:100%">💡 How to build better soil</button>`;
+        if ($('soilTips')) $('soilTips').onclick = () => SOILTIPS.open(() => self.journal && self.journal('stats'));
       } else if (t === 'animals') {
         self.animalTable(b);
       } else {
@@ -19390,10 +19409,13 @@ const UI = {
     acts.push({ id: 'compost', tap: (F.inv.compost || 0) >= 1, icon: '🟤', text: 'Spread a load of compost', small: (F.inv.compost || 0) >= 1 ? `You have ${fmt1(F.inv.compost)} loads · harvest goes up about ${Math.round(Math.min(0.6, 2 - (o.fert || 0)) * 18)}%` : 'No compost. Buy it at the feed store or muck out the barn stalls.', cls: (F.inv.compost || 0) >= 1 ? '' : 'dim' });
     if (!o.mulch || o.mulchD !== undefined) acts.push({ id: 'mulch', tap: BEDSOIL.canMulch(F), icon: '🍂', text: o.mulch ? 'Top up the mulch' : 'Mulch it with straw', small: BEDSOIL.canMulch(F) ? `Uses ${(F.inv.sqbale || 0) >= 1 ? 'a square bale' : 'a tenth of a round bale'} · holds water, +8% harvest, builds soil` : 'You need hay. Square bales are at the feed store.', cls: BEDSOIL.canMulch(F) ? '' : 'dim' });
     if (!o.crop) acts.push({ id: 'seeds', tap: true, icon: '🌱', text: 'Plant something', small: 'Switch to your seeds' });
+    acts.push({ id: 'tips', tap: true, icon: '💡', text: 'How to build better soil', small: 'Simple things that make any soil richer' });
     P.body.innerHTML = this.rows(rows) + '<div class="grp">Work the bed</div>' + this.rows(acts);
     P.body.querySelectorAll('.row.tap').forEach((r) => {
       r.onclick = () => {
-        const id = r.dataset.id; this.closeAll();
+        const id = r.dataset.id;
+        if (id === 'tips') return SOILTIPS.open(() => this.bedCare(o));
+        this.closeAll();
         if (id === 'seeds') return setTool('seeds');
         if (id === 'castings') act('plant', 1.4, 15, 2, () => { F.inv.castings -= 1; o.fert = Math.min(2.4, (o.fert || 0) + 1.0); const T = F.terrain; BEDSOIL.cells(F, o, (k) => { T.om[k] = Math.min(12, T.om[k] + 0.5); T.moist[k] = Math.min(1, T.moist[k] + 0.05); }); tally(F, 'castingsSpread'); G.view.dirtyAt(o.x, o.z); UI.toast(`🪱 Worm castings spread. This bed should now give about ${Math.round(BEDSOIL.yieldMult(F, o) * 100)}% of a normal harvest.`); });
         if (id === 'compost') act('plant', 1.6, 20, 4, () => { BEDSOIL.compost(F, o); G.view.dirtyAt(o.x, o.z); UI.toast(`🟤 Compost spread. This bed should now give about ${Math.round(BEDSOIL.yieldMult(F, o) * 100)}% of a normal harvest.`); });
@@ -19615,6 +19637,7 @@ const UI = {
     if (harvest) lines.push(['🧺', `Harvested ${harvest}`]);
     if (rep.ripe) lines.push(['🍎', `${rep.ripe} trees came ripe`]);
     if (rep.kittens) lines.push(['🐱', `${PETS.name(G.F, 'cat')} had ${rep.kittens} kittens in the barn! Walk up to them to say hello.`]);
+    if (rep.soilTip) lines.push(['🌱', `Soil tip: ${rep.soilTip[1]}. ${rep.soilTip[3]}`]);
     if (rep.kitGone) lines.push(['🐈', `${rep.kitGone.join(' and ')} went to live at Ruth Carter's sanctuary, where there are always mice to catch.`]);
     if (rep.stand) lines.push(['🏪', `Farm stand sold ${money(rep.stand)}${rep.standItems ? `: ${Object.entries(rep.standItems).map(([k, n]) => `${fmt1(n)} ${ITEMS[k].unit} ${ITEMS[k].name.toLowerCase()}`).join(', ')}` : ''}`]);
     if (rep.swaleFull) lines.push(['〰️', 'Your swales filled up in a storm and soaked it all in']);
@@ -21185,6 +21208,195 @@ const SHOP = {
   },
 };
 
+
+// ============================================================================ festival games (1.5.18)
+// Each festival has something to play, with prizes (money, Golden Acorns and the host's goodwill) the first time each year:
+//   Spring Seed Swap: Mabel's "Guess the seed" (five seeds, three guesses each)
+//   Midsummer Potluck: the pie & dish contest (enter something you cooked; three judges, five rivals)
+//   County Fair: the pig race (pick a pig, cheer it on at the right moments)
+//   Harvest Supper: apple bobbing (dunk when the marker is over an apple)
+//   Candle Night: the lantern walk (light the eight lanterns round the park after dark)
+const SEED_QUIZ = [
+  ['beans', 'Smooth and kidney-shaped, about the size of a fingernail. Speckled, white or black.'],
+  ['peas', 'Round and wrinkly, like tiny dried-up marbles.'],
+  ['squash', 'Big, flat and cream-colored, shaped like a teardrop with a thin rim.'],
+  ['sunflower', 'Striped grey and white, pointed at one end. The birds love them too.'],
+  ['corn', 'A hard, shiny yellow kernel, flat on one side with a little dimple.'],
+  ['tomato', 'Tiny, flat and fuzzy, pale tan. Hundreds come out of one fruit.'],
+  ['lettuce', 'Thin little slivers, pale grey or black, almost like slivers of pencil lead.'],
+  ['carrot', 'So tiny you can hardly pick one up, with fine hairs along its ridges.'],
+  ['beet', 'A knobbly, corky little cluster that is really several seeds stuck together.'],
+  ['cucumber', 'Flat, narrow and white, pointed at both ends, smaller than a squash seed.'],
+  ['melon', 'Flat and oval, cream-colored, slippery when you scoop it out of the fruit.'],
+  ['okra', 'Round, dark grey-green, about the size of a peppercorn.'],
+  ['kale', 'Tiny dark round balls, like poppy seeds but bigger.'],
+  ['onion', 'Black, small and angular, with flat sides like a little chip of coal.'],
+  ['pepper', 'Flat, pale and round like a tiny coin, with a little notch on one side.'],
+  ['basil', 'Tiny and black, and when you wet it, it puffs up a clear jelly coat.'],
+];
+const PIE_RIVALS = [
+  ['nb_brennan', 'Apple butter crumble', 62], ['nb_bellamy', 'Spiced pear tart', 66], ['nb_nguyen', 'Zucchini bread', 55], ['gus', 'Margaret\'s buttermilk pie', 64],
+  ['tilly', 'Honey lavender cake', 60], ['nb_hollis', 'Wildflower honey pie', 63], ['patel', 'Cardamom rice pudding', 61], ['nb_okafor', 'Sweet cream custard pie', 65],
+];
+const PIG_NAMES = [['Hambone', [236, 180, 170]], ['Truffle', [80, 60, 52]], ['Penelope', [246, 200, 196]], ['Sir Oinksalot', [200, 150, 120]], ['Daisy', [226, 170, 150]], ['Bacon Bit', [190, 120, 110]], ['Wiggles', [240, 196, 186]], ['Mud Pie', [120, 90, 70]]];
+const LANTERN_SPOTS = [[-14, 9.2], [-8, 8.1], [-2, 9.7], [4, 8.6], [9, 9.3], [16, 9.2], [20, 8.7], [26, 9.7]];
+const FESTGAME = {
+  st(F) { const s = FEST.state(F); s.games = s.games || {}; return s.games; },
+  prize(F, key, cash, acorns, host, why) {
+    const g = this.st(F); if (g['won_' + key]) return '';
+    g['won_' + key] = true;
+    if (cash && !F.kid) { F.money += cash; F.stats.income += cash; F.stats.yearIncome += cash; }
+    if (acorns && typeof SHOP !== 'undefined') SHOP.earn(acorns, why);
+    if (host) FRIENDS.grow(F, host, 0.4, true);
+    tally(F, 'festPrizes'); AUDIO.cash && AUDIO.cash(); UI.hudTick(0, true);
+    return `${cash && !F.kid ? money(cash) + ' and ' : ''}${acorns} 🌰`;
+  },
+  // the row each festival panel shows at the top
+  inject(f) {
+    const F = G.F, body = UI.cur && UI.cur.querySelector('.body'); if (!body) return;
+    const G2 = { seedswap: ['quiz', '🌱', 'Play "Guess the seed" with Mabel', 'Five seeds, three guesses each'], potluck: ['pie', '🥧', 'Enter the pie & dish contest', 'Three judges, five rivals, and a blue ribbon'], supper: ['bob', '🍎', 'Apple bobbing', 'How many apples can you catch?'], candle: ['lantern', '🏮', 'The lantern walk', 'Light the eight lanterns round the park after dark'] }[f.id];
+    if (!G2) return;
+    const g = this.st(F), won = g['won_' + G2[0]];
+    const el = document.createElement('div'); el.className = 'row tap'; el.style.background = 'rgba(255,236,170,.45)';
+    el.innerHTML = `<span class="ic">${G2[1]}</span><span class="tx">${esc(G2[2])}<small>${esc(G2[3])}${won ? ' · prize won this year, play again for fun' : ' · prizes for the winner'}</small></span><span class="chev">›</span>`;
+    el.onclick = () => this[G2[0]](f);
+    body.insertBefore(el, body.firstChild);
+  },
+  done(f, msg) { const D = UI.open({ title: f.name, sub: 'Festival games', icon: f.icon, foot: true }); D.body.innerHTML = msg; D.foot.innerHTML = '<button class="btn" id="fgBack">Back to the festival</button><button class="btn go" id="fgOk">Done</button>'; $('fgBack').onclick = () => FEST.open(); $('fgOk').onclick = () => UI.closeAll(); },
+  // ---------------------------------------------------------------- Guess the seed
+  quiz(f) {
+    const F = G.F, self = this, pool = SEED_QUIZ.filter(([k]) => ITEMS['seed_' + k]).sort(() => Math.random() - 0.5).slice(0, 5);
+    let i = 0, score = 0;
+    const ask = (fb) => {
+      if (i >= pool.length) {
+        const pr = score === 5 ? this.prize(F, 'quiz', 80, 25, 'mabel', 'Guess the seed: five out of five') : score >= 3 ? this.prize(F, 'quiz', 30, 10, 'mabel', 'Guess the seed') : '';
+        if (score >= 3) { const give = pool.slice(0, score === 5 ? 3 : 1).map(([k]) => 'seed_' + k); for (const k of give) F.inv[k] = (F.inv[k] || 0) + 1; }
+        return self.done(f, `<p class="note speech" style="font-size:16px">“${score === 5 ? 'Five for five! Thirty-one years and I don\'t think anyone\'s done that. Here, take some of these home.' : score >= 3 ? `${score} out of five. Not bad at all. Take a packet for your trouble.` : `${score} out of five. Seeds are sneaky. Come back next spring and try again.`}”</p>${pr ? `<p class="note">🏆 You won ${pr}${score >= 3 ? ' and seed packets' : ''}.</p>` : ''}`);
+      }
+      const [k, clue] = pool[i], others = SEED_QUIZ.filter(([q]) => q !== k && ITEMS['seed_' + q]).sort(() => Math.random() - 0.5).slice(0, 2).map(([q]) => q), opts = [k, ...others].sort(() => Math.random() - 0.5);
+      const D = UI.open({ title: 'Guess the seed', sub: `Seed ${i + 1} of ${pool.length} · ${score} right so far`, icon: '🌱', foot: true });
+      D.body.innerHTML = (fb ? `<p class="note">${fb}</p>` : '<p class="note">Mabel holds out a seed in her palm.</p>') + `<p class="note speech" style="font-size:16px">“${esc(clue)}”</p><div class="grp">Which is it?</div>` + UI.rows(opts.map((q) => ({ id: q, tap: true, icon: ITEMS['seed_' + q].icon, text: ITEMS[q] ? ITEMS[q].name : q })));
+      D.foot.innerHTML = '<button class="btn" id="fgQuit">Stop</button>'; $('fgQuit').onclick = () => FEST.open();
+      D.body.querySelectorAll('.row.tap').forEach((r) => { r.onclick = () => { const ok = r.dataset.id === k; if (ok) score++; i++; AUDIO.tone(ok ? 880 : 300, 0.12, 'sine', 0.05); ask(ok ? '✅ Right!' : `❌ That was ${(ITEMS[k] ? ITEMS[k].name : k).toLowerCase()}.`); }; });
+    };
+    ask(null);
+  },
+  // ---------------------------------------------------------------- the pie & dish contest
+  pie(f) {
+    const F = G.F, self = this, dishes = Object.keys(F.inv).filter((k) => k.startsWith('dish_') && F.inv[k] >= 1 && ITEMS[k] && ITEMS[k].kind === 'dish');
+    const D = UI.open({ title: 'Pie & dish contest', sub: 'Judged by Dot, Marco and Rosa', icon: '🥧', foot: true });
+    D.foot.innerHTML = '<button class="btn" id="fgBack">Back</button>'; $('fgBack').onclick = () => FEST.open();
+    if (!dishes.length) { D.body.innerHTML = '<p class="note">You need something you cooked to enter: a pie, a cake, a stew, anything from your own kitchen. Cook something at home and bring it back while the potluck is on.</p>'; return; }
+    D.body.innerHTML = '<p class="note">Pick your entry. Pies and bakes do well with these judges, and the better the dish, the better your chances. It goes on the judging table, so you won\'t get it back.</p>' + UI.rows(dishes.map((k) => ({ id: k, tap: true, icon: ITEMS[k].icon, text: ITEMS[k].name, small: `you have ${fmt1(F.inv[k])}` })));
+    D.body.querySelectorAll('.row.tap').forEach((r) => { r.onclick = () => {
+      const k = r.dataset.id, it = ITEMS[k]; F.inv[k] -= 1;
+      const base = 38 + Math.min(30, (it.price || 10) * 0.9) + (/pie|cake|tart|crisp|cobbler|bread|muffin|cookie|bake/i.test(it.name) ? 8 : 0);
+      const judges = ['dot', 'marco', 'rosa'].map((j) => [j, Math.round(clamp(base + (Math.random() - 0.5) * 14 + FRIENDS.hearts(F, j) * 0.6, 20, 99))]);
+      const mine = Math.round(judges.reduce((a, q) => a + q[1], 0) / 3);
+      const rivals = PIE_RIVALS.slice().sort(() => Math.random() - 0.5).slice(0, 5).map(([id, dish, sc]) => [FRIENDS.info(id).first, dish, Math.round(sc + (Math.random() - 0.5) * 12)]);
+      const table = rivals.concat([['You', it.name, mine]]).sort((a, b) => b[2] - a[2]), place = table.findIndex((q) => q[0] === 'You') + 1;
+      const pr = place === 1 ? self.prize(F, 'pie', 150, 30, 'dot', 'Blue ribbon: pie & dish contest') : place === 2 ? self.prize(F, 'pie', 75, 15, 'dot', 'Red ribbon: pie & dish contest') : place === 3 ? self.prize(F, 'pie', 40, 8, 'dot', 'White ribbon: pie & dish contest') : '';
+      if (place <= 3) tally(F, 'ribbons');
+      const say = { dot: ['Now that is how it\'s done, hon.', 'Good crust. Could be flakier.', 'I\'d serve that at the Blue Plate.'], marco: ['Balanced. Honest. I\'m impressed.', 'More salt. Always more salt.', 'This tastes like the farm it came from.'], rosa: ['People would queue for this on market day.', 'Lovely! A little sweet for me.', 'I want the recipe. No, really.'] };
+      self.done(f, `<p class="note">The judges taste your ${esc(it.name.toLowerCase())}.</p>` + judges.map(([j, sc]) => `<p class="note speech">${esc(FRIENDS.info(j).first)} (${sc}/100): “${esc(say[j][sc >= 70 ? 0 : sc >= 55 ? 2 : 1])}”</p>`).join('')
+        + `<div class="grp">Results</div>` + UI.rows(table.map((q, i) => ({ icon: i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : '·', text: `${q[0]}: ${q[1]}`, right: String(q[2]), cls: q[0] === 'You' ? 'on' : '' })))
+        + (pr ? `<p class="note">🏆 ${place === 1 ? 'Blue' : place === 2 ? 'Red' : 'White'} ribbon! You won ${pr}.</p>` : `<p class="note">${place <= 3 ? 'A ribbon! (Prize already won this year.)' : 'No ribbon this time. Next summer.'}</p>`));
+    }; });
+  },
+  // ---------------------------------------------------------------- the pig race (County Fair)
+  pig(f) {
+    const F = G.F, self = this, field = PIG_NAMES.slice().sort(() => Math.random() - 0.5).slice(0, 4);
+    const D = UI.open({ title: 'The pig race', sub: 'County Fair · pick your pig', icon: '🐖', foot: true });
+    D.foot.innerHTML = '<button class="btn" id="fgBack">Back</button>'; $('fgBack').onclick = () => FAIR.open();
+    D.body.innerHTML = '<p class="note">Four pigs, one cookie at the finish line. Pick a pig, then cheer it on: tap Cheer just when it looks back at you (the 👀) and it puts on a burst of speed. Cheer at the wrong moment and it stops to stare at you.</p>' + UI.rows(field.map(([n], i) => ({ id: String(i), tap: true, icon: '🐖', text: n })));
+    D.body.querySelectorAll('.row.tap').forEach((r) => { r.onclick = () => self.race(f, field, +r.dataset.id); });
+  },
+  race(f, field, mine) {
+    const F = G.F, self = this;
+    const D = UI.open({ title: 'The pig race', sub: `Go, ${field[mine][0]}!`, icon: '🐖', foot: true });
+    D.body.innerHTML = '<canvas id="fgCv" width="520" height="250" style="width:100%;border-radius:12px;background:#9cc46a"></canvas>';
+    D.foot.innerHTML = '<button class="btn go" id="fgCheer" style="flex:1;font-size:18px;padding:14px">📣 Cheer!</button>';
+    const cv = $('fgCv'), g = cv.getContext('2d'), pigs = field.map(([n, c], i) => ({ n, c, x: 30, v: 38 + Math.random() * 8, look: 0, nextLook: 1 + Math.random() * 2, boost: 0 }));
+    const me = pigs[mine]; FESTGAME._pigs = pigs; let t = 0, last = performance.now(), over = false;
+    $('fgCheer').onclick = () => { if (over) return; if (me.look > 0) { me.boost = 1.2; me.look = 0; AUDIO.tone(880, 0.1, 'square', 0.04); } else { me.stall = 0.5; AUDIO.tone(300, 0.08, 'square', 0.03); } };
+    const frame = (now) => {
+      if (!cv.isConnected) return;
+      const dt = clamp((now - last) / 1000, 0, 0.05); last = now; t += dt;
+      for (const p of pigs) {
+        if (p === me) { p.nextLook -= dt; if (p.nextLook < 0) { p.look = 0.55; p.nextLook = 1.2 + Math.random() * 1.6; } p.look = Math.max(0, p.look - dt); }
+        else if (Math.random() < dt * 0.7) p.boost = 0.6 + Math.random() * 0.5;
+        p.boost = Math.max(0, p.boost - dt);
+        p.stall = Math.max(0, (p.stall || 0) - dt);
+        if (!over) p.x += ((p.v + (p.boost > 0 ? 70 : 0) + Math.sin(t * 3 + p.v) * 6) * (p.stall > 0 ? 0.35 : 1)) * dt;
+      }
+      g.clearRect(0, 0, 520, 250); g.fillStyle = '#86b257'; for (let i = 0; i < 4; i++) g.fillRect(0, 22 + i * 56, 520, 44);
+      g.fillStyle = '#fff'; g.fillRect(470, 10, 6, 230); g.font = '22px sans-serif'; g.fillText('🍪', 478, 32);
+      pigs.forEach((p, i) => { const y = 50 + i * 56; g.font = '30px sans-serif'; g.save(); g.translate(p.x, y); g.scale(-1, 1); g.fillText('🐖', -16, 10); g.restore(); g.fillStyle = p === me ? '#7a2e20' : '#3d2d1c'; g.font = '700 12px sans-serif'; g.fillText(p.n + (p === me ? ' (yours)' : ''), 8, y - 14); if (p === me && p.look > 0) { g.font = '20px sans-serif'; g.fillText('👀', p.x - 4, y - 18); } if (p.boost > 0.3) { g.font = '14px sans-serif'; g.fillText('💨', p.x - 30, y + 4); } });
+      const win = pigs.find((p) => p.x >= 450);
+      if (win && !over) {
+        over = true; const order = pigs.slice().sort((a, b) => b.x - a.x), place = order.indexOf(me) + 1;
+        const pr = place === 1 ? self.prize(F, 'pig', 100, 20, 'hank', 'Won the pig race') : '';
+        setTimeout(() => self.done(f, `<p class="note speech" style="font-size:16px">${place === 1 ? `🏆 ${me.n} wins by a snout! The crowd goes wild.` : `${win.n} gets the cookie. ${me.n} came ${['first', 'second', 'third', 'fourth'][place - 1]}.`}</p>${pr ? `<p class="note">You won ${pr}. Hank calls it like an auction: “SOLD, to the pig with the fastest feet!”</p>` : '<p class="note">Try again: there\'s another heat any time the fair is on.</p>'}`), 900);
+      }
+      requestAnimationFrame(frame);
+    };
+    requestAnimationFrame(frame);
+  },
+  // ---------------------------------------------------------------- apple bobbing (Harvest Supper)
+  bob(f) {
+    const F = G.F, self = this;
+    const D = UI.open({ title: 'Apple bobbing', sub: 'Harvest Supper · 20 seconds', icon: '🍎', foot: true });
+    D.body.innerHTML = '<p class="note">Apples bob in the tub. Tap Dunk when the 👇 is right over one to grab it with your teeth. Miss and you come up spluttering, so wait for a good one.</p><canvas id="fgCv" width="520" height="220" style="width:100%;border-radius:12px;background:#5a7fa6"></canvas>';
+    D.foot.innerHTML = '<button class="btn go" id="fgDunk" style="flex:1;font-size:18px;padding:14px">💦 Dunk!</button>';
+    const cv = $('fgCv'), g = cv.getContext('2d'); let t = 0, last = performance.now(), caught = 0, over = false, mx = 260, splash = 0, wait = 0;
+    const apples = Array.from({ length: 6 }, (_, i) => ({ x: 60 + i * 80, ph: Math.random() * 6, sp: 0.6 + Math.random() * 0.8, c: Math.random() < 0.5 ? '🍎' : '🍏' }));
+    $('fgDunk').onclick = () => { if (over || wait > 0) return; splash = 0.35; const a = apples.find((q) => Math.abs(q.x + Math.sin(t * q.sp + q.ph) * 30 - mx) < 13); if (a) { caught++; wait = 0.7; a.x = -999; AUDIO.tone(900, 0.1, 'sine', 0.05); setTimeout(() => { a.x = 40 + Math.random() * 440; }, 700); } else { wait = 1.6; AUDIO.tone(220, 0.1, 'sine', 0.04); } };
+    const frame = (now) => {
+      if (!cv.isConnected) return;
+      const dt = clamp((now - last) / 1000, 0, 0.05); last = now; t += dt; splash = Math.max(0, splash - dt); wait = Math.max(0, wait - dt);
+      mx = 260 + Math.sin(t * 1.7) * 220;
+      g.clearRect(0, 0, 520, 220); g.fillStyle = '#7f5a3c'; g.fillRect(0, 170, 520, 50); g.fillStyle = '#6d9ccc'; g.fillRect(10, 90, 500, 90);
+      for (const a of apples) { if (a.x < -100) continue; g.font = '34px sans-serif'; g.fillText(a.c, a.x + Math.sin(t * a.sp + a.ph) * 30 - 17, 135 + Math.sin(t * 2 + a.ph) * 6); }
+      g.font = '30px sans-serif'; g.fillText(splash > 0 ? '💦' : wait > 0 ? '😵' : '👇', mx - 15, 70);
+      g.fillStyle = '#fff'; g.font = '700 16px sans-serif'; g.fillText(`🍎 ${caught}   ⏱ ${Math.max(0, Math.ceil(20 - t))}`, 14, 26);
+      if (t >= 20 && !over) {
+        over = true;
+        const pr = caught >= 8 ? self.prize(F, 'bob', 60, 15, 'rosa', 'Apple bobbing champion') : caught >= 5 ? self.prize(F, 'bob', 20, 6, 'rosa', 'Apple bobbing') : '';
+        if (caught >= 1) F.inv.fruit_apple = (F.inv.fruit_apple || 0) + caught;
+        setTimeout(() => self.done(f, `<p class="note speech" style="font-size:16px">${caught >= 8 ? `${caught} apples! Dripping wet and grinning: nobody's beaten that tonight.` : caught >= 5 ? `${caught} apples, and only a little soggy.` : `${caught} apple${caught === 1 ? '' : 's'}. The apples won this round.`}</p>${pr ? `<p class="note">🏆 You won ${pr}, and you get to keep your apples.</p>` : ''}`), 600);
+      }
+      if (!over) requestAnimationFrame(frame);
+    };
+    requestAnimationFrame(frame);
+  },
+  // ---------------------------------------------------------------- the lantern walk (Candle Night)
+  lantern(f) {
+    const F = G.F, g = this.st(F), lit = (g.lit || []).length;
+    const D = UI.open({ title: 'The lantern walk', sub: `${lit} of ${LANTERN_SPOTS.length} lit`, icon: '🏮', foot: true });
+    D.body.innerHTML = `<p class="note">Eight lanterns stand round the park, waiting for the dark. From five in the evening, walk up to each one and light it. Light all eight and ${esc(FRIENDS.info(f.host).first)} has something for you.</p>${F.hour < 17 ? '<p class="note">It\'s still too light. Come back at dusk.</p>' : ''}`;
+    D.foot.innerHTML = '<button class="btn" id="fgBack">Back</button><button class="btn go" id="fgOk">Off I go</button>'; $('fgBack').onclick = () => FEST.open(); $('fgOk').onclick = () => UI.closeAll();
+  },
+  lanternOn(F) { const f = FEST.on(F); return !!(f && f.id === 'candle'); },
+  light(i) {
+    const F = G.F, g = this.st(F); g.lit = g.lit || [];
+    if (g.lit.includes(i)) return;
+    act('collect', 1.0, 3, 0, () => {
+      g.lit.push(i); AUDIO.tone(660 + g.lit.length * 40, 0.15, 'sine', 0.05);
+      if (g.lit.length >= LANTERN_SPOTS.length) { const pr = this.prize(F, 'lantern', 100, 25, 'sam', 'Lit every lantern on Candle Night'); UI.toast(`🏮 All eight lanterns glow round the park. Sam: “Now it's Candle Night.”${pr ? ` You won ${pr}.` : ''}`); }
+      else UI.toast(`🏮 ${g.lit.length} of ${LANTERN_SPOTS.length} lanterns lit.`);
+    });
+  },
+  LM: null,
+  lanternDraws(out) {
+    const F = G.F; if (!G.room || G.room.type !== 'town' || !this.lanternOn(F)) return;
+    if (!this.LM) {
+      const mk = (on) => { const m = new MB(); m.mat = MAT.boards; m.cyl(0, 0, 0, 0.05, 0.05, 1.3, 6, [70, 52, 36]); m.mat = 0; m.box(0, 1.3, 0, 0.26, 0.04, 0.26, [40, 40, 44]); m.box(0, 1.62, 0, 0.26, 0.04, 0.26, [40, 40, 44]); if (on) { const L = new MB(); L.box(0, 1.34, 0, 0.22, 0.28, 0.22, [255, 214, 140]); for (let i = 0; i < L.d.length; i += STRIDE) L.d[i + 9] = 2; m.add(L); } else m.box(0, 1.34, 0, 0.22, 0.28, 0.22, [120, 110, 96]); return G.R.mesh(m); };
+      this.LM = [mk(false), mk(true)];
+    }
+    const lit = this.st(F).lit || [];
+    LANTERN_SPOTS.forEach(([x, z], i) => out.push({ mesh: this.LM[lit.includes(i) ? 1 : 0], model: M4.trs(x, 0, z, 0, 0, 0), noShadow: true }));
+  },
+};
 // ---------------------------------------------------------------- night life (1.5.17)
 // The moon goes through its phases (a 29½-day cycle), a clear night is for stargazing from the porch (with the season's
 // constellation, the moon, a sky fact, and now and then a shooting star to wish on: most of all in the August and December meteor
@@ -21264,6 +21476,33 @@ const MAPLE = {
     const sap = Math.floor(F.inv.maplesap || 0), pints = Math.floor(sap / 4); if (!pints) return;
     act('collect', 3.0, 90, 6, () => { F.inv.maplesap -= pints * 4; F.inv.syrup = (F.inv.syrup || 0) + pints; tally(F, 'syrup', pints); AUDIO.ding(); UI.toast(`🍁 ${pints} pint${pints > 1 ? 's' : ''} of maple syrup, boiled down from ${pints * 4} gallons of sap. The whole farm smells of it.`); });
   },
+};
+// ---------------------------------------------------------------- how to build better soil (1.5.18)
+// Plain-language tips, each with what it means in this game. Opened from a garden bed's card and the journal's Land & soil tab; one tip shows
+// up in the morning report every few days.
+const SOIL_TIPS = [
+  ['🌱', 'Keep something growing', 'Living roots feed the tiny life in the soil all year. Bare ground bakes, washes away and goes dead.', 'Don\'t leave beds empty: plant something, or sow the cover crop mix between crops.'],
+  ['🍂', 'Never leave soil bare: mulch it', 'A blanket of straw, leaves or wood chips keeps the soil cool and damp, stops weeds, and slowly rots into food for the soil.', 'Mulch a bed from its card. It lasts about four months.'],
+  ['🟤', 'Feed it compost', 'Compost is rotted-down plants and manure. It feeds the soil life, which feeds your plants, and it helps the soil hold water like a sponge.', 'Spread compost on a bed from its card. Each crop uses some up, so add more every season or two.'],
+  ['🪱', 'Let worms do the work', 'Worm castings (worm poop) are the richest soil food there is, full of the life that helps roots take up nutrients.', 'Feed spare vegetables and fruit to a worm farm and spread the castings on your beds.'],
+  ['🌾', 'Grow a cover crop', 'Clover, rye, peas and vetch grown between harvests protect the soil, and when you cut them down they become food for it. The peas and clover even pull fertilizer out of the air.', 'Plant the cover crop mix in any empty bed.'],
+  ['🚫', 'Dig less', 'Every time soil is dug or tilled, the tunnels, fungus threads and crumbs that make it healthy are torn up, and the organic matter burns off faster.', 'Mulched beds don\'t need digging: just plant into them.'],
+  ['🐄', 'Move the animals, then rest the grass', 'Animals bunched together for a day or two and then moved on trample, graze and manure the ground evenly. Then the grass grows back deeper roots while it rests. Animals left in one place too long wear it to dirt.', 'Split your pasture into paddocks and move the herd every few days. A paddock that has rested for about a month is ready again.'],
+  ['🐔', 'Hens follow the herd', 'Chickens behind cattle scratch apart the cow pats, eat the fly larvae and spread the manure out.', 'Tow an eggmobile a few days behind the cattle.'],
+  ['💧', 'Slow the water down', 'Rain that runs off takes topsoil with it. Rain that soaks in feeds the soil and the plants for weeks.', 'Swales on contour and ponds catch the rain and let it sink in, so the land around them greens up.'],
+  ['🌳', 'Plant trees and hedges', 'Trees drop leaves that build soil, shade the ground, break the wind and bring nutrients up from deep down.', 'Plant trees along your swales and around the farm. They take years, so start early.'],
+  ['🌼', 'Mix it up', 'Lots of different plants means lots of different roots and soil life. A field of one crop year after year wears out.', 'Grow different crops in a bed each season instead of the same one again.'],
+  ['⏳', 'Be patient', 'Real soil builds slowly: raising organic matter by 1% is a big deal and takes years. But each 1% helps the soil hold a lot more water.', 'Watch "Soil organic matter" in the journal\'s Land & soil tab climb over the seasons.'],
+];
+const SOILTIPS = {
+  open(back) {
+    const F = G.F, om = F.terrain.avgOM(true);
+    const P = UI.open({ title: 'How to build better soil', sub: `Your soil organic matter: ${om.toFixed(1)}%`, icon: '🪱', foot: !!back });
+    P.body.innerHTML = '<p class="note">Healthy soil is alive: worms, fungus and billions of tiny creatures that turn dead plants into food for living ones. Most of what makes soil better comes down to feeding that life and protecting it.</p>'
+      + SOIL_TIPS.map(([ic, t, why, how]) => `<div class="row"><span class="ic">${ic}</span><span class="tx">${esc(t)}<small>${esc(why)}</small><small style="color:var(--leaf2);opacity:1">🎮 ${esc(how)}</small></span></div>`).join('');
+    if (back) { P.foot.innerHTML = '<button class="btn" id="stBack">Back</button>'; $('stBack').onclick = back; }
+  },
+  daily(F, rep) { if (rep && F.day % 4 === 1) { const i = Math.floor((F.year * 360 + F.month * 30 + F.day) / 4) % SOIL_TIPS.length; rep.soilTip = SOIL_TIPS[i]; } },
 };
 // the cider press: six pounds of apples or pears make a jug of fresh cider, as many jugs as you've fruit for, at one go
 const PRESS = {
@@ -23454,6 +23693,7 @@ function startFarm(F, profile) {
   for (const o of F.objs) if (o.taken) delete o.taken;
   if (!F.weedsInit) { F.weedsInit = true; for (let i = 0; i < 14; i++) WEEDS.spawn(F); if (G.view) G.view.dirtyAll(); }
   try { fixReach(F); } catch (e) { /* never stop a farm from loading over a windmill */ }
+  try { fixOrphanWater(F); } catch (e) { /* the ground can wait */ }
   renumberFences(F);   // (1.5.9) tidies farms whose paddock numbers got out of step: duplicates, gaps, a paddock with no name
   F.chores = makeGameChores(F);
   G.mode = 'play';
@@ -23507,7 +23747,7 @@ function initInput() {
     const st = $('stick'); st.firstElementChild.style.transform = `translate(${vx}px, ${vy}px)`;
     st.classList.toggle('far', l > m * 0.8); st.classList.toggle('run', !!S.run);
   });
-  const up = (e) => { if (IN.look && IN.look.id === e.pointerId) { const L = IN.look; IN.look = null; IN.pts.delete(e.pointerId); if (e.type === 'pointerup' && Math.hypot(e.clientX - L.ox, e.clientY - L.oy) < 10 && performance.now() - (L.t || 0) < 450) personTap(e.clientX, e.clientY); return; } if (G.photo) { PHOTO.pointerUp(e); return; } if (G.drive) DRIVE.pointerUp(e); IN.pts.delete(e.pointerId); if (IN.pts.size < 2) IN.pinch = null; if (IN.stick && IN.stick.id === e.pointerId) { IN.stick = null; $('stick').hidden = true; } const tp = IN.tap; IN.tap = null; if (e.type === 'pointerup' && tp && tp.id === e.pointerId && !tp.moved && performance.now() - tp.t < 450) { if (!barnTap(tp.x, tp.y)) personTap(tp.x, tp.y); } };
+  const up = (e) => { if (IN.look && IN.look.id === e.pointerId) { const L = IN.look; IN.look = null; IN.pts.delete(e.pointerId); if (e.type === 'pointerup' && Math.hypot(e.clientX - L.ox, e.clientY - L.oy) < 10 && performance.now() - (L.t || 0) < 450) personTap(e.clientX, e.clientY); return; } if (G.photo) { PHOTO.pointerUp(e); return; } if (G.drive) DRIVE.pointerUp(e); IN.pts.delete(e.pointerId); if (IN.pts.size < 2) IN.pinch = null; if (IN.stick && IN.stick.id === e.pointerId) { IN.stick = null; $('stick').hidden = true; } const tp = IN.tap; IN.tap = null; if (e.type === 'pointerup' && tp && tp.id === e.pointerId && !tp.moved && performance.now() - tp.t < 450) { if (!barnTap(tp.x, tp.y) && !kitTap(tp.x, tp.y)) personTap(tp.x, tp.y); } };
   glc.addEventListener('pointerup', up); glc.addEventListener('pointercancel', up);
   glc.addEventListener('wheel', (e) => { if (G.photo) { PHOTO.wheel(e); return; } G.camK = clamp(G.camK * (1 + Math.sign(e.deltaY) * 0.08), 0.55, 1.45); }, { passive: true });
   window.addEventListener('keydown', (e) => {
@@ -23942,8 +24182,9 @@ function findTarget() {
       else if (MAPLE.tapped(F, o)) push(2.5, { label: 'Sap bucket: filling', icon: '🪣', ring: ringM, fn: () => UI.toast('The sap runs on freeze-thaw days: frosty nights, days above freezing. Check back in a day or two.') });
     }
     if (o.t === 'house' && tool === 'hand' && NIGHT.dark(F) && !G.drive) { const dw2 = doorWorld(o), dd2 = dw2 ? Math.hypot(dw2[0] - Fm.x, dw2[1] - Fm.z) : 99; if (dd2 > 1.25 && dd2 < 4) push(0.2, { label: `Stargaze from the porch ${MOON.ICON[MOON.idx(F)]}`, icon: '🌌', fn: () => NIGHT.gaze() }); }
-    if (o.t === 'press' && near(o.x, o.z, 2.0) && tool === 'hand') { const n = Math.floor(PRESS.fruit(F) / 6); push(n ? 0.5 : 2.5, n ? { label: `Press ${n} jug${n > 1 ? 's' : ''} of cider`, icon: '🍎', ring: [o.x, o.z, 1.2], fn: () => PRESS.press(F) } : { label: 'Cider press', icon: '🍎', ring: [o.x, o.z, 1.2], fn: () => UI.toast('Six pounds of apples or pears press into a jug of cider. Pick some fruit and come back.') }); }
-    if (o.t === 'wormbin' && near(o.x, o.z, 2.0) && tool === 'hand') push(0.6, { label: `Worm farm${(o.cast || 0) >= 1 ? ` · ${Math.floor(o.cast)} bag${Math.floor(o.cast) > 1 ? 's' : ''} ready` : ''}`, icon: '🪱', ring: [o.x, o.z, 1.2], fn: () => WORMS.card(o) });
+    if (o.t === 'press' && near(o.x, o.z, 2.0)) { const n = Math.floor(PRESS.fruit(F) / 6); push(n ? 0.5 : 2.5, n ? { label: `Press ${n} jug${n > 1 ? 's' : ''} of cider`, icon: '🍎', ring: [o.x, o.z, 1.2], fn: () => PRESS.press(F) } : { label: 'Cider press', icon: '🍎', ring: [o.x, o.z, 1.2], fn: () => UI.toast('Six pounds of apples or pears press into a jug of cider. Pick some fruit and come back.') }); }
+    // (1.5.18) any tool, and it wins over weeds and beds when you're right at the bin
+    if (o.t === 'wormbin' && near(o.x, o.z, 2.0)) push(near(o.x, o.z, 1.5) ? 0.18 : 0.6, { label: (o.cast || 0) >= 1 ? `Worm farm: ${Math.floor(o.cast)} bag${Math.floor(o.cast) > 1 ? 's' : ''} of castings ready` : (o.food || 0) < 5 ? 'Worm farm: feed the worms' : 'Worm farm', icon: '🪱', ring: [o.x, o.z, 1.2], fn: () => WORMS.card(o) });
     if (o.t === 'woodpile' && near(o.x, o.z, 2.0) && tool === 'hand' && (F.inv.maplesap || 0) >= 4) push(1.0, { label: `Boil maple sap down to syrup (${Math.floor(F.inv.maplesap / 4)} pints)`, icon: '🍁', fn: () => MAPLE.boil(F) });
     if ((o.t === 'tree' || o.t === 'brush' || o.t === 'cactus') && d < 1.7) {
       const ring = [o.x, o.z, 1];
@@ -24687,7 +24928,7 @@ function swaleFootprint(SH) {
   for (const [i, dir] of [[0, -1], [n - 1, 1]]) { const a = P[Math.max(0, Math.min(n - 1, i - dir))], b = P[i], tx = b[0] - a[0], tz = b[1] - a[1], tl = Math.hypot(tx, tz) || 1; for (let k = 1; k <= 3; k++) for (const sv of [-0.8, 0, 1.0, 1.9]) out.push([b[0] + tx / tl * k * 0.5 + N[i][0] * sv, b[1] + tz / tl * k * 0.5 + N[i][1] * sv, i, sv]); }
   return out;
 }
-// what stops a swale being dug here (a short reason), or null. Only trees, brush, rocks and cactus may be in the way (they get cleared).
+// what stops a swale being dug here (a short reason), or null. Only trees, brush, rocks, cactus and weeds may be in the way (they get cleared).
 function swaleProblem(F, SH) {
   const T = F.terrain, FP = swaleFootprint(SH);
   for (const [x, z] of FP) { const p = plotOf(x, z); if (p < 0 || !F.owned[p]) return 'It has to stay on your own land'; }
@@ -24697,7 +24938,7 @@ function swaleProblem(F, SH) {
   for (const sw of F.swales) { const Q = sw.pts || []; if (FP.some(([x, z]) => Q.some((q) => Math.abs(q[0] - x) < 4 && Math.abs(q[1] - z) < 4 && Math.hypot(q[0] - x, q[1] - z) < (sw.N ? 3.3 : 3.6)))) return 'It would cross another swale. Space them further apart'; }
   for (const pd of F.paddocks) if (FP.some(([x, z]) => distToEdges(pd, x, z) < 0.8)) return `It would cut through the ${pd.name} fence`;
   for (const o of F.objs) {
-    if (o.t === 'tree' || o.t === 'brush' || o.t === 'rock' || o.t === 'cactus') continue;
+    if (o.t === 'tree' || o.t === 'brush' || o.t === 'rock' || o.t === 'cactus' || o.t === 'weed') continue;
     const sd = solidOf(o), hw = o.t === 'bed' ? 1.7 : sd ? (sd.hw || sd.r || 0.5) + 0.6 : 0.9, hd = o.t === 'bed' ? 0.8 : sd ? (sd.hd || sd.r || 0.5) + 0.6 : 0.9;
     const c = Math.cos(o.r || 0), s2 = Math.sin(o.r || 0);
     if (FP.some(([x, z]) => { const dx = x - o.x, dz = z - o.z; return Math.abs(c * dx - s2 * dz) < hw && Math.abs(s2 * dx + c * dz) < hd; })) return `It would run into the ${objName(o)}`;
@@ -24740,7 +24981,7 @@ function nudgeInside(F, x, z, hw, hd) {
 // the trees, brush, rocks and cactus standing on a swale's ditch or berm
 function swaleClears(F, SH) {
   const FP = swaleFootprint(SH);
-  return F.objs.filter((o) => (o.t === 'tree' || o.t === 'brush' || o.t === 'rock' || o.t === 'cactus') && FP.some(([x, z]) => Math.hypot(x - o.x, z - o.z) < 1.1));
+  return F.objs.filter((o) => (o.t === 'tree' || o.t === 'brush' || o.t === 'rock' || o.t === 'cactus' || o.t === 'weed') && FP.some(([x, z]) => Math.hypot(x - o.x, z - o.z) < 1.1));
 }
 // ---------------------------------------------------------------- filling ponds and swales back in
 // The ground goes back to the land's own lie as fresh raked soil, which greens up over the next few weeks. Grown trees on a swale are cut
@@ -24758,6 +24999,19 @@ function swaleAt(F, x, z, r) {
 }
 function pondAt(F, x, z) { return F.ponds.find((p) => Math.hypot((x - p.x) / (p.rx + 1.6), (z - p.z) / (p.rz + 1.6)) < 1) || null; }
 // ground that something else still shapes: another pond or swale, or the levelled pad under a building
+// (1.5.18) a pond filled in before 1.5.18 could leave part of its hole dug and still marked as water. Any water with no pond is filled
+// back to the lie of the land as raked soil.
+function fixOrphanWater(F) {
+  const T = F.terrain; if (!T || !T.base) return 0;
+  const inPond = (x, z) => F.ponds.some((q) => Math.hypot((x - q.x) / q.rx, (z - q.z) / q.rz) < 1.2);
+  const nearCreek = (x, z) => F.creek && Math.abs(z - T.creekZ(x)) < 3;
+  const spots = [];
+  T.eachCell(-THALF, -THALF, THALF, THALF, (x, z, k) => { if (T.cover[k] === COVER.water && !inPond(x, z) && !nearCreek(x, z)) { T.cover[k] = COVER.bare; T.bio[k] = 0.2; spots.push([x, z]); } });
+  if (!spots.length) return 0;
+  for (const [x, z] of spots) T.eachVert(x - 1.5, z - 1.5, x + 1.5, z + 1.5, (vx, vz, k) => { if (inPond(vx, vz)) return; const b = T.base(vx, vz); if (T.h[k] < b) T.h[k] = lerp(T.h[k], b, smooth(1.5, 0.6, Math.hypot(vx - x, vz - z))); });
+  T.slopeC = null;
+  return spots.length;
+}
 function earthKeep(F, self) {
   const solid = F.objs.filter((o) => { const s = solidOf(o); return s && !['hive', 'trough', 'mailbox', 'tank'].includes(o.t); });
   return (x, z) => F.ponds.some((p) => p !== self && Math.hypot((x - p.x) / (p.rx * 2 + 0.6), (z - p.z) / (p.rz * 2 + 0.6)) < 1)
@@ -24815,8 +25069,12 @@ function fillPond(p) {
       F.ponds = F.ponds.filter((q) => q !== p);
       const keep = earthKeep(F, p);
       T.unDig(p.x - p.rx * 2.2, p.z - p.rz * 2.2, p.x + p.rx * 2.2, p.z + p.rz * 2.2, (x, z) => smooth(2.15, 1.95, Math.hypot((x - p.x) / p.rx, (z - p.z) / p.rz)), keep);
+      // (1.5.18) the hole itself is always filled right up, even with a swale, another pond or a building nearby: only the berm ring is
+      // left alone where something else shapes it. Before, a swale close by kept part of the hole dug and still marked as water.
+      const inOther = (x, z) => F.ponds.some((q) => Math.hypot((x - q.x) / q.rx, (z - q.z) / q.rz) < 1.15);
+      T.eachVert(p.x - p.rx * 1.3, p.z - p.rz * 1.3, p.x + p.rx * 1.3, p.z + p.rz * 1.3, (x, z, k) => { if (Math.hypot((x - p.x) / p.rx, (z - p.z) / p.rz) < 1.2 && !inOther(x, z) && T.base) { const b = T.base(x, z); if (T.h[k] < b) T.h[k] = b; } });
       T.eachCell(p.x - p.rx * 1.3, p.z - p.rz * 1.3, p.x + p.rx * 1.3, p.z + p.rz * 1.3, (x, z, k) => {
-        if (keep(x, z) || Math.hypot((x - p.x) / p.rx, (z - p.z) / p.rz) > 1.25) return;
+        if (inOther(x, z) || Math.hypot((x - p.x) / p.rx, (z - p.z) / p.rz) > 1.25) return;
         if (T.cover[k] === COVER.water || T.cover[k] === COVER.bare) { T.cover[k] = COVER.bare; T.bio[k] = 0.2; T.moist[k] = Math.max(T.moist[k], 0.6); }
       });
       T.slopeC = null; G.view.rebuildTerrain(); G.view.dirtyAll(); G.view.rebuildColliders(); G.view.rebuildWater(); G.view.syncActors(true);
@@ -24859,7 +25117,7 @@ function confirmPlace() {
   } else if (P.kind === 'pond') {
     (P.now ? digNow : act)('dig', 3.0, 240, 15, () => {
       const r = T.carvePond(x, z, P.rx, P.rz);
-      F.objs = F.objs.filter((o) => !((o.t === 'tree' || o.t === 'brush' || o.t === 'rock' || o.t === 'cactus') && Math.hypot((o.x - x) / (P.rx + 1), (o.z - z) / (P.rz + 1)) < 1));
+      F.objs = F.objs.filter((o) => !((o.t === 'tree' || o.t === 'brush' || o.t === 'rock' || o.t === 'cactus' || o.t === 'weed') && Math.hypot((o.x - x) / (P.rx + 1), (o.z - z) / (P.rz + 1)) < 1));
       F.ponds.push({ id: F.nextId++, x, z, rx: P.rx, rz: P.rz, level: r.level, floor: r.floor, vol: 0.05 });
       // the fence it sat across is moved out round it (the pond ends up inside that paddock)
       const moved = [];
@@ -24998,6 +25256,26 @@ function exitRoom() {
   });
 }
 // tapping an animal standing in a barn stall: step up to the front of its stall and open its card
+// (1.5.18) tap the worm farm or cider press on screen (from up to a dozen steps away) and you walk over and use it
+function kitTap(cx, cy) {
+  if (G.mode !== 'play' || G.busy || G.panelOpen || G.iris || G.drive || G.place || !G.lastFrame) return false;
+  const F = G.F, Fm = G.Fm, k = glc.width / Math.max(1, window.innerWidth);
+  let best = null, bd = 60 * k;
+  for (const o of F.objs) {
+    if (o.t !== 'wormbin' && o.t !== 'press') continue;
+    if (Math.hypot(o.x - Fm.x, o.z - Fm.z) > 12) continue;
+    const pt = projectPt(G.lastFrame, [o.x, groundAt(F, o.x, o.z) + 0.6, o.z], glc.width, glc.height); if (!pt) continue;
+    const d = Math.hypot(pt[0] - cx * k, pt[1] - cy * k); if (d < bd) { bd = d; best = o; }
+  }
+  if (!best) return false;
+  const o = best, d = Math.hypot(Fm.x - o.x, Fm.z - o.z) || 1;
+  if (d > 1.7) { const ux = (Fm.x - o.x) / d, uz = (Fm.z - o.z) / d; const nx = o.x + ux * 1.4, nz = o.z + uz * 1.4; if (!G.view.col.blocked(nx, nz, 0.3, {})) { Fm.x = nx; Fm.z = nz; } }
+  Fm.yaw = Math.atan2(o.x - Fm.x, o.z - Fm.z); G.targetT = 0;
+  if (o.t === 'wormbin') WORMS.card(o);
+  else if (PRESS.fruit(F) >= 6) PRESS.press(F);
+  else UI.toast('🍎 The cider press. Bring at least 6 lbs of apples or pears and tap it to press cider.');
+  return true;
+}
 function barnTap(cx, cy) {
   if (G.mode !== 'room' || !G.room || G.room.type !== 'barn' || G.busy || G.panelOpen || G.iris || !G.lastFrame) return false;
   const k = glc.width / Math.max(1, window.innerWidth);
@@ -25063,6 +25341,7 @@ function roomAction(it) {
     case 'board': JOBS.open(); break;
     case 'fair': FAIR.open(); break;
     case 'fest': FEST.open(); break;
+    case 'lantern': FESTGAME.light(it.idx); break;
     case 'nbhome': TRAVEL.menu(); break;
     case 'woods': WOODS.act(it); break;
     case 'coin': if (!F.kid && F.money < 1) break; if (!F.kid) F.money -= 1; AUDIO.tone(1400, 0.1, 'triangle', 0.1); AUDIO.tone(900, 0.3, 'sine', 0.06, 1, 0.25); UI.toast(['You wish for rain at just the right time. 🌧️', 'You wish for fat, happy hens. 🐔', 'You wish the hay prices stay low. 🌾', 'You wish for a good harvest. 🧺', 'Splash! The fountain keeps your secret.'][Math.floor(Math.random() * 5)]); break;
@@ -25109,6 +25388,7 @@ function renderTown(dt) {
   for (const n of G.room.npcs || []) { if (n.hidden) continue; drawFarmer(draws, n, n.nb ? NBV.partsOf(n) : townParts(R, n.key), T0, G.t); }
   if (G.room.type === 'neighbor') NBV.draws(draws);
   if (G.room.type === 'woods') WOODS.draws(draws);
+  try { FESTGAME.lanternDraws(draws); } catch (e) { /* no lanterns is fine */ }
   if (G.room.dyn) G.room.dyn(draws);
   for (const a of G.room.statics || []) drawActor(draws, a, T0);
   if (G.target && G.target.face && G.target.ringOk !== false && !FPV.on) draws.push(ringDraw([G.target.face.x, G.target.face.z, 0.8]));

@@ -8,6 +8,21 @@ Publishing: copy `index.html` and `sw.js` into the GitHub repo `silverton777/far
 
 ---
 
+## 1.5.18: festivals you can play, soil tips, pond and worm farm fixes
+
+**Why:** "Yes add festivals you can play - all those things."
+
+- Each festival panel now opens with a game. The prize (money, Golden Acorns and the host's goodwill) is paid the first time you win each year. You can play again any time the festival is on, just for fun. In kid mode the prize is acorns only.
+- Spring Seed Swap, "Guess the seed" with Mabel: she describes five seeds, three guesses each. 5/5 wins $80, 25 🌰 and three seed packets. 3 or 4 wins $30, 10 🌰 and a packet.
+- Midsummer Potluck, the pie & dish contest: enter something you cooked. Dot, Marco and Rosa each score it and comment, against five neighbours' entries. Pies and bakes do best, and so do better dishes. Blue ribbon $150 + 30 🌰, red $75 + 15 🌰, white $40 + 8 🌰. Your entry stays on the judging table.
+- County Fair, the pig race: pick one of four pigs, then tap Cheer when your pig looks back (👀) for a burst of speed. A win pays $100 + 20 🌰.
+- Harvest Supper, apple bobbing: 20 seconds to tap Dunk when the marker is over a bobbing apple. 5 or more wins $60 + 15 🌰, 3 or 4 wins $20 + 6 🌰. You keep the apples you catch.
+- Candle Night, the lantern walk: eight lanterns stand round the park. From 5 pm, walk up to each one and light it, and it glows. Light all eight for $100 + 25 🌰 and a thank-you from Sam.
+- How to build better soil (owner: "also give tips on how to improve soil. most people dont always know"): twelve plain-language tips, each with what it means in the game (keep something growing, mulch, compost, worm castings, cover crops, dig less, move the animals and rest the grass, hens behind the herd, slow the water, trees, mix it up, be patient). Open it from any garden bed's card or the journal's Land & soil tab. Every few days one tip appears in the morning report.
+- Filling in a pond (owner: "i filled in a pond and there is still a large hole and the game says water is in the way"): the hole is now always filled right up, even with a swale, another pond or a building nearby. Before, anything close by kept part of the hole dug and still counted as water. Farms that already have a hole left behind get it filled in when they load.
+- Weeds no longer stop a swale or pond (owner: "weeds shouldnt be considered in the way"). They're pulled up as it's dug.
+- Worm farm (owner: "there was no options to do anything to my worm farm"): walk up to it with any tool in hand (before, only the bare hand worked) and the action button says "Worm farm: feed the worms". It now wins over weeds and beds nearby. You can also just tap the bin, or the cider press, on screen from up to a dozen steps away and your farmer walks over and opens it.
+
 ## 1.5.17: night life: stargazing, fireflies, owls and full-moon walks
 
 **Why:** the owner picked "night life" from the list of new ideas: "fireflies, stargazing from the porch, owls, and a full-moon walk in the woods to find rare night animals".
@@ -129,7 +144,7 @@ Publishing: copy `index.html` and `sw.js` into the GitHub repo `silverton777/far
 **Why:** "put a calendar in the house you can view and have important dates on there like your friends birthdays, the festival dates, etc".
 
 - A calendar hangs on the right wall of the house, by the firewood. Tap it for a month grid (flip through the year) marking the birthdays of friends you have met, the four festivals and the County Fair, and a "Coming up" list of the next six dates.
-- Not done yet from the same request: interactive festivals (townspeople, games, prizes). The festivals today are still the original table-by-the-fountain version; see `FEST` and `townFest()`.
+- Not done yet from the same request: interactive festivals (townspeople, games, prizes). Games and prizes came in 1.5.18 (`FESTGAME`).
 
 ## 1.5.4: the map opens again; build with your farmer or on the map; Luna and Juneau for sale; journal goals reworked; $75,000 to start
 
