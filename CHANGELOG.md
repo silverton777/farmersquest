@@ -8,6 +8,23 @@ Publishing: copy `index.html` and `sw.js` into the GitHub repo `silverton777/far
 
 ---
 
+## 1.5.6: horse riding fixed, shopkeepers to talk to, dogs that go round things, fences round ponds and breaks in swales, all controls on the left thumb, bonus goals, $60,000 to start
+
+**Why:** the owner's list: "in one account i bought up a bunch of [land] and anytime i try to open the map the game freezes", "glitches when trying to get on and ride horse", "it says you havent met workers at town shops but there isnt an opportunity to talk with them, fix that", "back to $60000 starting money", "fix dogs being able to run through buildings and fences and animals", "ponds and swales cannot be build on fences and vice versa. give an option to fence around the pond or put a break in the swale", "hard time feeding pigs when in paddock. option wouldnt show up unless in barnyard", "tips like unroll bale here get in the way of the view and make it so you cannot use the right area of the screen", "add in unlocked mode a setting that changes ALL movement and panning controls on the left thumb", "the soil organic matter being raised by 0.5% needs to be at least level 6", "the aesthetic changes/animation upgrades ... have not taken place in the neighbors farms" and "i want some bonus goals that are separate from the others".
+
+- Horse riding: an error thrown on every frame while riding (or driving any vehicle) is fixed. Getting on, riding, steering and getting off are smooth again, and the horse and rider stay together.
+- Map on big farms: the land, soil and water pictures are now kept and only redrawn when the ground or the day changes, and only the layer you're looking at is drawn. In testing the map opened in under half a second even at 1,000,000 acres, so the freeze could not be reproduced; if it still happens on that account, the owner should say what was on screen.
+- Town shops: every shopkeeper (Mabel, Hank, Rosa, Mr. Abernathy, Mr. Lin, Dot) has a "Talk to …" spot beside the counter, and stepping up to the counter counts as meeting them for the friends list and the "Meet N people" goal.
+- New farms start with $60,000 again (1.5.4 had raised it to $75,000).
+- Dogs steer round buildings, trees and other animals instead of running through them, and jump a fence in a little arc rather than passing through it.
+- Fences, ponds and swales: a fence drawn through a pond offers "⭕ Fence around the pond" (the fence bends round the outside, so the pond ends up inside the paddock); a fence across a swale offers "〰️ Put a break in the swale" (the swale is raked back where the fence crosses and dug again as pieces either side). A pond placed across a fence offers to take the fence round it, and a swale dug across a fence offers "Dig it with a break at the fence". Works both with your farmer and on the map.
+- Pigs: "Feed the pigs" now shows inside any paddock that has pigs in it, not only in the barnyard (or says you're out of pig feed).
+- Action labels like "Unroll a round bale here" are shorter and no longer catch taps; the tip card lets taps through except on its own buttons, so the right side of the screen stays free for looking around.
+- Unlocked mode: Settings → Controls has an "All on left" choice. One stick on the left thumb walks and turns (driving and riding too), the right half of the screen no longer pans, and in first-person view the camera levels itself.
+- Journal: "Raise soil organic matter by 0.5%" starts at level 6.
+- Neighbours' farms: the soft grass carpet from home now covers their pastures, hay fields, orchards, lawns and farmstead, stopping at buildings, fences, drives, ponds and swales. Their animals already use the rebuilt models and animations.
+- Bonus goals: a new Bonus tab in the journal, separate from the farm goals: share a photo from photo mode (+30 🌰), share the game with a friend (+30 🌰), rate and review it (+50 🌰, opens once the store link is set in `APP_STORE_REVIEW`) and post about your farm with #FarmersQuest (+20 🌰). Each pays once.
+
 ## 1.5.5: a wall calendar in the house
 
 **Why:** "put a calendar in the house you can view and have important dates on there like your friends birthdays, the festival dates, etc".

@@ -10,6 +10,23 @@ Publishing: copy `index.html` and `sw.js` into the GitHub repo `silverton777/far
 
 ==========
 
+## 1.5.6: horse riding fixed, shopkeepers to talk to, dogs that go round things, fences round ponds and breaks in swales, all controls on the left thumb, bonus goals, $60,000 to start
+
+**Why:** the owner's list: "in one account i bought up a bunch of [land] and anytime i try to open the map the game freezes", "glitches when trying to get on and ride horse", "it says you havent met workers at town shops but there isnt an opportunity to talk with them, fix that", "back to $60000 starting money", "fix dogs being able to run through buildings and fences and animals", "ponds and swales cannot be build on fences and vice versa. give an option to fence around the pond or put a break in the swale", "hard time feeding pigs when in paddock. option wouldnt show up unless in barnyard", "tips like unroll bale here get in the way of the view and make it so you cannot use the right area of the screen", "add in unlocked mode a setting that changes ALL movement and panning controls on the left thumb", "the soil organic matter being raised by 0.5% needs to be at least level 6", "the aesthetic changes/animation upgrades ... have not taken place in the neighbors farms" and "i want some bonus goals that are separate from the others".
+
+- Horse riding: an error thrown on every frame while riding (or driving any vehicle) is fixed. Getting on, riding, steering and getting off are smooth again, and the horse and rider stay together.
+- Map on big farms: the land, soil and water pictures are now kept and only redrawn when the ground or the day changes, and only the layer you're looking at is drawn. In testing the map opened in under half a second even at 1,000,000 acres, so the freeze could not be reproduced; if it still happens on that account, the owner should say what was on screen.
+- Town shops: every shopkeeper (Mabel, Hank, Rosa, Mr. Abernathy, Mr. Lin, Dot) has a "Talk to …" spot beside the counter, and stepping up to the counter counts as meeting them for the friends list and the "Meet N people" goal.
+- New farms start with $60,000 again (1.5.4 had raised it to $75,000).
+- Dogs steer round buildings, trees and other animals instead of running through them, and jump a fence in a little arc rather than passing through it.
+- Fences, ponds and swales: a fence drawn through a pond offers "⭕ Fence around the pond" (the fence bends round the outside, so the pond ends up inside the paddock); a fence across a swale offers "〰️ Put a break in the swale" (the swale is raked back where the fence crosses and dug again as pieces either side). A pond placed across a fence offers to take the fence round it, and a swale dug across a fence offers "Dig it with a break at the fence". Works both with your farmer and on the map.
+- Pigs: "Feed the pigs" now shows inside any paddock that has pigs in it, not only in the barnyard (or says you're out of pig feed).
+- Action labels like "Unroll a round bale here" are shorter and no longer catch taps; the tip card lets taps through except on its own buttons, so the right side of the screen stays free for looking around.
+- Unlocked mode: Settings → Controls has an "All on left" choice. One stick on the left thumb walks and turns (driving and riding too), the right half of the screen no longer pans, and in first-person view the camera levels itself.
+- Journal: "Raise soil organic matter by 0.5%" starts at level 6.
+- Neighbours' farms: the soft grass carpet from home now covers their pastures, hay fields, orchards, lawns and farmstead, stopping at buildings, fences, drives, ponds and swales. Their animals already use the rebuilt models and animations.
+- Bonus goals: a new Bonus tab in the journal, separate from the farm goals: share a photo from photo mode (+30 🌰), share the game with a friend (+30 🌰), rate and review it (+50 🌰, opens once the store link is set in `APP_STORE_REVIEW`) and post about your farm with #FarmersQuest (+20 🌰). Each pays once.
+
 ## 1.5.5: a wall calendar in the house
 
 **Why:** "put a calendar in the house you can view and have important dates on there like your friends birthdays, the festival dates, etc".
@@ -219,7 +236,7 @@ FQ-CHANGELOG-END -->
   #whistleBtn { width: 60px; height: 60px; background: var(--cream); color: var(--ink); box-shadow: 0 3px 0 var(--shadow); transition: transform .12s, opacity .2s; }
   #whistleBtn:active { transform: translateY(2px) scale(.94); box-shadow: 0 1px 0 var(--shadow); }
   #whistleBtn.rest { opacity: .55; } #whistleBtn svg { display: block; }
-  #actLabel { position: fixed; right: max(18px, calc(env(safe-area-inset-right, 0px) + 6px)); bottom: max(110px, calc(env(safe-area-inset-bottom) + 98px)); background: rgba(40, 30, 20, 0.78); color: #fff; padding: 6px 12px; border-radius: 12px; font-size: 14px; font-weight: 750; max-width: 240px; text-align: center; z-index: 6; }
+  #actLabel { position: fixed; right: max(18px, calc(env(safe-area-inset-right, 0px) + 6px)); bottom: max(110px, calc(env(safe-area-inset-bottom) + 98px)); background: rgba(40, 30, 20, 0.78); color: #fff; padding: 6px 12px; border-radius: 12px; font-size: 14px; font-weight: 750; max-width: 200px; text-align: center; z-index: 6; pointer-events: none; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; opacity: .92; }   /* 1.5.6: the action hint never takes a touch, so the right side of the screen stays free for steering and looking round */
   #stick { position: fixed; width: 120px; height: 120px; margin: -60px 0 0 -60px; border-radius: 50%; background: rgba(255, 255, 255, 0.16); border: 2px solid rgba(255, 255, 255, 0.35); pointer-events: none; z-index: 6; }
   #stick i { position: absolute; left: 50%; top: 50%; width: 52px; height: 52px; margin: -26px 0 0 -26px; border-radius: 50%; background: rgba(255, 255, 255, 0.55); }
   #stick::after { content: ''; position: absolute; left: 50%; top: 50%; width: 168px; height: 168px; margin: -84px 0 0 -84px; border-radius: 50%; border: 2px dashed rgba(255, 255, 255, 0.0); transition: border-color .18s, background .18s; box-sizing: border-box; }
@@ -230,7 +247,7 @@ FQ-CHANGELOG-END -->
   #moveHint { position: fixed; left: max(24px, env(safe-area-inset-left, 0px)); bottom: max(26px, env(safe-area-inset-bottom)); color: #fff; font-weight: 800; font-size: 13px; text-shadow: 0 1px 3px #000a; opacity: .85; z-index: 5; pointer-events: none; }
   #toast { position: fixed; left: 50%; top: max(66px, calc(env(safe-area-inset-top) + 56px)); transform: translateX(-50%); background: var(--leaf); color: #fff; font-weight: 800; padding: 8px 18px; border-radius: 999px; box-shadow: 0 3px 0 rgba(0, 0, 0, .2); font-size: 14px; z-index: 40; max-width: min(520px, calc(100vw - 40px)); text-align: center; pointer-events: none; }
   #tipCard { position: fixed; left: 50%; top: max(118px, calc(env(safe-area-inset-top) + 108px)); transform: translateX(-50%); width: min(92vw, 480px); display: flex; gap: 10px; align-items: flex-start; background: #fffdf5; color: #3d2d1c; border: 2px dashed #c9b88a; border-radius: 16px; padding: 10px 12px; box-shadow: 0 4px 0 rgba(0,0,0,.18); z-index: 7; font-weight: 700; font-size: 14px; line-height: 1.35; }
-  #tipCard .ic { font-size: 24px; } #tipCard .tx { flex: 1; } #tipCard b { display: block; font-size: 11px; letter-spacing: .08em; text-transform: uppercase; opacity: .6; }
+  #tipCard { pointer-events: none; } #tipCard button { pointer-events: auto; } #tipCard .ic { font-size: 24px; } #tipCard .tx { flex: 1; } #tipCard b { display: block; font-size: 11px; letter-spacing: .08em; text-transform: uppercase; opacity: .6; }
   #tipCard button { border: 0; border-radius: 50%; width: 34px; height: 34px; background: var(--leaf); color: #fff; font-weight: 900; cursor: pointer; }
   #toast.bad { background: var(--warn); }
   #placeBar { position: fixed; left: 50%; transform: translateX(-50%); bottom: max(16px, env(safe-area-inset-bottom)); background: var(--cream); border-radius: 18px; box-shadow: 0 3px 0 var(--shadow); padding: 8px 10px 8px 14px; display: flex; gap: 8px; align-items: center; z-index: 7; max-width: calc(100vw - 230px); }
@@ -846,7 +863,7 @@ const LISTINGS = [
   { key: 'creek', name: 'Creek-bottom pasture', plots: 2, price: 40000, om: +0.2, cover: 'pasture', water: 1, desc: 'A seasonal creek and tired pasture. Floods in big storms.' },
   { key: 'prime', name: 'Established farm', plots: 3, price: 55000, om: +0.9, cover: 'pasture', water: 2, desc: 'Good grass, an old pond and a barn. Little money left over.' },
 ];
-const START_MONEY = 75000;   // the owner's call (1.5.4): a little more to get going on
+const START_MONEY = 60000;   // the owner's call (1.5.6): back to $60,000
 
 // ------------------------------------------------------------------ crops (months to harvest, seasons ok, yield per bed, sale price per unit)
 const CROPS = [
@@ -7812,6 +7829,9 @@ function groundAt(F, x, z) {
   return farHeight(T, F, x, z);
 }
 
+// where a vehicle (or a horse) meets the ground: front left, front right, back left, back right, in its own frame (1.5.6: this helper had gone
+// missing, so riding or driving threw an error every frame and the ride stuttered)
+function wheelSpots(def) { const x = (def.track || 1) / 2, z = (def.wb || 2) / 2; return [[x, z], [-x, z], [x, -z], [-x, -z]]; }
 // ---------------------------------------------------------------- driving
 const DRIVE = {
   on: false,
@@ -7859,7 +7879,7 @@ const DRIVE = {
     D.o.x = D.x; D.o.z = D.z; D.o.r = D.yaw;
     D.on = false; G.drive = null; F.driving = null; G.view.vehicles = [];
     if (D.horse) {
-      const a = D.horse, rec = a.rec; a.ridden = false; a.x = D.x; a.z = D.z; a.yaw = D.yaw; a.state = 'idle'; a.st = 3;
+      const a = D.horse, rec = a.rec; a.ridden = false; a.hopY = 0; a.x = D.x; a.z = D.z; a.yaw = D.yaw; a.state = 'idle'; a.st = 3;
       const pad = rec.pad && F.paddocks.find((p) => p.id === rec.pad);
       if (pad && !inPad(pad, a.x, a.z)) { const inside = F.paddocks.find((p) => inPad(p, a.x, a.z)); rec.pad = inside ? inside.id : null; UI.toast(inside ? `${rec.name} is in ${inside.name} now.` : `${rec.name} will hang around the barnyard now.`); }
       else if (!pad) { const inside = F.paddocks.find((p) => inPad(p, a.x, a.z)); if (inside) { rec.pad = inside.id; UI.toast(`${rec.name} is in ${inside.name} now.`); } }
@@ -7878,6 +7898,10 @@ const DRIVE = {
   // ---------------- input (touch: left half steers, right half is the throttle)
   pointerDown(e) {
     const I = this.inp, w = window.innerWidth;
+    if (FPV.leftOnly()) {   // one stick does it all: left/right steers, up is the throttle
+      if (e.clientX < w * 0.5 && !I.steer) { I.steer = { id: e.pointerId, x0: e.clientX, y0: e.clientY, v: 0, both: true }; I.thr = { id: e.pointerId, y0: e.clientY, v: 0 }; const s = $('steerUI'); s.style.left = e.clientX + 'px'; s.style.top = e.clientY + 'px'; s.hidden = false; s.firstElementChild.style.transform = ''; glc.setPointerCapture(e.pointerId); }
+      return;
+    }
     if (e.clientX < w * 0.5) { if (!I.steer) { I.steer = { id: e.pointerId, x0: e.clientX, y0: e.clientY, v: 0 }; const s = $('steerUI'); s.style.left = e.clientX + 'px'; s.style.top = e.clientY + 'px'; s.hidden = false; s.firstElementChild.style.transform = ''; } }
     else if (!I.thr) { I.thr = { id: e.pointerId, y0: e.clientY, v: 0 }; }
     glc.setPointerCapture(e.pointerId);
@@ -7885,7 +7909,7 @@ const DRIVE = {
   pointerMove(e) {
     const I = this.inp;
     if (I.steer && I.steer.id === e.pointerId) { const dx = clamp(e.clientX - I.steer.x0, -70, 70); I.steer.v = Math.abs(dx) < 4 ? 0 : dx / 70; $('steerUI').firstElementChild.style.transform = `translateX(${dx}px)`; }
-    if (I.thr && I.thr.id === e.pointerId) { I.thr.v = clamp((I.thr.y0 - e.clientY) / 130, 0, 1); }
+    if (I.thr && I.thr.id === e.pointerId) { I.thr.v = clamp((I.thr.y0 - e.clientY) / (I.steer && I.steer.both ? 90 : 130), 0, 1); }
   },
   pointerUp(e) {
     const I = this.inp;
@@ -8036,6 +8060,7 @@ const DRIVE = {
       if (Math.floor(h.walkPh / Math.PI) !== Math.floor(prev / Math.PI) && sp > 0.3) AUDIO.tone(sp > 4.5 ? 180 : 240, 0.05, 'triangle', 0.05 + Math.min(0.05, sp * 0.01), 0.6);
       D.gaitBob = Math.abs(Math.sin(h.walkPh)) * Math.min(1, sp / 2.5) * (sp > 4.5 ? 0.09 : sp > 2.2 ? 0.07 : 0.03);
       D.gait = sp < 0.15 ? 'Halt' : sp < 2.2 ? 'Walk' : sp < 4.5 ? 'Trot' : sp < 6.4 ? 'Canter' : 'Gallop';
+      h.hopY = (D.y - groundAt(F, D.x, D.z)) + (D.gaitBob || 0);   // the horse rises and falls with its rider, so the two never come apart
     }
     // the rider leans into the turn
     D.lean += (clamp(D.v * yawRate * -0.05, -0.3, 0.3) - D.lean) * (1 - Math.exp(-dt * 5));
@@ -8938,6 +8963,8 @@ const NBV = {
     // each field gets its details (rows, trees, fences, colliders), then a chunk that draws it
     for (const f of room.fields) this.planField(room, f, N, S, rr, F);
     this.farmstead(room, N, F, rr);
+    // patches of grass carpet: every field, the lawn round the house and the open ground of the farmstead (built when you walk near)
+    { const fsW = W >= 60 ? 15 : W / 2; room.turfs = room.fields.slice(); room.turfs.push({ kind: 'lawn', x0: -14, x1: -1, z0: -16, z1: -1 }, { kind: 'yard', x0: -fsW + 0.3, x1: fsW - 0.3, z0: -NB_FS + 0.2, z1: -0.7 }); }
     for (const f of room.fields) chunk(f.cx, -f.cz, Math.hypot(f.w, f.d) / 2 + 4, (m, r2, fx, fz) => this.drawField(m, r2, f, F, season, N, fx, fz), ['veg', 'orchard', 'woods', 'swales', 'foodforest', 'pasture'].includes(f.kind));
     // border trees outside the back and side fences, drawn in pieces along the edge
     const rb = rng(F.seed + 77);
@@ -9047,7 +9074,7 @@ const NBV = {
   // ---------------------------------------------------------------- drawing one field (called when you get near it)
   drawField(mb, R, f, F, season, N, fx, fz) {
     const fh = 0.03, soil = [116, 86, 60], H0 = () => 0;
-    const ground = (col, h) => { mb.mat = MAT.ground; mb.box(f.cx, 0, f.cz, f.w, h || fh, f.d, col); mb.mat = 0; };
+    const ground = (col, h) => { mb.mat = MAT.ground; mb.box(f.cx, 0, f.cz, f.w, h || fh, f.d, col); mb.mat = 0; f.turfCol = col; };
     const tufts = (n, hMin, hMax, col) => {
       for (let i = 0; i < n; i++) {
         const x = f.x0 + 1 + R() * (f.w - 2), z = f.z0 + 1 + R() * (f.d - 2), h = hMin + R() * (hMax - hMin), a = R() * 6.28, dx = Math.cos(a) * 0.14, dz = Math.sin(a) * 0.14;
@@ -9060,7 +9087,7 @@ const NBV = {
       case 'pasture': {
         const col = nbGrassCol(F, f.occupied ? 1 : f.age <= 1 ? 0.6 : 0.1);
         ground(col);
-        if (!winter) tufts(Math.min(320, Math.round(f.w * f.d * 0.05 * (f.occupied ? 0.4 : 1))), f.h * 0.15, f.h * 0.5, col);
+        if (!winter) tufts(Math.min(320, Math.round(f.w * f.d * 0.05 * (f.occupied ? 0.4 : 1) * (ART.shell > 0 ? 0.35 : 1))), f.h * 0.15, f.h * 0.5, col);   // with the grass carpet on, only the odd taller clump
         if (f.tank) { mb.mat = MAT.metal; mb.cyl(f.tank[0], 0, f.tank[1], 1.3, 1.3, 0.6, 14, [150, 156, 164], { capCol: [90, 140, 170] }); mb.mat = 0; }
         if (f.shade) nbTree(mb, fx, fz, 'oak', f.shade[0], f.shade[1], 1.35, season, R);
         break;
@@ -9360,9 +9387,60 @@ const NBV = {
         if (c.gl) out.push({ mesh: c.gl, noShadow: d > c.r + 26 });
       } else if (c.gl && d > c.r + 240) { R.free(c.gl); c.gl = null; }
     }
+    // the grass carpet (the same soft shell grass as at home) on the fields, the lawn and the farmstead near you
+    if (ART.shell > 0) {
+      let tb = 0;
+      for (const f of room.turfs || []) {
+        const dx = Math.max(f.x0 - fx, 0, fx - f.x1), dz = Math.max(f.z0 - fz, 0, fz - f.z1), d = Math.hypot(dx, dz);
+        if (d < 45) {
+          if (f.turfGl === undefined && tb < 1 && (f.turfCol || f.kind === 'lawn' || f.kind === 'yard')) { f.turfGl = this.turf(room, f); tb++; }
+          if (f.turfGl) out.push({ mesh: f.turfGl, lift: true, noShadow: true, shell: d < 33 ? GRASS_SHELL : undefined });
+        } else if (f.turfGl && d > 90) { G.R.free(f.turfGl); f.turfGl = undefined; }
+      }
+    }
     for (const a of room.actors) if (Math.abs(a.x - fx) < 70 && Math.abs(a.z - fz) < 70) drawActor(out, a, T0);
   },
-  free() { const room = this.room; if (!room) return; for (const c of room.chunks) if (c.gl) { G.R.free(c.gl); c.gl = null; } this.room = null; },
+  // one patch of grass carpet: a 1-unit grid over a field (or the lawn, or the open ground of the farmstead), each corner carrying how
+  // long the grass is there. Grass stops at buildings, fences, trees, the drive, ponds and swales, so nothing pokes through them.
+  turf(room, f) {
+    const F = G.F, season = room.season, k = f.kind;
+    const hay = f.hay || {};
+    const base = { pasture: f.occupied ? 0.32 : f.age <= 1 ? 0.55 : 0.95, hay: hay.bales || hay.cutNow ? 0.22 : hay.dormant ? 0.45 : 1.0, orchard: 0.7, woods: 0.6, swales: 0.75, foodforest: 0.6, coopfield: 0.45, broilers: 0.45, pond: 0.75, vine: 0.5, flowers: 0.5, lawn: 0.42, yard: 0.6 }[k];
+    if (base === undefined) return null;
+    const sk = (season === 3 ? 0.5 : season === 2 ? 0.85 : 1) * (F.region === 'sonoran' ? 0.55 : 1);
+    const col0 = k === 'lawn' ? [118, 160, 82] : k === 'yard' ? nbGrassCol(F, 0.3) : f.turfCol, y = k === 'lawn' ? 0.026 : k === 'yard' ? 0.002 : 0.031;
+    const drives = [[0, -4, 2, 9], [-3, -3.1, 7, 2], [0, -10.5, 2, 12]], lawn = [-14, -1, -16, -1];
+    const segD = (x, z, a, b) => { const vx = b[0] - a[0], vz = b[1] - a[1], l2 = vx * vx + vz * vz || 1e-9, t = clamp(((x - a[0]) * vx + (z - a[1]) * vz) / l2, 0, 1); return Math.hypot(x - a[0] - vx * t, z - a[1] - vz * t); };
+    const keep = (x, z) => {
+      if (room.col.blocked(x, z, 0.12)) return 0;
+      if (k === 'lawn' || k === 'yard') { for (const [u, v, w, d] of drives) if (Math.abs(x - u) < w / 2 + 0.25 && Math.abs(z - v) < d / 2 + 0.25) return 0; }
+      if (k === 'yard' && x > lawn[0] - 0.3 && x < lawn[1] + 0.3 && z > lawn[2] - 0.3 && z < lawn[3] + 0.3) return 0;
+      if (k === 'pond' && f.pond && Math.hypot((x - f.pond[0]) / (f.pond[2] + 0.9), (z - f.pond[1]) / (f.pond[3] + 0.9)) < 1) return 0;
+      if (k === 'swales') for (const l of f.lines || []) if (segD(x, z, l[0], l[1]) < 1.9) return 0;
+      if (k === 'broilers') for (const p of f.pens || []) if (Math.abs(x - p[0]) < 1.6 && z > f.z0 + 0.4 && z < p[1] + 1.4) return 0;
+      if (k === 'coopfield' && f.egg && Math.hypot(x - f.egg[0], z - f.egg[1]) < 2.2) return 0;
+      return 1;
+    };
+    const X0 = Math.floor(f.x0) , X1 = Math.ceil(f.x1), Z0 = Math.floor(f.z0), Z1 = Math.ceil(f.z1), nx = X1 - X0, nz = Z1 - Z0, W = nx + 1;
+    const cx = (i) => clamp(X0 + i, f.x0, f.x1), cz = (j) => clamp(Z0 + j, f.z0, f.z1);
+    const lens = new Float32Array(W * (nz + 1)), cols = [];
+    for (let j = 0; j <= nz; j++) for (let i = 0; i <= nx; i++) {
+      const x = cx(i), z = cz(j), n = fbm(x * 0.11, z * 0.11, 5, 2);
+      // the least over the corner and its neighbours, so a blade never pokes through anything
+      const kp = Math.min(keep(x, z), keep(x + 0.5, z + 0.5), keep(x - 0.5, z + 0.5), keep(x + 0.5, z - 0.5), keep(x - 0.5, z - 0.5));
+      lens[j * W + i] = Math.max(0.03, base * sk * (0.6 + 0.6 * n) * kp);
+      cols[j * W + i] = shade(col0, 0.94 + 0.12 * n);
+    }
+    const mb = new MB(); mb.mat = MAT.ground;
+    for (let j = 0; j < nz; j++) for (let i = 0; i < nx; i++) {
+      const k00 = j * W + i, k10 = k00 + 1, k01 = k00 + W, k11 = k01 + 1;
+      const p = (q) => [cx(q % W), y, cz(Math.floor(q / W))];
+      for (const q of [k00, k01, k11, k00, k11, k10]) mb.vert(p(q), [0, 1, 0], cols[q], 0, [0, lens[q]], MAT.ground);
+    }
+    mb.mat = 0;
+    return mb.d.length ? G.R.mesh(mb) : null;
+  },
+  free() { const room = this.room; if (!room) return; for (const c of room.chunks) if (c.gl) { G.R.free(c.gl); c.gl = null; } for (const f of room.turfs || []) if (f.turfGl) { G.R.free(f.turfGl); f.turfGl = undefined; } this.room = null; },
   // ---------------------------------------------------------------- going there and back
   mins(N) { return 8 + Math.round(Math.abs(nbX(N)) / 8); },
   visit(key, tripMins) {
@@ -11164,7 +11242,7 @@ const PHOTO = {
   },
   async share(rec) {
     const name = `farmers-quest-${rec.id}.jpg`, file = new File([rec.blob], name, { type: 'image/jpeg' });
-    try { if (navigator.canShare && navigator.canShare({ files: [file] })) { await navigator.share({ files: [file], title: 'Farmers Quest' }); return; } } catch (e) { if (e && e.name === 'AbortError') return; }
+    try { if (navigator.canShare && navigator.canShare({ files: [file] })) { await navigator.share({ files: [file], title: 'Farmers Quest', text: 'From my farm in Farmers Quest 🌾 #FarmersQuest' }); BONUS.done('photo'); return; } } catch (e) { if (e && e.name === 'AbortError') return; }
     const a = document.createElement('a'), u = URL.createObjectURL(rec.blob); a.href = u; a.download = name; document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(u), 5000);
     UI.toast('Photo saved to your downloads.');
   },
@@ -13854,7 +13932,7 @@ function drawActor(out, a, T, pondLevel) {
   const M = a.mesh, D = M.dims, s = a.size;
   // a freshly shorn sheep keeps only a short coat of fleece
   const fur = a.shornK && M.fur ? (a.shornFur = a.shornFur || Object.assign({}, M.fur, { len: M.fur.len * 0.3, layers: Math.max(3, M.fur.layers - 4) })) : M.fur;
-  let y = T.ground ? T.ground(a.x, a.z) : T.at(a.x, a.z);
+  let y = (T.ground ? T.ground(a.x, a.z) : T.at(a.x, a.z)) + (a.hopY || 0);
   if (a.swim && pondLevel !== undefined) y = pondLevel - D.height * 0.55 * s + Math.sin(a.phase * 2) * 0.02;
   const walking = a.state === 'walk', ph = a.walkPh || 0, tt = a.phase || 0, hy = a.head || 0;
   // the stride eases in and out (wk) instead of switching on and off, so an animal sets off and settles with its legs gliding to rest
@@ -13980,6 +14058,7 @@ class FarmView {
   }
   rebuildAll() { this.rebuildTerrain(); this.dirty.fill(true); this.updateChunks(true); this.rebuildWater(); this.rebuildColliders(); this.syncActors(true); PETS.sync(this); }
   rebuildTerrain() {
+    this.terrainVer = (this.terrainVer || 0) + 1;   // the farm map caches its ground picture against this
     roadFixCover(this.F);
     if (this.tiles) for (const t of this.tiles) this.R.free(t.mesh);
     // a homestead-only farm builds all its ground at full detail. A bigger one builds the ground near you at full detail and the rest
@@ -15436,6 +15515,47 @@ function treesOnSwales(F) {
 }
 // lv: the level a goal starts at. A hard or slow goal starts higher, so it holds back only the higher milestone prizes (a goal at
 // level 3 is needed for the level-4 prize, not for the farm dogs at level 2). after: a goal that only shows up once others are done.
+// ---------------------------------------------------------------- bonus goals (1.5.6): little thank-yous for sharing the game, kept apart
+// from the farm goals. They pay Golden Acorns once each and never block a milestone. Kept per device (store), not per farm.
+const APP_LINK = 'https://silverton777.github.io/farmersquest/';
+const APP_STORE_REVIEW = '';   // the App Store / Play review link, once the game is listed there
+const BONUS_GOALS = [
+  { id: 'photo', icon: '📸', name: 'Share a photo of your farm', small: 'Take a picture in photo mode, then share it to social media from the photo (Share / save)', reward: 30 },
+  { id: 'friend', icon: '💌', name: 'Share Farmers Quest with a friend', small: 'Send a friend the link so they can start a farm of their own', reward: 30, go: 'friend' },
+  { id: 'rate', icon: '⭐', name: 'Rate and review the game', small: 'Leave a rating and a few words in the app store', reward: 50, go: 'rate' },
+  { id: 'post', icon: '📣', name: 'Tell your followers', small: 'Share a post about your farm with the hashtag #FarmersQuest', reward: 20, go: 'post' },
+];
+const BONUS = {
+  isDone(id) { return !!store.get('fq_bonus', {})[id]; },
+  done(id) {
+    const d = store.get('fq_bonus', {}); if (d[id]) return;
+    const g = BONUS_GOALS.find((q) => q.id === id); if (!g) return;
+    d[id] = Date.now(); store.set('fq_bonus', d);
+    if (typeof SHOP !== 'undefined') SHOP.earn(g.reward, `Bonus goal: ${g.name}`);
+    if (UI.cur && $('bonusList')) this.panel($('bonusList').parentElement);
+  },
+  async shareLink(text, id) {
+    const data = { title: 'Farmers Quest', text, url: APP_LINK };
+    try { if (navigator.share) { await navigator.share(data); this.done(id); return; } } catch (e) { if (e && e.name === 'AbortError') return; }
+    try { await navigator.clipboard.writeText(`${text} ${APP_LINK}`); UI.toast('Link copied. Paste it into a message or a post.'); this.done(id); } catch (e) { UI.toast(`Share this link: ${APP_LINK}`); }
+  },
+  go(id) {
+    if (id === 'friend') return this.shareLink('Come and farm with me in Farmers Quest, a cozy farming game you can play on your phone 🌾', 'friend');
+    if (id === 'post') return this.shareLink('My farm is growing in Farmers Quest 🌾🐄🍎 #FarmersQuest', 'post');
+    if (id === 'rate') {
+      if (!APP_STORE_REVIEW) return UI.toast('Reviews open once Farmers Quest is in the App Store and Google Play. Thank you for wanting to!');
+      window.open(APP_STORE_REVIEW, '_blank'); setTimeout(() => this.done('rate'), 4000);
+    }
+  },
+  panel(b) {
+    const n = BONUS_GOALS.filter((g) => this.isDone(g.id)).length;
+    b.innerHTML = `<div id="bonusList"><p class="note">Bonus goals are extra thank-yous for helping Farmers Quest grow. They pay Golden Acorns once each and are separate from your farm goals. ${n}/${BONUS_GOALS.length} done.</p>${BONUS_GOALS.map((g) => {
+      const d = this.isDone(g.id);
+      return `<div class="row${d ? '' : ' tap'}" data-b="${g.id}"><span class="ic">${d ? '✅' : g.icon}</span><span class="tx">${esc(g.name)}<small>${esc(g.small)} · ${d ? 'done, thank you!' : `+${g.reward} 🌰`}</small></span>${!d && g.go ? '<span class="chev">›</span>' : ''}</div>`;
+    }).join('')}</div>`;
+    b.querySelectorAll('[data-b]').forEach((r) => { r.onclick = () => { const g = BONUS_GOALS.find((q) => q.id === r.dataset.b); if (this.isDone(g.id)) return; if (g.go) this.go(g.go); else if (g.id === 'photo') { UI.closeAll(); PHOTO.start(); UI.toast('Frame a nice shot, take it, then tap the photo and Share.'); } }; });
+  },
+};
 const GOALS = [
   { id: 'pond', cat: 'Water', icon: '💧', name: 'Dig your first pond', reward: 500, prog: (F) => (F.ponds.length ? 1 : 0) },
   { id: 'water', cat: 'Water', icon: '🌊', name: 'Fill a pond to the brim', reward: 1000, lv: 2, prog: (F) => Math.max(0, ...F.ponds.map((p) => p.vol)) },
@@ -15475,7 +15595,7 @@ const LADDERS = [
   { id: 'hay', cat: 'Animals', icon: '🌾', base: 10, reward: 700, of: (F) => Math.floor(F.stats.bales || 0), name: (n) => `Cut ${plural(n, 'bale')} of your own hay`, old: { hay: 1 } },
   { id: 'bidwon', cat: 'Animals', icon: '🔨', base: 1, reward: 400, of: (F) => tallied(F, 'auctionWon'), name: (n) => (n === 1 ? 'Win a lot at the Saturday auction' : `Win ${n} lots at the Saturday auction`), old: { bid1: 1 } },
   { id: 'bidsold', cat: 'Animals', icon: '💰', base: 3, reward: 700, of: (F) => tallied(F, 'auctionSold'), name: (n) => `Sell ${plural(n, 'animal')} in the auction ring`, old: { bid3: 1 } },
-  { id: 'om', cat: 'Soil', icon: '🪱', steps: [0.5, 1, 1.5, 2, 2.5, 3, 4, 5, 6, 8], reward: 2000, of: (F) => F.terrain.avgOM(true) - F.stats.startOM, name: (n) => `Raise soil organic matter by ${n}%`, old: { om1: 1, om2: 3 }, frac: true, lv: 3 },
+  { id: 'om', cat: 'Soil', icon: '🪱', steps: [0.5, 1, 1.5, 2, 2.5, 3, 4, 5, 6, 8], reward: 2000, of: (F) => F.terrain.avgOM(true) - F.stats.startOM, name: (n) => `Raise soil organic matter by ${n}%`, old: { om1: 1, om2: 3 }, frac: true, lv: 6 },
   { id: 'market', cat: 'Business', icon: '🏪', base: 5, reward: 600, of: (F) => F.stats.marketVisits || 0, name: (n) => `Sell at ${n} farmers markets`, old: { market: 2 } },
   { id: 'income', cat: 'Business', icon: '💵', base: 25000, reward: 3000, of: (F) => F.stats.income || 0, name: (n) => `Earn $${n.toLocaleString()} from farm sales`, old: { income: 1 } },
   { id: 'lots', cat: 'Business', icon: '🏡', steps: [2, 3, 4, 5, 6, 8, 10, 13, 16, 20, 25, 30, 37, 49, 61, 73, 85, 97, 109], reward: 1500, of: (F) => ownedCount(F), max: (F) => (F && HOLD.acres(F) >= MAX_ACRES - 1 ? ownedCount(F) : NPLOTS), name: (n) => `Own ${n} parcels of land`, old: { land: 7 } },
@@ -16482,7 +16602,7 @@ function interiorFrame(F0, room) {
 
 'use strict';
 // ============================================================================ profiles + saves (each profile has its own farm save)
-const FQ_VERSION = '1.5.5';
+const FQ_VERSION = '1.5.6';
 const LOOKS = [
   { shirt: [214, 74, 64], hair: [120, 76, 40] }, { shirt: [70, 130, 200], hair: [236, 206, 120] }, { shirt: [240, 170, 60], hair: [80, 50, 30] },
   { shirt: [120, 170, 90], hair: [40, 30, 28] }, { shirt: [170, 100, 190], hair: [200, 110, 60] }, { shirt: [60, 160, 160], hair: [150, 100, 60] },
@@ -17087,11 +17207,12 @@ const UI = {
   // ---------------- journal: goals + farm stats
   journal(tab) {
     const F = G.F, self = this;
-    const P = this.open({ title: 'Farm journal', sub: `${F.name} · ${regionByKey(F.region).name}`, icon: '📖', tabs: [{ key: 'goals', name: 'Goals' }, { key: 'stats', name: 'Land & soil' }, { key: 'animals', name: 'Animals' }, { key: 'climate', name: 'Climate' }, { key: 'pursuits', name: 'Pursuits' }, { key: 'friends', name: 'Friends' }, { key: 'collect', name: 'Collections' }], tab: tab || 'goals', onTab: (t, b) => fill(t, b) });
+    const P = this.open({ title: 'Farm journal', sub: `${F.name} · ${regionByKey(F.region).name}`, icon: '📖', tabs: [{ key: 'goals', name: 'Goals' }, { key: 'stats', name: 'Land & soil' }, { key: 'animals', name: 'Animals' }, { key: 'climate', name: 'Climate' }, { key: 'pursuits', name: 'Pursuits' }, { key: 'friends', name: 'Friends' }, { key: 'collect', name: 'Collections' }, { key: 'bonus', name: 'Bonus' }], tab: tab || 'goals', onTab: (t, b) => fill(t, b) });
     function fill(t, b) {
       if (t === 'pursuits') { PURSUE.panel(b); return; }
       if (t === 'friends') { FRIENDS.panel(b); return; }
       if (t === 'collect') { COLLECT.panel(b); return; }
+      if (t === 'bonus') { BONUS.panel(b); return; }
       if (t === 'goals') {
         let cat = '', html = '';
         for (const g of goalView(F)) {
@@ -17584,7 +17705,7 @@ const UI = {
   },
   menu() {
     const F = G.F, P = this.open({ title: 'Menu', icon: '⚙️' });
-    P.body.innerHTML = `<div class="row"><span class="ic">🎥</span><span class="tx">View<small>See the farm through your own eyes, or from above</small></span><div class="mseg" id="mView"><button data-v="third" class="${FPV.on ? '' : 'on'}">Third person</button><button data-v="first" class="${FPV.on ? 'on' : ''}">First person</button></div></div><div class="row"><span class="ic">🎮</span><span class="tx">First-person controls<small>${FPV.oneThumb() ? 'Left thumb walks and turns · right side looks up and down' : 'Left thumb moves · right thumb looks around'}</small></span><div class="mseg" id="mCtrl"><button data-c="twin" class="${FPV.oneThumb() ? '' : 'on'}">Two thumbs</button><button data-c="one" class="${FPV.oneThumb() ? 'on' : ''}">One thumb</button></div></div><div class="row"><span class="ic">👆</span><span class="tx">Look sensitivity<small>How fast the right thumb turns the view in first person</small></span><input type="range" id="mSens" min="0.4" max="2" step="0.1" value="${FPV.sens()}" style="width:120px"></div><label class="switch"><input type="checkbox" id="mKid" ${F.kid ? 'checked' : ''}> Kid mode (no numbers, no energy)</label><label class="switch"><input type="checkbox" id="mLow" ${G.lowDetail ? 'checked' : ''}> Low detail (for older devices)</label><label class="switch"><input type="checkbox" id="mSound" ${AUDIO.on ? 'checked' : ''}> Sound effects & nature</label><label class="switch"><input type="checkbox" id="mMusic" ${MUSIC.on ? 'checked' : ''}> Music · ${esc((TRACKS.find((t) => t.key === MUSIC.pick) || { name: MUSIC.pick === 'shuffle' ? 'Shuffle' : 'Auto' }).name)}</label>` +
+    P.body.innerHTML = `<div class="row"><span class="ic">🎥</span><span class="tx">View<small>See the farm through your own eyes, or from above</small></span><div class="mseg" id="mView"><button data-v="third" class="${FPV.on ? '' : 'on'}">Third person</button><button data-v="first" class="${FPV.on ? 'on' : ''}">First person</button></div></div><div class="row"><span class="ic">🎮</span><span class="tx">${F.unlocked ? 'Controls' : 'First-person controls'}<small>${FPV.leftOnly() ? 'Everything on the left thumb: walk and turn, steer and ride; the view levels itself' : FPV.oneThumb() ? 'Left thumb walks and turns · right side looks up and down' : 'Left thumb moves · right thumb looks around'}</small></span><div class="mseg" id="mCtrl"><button data-c="twin" class="${FPV.oneThumb() ? '' : 'on'}">Two thumbs</button><button data-c="one" class="${FPV.oneThumb() && !FPV.leftOnly() ? 'on' : ''}">One thumb</button>${F.unlocked ? `<button data-c="left" class="${FPV.leftOnly() ? 'on' : ''}">All on left</button>` : ''}</div></div><div class="row"><span class="ic">👆</span><span class="tx">Look sensitivity<small>How fast the right thumb turns the view in first person</small></span><input type="range" id="mSens" min="0.4" max="2" step="0.1" value="${FPV.sens()}" style="width:120px"></div><label class="switch"><input type="checkbox" id="mKid" ${F.kid ? 'checked' : ''}> Kid mode (no numbers, no energy)</label><label class="switch"><input type="checkbox" id="mLow" ${G.lowDetail ? 'checked' : ''}> Low detail (for older devices)</label><label class="switch"><input type="checkbox" id="mSound" ${AUDIO.on ? 'checked' : ''}> Sound effects & nature</label><label class="switch"><input type="checkbox" id="mMusic" ${MUSIC.on ? 'checked' : ''}> Music · ${esc((TRACKS.find((t) => t.key === MUSIC.pick) || { name: MUSIC.pick === 'shuffle' ? 'Shuffle' : 'Auto' }).name)}</label>` +
       this.rows([{ id: 'photo', tap: true, icon: '📷', text: 'Photo mode', small: 'Free camera, filters, frames and an album' }, { id: 'tips', tap: true, icon: '💡', text: 'Property tips', small: 'What to do next on your place' }, { id: 'music', tap: true, icon: '🎵', text: 'Music & tracks', small: 'Cozy and lofi tunes, volume' }, { id: 'shop', tap: true, icon: '🛍️', text: 'Farm shop', small: 'Boosts, outfits, paint, farm pets, Golden Acorns' }, { id: 'journal', tap: true, icon: '📖', text: 'Farm journal & goals' }, { id: 'how', tap: true, icon: '🎬', text: 'How to play' }, { id: 'help', tap: true, icon: '❓', text: 'Controls' }, { id: 'save', tap: true, icon: '💾', text: 'Save now' }, { id: 'about', tap: true, icon: 'ℹ️', text: 'About & privacy' }, { id: 'quit', tap: true, icon: '🏠', text: 'Save & go to home screen' }]);
     $('mView').querySelectorAll('[data-v]').forEach((b) => { b.onclick = () => { if ((b.dataset.v === 'first') !== FPV.on) FPV.toggle(); $('mView').querySelectorAll('[data-v]').forEach((q) => q.classList.toggle('on', q === b)); }; });
     $('mSens').oninput = (e) => store.set('fq_look', +e.target.value);
@@ -17687,6 +17808,114 @@ function sameGates(a, b) { const A = a.gates || [], B = b.gates || []; return A.
 function padCopy(p) { const c = { pts: padPts(p).map((q) => q.slice()), gates: (p.gates || []).map((g) => ({ e: g.e, t: g.t })), kind: p.kind }; if (p.open) c.open = true; return padSync(c); }
 
 // is this paddock shape allowed? (ignoreId = the paddock being edited)
+// ---------------------------------------------------------------- fences meeting ponds and swales (1.5.6)
+// A fence may not run through a pond or across a swale, and neither may be dug across a fence. Each clash comes with a way through:
+// a fence can be taken round the outside of a pond (so the pond ends up inside the paddock), and a swale can be left with a break
+// where the fence crosses it (a short gap of level ground, the swale's two ends taper off either side).
+function fenceSegsOf(q) { return paddockSides(q).filter((sd) => !sideShared(sd)).map((sd) => [sd.a[0], sd.a[1], sd.b[0], sd.b[1]]); }
+function segDist(x, z, g) { const vx = g[2] - g[0], vz = g[3] - g[1], l2 = vx * vx + vz * vz || 1e-9, t = clamp(((x - g[0]) * vx + (z - g[1]) * vz) / l2, 0, 1); return Math.hypot(x - (g[0] + vx * t), z - (g[1] + vz * t)); }
+// the swales a fence (paddock or line) would cross
+function fenceSwaleHits(F, p) {
+  const segs = fenceSegsOf(p); if (!segs.length) return [];
+  return (F.swales || []).filter((sw) => { const SH = swaleSH(F, sw); return SH.pts.some((q, i) => [-1.6, 0, 1.0, 2.2].some((sv) => { const x = q[0] + SH.N[i][0] * sv, z = q[1] + SH.N[i][1] * sv; return segs.some((g) => segDist(x, z, g) < 0.6); })); });
+}
+// split a swale's points into the stretches that keep clear of the given fence segments (a gap of about 2 m each side of the fence)
+function swaleRunsClear(SH, segs, gap) {
+  const P = SH.pts, N = SH.N, ok = P.map((q, i) => ![-2.0, -1.0, 0, 1.0, 1.9, 2.8].some((sv) => { const x = q[0] + N[i][0] * sv, z = q[1] + N[i][1] * sv; return segs.some((g) => segDist(x, z, g) < gap); }));
+  const runs = []; let cur = [];
+  P.forEach((q, i) => { if (ok[i]) cur.push(q); else { if (cur.length >= 9) runs.push(cur); cur = []; } });
+  if (cur.length >= 9) runs.push(cur);
+  return runs;
+}
+// shorten each run from the end nearest a fence until its ditch and berm keep clear of every fence (the berm and the tapered ends
+// reach a little past the line itself). Runs that get too short are dropped.
+function fitSwaleRuns(F, runs, level, segs) {
+  const T = F.terrain, out = [];
+  for (let r of runs) {
+    r = r.slice();
+    for (let n = 0; n < 40 && r.length >= 9; n++) {
+      const w = swaleProblem(F, T.swaleShape(r, level));
+      if (!w || !/ fence$/.test(w)) break;
+      const dA = Math.min(...segs.map((g) => segDist(r[0][0], r[0][1], g))), dB = Math.min(...segs.map((g) => segDist(r[r.length - 1][0], r[r.length - 1][1], g)));
+      if (dA < dB) r.shift(); else r.pop();
+    }
+    if (r.length >= 9) out.push(r);
+  }
+  return out;
+}
+function allFenceSegs(F, ignoreId) { const out = []; for (const q of allFences(F)) if (q.id !== ignoreId) out.push(...fenceSegsOf(q)); return out; }
+// dig a swale in pieces, leaving a break wherever a fence crosses it. Returns the new swale records.
+function digSwaleRuns(F, runs, level) {
+  const T = F.terrain, r2 = (v) => Math.round(v * 1000) / 1000, made = [];
+  for (const pts of runs) {
+    const SH = T.carveSwale(pts, level), mound = SH.pts.map((q, i) => [r2(q[0] + SH.N[i][0] * 1.85), r2(q[1] + SH.N[i][1] * 1.85)]);
+    const rec = { id: F.nextId++, pts: SH.pts.map((q) => [r2(q[0]), r2(q[1])]), N: SH.N.map((n) => [r2(n[0]), r2(n[1])]), level, wet: 0, mound, v: 2 };
+    F.swales.push(rec); made.push(rec);
+  }
+  return made;
+}
+// put a break in an existing swale where these fence segments cross it: the swale is raked back to the lie of the land, then dug again
+// as two (or more) shorter swales that stop either side of the fence
+function breakSwale(F, sw, segs) {
+  const T = F.terrain, SH = swaleSH(F, sw), P = SH.pts, N = SH.N, total = (P.length - 1) * 0.5;
+  const level = sw.level, wet = sw.wet || 0;
+  const xs = P.map((q) => q[0]), zs = P.map((q) => q[1]), m = 5;
+  F.swales = F.swales.filter((q) => q !== sw);
+  const keep = earthKeep(F, sw);
+  T.unDig(Math.min(...xs) - m, Math.min(...zs) - m, Math.max(...xs) + m, Math.max(...zs) + m, (x, z) => {
+    const q = T.swaleNear(P, N, x, z); if (!q || q.past > 1.5) return 0;
+    const e = swaleEnd(q.along, total), sl = q.s / swaleLat(Math.max(e, 0.01));
+    return smooth(-3.6, -2.6, sl) * smooth(4.4, 3.4, sl) * (1 - smooth(0.4, 1.5, q.past));
+  }, keep);
+  T.eachCell(Math.min(...xs) - m, Math.min(...zs) - m, Math.max(...xs) + m, Math.max(...zs) + m, (x, z, k) => { if (T.cover[k] === COVER.path && !keep(x, z)) { const q = T.swaleNear(P, N, x, z); if (q && q.past < 0.6 && q.s > -1.4 && q.s < 2.9) { T.cover[k] = COVER.grass; T.bio[k] = 0.35; } } });
+  const runs = fitSwaleRuns(F, swaleRunsClear(SH, segs, 2.0), level, segs);   // the fence is already up, so each piece is kept clear of it
+  const made = digSwaleRuns(F, runs, level); for (const r of made) r.wet = wet;
+  return made.length;
+}
+// a fence taken round the outside of a pond: every stretch of the line that would cross the water is replaced by an arc round the
+// pond, about a metre and a half clear of the bank. For a paddock the arc goes the way that takes the pond inside it.
+function fenceRoundPond(pts, closed, pd) {
+  const cx = pd.x, cz = pd.z, Rx = pd.rx * 1.08 + 1.4, Rz = pd.rz * 1.08 + 1.4;
+  const inE = (q) => Math.hypot((q[0] - cx) / Rx, (q[1] - cz) / Rz) < 1, ang = (q) => Math.atan2((q[1] - cz) / Rz, (q[0] - cx) / Rx), onE = (a) => [cx + Math.cos(a) * Rx, cz + Math.sin(a) * Rz];
+  // fine points along the line
+  const D = []; const n0 = pts.length, nE = closed ? n0 : n0 - 1;
+  for (let i = 0; i < nE; i++) { const a = pts[i], b = pts[(i + 1) % n0], L = Math.hypot(b[0] - a[0], b[1] - a[1]), n = Math.max(1, Math.ceil(L / 0.25)); for (let k = 0; k < n; k++) D.push([lerp(a[0], b[0], k / n), lerp(a[1], b[1], k / n)]); }
+  if (!closed) D.push(pts[n0 - 1].slice());
+  if (!D.some(inE)) return pts;
+  if (closed) { const s0 = D.findIndex((q) => !inE(q)); if (s0 < 0) return pts; D.push(...D.splice(0, s0)); }
+  else if (inE(D[0]) || inE(D[D.length - 1])) return null;   // an open line that starts or ends in the water can't go round it
+  const out = []; let i = 0;
+  while (i < D.length) {
+    if (!inE(D[i])) { out.push(D[i]); i++; continue; }
+    const A = out[out.length - 1]; let j = i; while (j < D.length && inE(D[j])) j++;
+    const B = j < D.length ? D[j] : (closed ? out[0] : null); if (!B) return null;
+    let a0 = ang(A), a1 = ang(B), dCCW = a1 - a0; while (dCCW <= 0) dCCW += Math.PI * 2; const dCW = dCCW - Math.PI * 2;
+    let d = Math.abs(dCCW) < Math.abs(dCW) ? dCCW : dCW;
+    if (closed) { const mid = (dd) => onE(a0 + dd / 2), poly = pts, outside = (q) => !inPoly(poly, q[0], q[1]); if (!outside(mid(d)) && outside(mid(d === dCCW ? dCW : dCCW))) d = d === dCCW ? dCW : dCCW; }
+    const steps = Math.max(3, Math.ceil(Math.abs(d) / 0.22));
+    for (let k = 1; k < steps; k++) out.push(onE(a0 + d * k / steps));
+    i = j;
+  }
+  // a closed ring is simplified as two open halves (a line that ends where it starts has no direction to measure against)
+  let simp;
+  if (closed) { const m = Math.floor(out.length / 2), A = simplifyLine(out.slice(0, m + 1), 0.12), B = simplifyLine(out.slice(m).concat([out[0]]), 0.12); simp = A.concat(B.slice(1, -1));
+    // and a corner left in the middle of a straight side where the halves met is dropped
+    simp = simp.filter((q, i) => { const a = simp[(i - 1 + simp.length) % simp.length], b = simp[(i + 1) % simp.length], L = Math.hypot(b[0] - a[0], b[1] - a[1]) || 1e-9; return Math.abs((q[0] - a[0]) * (b[1] - a[1]) - (q[1] - a[1]) * (b[0] - a[0])) / L > 0.05; }); }
+  else simp = simplifyLine(out, 0.12);
+  return simp.map((q) => [Math.round(q[0] * 100) / 100, Math.round(q[1] * 100) / 100]);
+}
+// reshape a fence round every pond it crosses, keeping its gates where they were on the ground
+function fenceAroundPonds(F, p) {
+  const old = padPts(p).map((q) => q.slice()), closed = !p.open, gatesW = gatesOf(p).map((g) => [g.cx, g.cz]);
+  let pts = old;
+  for (const pd of F.ponds) { const r = fenceRoundPond(pts, closed, pd); if (!r) return false; pts = r; }
+  if (pts === old) return false;
+  p.pts = pts; padSync(p);
+  const S = paddockSides(p);
+  p.gates = gatesW.map(([x, z]) => { let best = null; S.forEach((sd, e) => { const ex = sd.b[0] - sd.a[0], ez = sd.b[1] - sd.a[1], L2 = ex * ex + ez * ez || 1e-9, t = clamp(((x - sd.a[0]) * ex + (z - sd.a[1]) * ez) / L2, 0.1, 0.9), d = Math.hypot(x - (sd.a[0] + ex * t), z - (sd.a[1] + ez * t)); if (!best || d < best.d) best = { d, e, t }; }); return best ? { e: best.e, t: Math.round(best.t * 40) / 40 } : null; }).filter(Boolean);
+  padSync(p);
+  return true;
+}
 function checkPaddock(F, p, ignoreId) {
   if (p.open) return checkFenceLine(F, p, ignoreId);
   const P = padPts(p);
@@ -17715,6 +17944,7 @@ function checkPaddock(F, p, ignoreId) {
     if (distToEdges(p, o.x, o.z) < r + 0.2) return `The fence would run into the ${o.t === 'woodpile' ? 'woodshed' : o.t}`;
   }
   for (const pd of F.ponds) if (per.some((q) => Math.hypot((q[0] - pd.x) / (pd.rx * 1.08), (q[1] - pd.z) / (pd.rz * 1.08)) < 1)) return 'The fence would run through the pond';
+  if (!p.breakSwales && fenceSwaleHits(F, p).length) return 'The fence would cross a swale';
   for (const q of per.concat(inside)) { const rp = fenceRoadProblem(F, q[0], q[1]); if (rp) return rp; }
   if (paddockSides(p).every((sd) => sideShared(sd))) return 'That is just the boundary fence. Draw at least one new side';
   if (!(p.gates || []).length) return 'Add a gate: tap 🚪 + Gate, then tap the fence where you want it';
@@ -17739,6 +17969,7 @@ function checkFenceLine(F, p, ignoreId) {
     if (distToEdges(p, o.x, o.z) < r + 0.2) return `The fence would run into the ${o.t === 'woodpile' ? 'woodshed' : o.t}`;
   }
   for (const pd of F.ponds) if (per.some((q) => Math.hypot((q[0] - pd.x) / (pd.rx * 1.08), (q[1] - pd.z) / (pd.rz * 1.08)) < 1)) return 'The fence would run through the pond';
+  if (!p.breakSwales && fenceSwaleHits(F, p).length) return 'The fence would cross a swale';
   for (const q of per) { const rp = fenceRoadProblem(F, q[0], q[1]); if (rp) return rp; }
   const SS = paddockSides(p); if ((p.gates || []).some((g) => SS[g.e] && sideShared(SS[g.e]))) return 'A gate can\'t go in the boundary fence';
   return null;
@@ -18011,8 +18242,12 @@ const MAP = {
     const img = (n) => { const c = document.createElement('canvas'); c.width = c.height = n; return c; };
     const L = [-0.55, 0.62, -0.55], Ll = Math.hypot(...L);
     const shadeAt = (x, z, ex) => { const e = 0.5, hx = (T.at(x + e, z) - T.at(x - e, z)) * ex, hz = (T.at(x, z + e) - T.at(x, z - e)) * ex, l = Math.hypot(hx, 2 * e, hz); const d = (-hx * L[0] + 2 * e * L[1] - hz * L[2]) / (l * Ll); return clamp(0.55 + 0.6 * d, 0.6, 1.18); };
-    // near land, one pixel per cell, in three flavours
-    for (const layer of ['land', 'soil', 'water']) {
+    // near land, one pixel per cell, in three flavours. Only the layer on show is drawn, and each is kept until the ground changes,
+    // so opening the map on a big farm doesn't stall (1.5.6)
+    const key = [V.terrainVer || 0, TN, F.year, F.month, F.day, season].join(':');
+    if (this.baseKey !== key) { this.baseKey = key; this.base_land = this.base_soil = this.base_water = null; this.farImg = null; }
+    for (const layer of [this.layer === 'soil' || this.layer === 'water' ? this.layer : 'land']) {
+      if (this['base_' + layer]) continue;
       const c = img(TN), g = c.getContext('2d'), id = g.createImageData(TN, TN);
       for (let j = 0; j < TN; j++) for (let i = 0; i < TN; i++) {
         const k = j * TN + i, x = i - THALF + 0.5, z = j - THALF + 0.5;
@@ -18027,6 +18262,7 @@ const MAP = {
       this['base_' + layer] = c;
     }
     // the countryside around, coarser
+    if (this.farImg) return;
     const FN = Math.ceil(WORLD_R / 2), fc = img(FN), fg = fc.getContext('2d'), fid = fg.createImageData(FN, FN);
     for (let j = 0; j < FN; j++) for (let i = 0; i < FN; i++) {
       const x = -FN * 2 + (i + 0.5) * 4, z = -FN * 2 + (j + 0.5) * 4, col = T.farCol(x, z, dry), k = (j * FN + i) * 4;
@@ -18094,7 +18330,8 @@ const MAP = {
     g.setTransform(d * s, 0, 0, d * s, d * (this.W / 2 - this.cx * s), d * (this.H / 2 - this.cz * s));
     g.imageSmoothingEnabled = true;
     g.globalAlpha = 0.75; g.drawImage(this.farImg, -this.farImg.width * 2, -this.farImg.width * 2, this.farImg.width * 4, this.farImg.width * 4); g.globalAlpha = 1;
-    g.drawImage(this['base_' + this.layer], -THALF, -THALF, TN, TN);
+    if (!this['base_' + (this.layer === 'soil' || this.layer === 'water' ? this.layer : 'land')]) { try { this.buildBase(); } catch (e) { console.error(e); } }
+    const baseImg = this['base_' + (this.layer === 'soil' || this.layer === 'water' ? this.layer : 'land')] || this.base_land; if (baseImg) g.drawImage(baseImg, -THALF, -THALF, TN, TN);
     const px = 1 / s;   // one screen pixel in world units
     // land you don't own yet: a golden wash and dashed edge on what you could buy, a dark wash on what isn't for sale yet
     { const sale = plotsForSale(F);
@@ -18520,12 +18757,12 @@ const MAP = {
     const D = this.dig; if (!D) return;
     if (D.kind === 'swale') {
       if (!D.a || !D.b) { D.P = null; D.v = null; return; }
-      const P = { kind: 'swale', stage: 1, a: D.a.slice(), cur: D.b.slice() };
+      const P = { kind: 'swale', stage: 1, a: D.a.slice(), cur: D.b.slice(), breakFences: !!D.breakFences };
       D.v = validatePlace(P); D.P = P;
       if (P.pts) { const SH = G.F.terrain.swaleShape(P.pts, P.level); D.line = SH.pts; D.mound = SH.pts.map((p, i) => [p[0] + SH.N[i][0] * 1.85, p[1] + SH.N[i][1] * 1.85]); } else { D.line = null; D.mound = null; }
     } else {
       if (!D.at) { D.P = null; D.v = null; return; }
-      const q = MAP_PONDS[D.size], P = { kind: 'pond', rx: q[0], rz: q[1], price: q[2], label: q[3], cur: D.at.slice() };
+      const q = MAP_PONDS[D.size], P = { kind: 'pond', rx: q[0], rz: q[1], price: q[2], label: q[3], cur: D.at.slice(), fenceRound: !!D.fenceRound };
       D.v = validatePlace(P); D.P = P; if (P.nudged) D.at = P.cur.slice();
     }
   },
@@ -18574,7 +18811,15 @@ const MAP = {
     const changed = !from || !samePad(from, this.draft) || from.kind !== this.draft.kind || !sameGates(from, this.draft);
     $('mapDims').textContent = `${meters(padFenceLen(this.draft))} m of fence · ${(padArea(this.draft) * 25 / 4047).toFixed(2)} acres · ${this.draft.gates.length} gate${this.draft.gates.length === 1 ? '' : 's'}`;
     if (this.draft.open) $('mapDims').textContent = `${meters(padFenceLen(this.draft))} m of fence · ${this.draft.gates.length} gate${this.draft.gates.length === 1 ? '' : 's'}`;
-    if (this.err) { el.innerHTML = `<span class="bad">⚠️ ${esc(this.err)}</span>`; }
+    if (this.err) {
+      const fix = /through the pond/.test(this.err) ? ['pond', '⭕ Fence around the pond'] : /cross a swale/.test(this.err) ? ['swale', '〰️ Put a break in the swale'] : null;
+      el.innerHTML = `<span class="bad">⚠️ ${esc(this.err)}</span>${fix ? ` <button class="btn" id="mapFix" style="margin-left:6px;padding:4px 10px">${fix[1]}</button>` : ''}`;
+      if (fix) $('mapFix').onclick = () => {
+        if (fix[0] === 'pond') { if (!fenceAroundPonds(G.F, this.draft)) { UI.toast('That fence can\'t be taken round the pond. Move it clear of the water.', true); return; } UI.toast('The fence now goes round the outside of the pond.'); }
+        else { this.draft.breakSwales = true; UI.toast('A break will be left in the swale where the fence crosses it.'); }
+        this.validate(); this.bar(); this.dirty = true;
+      };
+    }
     else if (this.addGate) el.textContent = 'Tap the fence where the new gate should go.';
     else if (!changed) el.textContent = 'Drag corners to reshape · tap + on a side to add a corner · drag 🚪 gates · drag ✥ to move it all';
     else el.innerHTML = `<b>${F.kid ? '' : b.cost ? money(b.cost) + ' · ' : 'Free · '}</b>${esc(billText(F, from, this.draft, b))}${!F.kid && !F.unlocked && F.money < b.cost ? ' <span class="bad">(not enough money)</span>' : ''}`;
@@ -18583,7 +18828,13 @@ const MAP = {
   commit() {
     const F = G.F, from = this.current(), to = this.draft;
     if (this.err || !to) return;
+    const cut = to.breakSwales ? fenceSwaleHits(F, to) : [], segs = fenceSegsOf(to);
     if (applyFence(F, from, to)) {
+      if (cut.length) {
+        let gone = 0; for (const sw of cut) if (!breakSwale(F, sw, segs)) gone++;
+        F.terrain.slopeC = null; G.view.rebuildTerrain(); G.view.dirtyAll(); G.view.rebuildWater();
+        UI.toast(gone === cut.length ? `The fence is up. ${cut.length === 1 ? 'The swale was' : 'The swales were'} too short to keep a piece either side, so ${cut.length === 1 ? 'it was' : 'they were'} raked level.` : `The fence is up, with a break left in ${cut.length === 1 ? 'the swale' : cut.length + ' swales'} where it crosses.${gone ? ` ${gone} short one${gone > 1 ? 's were' : ' was'} raked level.` : ''}`);
+      }
       this.mode = 'view'; this.draft = null; this.selId = null; this.err = null;
       this.buildBase(); this.buildContours(); this.bar(); this.dirty = true;
       if (G.iris || G.F.hour >= 24) this.close();
@@ -18647,7 +18898,9 @@ const MAP = {
         : (!D.at ? '<b>Pick a size, then tap where the pond goes.</b> Low ground with slope above it catches the most rain.' : (v.err ? `⚠️ ${esc(v.err)}` : esc(v.text)) + ' <small>Tap again to move it.</small>');
       const sizes = D.kind === 'pond' ? Object.entries(MAP_PONDS).map(([k, q]) => `<button class="mchip${k === D.size ? ' on' : ''}" data-ps="${k}">${q[3]}${G.F.kid ? '' : ` · $${q[2].toLocaleString()}`}</button>`).join('') : '';
       const ready = P && v && !v.err && (D.kind === 'pond' ? D.at : D.b);
-      B.innerHTML = `<div class="mrow"><span class="mhint">${hint}</span>${sizes}<button class="btn" id="mapCancel">Cancel</button><button class="btn go" id="mapDig"${ready ? '' : ' disabled'}>${ICO.shovel} Dig it</button></div>`;
+      const fixB = v && v.err && v.fix ? `<button class="btn" id="mapDigFix">${v.fix.label}</button>` : '';
+      B.innerHTML = `<div class="mrow"><span class="mhint">${hint}</span>${sizes}${fixB}<button class="btn" id="mapCancel">Cancel</button><button class="btn go" id="mapDig"${ready ? '' : ' disabled'}>${ICO.shovel} Dig it</button></div>`;
+      if ($('mapDigFix')) $('mapDigFix').onclick = () => { if (v.fix.id === 'fenceround') D.fenceRound = true; else D.breakFences = true; this.validateDig(); this.bar(); this.dirty = true; };
       $('mapCancel').onclick = () => this.cancelEdit();
       $('mapDig').onclick = () => this.commitDig();
       B.querySelectorAll('[data-ps]').forEach((b) => { b.onclick = () => { D.size = b.dataset.ps; this.validateDig(); this.bar(); this.dirty = true; }; });
@@ -19042,9 +19295,21 @@ const PETS = {
       }
       if (tx !== undefined) {
         const dx = tx - p.x, dz = tz - p.z, d = Math.hypot(dx, dz), s = Math.min(d, speed * dt);
-        p.x += dx / d * s; p.z += dz / d * s; p.walkPh += s * (p.kind === 'farmdog' ? 4.6 / Math.max(0.5, p.size) : p.kind === 'dog' ? 5 : 7); p.state = 'walk';
-        let dd = Math.atan2(dx, dz) - p.yaw; while (dd > Math.PI) dd -= Math.PI * 2; while (dd < -Math.PI) dd += Math.PI * 2; p.yaw += dd * (1 - Math.exp(-dt * 8));
-        V.col.resolve(p, p.rad, { noFence: true });
+        // dogs (1.5.6): steer round buildings, trees and other animals instead of running through them; at a fence they jump it in a little arc
+        let ang = Math.atan2(dx, dz), go = null;
+        const solid = (x, z) => V.col.blocked(x, z, p.rad, { noFence: true }) || (V.actors && [...V.actors.values()].some((a) => !a.dead && !a.inside && Math.abs(a.x - x) < 2 && Math.abs(a.z - z) < 2 && Math.hypot(a.x - x, a.z - z) < (a.rad || 0.4) * 0.8 + p.rad));
+        if (p.hopT > 0) go = 0;
+        else for (const off of [0, 0.5, -0.5, 1.0, -1.0, 1.6, -1.6, 2.3, -2.3]) { const L = s + p.rad; if (!solid(p.x + Math.sin(ang + off) * L, p.z + Math.cos(ang + off) * L)) { go = off; break; } }
+        if (go === null) { p.state = 'idle'; }
+        else {
+          ang += go;
+          const nx = p.x + Math.sin(ang) * s, nz = p.z + Math.cos(ang) * s;
+          if (!(p.hopT > 0) && V.col.blocked(nx, nz, p.rad * 0.7, {}) && !V.col.blocked(nx, nz, p.rad * 0.7, { noFence: true })) p.hopT = 0.5;   // a fence in the way: jump it
+          p.x = nx; p.z = nz; p.walkPh += s * (p.kind === 'farmdog' ? 4.6 / Math.max(0.5, p.size) : p.kind === 'dog' ? 5 : 7); p.state = 'walk';
+          let dd = ang - p.yaw; while (dd > Math.PI) dd -= Math.PI * 2; while (dd < -Math.PI) dd += Math.PI * 2; p.yaw += dd * (1 - Math.exp(-dt * 8));
+        }
+        if (p.hopT > 0) { p.hopT -= dt; const k = 1 - Math.max(0, p.hopT) / 0.5; p.hopY = Math.sin(k * Math.PI) * 0.75 * Math.min(1.3, p.size || 1); if (p.hopT <= 0) p.hopY = 0; }
+        else V.col.resolve(p, p.rad, {});
       } else p.state = 'idle';
       if (p.kind !== 'farmdog') p.head = lerp(p.head, p.kind === 'cat' && p.state === 'idle' && (F.hour >= 13 && F.hour < 16) ? 0.5 : 0, dt * 2);
     }
@@ -20118,6 +20383,8 @@ function buildShopRoom(kind, F) {
   const label = { feed: 'Shop for seeds, trees, hay & feed', stock: 'Buy animals', land: 'Buy land', merc: 'Fencing, outfits & the farm shop', diner: 'Order something to eat' }[kind];
   inter.push({ x: 0, z: cz + 1.15, r: 1.2, label: open ? label : (isSunday(F) ? 'Closed on Sundays' : 'Closed · opens at 6 AM'), act: open ? 'counter' : 'closed', shop: kind, icon: S.icon });
   const keeper = { key: S.keeper, x: 0, z: cz - 0.85, yaw: 0, walk: 0, phase: 0, act: 'idle', actT: 0, tool: 'hand', look: 0 };
+  // the shopkeeper can be talked to as well as bought from (1.5.6): step to the end of the counter
+  if (S.keeper && TOWNFOLK[S.keeper]) inter.push({ x: 1.55, z: cz + 0.95, r: 0.75, label: `Talk to ${TOWNFOLK[S.keeper].name}`, act: 'keepertalk', icon: '💬', off: () => !!(G.room && G.room.keeper && G.room.keeper.away) });
   // goods by shop
   if (kind === 'feed') {
     lightW(-2.6, 1.3, z0 + 0.02, 1.4, 1.0); lightW(2.6, 1.3, z0 + 0.02, 1.4, 1.0);
@@ -20991,6 +21258,7 @@ function initInput() {
     AUDIO.unlock();
     if (G.photo) { PHOTO.pointerDown(e); return; }
     // first person: a finger on the right side always looks around, even while the left thumb is walking (no pinch-zoom here)
+    if (FPV.leftOnly() && !G.drive && e.clientX > window.innerWidth * 0.5) return;   // all-on-the-left: the right side is left clear
     if (FPV.on && !G.drive && (G.mode === 'play' || G.mode === 'room') && e.clientX > window.innerWidth * 0.45 && !IN.look) { IN.look = { id: e.pointerId, x: e.clientX, y: e.clientY, ox: e.clientX, oy: e.clientY }; glc.setPointerCapture(e.pointerId); return; }
     if (FPV.on && IN.stick) return;   // a third finger does nothing
     IN.pts.set(e.pointerId, [e.clientX, e.clientY]);
@@ -21094,6 +21362,7 @@ function updateGame(dt) {
         if (!FPV.oneThumb() && Math.abs(offX) > dx) Fm.yaw -= Math.sign(offX) * Math.pow(Math.min(1, (Math.abs(offX) - dx) / 120), 1.25) * dt * 2.6 * k;
         if (Math.abs(offY) > dy) FPV.pitch = clamp(FPV.pitch - Math.sign(offY) * Math.min(1, (Math.abs(offY) - dy) / 140) * dt * 1.1 * k, -1.15, 0.85);
       }
+      if (FPV.leftOnly()) FPV.pitch += (-0.12 - FPV.pitch) * (1 - Math.exp(-dt * 2.5));
       if (FPV.oneThumb() && IN.stick) {
         // one-thumb: left and right on the stick turn you (faster the further you push), up and down walk
         const st = -IN.stick.dx, turn = Math.abs(st) > 0.12 ? Math.sign(st) * Math.pow((Math.abs(st) - 0.12) / 0.88, 1.4) : 0;
@@ -21189,7 +21458,9 @@ const FPV = {
   sens() { return store.get('fq_look', 1); },
   // two ways to play: 'twin' (left thumb moves and side-steps, right thumb looks around: the usual layout) or 'one' (left thumb walks
   // and turns, the right side only tilts the view up and down)
-  oneThumb() { return store.get('fq_ctrl', 'twin') === 'one'; },
+  oneThumb() { const c = store.get('fq_ctrl', 'twin'); return c === 'one' || (c === 'left' && this.leftOnly()); },
+  // Unlocked mode can put every control on the left thumb (1.5.6): walk, turn, steer and throttle all from one stick, the view levels itself
+  leftOnly() { return store.get('fq_ctrl', 'twin') === 'left' && !!(G.F && G.F.unlocked); },
   look(dx, dy) { const Fm = G.Fm; if (!Fm) return; const k = this.sens(); if (!this.oneThumb() && !G.busy) Fm.yaw -= dx * 0.0062 * k; this.pitch = clamp(this.pitch - dy * 0.0048 * k, -1.15, 0.85); },
   // stick (x right, y down the screen) to a world direction: up the screen walks the way you face
   toWorld(mx, my, yaw) { const fx = Math.sin(yaw), fz = Math.cos(yaw), rx = -fz, rz = fx; return [fx * -my + rx * mx, fz * -my + rz * mx]; },
@@ -21466,13 +21737,18 @@ function findTarget() {
     const g = gatesOf(p).sort((a, b) => Math.hypot(a.cx - Fm.x, a.cz - Fm.z) - Math.hypot(b.cx - Fm.x, b.cz - Fm.z))[0];
     if (!g) { if (tool === 'hand' && inPad(p, Fm.x, Fm.z)) push(2.8, { label: `${p.name} · ${grassWord(F, p)}`, icon: ICO.fence, fn: () => UI.paddockCard(p) }); continue; }   // no gate in it yet
     const cx = g.cx, cz = g.cz;
+    // pigs can be fed at the gate or anywhere inside their paddock, whatever else is due there (1.5.6)
+    const pigsHere = F.animals.some((a) => a.pad === p.id && a.sp === 'pig'), inside = inPad(p, Fm.x, Fm.z);
+    if (tool === 'hand' && pigsHere && (inside || near(cx, cz, 2.2)) && !F.today.fedPigs) {
+      if ((F.inv.feed_pig || 0) > 0.05) push(0.19, { label: `Feed the pigs in ${p.name}`, icon: '🐖', fn: () => act('feed', 1.2, 15, 3, () => { F.today.fedPigs = true; doneChore('Pigs fed'); }), ring: inside ? undefined : [cx, cz] });
+      else push(0.6, { label: 'Pigs are hungry: buy hog feed at the Feed & Seed', icon: '🐖', fn: () => UI.toast('You are out of hog feed. The Feed & Seed in town sells it.', true) });
+    }
     if (!near(cx, cz, 2.2)) continue;
     const key = 'p' + p.id;
     const choreFeed = (F.chores || []).find((c) => c.act === 'feed' && c.gkey === key && !choreDone(F, c));
     const choreWater = (F.chores || []).find((c) => c.act === 'water' && c.gkey === key && !choreDone(F, c));
     const pigs = F.animals.some((a) => a.pad === p.id && a.sp === 'pig');
     if (tool === 'hand' && choreFeed) push(0.2, { label: `Feed hay in ${p.name}`, icon: '🌾', fn: () => act('feed', 1.2, 20, 4, () => { F.today['fed_' + key] = true; doneChore('Hay fed'); }), ring: [cx, cz] });
-    else if (tool === 'hand' && pigs && mustOpen('fedPigs')) push(0.2, { label: 'Feed the pigs', icon: '🐖', fn: () => act('feed', 1.2, 15, 3, () => { F.today.fedPigs = true; doneChore('Pigs fed'); }), ring: [cx, cz] });
     else if (tool === 'can' && choreWater) push(0.2, { label: `Carry water to ${p.name}`, icon: '💧', fn: () => act('water', 1.6, 25, 6, () => { F.today['water_' + key] = true; doneChore('Water delivered'); }), ring: [cx, cz] });
     else if (tool === 'hand') push(2.5, { label: `${p.name} · ${grassWord(F, p)}`, icon: ICO.fence, fn: () => UI.paddockCard(p), ring: [cx, cz], soft: true });
   }
@@ -21964,6 +22240,7 @@ function placeTarget() {
   const v = validatePlace(P);
   P.err = v.err; P.cost = v.cost;
   $('placeTxt').textContent = v.err ? '⚠️ ' + v.err : v.text;
+  if (v.err && v.fix && (P.stage !== 0 || P.kind === 'pond')) return { label: v.fix.label, icon: '🛠️', fn: () => { if (v.fix.id === 'fenceround') P.fenceRound = true; else if (v.fix.id === 'breakfence') P.breakFences = true; G.targetT = 0; } };
   if (P.kind === 'move') return { label: v.err ? 'Can\'t put it here' : 'Move it here', icon: v.err ? '🚫' : '✅', fn: () => (v.err ? UI.toast(v.err, true) : confirmPlace()) };
   if (P.kind === 'vines') return { label: v.err ? 'Can\'t plant the row here' : `Plant this row (${P.layout.ok.filter(Boolean).length} vines)`, icon: v.err ? '🚫' : '🍇', fn: () => (v.err ? UI.toast(v.err, true) : confirmPlace()) };
   if (P.kind === 'build' || P.kind === 'pond') return { label: v.err ? 'Can\'t place here' : `Place it ($${v.cost.toLocaleString()})`, icon: v.err ? '🚫' : '✅', fn: () => (v.err ? UI.toast(v.err, true) : confirmPlace()) };
@@ -22005,6 +22282,26 @@ function validatePlace(P, noSnap) {
     for (const q of pts) { const rp = roadProblem(F, q[0], q[1], 0.5); if (rp) return { err: rp, cost }; }
     for (const o of F.objs) if (solidOf(o) && Math.hypot((o.x - x) / (P.rx + 2.5), (o.z - z) / (P.rz + 2.5)) < 1) return { err: 'Too close to a building', cost };
     for (const p of F.ponds) if (Math.hypot(p.x - x, p.z - z) < p.rx + P.rx + 2) return { err: 'Too close to another pond', cost };
+    // a fence in the way: the pond can't go across it, but the fence can be taken round the outside of the pond
+    P.fencePlans = null;
+    { const pd = { x, z, rx: P.rx, rz: P.rz }, Rx = P.rx * 1.08 + 0.6, Rz = P.rz * 1.08 + 0.6;
+      const hits = allFences(F).filter((q) => fenceSegsOf(q).some((g) => { for (let k = 0; k <= 12; k++) { const t = k / 12, gx = lerp(g[0], g[2], t), gz = lerp(g[1], g[3], t); if (Math.hypot((gx - x) / Rx, (gz - z) / Rz) < 1) return true; } return false; }));
+      if (hits.length) {
+        const fix = { id: 'fenceround', label: '⭕ Fence around the pond' };
+        if (!P.fenceRound) return { err: `It would sit across the ${hits[0].name} fence`, cost, fix };
+        const plans = [];
+        for (const q of hits) {
+          const cp = padSync(Object.assign({}, q, { pts: padPts(q).map((r) => r.slice()), gates: (q.gates || []).map((g) => ({ e: g.e, t: g.t })) }));
+          const ok = (() => { const r = fenceRoundPond(padPts(cp), !cp.open, pd); if (!r) return false; const gw = gatesOf(q).map((g) => [g.cx, g.cz]); cp.pts = r; padSync(cp); cp.gates = gw.map(([gx, gz]) => { let best = null; paddockSides(cp).forEach((sd, e) => { const ex = sd.b[0] - sd.a[0], ez = sd.b[1] - sd.a[1], L2 = ex * ex + ez * ez || 1e-9, t = clamp(((gx - sd.a[0]) * ex + (gz - sd.a[1]) * ez) / L2, 0.1, 0.9), d = Math.hypot(gx - (sd.a[0] + ex * t), gz - (sd.a[1] + ez * t)); if (!best || d < best.d) best = { d, e, t }; }); return best ? { e: best.e, t: best.t } : null; }).filter(Boolean); padSync(cp); return true; })();
+          const e = ok ? checkPaddock(F, cp, q.id) : 'no way round';
+          if (!ok || (e && !/gate/i.test(e))) return { err: `The ${q.name} fence can't be taken round the pond here${e && e !== 'no way round' ? ` (${e.charAt(0).toLowerCase() + e.slice(1)})` : ''}. Move the pond clear of it`, cost };
+          plans.push([q, cp]);
+        }
+        P.fencePlans = plans;
+        if (F.money < cost) return { err: `Need $${cost.toLocaleString()}`, cost };
+        return { text: `${P.label} pond: $${cost.toLocaleString()}. The ${hits.map((q) => q.name).join(' and ')} fence will be moved out round the pond, so the pond waters that paddock.`, cost };
+      }
+    }
     if (F.money < cost) return { err: `Need $${cost.toLocaleString()}`, cost };
     const catchment = (() => { let n = 0; T.eachCell(x - 15, z - 15, x + 15, z + 15, (cx, cz) => { if (T.at(cx, cz) > T.at(x, z) + 0.3 && Math.hypot(cx - x, cz - z) < 15) n++; }); return n; })();
     return { text: `${P.label} pond: $${cost.toLocaleString()} · ${catchment > 200 ? 'great' : catchment > 90 ? 'fair' : 'small'} catchment uphill`, cost };
@@ -22026,6 +22323,18 @@ function validatePlace(P, noSnap) {
     const len = driveLength(P.pts), cost = Math.round(len * 30);
     if (len < 4) return { err: tapMiss > 3 ? 'The level line from here doesn\'t run towards that spot. Tap further along the contour' : 'Make it at least 20 m long', cost };
     const SH = T.swaleShape(P.pts, C.level), why = swaleProblem(F, SH);
+    P.runs = null;
+    if (why && / fence$/.test(why)) {
+      // it crosses a fence: offer to leave a break where the fence goes over (the swale is dug as pieces either side)
+      const fix = { id: 'breakfence', label: '〰️ Dig it with a break at the fence' };
+      if (!P.breakFences) return { err: why, cost, fix };
+      const segsA = allFenceSegs(F), runs = fitSwaleRuns(F, swaleRunsClear(SH, segsA, 2.0), C.level, segsA);
+      if (!runs.length) return { err: 'There\'s too little swale left between the fences. Pick a longer stretch', cost };
+      for (const r of runs) { const w2 = swaleProblem(F, T.swaleShape(r, C.level)); if (w2) return { err: w2, cost }; }
+      P.runs = runs;
+      if (F.money < cost) return { err: `Need $${cost}`, cost };
+      return { text: `Swale on contour: ${meters(len)} m, $${cost}, dug in ${runs.length} piece${runs.length > 1 ? 's' : ''} with a break where the fence crosses.`, cost };
+    }
     if (why) return { err: why, cost };
     if (F.money < cost) return { err: `Need $${cost}`, cost };
     const fell = swaleClears(F, SH), nt = fell.filter((o) => o.t === 'tree').length;
@@ -22281,11 +22590,23 @@ function confirmPlace() {
       const r = T.carvePond(x, z, P.rx, P.rz);
       F.objs = F.objs.filter((o) => !((o.t === 'tree' || o.t === 'brush' || o.t === 'rock' || o.t === 'cactus') && Math.hypot((o.x - x) / (P.rx + 1), (o.z - z) / (P.rz + 1)) < 1));
       F.ponds.push({ id: F.nextId++, x, z, rx: P.rx, rz: P.rz, level: r.level, floor: r.floor, vol: 0.05 });
-      finish('Pond dug! Rain running downhill will fill it. 💧');
+      // the fence it sat across is moved out round it (the pond ends up inside that paddock)
+      const moved = [];
+      for (const [q, cp] of P.fencePlans || []) { if (applyFence(F, q, cp, { quiet: true })) moved.push(q.name); }
+      finish(`Pond dug! Rain running downhill will fill it. 💧${moved.length ? ` The ${moved.join(' and ')} fence now runs round it.` : ''}`);
     }, { tick: (dt) => { if (Math.random() < dt * 8) G.view.puffs.push({ clod: true, x: G.Fm.x + Math.sin(G.Fm.yaw) * 0.8, y: T.at(G.Fm.x, G.Fm.z) + 0.3, z: G.Fm.z + Math.cos(G.Fm.yaw) * 0.8, vx: (Math.random() - 0.5) * 2, vz: (Math.random() - 0.5) * 2, vy: 2.5, t: 0, tint: [0.45, 0.32, 0.22, 0.9] }); } });
   } else if (P.kind === 'swale') {
     const pts = P.pts.slice(), level = P.level;
     (P.now ? digNow : act)('dig', 2.8, 180, 14, () => {
+      if (P.runs && P.runs.length) {   // dug in pieces, with a break at each fence it crosses
+        const cl = [].concat(...P.runs.map((r) => swaleClears(F, T.swaleShape(r, level))));
+        const wd = cl.filter((o) => o.t === 'tree').reduce((s2, o) => s2 + (o.wild ? 0.6 : 0.4) * treeScale(o), 0); if (wd) F.inv.firewood = (F.inv.firewood || 0) + wd;
+        for (const o of cl) if (o.t === 'tree' && G.view && G.view.fellTree) G.view.fellTree(o, P.runs[0][0][0], P.runs[0][0][1]);
+        F.objs = F.objs.filter((o) => !cl.includes(o));
+        const made = digSwaleRuns(F, P.runs, level);
+        finish(`Swale dug on contour in ${made.length} piece${made.length > 1 ? 's' : ''}, with a break where the fence crosses.${wd ? ` +${fmt1(wd)} firewood.` : ''}`);
+        return;
+      }
       const SH0 = T.swaleShape(pts, level), cleared0 = swaleClears(F, SH0), SH = T.carveSwale(pts, level), r2 = (v) => Math.round(v * 1000) / 1000;
       const mound = SH.pts.map((p, i) => [r2(p[0] + SH.N[i][0] * 1.85), r2(p[1] + SH.N[i][1] * 1.85)]);
       const cleared = cleared0;   // trees, brush, rocks and cactus on the ditch or the berm come out; the trees become firewood
@@ -22437,9 +22758,11 @@ function roomAction(it) {
     case 'market': if (shopOpen(F)) UI.town('market', { single: true }); else UI.toast(isSunday(F) ? 'No market on Sundays. The stalls are packed up until Monday morning.' : 'The market stalls are packed up for the night.', true); break;
     case 'counter': {
       const F = G.F, met = (F.metShop || {})[it.shop] || (it.shop === 'stock' && (F.hankMet || F.barnFirst !== undefined));
+      const kp = G.room && G.room.keeper; if (kp && kp.key && TOWNFOLK[kp.key]) FRIENDS.meet(F, kp.key);   // buying from someone means you've met them
       const go = () => (it.shop === 'diner' ? UI.town('diner', { single: true }) : UI.town(it.shop, { single: true }));
       if (!met && SHOP_GREET[it.shop]) HANKINTRO.start(go, it.shop); else go(); break;
     }
+    case 'keepertalk': if (G.room && G.room.keeper) { FRIENDS.meet(F, G.room.keeper.key); npcTalk(G.room.keeper); } break;
     case 'closed': UI.toast(closedText(F, 'This shop'), true); break;
     case 'home': TRAVEL.menu(); break;
     case 'board': JOBS.open(); break;
