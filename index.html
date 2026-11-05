@@ -10,6 +10,21 @@ Publishing: copy `index.html` and `sw.js` into the GitHub repo `silverton777/far
 
 ==========
 
+## 1.5.20: the Hollow Creek library
+
+**Why:** "what do you think of a library in the town that you can go in a read books on the different farming techniques that can unlock recipes, etc. Add reading books and stuff to the goal list as well." Also: "dont make them higher levels necessarily to accomodate existing players put them where they seem fit."
+
+- A stone library stands at the west end of Main Street, past the Home signpost. Inside: tall shelves of books, a long reading table, and a red armchair with a green lamp. It's open the same hours as the shops.
+- Ida, the town librarian, is a new townsperson behind the counter. She has her own conversations, gift likes, a birthday (April 23) and stories, and she'll take a kitten.
+- 14 books, each about one real farming technique in four short pages: compost, no-dig gardening, worms, cover crops, rotational grazing, slowing water with swales and ponds, hens behind the herd, the backyard orchard, preserving, cheesemaking, beekeeping, maple sugaring, the three sisters and seed saving.
+- Finishing a book teaches you something:
+  - 15 new recipes in all, for example apple crisp, dilly beans, pickled beets, fruit leather, ricotta, aged cheddar, maple cream, honey-roasted nuts, shepherd's pie, garden quiche and three sisters stew.
+  - Or a lasting knack: compost goes half as far again, mulch lasts six months, the worm farm works a quarter faster, and Mabel leaves you saved seed each spring.
+  - You also get 10 Golden Acorns. Reading is restful: you get a little energy back.
+- Read at the library (Ida likes the company, so it counts toward her friendship), or borrow one book at a time and read it by the stove at home. Bring it back and borrow the next.
+- The kitchen shows which locked recipes are in which library book.
+- New "Learning" goals: read a book (then 3, 6, 10, all 14), learn recipes from books, cook something you learned from a book, read every book on soil, and read the whole library. They sit at the levels that suit them.
+
 ## 1.5.19: a look under the soil
 
 **Why:** the soil view from the owner's list ("how would you do the soil view?"): a cutaway of the soil itself.
@@ -10070,7 +10085,7 @@ const HOLD = {
 
 // birthdays: [month 0-11, day 1-30]
 const FR_BDAY = {
-  sam: [0, 19], dot: [1, 12], mabel: [2, 14], junie: [3, 8], patel: [4, 5], tilly: [5, 17], hank: [6, 9], rosa: [7, 15], gus: [8, 6], marco: [9, 30], lin: [10, 11], abernathy: [11, 20],
+  sam: [0, 19], dot: [1, 12], mabel: [2, 14], junie: [3, 8], patel: [4, 5], tilly: [5, 17], hank: [6, 9], rosa: [7, 15], gus: [8, 6], marco: [9, 30], lin: [10, 11], abernathy: [11, 20], ida: [3, 23],
   nb_lindqvist: [0, 28], nb_reyes: [1, 24], nb_okafor: [2, 30], nb_abebe: [3, 21], nb_hollis: [4, 26], nb_brennan: [5, 3], nb_nguyen: [6, 22], nb_bellamy: [7, 28], nb_delgado: [8, 12], nb_rasmussen: [9, 14],
 };
 // what each person thinks of a gift. An entry is an item key, '@kind' for a whole kind of item, or 'prefix*'.
@@ -10079,6 +10094,7 @@ const FR_TASTE = {
   hank: { love: ['meat_beef', 'meat_bison', 'fish_bass'], like: ['@meat', 'milk', 'fish_*'], hate: ['wool', 'kale'] },
   rosa: { love: ['fruit_peach', 'squash', 'honey'], like: ['@produce'], hate: ['firewood'] },
   abernathy: { love: ['fruit_apple', 'honey'], like: ['milk', 'eggs', 'blueeggs'], hate: ['@meat'] },
+  ida: { love: ['honey', 'dish_honeycake', 'dish_pie', 'fruit_pear*'], like: ['fruit_*', 'dish_*', '@produce'], hate: ['@meat', 'castings'] },
   lin: { love: ['garlic', 'pepper', 'fruit_citrus'], like: ['fruit_*', 'wool'], hate: ['milk'] },
   dot: { love: ['fruit_peach', 'eggs', 'blueeggs', 'milk', 'meat_pork'], like: ['@produce', '@meat'], hate: ['wool'] },
   gus: { love: ['milk', 'fruit_apple', 'honey', 'fish_catfish'], like: ['eggs', 'blueeggs', 'hay', 'firewood', 'fish_*'], hate: ['pepper', 'kale'] },
@@ -10328,6 +10344,22 @@ const RECIPES = [
   { id: 'wildjam', name: 'Wild berry jam', icon: '🫐', start: true, pantry: true, need: [['@berry', 2], ['honey', 0.4]], unit: 'jar', energy: 20, price: 46, mins: 45 },
   { id: 'wildbutter', name: 'Wild fruit butter', icon: '🍑', start: true, pantry: true, need: [['@wildfruit', 3], ['honey', 0.3]], unit: 'jar', energy: 22, price: 36, mins: 60 },
   { id: 'applebutter', name: 'Slow apple butter', icon: '🍎', start: true, pantry: true, need: [['@apple', 5]], unit: 'jar', energy: 22, price: 28, mins: 90 },
+  // learned from library books (1.5.20)
+  { id: 'peashoots', name: 'Pea shoot stir-fry', icon: '🌱', book: 'cover', need: [['peas', 2], ['garlic', 0.5]], unit: 'plate', energy: 30, price: 14, mins: 20 },
+  { id: 'shepherdspie', name: 'Shepherd\'s pie', icon: '🥧', book: 'grazing', need: [['meat_lamb|meat_beef', 1.5], ['potato', 2], ['@veg', 1]], unit: 'dish', energy: 75, price: 34, mins: 90 },
+  { id: 'quiche', name: 'Garden quiche', icon: '🥧', book: 'hens', need: [['@egg', 0.5], ['milk', 0.5], ['@veg', 1]], unit: 'quiche', energy: 55, price: 22, mins: 60 },
+  { id: 'applecrisp', name: 'Apple crisp', icon: '🍏', book: 'orchard', need: [['@apple', 3], ['honey', 0.3]], unit: 'dish', energy: 45, price: 20, mins: 50 },
+  { id: 'fruitcompote', name: 'Spiced fruit compote', icon: '🍑', book: 'orchard', pantry: true, need: [['@fruit', 3]], unit: 'jar', energy: 20, price: 26, mins: 40 },
+  { id: 'dillybeans', name: 'Dilly beans', icon: '🫛', book: 'preserving', pantry: true, need: [['beans', 3], ['garlic', 0.5]], unit: 'jar', energy: 12, price: 30, mins: 40 },
+  { id: 'pickledbeets', name: 'Pickled beets', icon: '🫙', book: 'preserving', pantry: true, need: [['beet', 3]], unit: 'jar', energy: 14, price: 26, mins: 45 },
+  { id: 'fruitleather', name: 'Fruit leather', icon: '🍓', book: 'preserving', pantry: true, need: [['@fruit', 3]], unit: 'roll', energy: 24, price: 30, mins: 90 },
+  { id: 'ricotta', name: 'Fresh ricotta', icon: '🧀', book: 'cheese', pantry: true, need: [['milk', 2]], unit: 'tub', energy: 22, price: 24, mins: 30 },
+  { id: 'cheddar', name: 'Aged farmhouse cheddar', icon: '🧀', book: 'cheese', pantry: true, need: [['milk', 8]], unit: 'wheel', energy: 40, price: 140, mins: 120 },
+  { id: 'honeysquash', name: 'Honey-roasted squash', icon: '🎃', book: 'bees', need: [['squash', 2], ['honey', 0.3]], unit: 'dish', energy: 40, price: 16, mins: 50 },
+  { id: 'honeynuts', name: 'Honey-roasted nuts', icon: '🥜', book: 'bees', pantry: true, need: [['@nut', 2], ['honey', 0.3]], unit: 'jar', energy: 34, price: 50, mins: 40 },
+  { id: 'maplebeans', name: 'Maple baked beans', icon: '🫘', book: 'maple', need: [['beans', 3], ['syrup', 0.25]], unit: 'pot', energy: 60, price: 22, mins: 120 },
+  { id: 'maplecream', name: 'Maple cream', icon: '🍁', book: 'maple', pantry: true, need: [['syrup', 1]], unit: 'jar', energy: 24, price: 70, mins: 40 },
+  { id: 'threesisters', name: 'Three sisters stew', icon: '🌽', book: 'threesisters', need: [['corn', 1], ['beans', 1], ['squash', 1]], unit: 'pot', energy: 65, price: 20, mins: 60 },
   { id: 'cider', name: 'Fresh apple cider', icon: '🧃', start: true, pantry: true, need: [['@apple', 6]], unit: 'jug', energy: 24, price: 26, mins: 50 },
   { id: 'grapejelly', name: 'Grape jelly', icon: '🍇', start: true, pantry: true, need: [['@grape', 3], ['honey', 0.5]], unit: 'jar', energy: 22, price: 44, mins: 50 },
   { id: 'grapejuice', name: 'Fresh grape juice', icon: '🧃', start: true, pantry: true, need: [['@grape', 4]], unit: 'jug', energy: 26, price: 30, mins: 40 },
@@ -10374,7 +10406,7 @@ const COOK = {
   },
   have(F, what) { return this.keys(F, what).reduce((n, k) => n + (F.inv[k] || 0), 0); },
   recipeFor(id) { return RECIPES.find((r) => r.from === id) || null; },
-  known(F, r) { return !!r.start || FRIENDS.hearts(F, r.from) >= 4; },
+  known(F, r) { return !!r.start || (r.book ? LIBRARY.read(F, r.book) : FRIENDS.hearts(F, r.from) >= 4); },
   // can you cook it? plan lists what would be used up
   check(F, r) {
     const plan = [], short = [];
@@ -10401,7 +10433,8 @@ const COOK = {
     b.innerHTML = (jar ? `<p class="note">Put up what your land gives you: jam from berries and orchard fruit, salsa and sauces, dried mushrooms, cured meat, cheese and butter, yarn from your wool. Jars keep, and they sell for much more than the raw produce.</p>`
         : `<p class="note">Home cooking from your own farm. Dishes can be eaten, sold at the market, given as gifts or entered at the County Fair.</p>`)
       + `<div class="grp">${jar ? 'Things you can put up' : 'Recipes you know'} · ${known.length} of ${pool.length}</div>` + UI.rows(known.map(row))
-      + (locked.length ? `<div class="grp">Recipes friends can teach you (four hearts)</div>` + UI.rows(locked.map((r) => { const P = FRIENDS.info(r.from); return { icon: '🔒', cls: 'dim', text: r.name, small: `${P ? P.name : r.from} · ${FRIENDS.hearts(F, r.from)} of 4 hearts` }; })) : '');
+      + (locked.some((r) => r.book) ? `<div class="grp">Recipes in library books</div>` + UI.rows(locked.filter((r) => r.book).map((r) => { const B = LIBRARY.book(r.book); return { icon: '🔒', cls: 'dim', text: r.name, small: `Read "${B ? B.title : r.book}" at the library in town` }; })) : '')
+      + (locked.some((r) => !r.book) ? `<div class="grp">Recipes friends can teach you (four hearts)</div>` + UI.rows(locked.filter((r) => !r.book).map((r) => { const P = FRIENDS.info(r.from); return { icon: '🔒', cls: 'dim', text: r.name, small: `${P ? P.name : r.from} · ${FRIENDS.hearts(F, r.from)} of 4 hearts` }; })) : '');
     b.querySelectorAll('.row.tap').forEach((rw) => { rw.onclick = () => self.cook(RECIPES.find((q) => q.id === rw.dataset.id)); });
   },
   cook(r) {
@@ -11254,7 +11287,7 @@ function townFest(mb, col, inter, signs, f) {
 
 // how each person likes to be answered, best first: kind | practical | funny | curious
 const TALK_STYLE = {
-  mabel: ['practical', 'kind', 'curious'], hank: ['funny', 'practical', 'curious'], rosa: ['kind', 'funny', 'practical'], abernathy: ['practical', 'curious', 'kind'],
+  mabel: ['practical', 'kind', 'curious'], hank: ['funny', 'practical', 'curious'], rosa: ['kind', 'funny', 'practical'], abernathy: ['practical', 'curious', 'kind'], ida: ['curious', 'kind', 'funny'],
   lin: ['practical', 'curious', 'funny'], dot: ['kind', 'funny', 'curious'], gus: ['funny', 'kind', 'practical'], patel: ['curious', 'practical', 'kind'],
   marco: ['funny', 'curious', 'kind'], tilly: ['kind', 'curious', 'practical'], junie: ['curious', 'funny', 'kind'], sam: ['kind', 'funny', 'practical'],
   nb_okafor: ['kind', 'practical'], nb_nguyen: ['practical', 'curious'], nb_delgado: ['curious', 'kind'], nb_bellamy: ['kind', 'funny'], nb_lindqvist: ['practical', 'kind'],
@@ -13609,7 +13642,7 @@ const WH_TILT = {
   nb_hollis: { woods: 2 }, nb_brennan: { woods: 2.6 }, nb_reyes: { woods: 2 }, nb_okafor: { home: 1.8 }, nb_delgado: { home: 1.5 }, nb_rasmussen: { home: 1.4 }, nb_nguyen: { town: 2.2 }, nb_bellamy: { nbfarm: 1.6 }, nb_lindqvist: { shop: 1.6 }, nb_abebe: { home: 1.5 },
 };
 const WH_SHOPS = { nb: [['feed', 0.3], ['diner', 0.3], ['merc', 0.2], ['stock', 0.1], ['land', 0.1]], town: [['diner', 0.45], ['merc', 0.2], ['feed', 0.15], ['stock', 0.1], ['land', 0.1]] };
-const WH_SHOP_NAME = { feed: 'the Feed & Seed', stock: 'the Livestock Auction', merc: 'the Mercantile', land: 'the Land Office', diner: 'the Blue Plate Diner' };
+const WH_SHOP_NAME = { library: 'the library', feed: 'the Feed & Seed', stock: 'the Livestock Auction', merc: 'the Mercantile', land: 'the Land Office', diner: 'the Blue Plate Diner' };
 // where customers stand in each shop (the counter is at the back, the door at the front)
 const WH_SHOP_SPOTS = { feed: [[-3.2, 1.2], [-1.5, 1.9], [1.5, 1.9], [3.3, 1.0]], stock: [[-3.5, 2.4], [0, 2.7], [3.6, 2.2]], land: [[-3.2, 1.2], [-1.4, 1.9], [1.6, 1.8], [3.2, 1.3]], merc: [[-3.2, 0.2], [-1.4, 1.9], [1.8, 1.9], [3.4, 1.6]], diner: [[-3.4, 2.2], [-0.5, 0.9], [1.2, 0.9], [3.4, 2.2]] };
 
@@ -13738,7 +13771,7 @@ const VISIT_QS = [
 const VISIT_REACT = { best: ['“Now that is sensible. Thank you.”', '“You have thought about this. I am glad I asked.”'], good: ['“Mm, that could work.”', '“Fair enough. I will think about it.”'], ok: ['“Ha. Well, I did ask.”', '“Hm. Maybe.”'] };
 const VISIT_PTS = { best: 0.3, good: 0.16, ok: 0.06 };
 // what they bring: a few things of their own
-const VISIT_GIVE = { junie: [['bouquet', 1]], rosa: [['squash', 2], ['tomato', 3]], dot: [['dish_pie', 1]], hank: [['hay', 1]], abernathy: [['fruit_apple', 3]], lin: [['fence_poly', 10]], gus: [['firewood', 1]], marco: [['garlic', 2]], patel: [['mineral', 1]], sam: [['honey', 1]], tilly: [['honey', 2]] };
+const VISIT_GIVE = { ida: [['fruit_apple', 2]], junie: [['bouquet', 1]], rosa: [['squash', 2], ['tomato', 3]], dot: [['dish_pie', 1]], hank: [['hay', 1]], abernathy: [['fruit_apple', 3]], lin: [['fence_poly', 10]], gus: [['firewood', 1]], marco: [['garlic', 2]], patel: [['mineral', 1]], sam: [['honey', 1]], tilly: [['honey', 2]] };
 
 // what everybody says (1.5.7): for each person, everyday lines (g), lines for each season (s: spring, summer, autumn, winter),
 // warmer lines once you're friends (close) and what they say about other people in the county (about)
@@ -13915,6 +13948,56 @@ const CHAT_LINES = {
       "Hank tried to auction off a zucchini at the market once. It went for three dollars.",
       "Sam brings me the vendor letters and always stops for a peach.",
       "Mabel and I have known each other since we were girls. She was bossy then too."
+    ]
+  },
+  ida: {
+    g: [
+      "Every book on these shelves was read by somebody in this county before you. Some of them wrote in the margins. Read those too.",
+      "The most borrowed book in this library is about compost. That tells you something good about Hollow Creek.",
+      "I've been the librarian here for twenty-six years. Before that, my mother was. The card catalogue is older than both of us.",
+      "Quiet in the reading room, please. Unless you've found something exciting. Then come and tell me.",
+      "A farm is a library you read with your boots. The books just help you know what you're looking at.",
+      "If you can't find what you're after, ask. Half of what I know is where things are.",
+      "Overdue? Nobody's ever been fined in this library. I just look at them, kindly, until they bring it back.",
+      "The best farmers I know read in winter and work in summer.",
+      "I keep a list of every question a farmer has asked me. It's four notebooks long. Some of them are very good questions.",
+      "There's a reading chair by the window. The light is best around ten in the morning.",
+      "Old Gus donated his whole shelf of dairy journals. Forty years of them. I'm still cataloguing.",
+      "Every spring somebody asks for the seed-saving book, and every spring it's out. Get on the list early.",
+      "Reading about soil and then going out and digging a hole is the best way to learn it. Look at what you dig up.",
+      "We had a flood in '79. I still have the books we dried on clothes lines. They smell faintly of the creek.",
+      "A good book should leave you wanting to go and do something. The best ones leave you muddy.",
+      "Junie's read every animal book we have. Twice. She's started on the veterinary manuals.",
+      "Libraries are just a town sharing what it knows. Farms used to do the same over the fence.",
+      "I always know it's spring when the gardening shelf empties out overnight.",
+      "Don't dog-ear the pages, please. I have bookmarks. Hundreds of them.",
+      "The county extension office sends me pamphlets. I read them all, so you don't have to.",
+      "If you finish one of the cookery books, bring me a taste. That's the only late fee I charge.",
+      "Water, soil, animals, trees. Most farming books are about one of those four. The good ones are about all of them.",
+      "Some people think libraries are about books. They're really about people asking questions.",
+      "When the power's out, the library's still open. Candles and a good story never needed electricity."
+    ],
+    s: [
+      ["Spring! Everybody wants the garden books at once. I've started a waiting list.", "The seed catalogues came in. I read them like novels.", "Rain on the library roof is the best reading weather there is."],
+      ["Summer is quiet in here. Everybody's out in the fields. I catch up on the mending of old spines.", "The reading room stays cool in the heat. Come in and sit a while.", "I take my lunch on the steps and watch the market. Good people-watching."],
+      ["Harvest time. Everybody wants the preserving books. I put them by the door.", "The leaves on the maple out front are the colour of old book covers.", "Fall is when the farmers come back in, tired and full of questions."],
+      ["Winter is the library's busy season. The fire's lit and the kettle's on.", "Long nights, short days. Perfect for a long book.", "I read by the stove until the town's gone quiet. Best part of the year."]
+    ],
+    close: [
+      "You've read more of this library than most people in town. I'm keeping a list. You're near the top.",
+      "I put a book aside for you. I won't tell you which. You'll know it when you see it on the counter.",
+      "You ask the kind of questions I like. The ones that don't have easy answers.",
+      "Come by after closing sometime. I'll show you the old county records in the back room.",
+      "I've started telling people to ask you, when they want to know about soil. You've earned it.",
+      "If this library had a favourite reader, I'm not saying it would be you. But I'm not saying it wouldn't."
+    ],
+    about: [
+      "Mabel borrows the same book on heirloom tomatoes every year. I've stopped putting it back on the shelf.",
+      "Mr. Abernathy reads the old county maps for fun. He brings me tea when he does. A gentleman.",
+      "Junie asked me for a book on dragons and a book on cows. In that order. I gave her both.",
+      "Dot brings me pie on Fridays. I've learned not to ask which kind. It's always perfect.",
+      "Tilly read every bee book we have and then wrote her own notes in the back. Good notes, too.",
+      "Old Gus pretends he doesn't read. He has a library card older than me."
     ]
   },
   abernathy: {
@@ -15252,6 +15335,7 @@ const TALK_OWN = {
   mabel: [["mabel1", "I've been thinking of retiring. Then I see the spring seed order and I can't.", "You'd be missed so much.", "Train someone up slowly. You'll know when it's time.", "Retire? You'd be back behind the counter in a week.", "What would you do with your days?"], ["mabel2", "My mother's seed ledger goes back fifty years. Every packet she ever sold.", "What a treasure.", "That should go to the land office archives one day.", "Fifty years of beans. Impressive.", "What was the most popular seed back then?"]],
   hank: [["hank1", "I'm thinking of teaching an auctioneering class. Who'd sign up, though?", "I think lots of people would love it.", "Start with the kids. Junie for one.", "Will there be a speed test?", "What's the first thing you'd teach?"], ["hank2", "Sold a cow to a family who drove four hours. They cried when she loaded calm.", "That's a lovely story.", "Calm animals load easy. That's good handling.", "Four hours for one cow. That's love.", "What was so special about her?"]],
   rosa: [["rosa1", "I want to add music to the market. A fiddler, maybe a banjo.", "That would be lovely.", "Ask Carol's uncle. He plays every dance.", "As long as nobody brings bagpipes.", "What kind of music would you like?"], ["rosa2", "My grandmother sold flowers on this exact spot sixty years ago.", "What a beautiful thing to carry on.", "You should put up a little sign about her.", "Her flowers have very deep roots.", "What was she like?"]],
+  ida: [["ida1", "I've found a letter tucked in a book from 1932. It's a love letter, and it's never been opened.", "Oh, that's wonderful and sad at once.", "Find the family. Mr. Abernathy will have the records.", "Did you read it? You read it.", "Who was it addressed to?"], ["ida2", "I want to start a story hour for the little ones on Saturdays. Do you think anyone would come?", "They'd love it. I'm sure of it.", "Hold it before the market. The parents will be in town anyway.", "If nobody comes, read it to the library cat.", "What would you read first?"], ["ida3", "The roof leaks over the poetry section. I'm not sure what that means, but I don't like it.", "That must be worrying for you.", "Get Mr. Lin to look at the flashing. It's usually the flashing.", "The poetry was getting too dry anyway.", "How long has it been leaking?"], ["ida4", "I'm writing a history of Hollow Creek. I'm on chapter one. I've been on chapter one for six years.", "Six years of research is a gift to the town.", "Write one page a day. In a year you'll have a book.", "Chapter one is the hardest. Chapter two is probably also hard.", "What happens in chapter one?"]],
   abernathy: [["aber1", "I've found a misspelling on the 1887 map. The creek is labelled 'Hollow Greek.'", "That's charming, actually.", "Note it in the records. History should be accurate.", "So the town is secretly Greek.", "How did nobody notice?"], ["aber2", "I've been asked to give a talk on county history at the library. I'm nervous.", "You'll be wonderful. You know it all.", "Practise once in front of a friend.", "Bring peppermints for the audience.", "What will you talk about?"]],
   lin: [["lin1", "My father's old ledger shows the price of a hammer in 1960. Two dollars.", "What a piece of history.", "Hang it on the wall. Customers would love it.", "So you're saying I'm overcharging?", "What else was in the ledger?"], ["lin2", "I've been thinking of selling seeds too. Mabel would not be pleased.", "Maybe ask her first. She'd appreciate that.", "Stick to tools. It's what you're known for.", "That's a declaration of war.", "What would you sell?"]],
   dot: [["dot1", "I'm thinking of entering my pie in the state fair. It's a big step.", "You'd win. Everybody knows it.", "Practise the crust ten times before you go.", "The state's not ready for your pie.", "Which pie would you bring?"], ["dot2", "The jukebox broke. People started singing their own songs. It was wonderful.", "That sounds magical.", "Maybe don't fix it too fast.", "The diner's got a choir now.", "What did they sing?"]],
@@ -17203,7 +17287,7 @@ function simDay(F, auto, rep) {
   if (F.objs.some((o) => o.t === 'stand')) STAND.sellDay(F, rep);
   if (auto) collectEggs(F, rep);
   try { KITTENS.daily(F, rep); } catch (e) { console.warn('kittens', e); }
-  try { MAPLE.daily(F, rep); WORMS.daily(F); SOILTIPS.daily(F, rep); } catch (e) { console.warn('maple/worms', e); }
+  try { MAPLE.daily(F, rep); WORMS.daily(F); SOILTIPS.daily(F, rep); LIBRARY.daily(F, rep); } catch (e) { console.warn('maple/worms', e); }
   BARN.nightly(F);
   // paddock rest counters
   for (const p of F.paddocks) p.rest = (p.rest || 0) + 1;
@@ -17294,13 +17378,14 @@ const BEDSOIL = {
     }
   },
   compost(F, o) {
-    F.inv.compost = Math.max(0, (F.inv.compost || 0) - 1); o.fert = Math.min(2, (o.fert || 0) + 0.6);
-    const T = F.terrain; this.cells(F, o, (k) => { T.om[k] = Math.min(12, T.om[k] + 0.3); T.moist[k] = Math.min(1, T.moist[k] + 0.05); });
+    const kb = LIBRARY.read(F, 'compost') ? 1.5 : 1;   // (1.5.20) "The Living Heap": compost goes half as far again
+    F.inv.compost = Math.max(0, (F.inv.compost || 0) - 1); o.fert = Math.min(2, (o.fert || 0) + 0.6 * kb);
+    const T = F.terrain; this.cells(F, o, (k) => { T.om[k] = Math.min(12, T.om[k] + 0.3 * kb); T.moist[k] = Math.min(1, T.moist[k] + 0.05); });
   },
   // a square bale mulches a bed; a round bale's worth does ten
   mulch(F, o) {
     if ((F.inv.sqbale || 0) >= 1) F.inv.sqbale -= 1; else F.inv.hay = Math.max(0, (F.inv.hay || 0) - 0.1);
-    o.mulch = true; o.mulchD = 120;
+    o.mulch = true; o.mulchD = LIBRARY.read(F, 'nodig') ? 180 : 120;   // (1.5.20) "The No-Dig Garden": six months
   },
   canMulch(F) { return (F.inv.sqbale || 0) >= 1 || (F.inv.hay || 0) >= 0.1; },
 };
@@ -17524,9 +17609,13 @@ const GOALS = [
   { id: 'fest1', cat: 'Community', icon: '🎉', name: 'Join in at a festival', reward: 300, lv: 2, prog: (F) => tallied(F, 'fests') },
   { id: 'fest4', cat: 'Community', icon: '🕯️', name: 'Take part in all four festivals', reward: 1500, lv: 4, prog: (F) => Object.keys(F.festLog || {}).length / 4 },
   { id: 'local', cat: 'Community', icon: '🏅', name: 'Become a Local in town', reward: 1200, lv: 2, prog: (F) => STANDING.score(F) / 90 },
+  // the library (1.5.20)
+  { id: 'cookbook', cat: 'Learning', icon: '📖', name: 'Cook something you learned from a book', reward: 300, lv: 2, prog: (F) => (RECIPES.some((r) => r.book && (F.cooked || {})[r.id]) ? 1 : 0) },
+  { id: 'soilshelf', cat: 'Learning', icon: '🪱', name: 'Read every book on soil', reward: 800, lv: 3, prog: (F) => BOOKS.filter((b) => b.topic === 'Soil' && LIBRARY.read(F, b.key)).length / BOOKS.filter((b) => b.topic === 'Soil').length },
+  { id: 'bookworm', cat: 'Learning', icon: '🐛', name: 'Read every book in the library', reward: 2500, lv: 5, prog: (F) => LIBRARY.count(F) / BOOKS.length },
   { id: 'wildall', cat: 'The woods', icon: '🦉', name: 'Spot every kind of wildlife in your woods', reward: 2500, lv: 5, prog: (F) => { const P = WOODS.prof(F), W = (F.woods || {}).wild || {}; return P.wild.filter((q) => W[q[0]]).length / P.wild.length; } },
 ];
-const GOAL_CATS = ['Water', 'Trees', 'Buildings', 'Animals', 'Soil', 'Business', 'Community', 'The woods', 'Kitchen', 'Memories'];
+const GOAL_CATS = ['Water', 'Trees', 'Buildings', 'Animals', 'Soil', 'Business', 'Community', 'The woods', 'Kitchen', 'Learning', 'Memories'];
 const LADDER_MULT = [1, 2, 4, 7, 10, 15, 20, 30, 40, 60, 80, 100, 150, 200, 300, 400, 600, 800, 1000];
 const plural = (n, one, many) => `${n.toLocaleString()} ${n === 1 ? one : (many || one + 's')}`;
 // base: first target (later targets follow LADDER_MULT) or steps: an explicit list (extended by x1.5 after the last);
@@ -17563,6 +17652,8 @@ const LADDERS = [
   { id: 'wildlife', cat: 'The woods', icon: '🦌', steps: [3, 5, 8, 12, 16, 20, 25, 30], reward: 400, of: (F) => Object.keys((F.woods || {}).wild || {}).length, max: (F) => WOODS.prof(F).wild.length, name: (n) => `Spot ${n} kinds of wildlife`, old: { wild5: 2 } },
   { id: 'finds', cat: 'The woods', icon: '✨', base: 5, reward: 400, of: (F) => tallied(F, 'finds'), name: (n) => `Dig up ${plural(n, 'odd find')}`, old: { finds5: 1 }, lv: 3 },
   { id: 'bouquets', cat: 'The woods', icon: '💐', base: 1, reward: 150, of: (F) => tallied(F, 'bouquets'), name: (n) => (n === 1 ? 'Tie a wild bouquet' : `Tie ${n} wild bouquets`), old: { bouquet1: 1 } },
+  { id: 'books', cat: 'Learning', icon: '📚', steps: [1, 3, 6, 10, 14], reward: 300, lv: 1, of: (F) => LIBRARY.count(F), max: () => BOOKS.length, name: (n) => (n === 1 ? 'Read a book at the library' : `Read ${n} books from the library`) },
+  { id: 'bookrecipes', cat: 'Learning', icon: '🥘', steps: [2, 5, 10, 15], reward: 400, lv: 2, of: (F) => LIBRARY.bookRecipes(F), max: () => RECIPES.filter((r) => r.book).length, name: (n) => `Learn ${n} recipes from library books` },
   { id: 'cooked', cat: 'Kitchen', icon: '🍳', steps: [1, 10, 25, 50, 100, 200, 350, 500, 750, 1000], reward: 200, of: (F) => tallied(F, 'cooked'), name: (n) => (n === 1 ? 'Cook your first dish' : `Cook ${n} dishes`), old: { cook1: 1, cook25: 3 } },
   { id: 'recipes', cat: 'Kitchen', icon: '🥧', steps: [3, 6, 10, 15, 20, 25, 30, 40], reward: 500, of: (F) => Object.keys(F.cooked || {}).length, max: (F) => RECIPES.filter((r) => recipeHere(F, r)).length, name: (n) => `Cook ${n} different recipes`, old: { cook6: 2 } },
   { id: 'fish', cat: 'Kitchen', icon: '🎣', steps: [1, 5, 10, 20, 35, 50, 75, 100, 150, 200, 300], reward: 250, of: (F) => tallied(F, 'fish'), name: (n) => (n === 1 ? 'Catch your first fish' : `Catch ${n} fish`), old: { fish1: 1 } },
@@ -18088,6 +18179,7 @@ function furnishHouse(mb, col, inter, F, lightW, x0, x1, z0, z1) {
   for (let r = 0; r < 4; r++) for (let c = 0; c < 5; c++) mb.box(-0.15 + c * 0.075, 0.04 + r * 0.085, 0.062, 0.05, 0.05, 0.006, (r * 5 + c) % 7 === 3 ? [232, 150, 70] : [214, 208, 190], { sharp: true });
   mb.pop();
   inter.push({ x: x1 - 1.0, z: 2.35, r: 1.1, label: 'Wall calendar', act: 'calendar', icon: '📅' });
+  inter.push({ x: x1 - 1.2, z: wz - 0.1, r: 1.1, label: 'Read your library book by the stove', act: 'libhome', icon: '📖', off: () => { const L = G.F && G.F.lib; return !L || !L.out || LIBRARY.read(G.F, L.out); } });
 
   // ---------------------------------------------------------------- the dining nook on the left wall: a bench against the wall, the table, two chairs on the open side
   const tz = 1.55, tx = x0 + 1.05;
@@ -18551,7 +18643,7 @@ function interiorFrame(F0, room) {
 
 'use strict';
 // ============================================================================ profiles + saves (each profile has its own farm save)
-const FQ_VERSION = '1.5.19';
+const FQ_VERSION = '1.5.20';
 const LOOKS = [
   { shirt: [214, 74, 64], hair: [120, 76, 40] }, { shirt: [70, 130, 200], hair: [236, 206, 120] }, { shirt: [240, 170, 60], hair: [80, 50, 30] },
   { shirt: [120, 170, 90], hair: [40, 30, 28] }, { shirt: [170, 100, 190], hair: [200, 110, 60] }, { shirt: [60, 160, 160], hair: [150, 100, 60] },
@@ -19434,7 +19526,7 @@ const UI = {
         if (id === 'seeds') return setTool('seeds');
         if (id === 'castings') act('plant', 1.4, 15, 2, () => { F.inv.castings -= 1; o.fert = Math.min(2.4, (o.fert || 0) + 1.0); const T = F.terrain; BEDSOIL.cells(F, o, (k) => { T.om[k] = Math.min(12, T.om[k] + 0.5); T.moist[k] = Math.min(1, T.moist[k] + 0.05); }); tally(F, 'castingsSpread'); G.view.dirtyAt(o.x, o.z); UI.toast(`🪱 Worm castings spread. This bed should now give about ${Math.round(BEDSOIL.yieldMult(F, o) * 100)}% of a normal harvest.`); });
         if (id === 'compost') act('plant', 1.6, 20, 4, () => { BEDSOIL.compost(F, o); G.view.dirtyAt(o.x, o.z); UI.toast(`🟤 Compost spread. This bed should now give about ${Math.round(BEDSOIL.yieldMult(F, o) * 100)}% of a normal harvest.`); });
-        if (id === 'mulch') act('plant', 1.6, 20, 3, () => { BEDSOIL.mulch(F, o); G.view.dirtyAt(o.x, o.z); UI.toast('🍂 Mulched. It will hold the water in and feed the soil for about four months.'); });
+        if (id === 'mulch') act('plant', 1.6, 20, 3, () => { BEDSOIL.mulch(F, o); G.view.dirtyAt(o.x, o.z); UI.toast(`🍂 Mulched. It will hold the water in and feed the soil for about ${LIBRARY.read(F, 'nodig') ? 'six' : 'four'} months.`); });
       };
     });
   },
@@ -19652,6 +19744,7 @@ const UI = {
     if (harvest) lines.push(['🧺', `Harvested ${harvest}`]);
     if (rep.ripe) lines.push(['🍎', `${rep.ripe} trees came ripe`]);
     if (rep.kittens) lines.push(['🐱', `${PETS.name(G.F, 'cat')} had ${rep.kittens} kittens in the barn! Walk up to them to say hello.`]);
+    if (rep.savedSeed) lines.push(['🌱', 'Mabel left a couple of packets of her own saved seed in your mailbox, the way the seed-saving book said she would.']);
     if (rep.soilTip) lines.push(['🌱', `Soil tip: ${rep.soilTip[1]}. ${rep.soilTip[3]}`]);
     if (rep.kitGone) lines.push(['🐈', `${rep.kitGone.join(' and ')} went to live at Ruth Carter's sanctuary, where there are always mice to catch.`]);
     if (rep.stand) lines.push(['🏪', `Farm stand sold ${money(rep.stand)}${rep.standItems ? `: ${Object.entries(rep.standItems).map(([k, n]) => `${fmt1(n)} ${ITEMS[k].unit} ${ITEMS[k].name.toLowerCase()}`).join(', ')}` : ''}`]);
@@ -21588,6 +21681,166 @@ const SOILVIEW = {
   here(back) { const F = G.F, Fm = G.Fm; if (G.mode !== 'play') return UI.toast('Go out on the farm to look at the soil.', true); if (!ownedAt(F, Fm.x, Fm.z)) return UI.toast('This isn\'t your land.', true); const bed = F.objs.find((o) => o.t === 'bed' && Math.hypot(o.x - Fm.x, o.z - Fm.z) < 1.6); this.open(Fm.x, Fm.z, bed, back); },
   dig() { act('dig', 1.2, 15, 1, () => this.here()); },
 };
+// ---------------------------------------------------------------- the Hollow Creek library (1.5.20)
+// Ida keeps a small library at the west end of Main Street. Each book is about one real farming technique: a few short pages in
+// plain words, and when you finish it something opens up (new recipes for the kitchen, or a lasting knack on the farm, such as
+// compost going further). Read at the library (Ida likes the company) or borrow one at a time and read it by the stove at home.
+//   F.lib = { read: { key: day }, out: key | null }
+const BOOKS = [
+  { key: 'compost', topic: 'Soil', icon: '🟤', title: 'The Living Heap', by: 'Clara Whitfield', mins: 60,
+    pages: ['A compost heap is a city of tiny workers: bacteria, fungi, worms and beetles, all eating your scraps and turning them into dark, sweet-smelling soil food.',
+      'Mix "greens" (fresh grass, kitchen scraps, manure) with "browns" (straw, dry leaves, wood chips): about one part green to two parts brown. Keep it as damp as a wrung-out sponge.',
+      'Turn it now and then to let air in. A good heap gets hot in the middle, hot enough to kill weed seeds. When it smells like a forest floor and you can\'t tell what went in, it\'s ready.',
+      'Spread it thin and often rather than thick and rarely. Compost feeds the life in the soil, and the soil life feeds your plants.'],
+    perk: 'Compost you spread on a bed goes half as far again.' },
+  { key: 'nodig', topic: 'Soil', icon: '🍂', title: 'The No-Dig Garden', by: 'Tom Ashby', mins: 60,
+    pages: ['Every time you dig, you tear apart the tunnels, fungus threads and crumbs that make soil healthy, and the organic matter burns off faster.',
+      'Instead, build up from the top. Lay cardboard over grass to smother it, then pile on compost and a thick blanket of mulch: straw, leaves or wood chips.',
+      'Plant straight into the mulch. Pull it back for seeds, tuck it round seedlings. The worms will do your digging for you, and they never get tired.',
+      'Top the mulch up whenever you can see soil through it. A garden that\'s never bare is a garden that keeps getting better.'],
+    perk: 'Mulch on your beds lasts six months instead of four.' },
+  { key: 'worms', topic: 'Soil', icon: '🪱', title: 'Small Wonders: Worms and the Soil', by: 'Dr. Nina Ross', mins: 45,
+    pages: ['Under a healthy pasture there can be more weight of earthworms than of cattle on top of it.',
+      'Worms pull dead leaves down into the soil, and their tunnels let air and rain in. What comes out the other end, the castings, is richer than anything you can buy.',
+      'Red wigglers, the worms in a worm bin, like scraps chopped small, damp bedding and a dark spot out of the sun and frost. Don\'t give them onions, citrus or meat.',
+      'Feed a little at a time, and harvest the castings from the bottom while the worms keep working at the top.'],
+    perk: 'Your worm farm makes castings a quarter faster.' },
+  { key: 'cover', topic: 'Soil', icon: '🌾', title: 'Green Manure', by: 'Elias Kerr', mins: 45,
+    pages: ['A cover crop is something you grow not to eat but to feed and protect the soil: rye, oats, clover, peas, vetch.',
+      'Sow it when a bed or field would otherwise sit bare, after the summer crop or over the winter. The roots hold the soil, and the leaves shade it.',
+      'Peas, beans and clover have little nodules on their roots full of bacteria that pull nitrogen, plant food, out of the air. When the plants die back, that food stays in your soil.',
+      'Cut the cover crop down before it sets seed and leave it on top as mulch, or let the hens and pigs have it.'],
+    recipes: ['peashoots'] },
+  { key: 'grazing', topic: 'Animals', icon: '🐄', title: 'Grass, Hooves and Rest', by: 'Jo Delaney', mins: 75,
+    pages: ['Animals left in one big field graze their favourite plants down to nothing and leave the rest. The good grasses die out and the ground goes bare.',
+      'Split the pasture into paddocks. Put the herd in one for a day or a few days, bunched up, then move them on. They graze everything evenly, trample old grass into the soil, and spread their manure.',
+      'Then the paddock rests. Grass needs about a month (longer in a drought) to grow back its roots. Graze it again too soon and it gets weaker every time.',
+      'Done right, the land gets better every year: thicker grass, deeper roots, more organic matter. The animals are the tool; the grass is the crop.'],
+    recipes: ['shepherdspie'] },
+  { key: 'water', topic: 'Water', icon: '💧', title: 'Slow the Water Down', by: 'Walt Peterson', mins: 60,
+    pages: ['Rain that runs off your land takes your topsoil with it. Rain that soaks in waters your plants for weeks.',
+      'A swale is a level ditch dug along the contour, with the soil piled into a mound on the downhill side. Water running down the hill stops in the ditch and sinks in, slowly, all along it.',
+      'Plant trees on the mound. Their roots drink the stored water, and in a few years you have a green belt across the slope.',
+      'A pond catches water from the land above it. Put it where the land funnels toward it, and you\'ll have water through the dry months.'],
+    recipes: [] },
+  { key: 'hens', topic: 'Animals', icon: '🐔', title: 'Hens Behind the Herd', by: 'Lucy Fenwick', mins: 45,
+    pages: ['On a well-run farm the chickens follow the cattle by three or four days.',
+      'By then the fly larvae in the cow pats are big and juicy. The hens scratch the pats apart to eat them, which spreads the manure and breaks the fly cycle.',
+      'A coop on wheels, an eggmobile, makes it easy: tow it to the next paddock the cattle have left.',
+      'The eggs are better too: deep orange yolks from hens that eat grass and bugs all day.'],
+    recipes: ['quiche'] },
+  { key: 'orchard', topic: 'Trees', icon: '🍎', title: 'The Backyard Orchard', by: 'June Carver', mins: 60,
+    pages: ['Plant fruit trees in winter, while they\'re asleep. Pick a sunny spot out of the frost pockets: cold air runs downhill like water and pools in the low places.',
+      'Most apples and pears need a partner of a different kind nearby so the bees can carry pollen between them.',
+      'Mulch a wide ring round each tree and keep the grass back. Prune in late winter to open the middle to the light.',
+      'An apple tree takes a few years to bear. Plant it this year and you\'ll thank yourself later.'],
+    recipes: ['applecrisp', 'fruitcompote'] },
+  { key: 'preserving', topic: 'Kitchen', icon: '🫙', title: 'The Root Cellar Year', by: 'Martha Greer', mins: 75,
+    pages: ['A harvest comes all at once. Putting food by is how a farm eats all year.',
+      'Pickling keeps vegetables in vinegar and salt. Fermenting lets good bacteria turn cabbage and greens sour and tangy, and keeps them for months.',
+      'Drying works for fruit, herbs and beans: a warm, airy spot and patience. A root cellar keeps potatoes, carrots and beets cool, dark and damp until spring.',
+      'Label every jar with what and when. You\'ll be surprised what you find in March.'],
+    recipes: ['dillybeans', 'pickledbeets', 'fruitleather'] },
+  { key: 'cheese', topic: 'Kitchen', icon: '🧀', title: 'Small-Batch Cheesemaking', by: 'Ada Lowell', mins: 75,
+    pages: ['Cheese is milk kept for later. Warm the milk, add a culture and rennet, and it sets into curds and whey.',
+      'Fresh cheeses like ricotta are ready the same day. Hard cheeses are pressed, salted and aged for weeks or months in a cool cellar.',
+      'The whey left over is good for pigs and hens, or for watering the garden.',
+      'Good cheese starts with good grass. Cows on fresh pasture give milk that tastes of the season.'],
+    recipes: ['ricotta', 'cheddar'] },
+  { key: 'bees', topic: 'Animals', icon: '🐝', title: 'The Beekeeper\'s Year', by: 'Bea Thornton', mins: 60,
+    pages: ['A hive is one big family: one queen, thousands of worker daughters, and a few lazy sons in summer.',
+      'Bees need flowers from spring to fall. Fruit trees in spring, clover and wildflowers in summer, goldenrod and asters in fall.',
+      'Only take the honey the bees can spare. They need about sixty pounds to get through a cold winter.',
+      'Bees pollinate your orchard and garden. A farm with bees grows more of everything.'],
+    recipes: ['honeysquash', 'honeynuts'] },
+  { key: 'maple', topic: 'Trees', icon: '🍁', title: 'Sugaring Season', by: 'Samuel Hart', mins: 45,
+    pages: ['Maple sap runs on freeze-thaw days in late winter: frosty nights below freezing and sunny days above it.',
+      'Tap a tree at least a foot across, on the sunny side, about waist high. One tap for a tree that size, two for a really big one.',
+      'It takes about forty gallons of sap to boil down to one gallon of syrup. Boil outdoors: that\'s a lot of steam.',
+      'When the buds swell the sap turns bitter. Pull the taps and let the tree heal.'],
+    recipes: ['maplebeans', 'maplecream'] },
+  { key: 'threesisters', topic: 'Garden', icon: '🌽', title: 'The Three Sisters', by: 'the Hollow Creek Garden Club', mins: 45,
+    pages: ['Corn, beans and squash, planted together the way Native American farmers have for centuries.',
+      'The corn grows tall and gives the beans a pole to climb. The beans feed the soil with nitrogen. The squash spreads its big leaves over the ground, shading out weeds and keeping the soil damp.',
+      'Each plant helps the others, and together they give more food from a patch than any one of them alone.',
+      'Mixing plants this way, rather than long rows of one crop, is called companion planting.'],
+    recipes: ['threesisters'] },
+  { key: 'seeds', topic: 'Garden', icon: '🌱', title: 'Saving Your Own Seed', by: 'Martha Greer', mins: 45,
+    pages: ['Seeds saved from your own best plants, year after year, grow into plants that suit your soil and your weather.',
+      'Start with easy ones: beans, peas, tomatoes and lettuce. Let a few of the best plants go to seed, and pick the seeds when they\'re dry and hard.',
+      'Store them cool, dark and dry, in paper envelopes with the name and year.',
+      'Swap with your neighbours at the Spring Seed Swap. That\'s how old varieties stay alive.'],
+    perk: 'Mabel has a few of her own saved seeds for you each spring.' },
+];
+const BOOK_TOPICS = ['Soil', 'Water', 'Animals', 'Trees', 'Garden', 'Kitchen'];
+const LIBRARY = {
+  st(F) { F.lib = F.lib || { read: {}, out: null }; F.lib.read = F.lib.read || {}; return F.lib; },
+  read(F, key) { return !!(F && F.lib && F.lib.read && F.lib.read[key]); },
+  count(F) { return Object.keys((F.lib && F.lib.read) || {}).length; },
+  topicDone(F, topic) { return BOOKS.filter((b) => b.topic === topic).every((b) => this.read(F, b.key)); },
+  bookRecipes(F) { return RECIPES.filter((r) => r.book && this.read(F, r.book)).length; },
+  book(key) { return BOOKS.find((b) => b.key === key); },
+  unlocks(b) { const R = (b.recipes || []).map((id) => RECIPES.find((r) => r.id === id)).filter(Boolean); return [...R.map((r) => `${r.icon} ${r.name}`), ...(b.perk ? [`✨ ${b.perk}`] : [])]; },
+  // the library itself: Ida's shelves
+  open() {
+    const F = G.F, s = this.st(F), self = this;
+    if (s.out && this.read(F, s.out)) { const b = this.book(s.out); s.out = null; UI.toast(`📚 You hand "${b.title}" back to Ida. “Well? Worth the read?”`); }
+    const P = UI.open({ title: 'Hollow Creek Library', sub: `${this.count(F)} of ${BOOKS.length} books read · Ida, the town librarian`, icon: '📚', foot: true });
+    let html = `<p class="note">Every book here is about one way of farming well, in plain words. Finish one and something opens up: new recipes for your kitchen, or a knack that lasts. Read here, or borrow one book at a time and read it by the stove at home.${s.out ? ` You have <b>${esc(this.book(s.out).title)}</b> out.` : ''}</p>`;
+    for (const t of BOOK_TOPICS) {
+      const list = BOOKS.filter((b) => b.topic === t); if (!list.length) continue;
+      html += `<div class="grp">${t} · ${list.filter((b) => this.read(F, b.key)).length} of ${list.length} read</div>` + UI.rows(list.map((b) => ({ id: b.key, tap: true, icon: this.read(F, b.key) ? '✅' : b.icon, text: b.title, small: `${b.by} · about ${b.mins >= 60 ? `${b.mins / 60} hour${b.mins > 60 ? 's' : ''}` : b.mins + ' minutes'}${s.out === b.key ? ' · borrowed' : ''} · ${this.unlocks(b).join(', ') || 'good to know'}` })));
+    }
+    P.body.innerHTML = html;
+    P.foot.innerHTML = '<button class="btn" id="libTalk">💬 Talk to Ida</button><button class="btn go" id="libDone">Done</button>';
+    $('libDone').onclick = () => UI.closeAll();
+    $('libTalk').onclick = () => { const n = (G.room && G.room.keeper && G.room.keeper.key === 'ida') ? G.room.keeper : WHERE.makeNpc(F, 'ida', G.Fm.x, G.Fm.z - 1); UI.closeAll(); FRIENDS.meet(F, 'ida'); npcTalk(n); };
+    P.body.querySelectorAll('.row.tap').forEach((r) => { r.onclick = () => self.card(r.dataset.id); });
+    FRIENDS.meet(F, 'ida');
+  },
+  card(key) {
+    const F = G.F, s = this.st(F), b = this.book(key), done = this.read(F, key), self = this;
+    const P = UI.open({ title: b.title, sub: `by ${b.by} · ${b.topic}`, icon: b.icon, foot: true });
+    P.body.innerHTML = `<p class="note speech" style="font-size:15px">“${esc(b.pages[0])}”</p><div class="grp">${done ? 'You learned' : 'Read it and you\'ll learn'}</div>` + UI.rows(this.unlocks(b).map((u) => ({ icon: done ? '✅' : '🔒', text: u.replace(/^\S+\s/, ''), small: u.startsWith('✨') ? 'A lasting knack on your farm' : 'A new recipe for your kitchen' })).concat(this.unlocks(b).length ? [] : [{ icon: '💡', text: 'Good to know', small: 'No recipe in this one, just how it works' }]))
+      + `<p class="note">${done ? 'You\'ve read this one. Read it again any time.' : `Reading it takes about ${b.mins} minutes, and it\'s restful.`}</p>`;
+    const canBorrow = !s.out || s.out === key;
+    P.foot.innerHTML = `<button class="btn" id="bkBack">Back</button>${!done && canBorrow && s.out !== key ? '<button class="btn" id="bkBorrow">🏠 Borrow it</button>' : ''}<button class="btn go" id="bkRead">📖 Read it here</button>`;
+    $('bkBack').onclick = () => self.open();
+    if ($('bkBorrow')) $('bkBorrow').onclick = () => { s.out = key; UI.closeAll(); UI.toast(`📚 You borrow "${b.title}". Ida stamps the card: “Bring it back when you\'re done, and tell me what you thought.” Read it by the stove at home.`); };
+    $('bkRead').onclick = () => self.reader(key, 'library');
+    if (!canBorrow) { const n = document.createElement('p'); n.className = 'note'; n.textContent = `You have "${this.book(s.out).title}" out already. Read it and bring it back, then you can borrow another.`; P.body.appendChild(n); }
+  },
+  // the pages, one at a time; finishing the last page is finishing the book
+  reader(key, where) {
+    const F = G.F, b = this.book(key), self = this; let i = 0;
+    const show = () => {
+      const P = UI.open({ title: b.title, sub: `Page ${i + 1} of ${b.pages.length}`, icon: '📖', foot: true });
+      P.body.innerHTML = `<p style="font-size:17px;line-height:1.55;margin:6px 4px 10px">${esc(b.pages[i])}</p>`;
+      P.foot.innerHTML = `${i ? '<button class="btn" id="pgBack">‹ Back</button>' : '<button class="btn" id="pgShut">Close the book</button>'}<button class="btn go" id="pgNext">${i < b.pages.length - 1 ? 'Next page ›' : 'Finish the book'}</button>`;
+      if ($('pgBack')) $('pgBack').onclick = () => { i--; show(); };
+      if ($('pgShut')) $('pgShut').onclick = () => (where === 'library' ? self.card(key) : UI.closeAll());
+      $('pgNext').onclick = () => { if (i < b.pages.length - 1) { i++; show(); } else self.finish(key, where); };
+    };
+    show();
+  },
+  finish(key, where) {
+    const F = G.F, s = this.st(F), b = this.book(key), first = !this.read(F, key);
+    UI.closeAll();
+    spendTime(b.mins, 0);
+    F.energy = Math.min(100, F.energy + (where === 'home' ? 8 : 5));
+    if (!first) { UI.toast(`📖 You read "${b.title}" again. It\'s even better the second time.`); return; }
+    s.read[key] = F.day + F.month * 30 + F.year * 360;
+    tally(F, 'booksRead');
+    if (where === 'library') FRIENDS.grow(F, 'ida', 0.2, true);
+    if (typeof SHOP !== 'undefined') SHOP.earn(10, `Read "${b.title}"`);
+    const u = this.unlocks(b);
+    const ul = u.join(', '); UI.toast(`📚 Finished "${b.title}".${u.length ? ` You learned: ${ul}${ul.endsWith('.') ? '' : '.'}` : ''}`);
+    AUDIO.ding();
+    checkGoalsToast();
+  },
+  // Mabel's saved seeds (the seed-saving book): a couple of packets each spring
+  daily(F, rep) { if (this.read(F, 'seeds') && F.month === 2 && F.day === 1) { const ks = ['seed_beans', 'seed_tomato', 'seed_peas', 'seed_lettuce'].filter((k) => ITEMS[k]); for (const k of ks.slice(0, 2)) F.inv[k] = (F.inv[k] || 0) + 1; if (rep) rep.savedSeed = true; } },
+};
 // ---------------------------------------------------------------- how to build better soil (1.5.18)
 // Plain-language tips, each with what it means in this game. Opened from a garden bed's card and the journal's Land & soil tab; one tip shows
 // up in the morning report every few days.
@@ -21633,7 +21886,7 @@ const PRESS = {
 const WORMS = {
   CAP: 20,
   scraps(F) { return COOK.keys(F, '@veg').concat(COOK.keys(F, '@fruit'), COOK.keys(F, '@wildfruit')).filter((k, i, A) => A.indexOf(k) === i && (F.inv[k] || 0) > 0.01); },
-  daily(F) { for (const o of F.objs) if (o.t === 'wormbin') { const eat = Math.min(o.food || 0, 2.5); o.food = (o.food || 0) - eat; o.cast = Math.min(8, (o.cast || 0) + eat * 0.1); } },
+  daily(F) { for (const o of F.objs) if (o.t === 'wormbin') { const eat = Math.min(o.food || 0, 2.5); o.food = (o.food || 0) - eat; o.cast = Math.min(8, (o.cast || 0) + eat * 0.1 * (LIBRARY.read(F, 'worms') ? 1.25 : 1)); } },
   card(o) {
     const F = G.F, self = this;
     const P = UI.open({ title: 'Worm farm', sub: 'Red wigglers turning scraps into soil food', icon: '🪱', foot: true });
@@ -21664,6 +21917,7 @@ const KIT_HOMES = {
   junie: 'I\'ll love her forever and ever! I\'m calling her Pickles. No, wait, Moonpie. No, Pickles.',
   gus: 'A barn\'s not a barn without a cat. Margaret always had one on the porch rail. Thank you.',
   tilly: 'Clover the goat is going to be SO jealous. Come here, little one.',
+  ida: 'A library cat! Every proper library has one asleep on the returns cart. She\'ll be called Dewey.',
   mabel: 'Oh, the store could use a mouser. And a little company behind the counter.',
   sam: 'She can ride along on the route. Every mail truck needs a co-pilot.',
   dot: 'A diner cat! Don\'t tell the health inspector. She\'ll live upstairs, I promise.',
@@ -22637,6 +22891,7 @@ function addSignBoard(mb, lines, cx, cy, z, w, h, opt) {
 // ============================================================================ the town: a main street you walk down, shops you step into, and the people who live there
 // Built on the room system: the street is an outdoor "room" (G.room.type === 'town'), each shop is an indoor room.
 const TOWN_SHOPS = [
+  { key: 'library', name: 'Hollow Creek Library', icon: '📚', x: -27.6, w: 6, d: 5, h: 3.4, wall: [168, 146, 122], trim: [244, 238, 222], keeper: 'ida' },
   { key: 'feed', name: 'Feed & Seed', icon: '🌾', x: -17, w: 7, d: 6, h: 3.6, wall: [176, 66, 50], trim: [246, 238, 220], awning: [[60, 120, 60], [246, 238, 220]], keeper: 'mabel' },
   { key: 'stock', name: 'Livestock Auction', icon: '🐄', x: -7.5, barn: true, keeper: 'hank' },
   { key: 'market', name: 'Farmers Market', icon: '🧺', x: 4.5, open: true, keeper: 'rosa' },
@@ -22651,6 +22906,7 @@ const TOWNFOLK = {
   hank: { name: 'Hank', role: 'the auctioneer', look: { shirt: [200, 190, 160], pants: [60, 70, 100], hair: [90, 70, 50], hat: 'cowboy' }, lines: ['Buy animals that suit your weather. A Highland in the desert is a sad Highland.', 'Bring me fat steers and I\'ll find you a buyer. Bring me skinny ones and I\'ll find you a lecture.', 'Rotate those paddocks. Grass grows back deeper when you let it rest.'] },
   rosa: { name: 'Rosa', role: 'manages the farmers market', look: { shirt: [220, 120, 60], pants: [70, 80, 110], hair: [40, 30, 28], hat: 'straw', hairStyle: 'long' }, lines: ['Saturday is market day. Folks pay more when the whole town comes out.', 'Prices dip when you sell a lot of one thing. Grow a little of everything!', 'Your eggs went fast last week. People love real yolks.'] },
   abernathy: { name: 'Mr. Abernathy', role: 'the county land clerk', look: { shirt: [240, 240, 236], pants: [50, 50, 60], hair: [120, 120, 125], hat: 'none', hairStyle: 'bald' }, lines: ['Twenty-five lots on the county map, and any one touching yours can be had for a fair price. Open the Land office and the map shows which ones are for sale.', 'Mind the contour lines on your map. Water follows them, so should your swales.', 'Every plot has a story. Most of them involve mud.'] },
+  ida: { name: 'Ida', role: 'the town librarian', look: { shirt: [120, 90, 150], pants: [70, 64, 80], hair: [196, 196, 204], hat: 'none', hairStyle: 'bun' }, lines: ['Every book here was read by somebody in this county before you. Some of them wrote in the margins.', 'Quiet in the reading room, please. Unless you\'ve found something exciting.', 'Borrow one, read it by the fire, bring it back. That\'s all there is to it.'] },
   lin: { name: 'Mr. Lin', role: 'owns the Mercantile', look: { shirt: [60, 80, 120], pants: [80, 70, 60], hair: [30, 26, 24], hat: 'cap' }, lines: ['Got spare fence? I\'ll buy it back. Need more? I\'ve got rolls of it.', 'New hats came in. That straw one has seen things.', 'Polywire is the farmer\'s best friend. Moves in minutes.'] },
   dot: { name: 'Dot', role: 'cooks at the Blue Plate', look: { shirt: [240, 120, 140], pants: [60, 60, 70], hair: [220, 160, 80], hat: 'none', hairStyle: 'long' }, lines: ['Pie\'s fresh. Peach today, if you\'re lucky.', 'You look like you\'ve been fencing since sunrise. Sit down, hon.', 'I buy local when I can. Bring me good tomatoes and I\'ll pay you right.'] },
   gus: { name: 'Old Gus', role: 'retired dairy farmer', look: { shirt: [120, 100, 80], pants: [70, 90, 130], hair: [230, 230, 230], hat: 'cap', hairStyle: 'curly' }, wander: true, wants: ['milk', 'fruit_apple', 'honey'], lines: ['Back in my day we dug swales with a spoon. Uphill. Both ways.', 'Build your soil and the soil builds your farm. Took me forty years to learn that.', 'Trees on the mound below a swale. Water does the rest.'] },
@@ -22679,7 +22935,8 @@ const closedText = (F, what) => (isSunday(F) ? `Closed on Sundays. ${what || 'Ev
 // where each board hangs (centre x, centre y, depth z), how big it is, and its colours; the little OPEN / CLOSED plaque hangs on the door
 function townSigns(mb) {
   const F0 = TOWN_FRONT, byKey = (k) => TOWN_SHOPS.find((q) => q.key === k);
-  const feed = byKey('feed'), stock = byKey('stock'), market = byKey('market'), land = byKey('land'), merc = byKey('merc'), diner = byKey('diner');
+  const feed = byKey('feed'), stock = byKey('stock'), market = byKey('market'), land = byKey('land'), merc = byKey('merc'), diner = byKey('diner'), lib = byKey('library');
+  addSignBoard(mb, ['LIBRARY'], lib.x, lib.h + 0.55, F0 + 0.04, lib.w * 0.78, 0.9, { face: [96, 40, 44], frame: [244, 238, 222], ink: [252, 240, 200] });
   addSignBoard(mb, ['FEED & SEED'], feed.x, feed.h + 0.55, F0 + 0.04, feed.w * 0.92, 0.9, { face: [46, 88, 54], frame: [246, 238, 220], ink: [252, 240, 200] });
   addSignBoard(mb, ['MERCANTILE', '& OUTFITTER'], merc.x, merc.h + 0.3, F0 + 0.04, merc.w * 0.9, 1.55, { face: [34, 54, 96], frame: [236, 226, 200], ink: [252, 240, 200] });
   addSignBoard(mb, ['BLUE PLATE DINER'], diner.x, diner.h - 0.12, F0 + 0.04, diner.w * 0.94, 0.82, { face: [186, 52, 52], frame: [250, 250, 245], ink: [255, 246, 226] });
@@ -22694,7 +22951,7 @@ function townPlaque(open) {
   const mb = new MB(); addSignBoard(mb, [open ? 'OPEN' : 'CLOSED'], 0, 0, 0, open ? 0.62 : 0.88, 0.34, open ? { face: [44, 120, 62], frame: [250, 244, 226], ink: [255, 250, 230] } : { face: [176, 48, 40], frame: [250, 244, 226], ink: [255, 246, 226] });
   return (TOWN_PLAQUE[k] = G.R.mesh(mb));
 }
-const TOWN_PLAQUE_AT = { feed: [0, 1.7, 0.14], merc: [0, 1.7, 0.14], diner: [0, 1.7, 0.14], land: [0, 1.7, 0.14], market: [0, 1.7, -0.06], stock: [0, 1.7, -0.14] };
+const TOWN_PLAQUE_AT = { library: [0, 1.7, 0.14], feed: [0, 1.7, 0.14], merc: [0, 1.7, 0.14], diner: [0, 1.7, 0.14], land: [0, 1.7, 0.14], market: [0, 1.7, -0.06], stock: [0, 1.7, -0.14] };
 function townPlaquesDraw(draws) {
   const open = shopOpen(G.F);
   for (const S of TOWN_SHOPS) { const a = TOWN_PLAQUE_AT[S.key]; if (!a) continue; draws.push({ mesh: townPlaque(open), model: M4.trs(S.x + a[0], a[1], TOWN_FRONT + a[2], 0, 0, 0, 1), noShadow: true }); }
@@ -22772,14 +23029,14 @@ function buildTownRoom(F) {
   const nat = (Rg.nativeTrees || ['oak']).map(nativeKind);
   // shade trees behind the shops and at the ends of the street (never between you and the camera)
   for (let i = 0; i < 12; i++) { const x = -24 + i * 5 + (R() - 0.5) * 2, z = -11 - R() * 4; addTree(mb, nat[(i + 2) % nat.length], x, 0, z, 1 + R() * 0.4, season, R); }
-  for (const [x, z] of [[-27.5, -5.5], [-28.5, 7.5], [-27, 12], [37, -5.5], [38, 7.5], [36.5, 12]]) addTree(mb, nat[Math.floor(R() * nat.length)], x, 0, z, 1 + R() * 0.3, season, R);
+  for (const [x, z] of [[-34.5, -5.5], [-28.5, 7.5], [-27, 12], [37, -5.5], [38, 7.5], [36.5, 12]]) addTree(mb, nat[Math.floor(R() * nat.length)], x, 0, z, 1 + R() * 0.3, season, R);
   for (let i = 0; i < 10; i++) { const x = -22 + i * 6 + (R() - 0.5) * 2, z = 19 + R() * 3; addTree(mb, nat[i % nat.length], x, 0, z, 0.9 + R() * 0.3, season, R); }
   // low hedges and planters along the park edge
   for (let x = -24; x <= 33; x += 3.2) { if (Math.abs(x - 2) < 2.4) continue; mb.ell(x, 0.15, 13.6, 1.3, 0.45, 0.5, shade(P.forest, 1.15), { lat: 4, lon: 8 }); }
   // hills of farmland beyond, so the town sits in the country
   mb.mat = MAT.ground; for (let i = 0; i < 9; i++) { const x = -36 + i * 10, z = -24 - (i % 3) * 3; mb.ell(x, -1.5, z, 9, 3 + (i % 2) * 1.5, 6, shade(grass, 0.9 + (i % 3) * 0.05), { lat: 5, lon: 10 }); } mb.mat = 0;
   // world edges
-  const B = [-25.5, 34.5, -2.35, 14.5];
+  const B = [-31.5, 34.5, -2.35, 14.5];   // (1.5.20) the west end reaches the library
   col.seg(B[0], B[2], B[1], B[2], 0.1); col.seg(B[0], B[3], B[1], B[3], 0.1); col.seg(B[0], B[2], B[0], B[3], 0.1); col.seg(B[1], B[2], B[1], B[3], 0.1);
   const signs = [];   // the shops now have real lettered signs; only 'Home' and the job board keep a floating label
   signs.push({ x: -23.2, y: 4.85, z: 1.3, text: 'Home', icon: '🏡', plain: 'home' });
@@ -22794,9 +23051,9 @@ function buildTownRoom(F) {
 function townStore(mb, col, S) {
   const z1 = TOWN_FRONT, zc = z1 - S.d / 2, h = S.h, wall = S.wall, trim = S.trim;
   mb.mat = MAT.stone; mb.box(S.x, -0.25, zc, S.w + 0.2, 0.35, S.d + 0.2, [150, 146, 140]); mb.mat = 0;
-  mb.mat = S.key === 'land' || S.diner ? MAT.siding : S.key === 'merc' ? MAT.stone : MAT.boards; mb.box(S.x, 0.05, zc, S.w, h, S.d, wall); mb.mat = 0;
+  mb.mat = S.key === 'land' || S.diner ? MAT.siding : S.key === 'merc' || S.key === 'library' ? MAT.stone : MAT.boards; mb.box(S.x, 0.05, zc, S.w, h, S.d, wall); mb.mat = 0;
   // western false front with a cornice
-  if (!S.diner) { mb.mat = S.key === 'merc' ? MAT.stone : MAT.boards; mb.box(S.x, h + 0.05, z1 - 0.15, S.w, 1.1, 0.3, wall); mb.mat = 0; mb.box(S.x, h + 1.15, z1 - 0.1, S.w + 0.3, 0.14, 0.45, trim); }
+  if (!S.diner) { mb.mat = S.key === 'merc' || S.key === 'library' ? MAT.stone : MAT.boards; mb.box(S.x, h + 0.05, z1 - 0.15, S.w, 1.1, 0.3, wall); mb.mat = 0; mb.box(S.x, h + 1.15, z1 - 0.1, S.w + 0.3, 0.14, 0.45, trim); }
   else { mb.sel(S.x, h - 0.1, zc, S.w / 2 + 0.05, 0.45, S.d / 2 + 0.05, 2.6, [210, 214, 220], { lat: 6, lon: 12 }); }
   mb.box(S.x, h, zc - 0.15, S.w - 0.2, 0.08, S.d - 0.4, [90, 86, 84]);
   // door + display windows with warm light inside
@@ -22939,7 +23196,7 @@ function buildShopRoom(kind, F) {
   mb.box(0, 1.0, cz, 3.6, 0.07, 0.85, kind === 'diner' ? [236, 236, 230] : [196, 160, 110]);
   col.rect(0, cz, 1.8, 0.4, 0, 0, 0, false);
   const open = shopOpen(F);
-  const label = { feed: 'Shop for seeds, trees, hay & feed', stock: 'Buy animals', land: 'Buy land', merc: 'Fencing, outfits & the farm shop', diner: 'Order something to eat' }[kind];
+  const label = { library: 'Borrow or return a book', feed: 'Shop for seeds, trees, hay & feed', stock: 'Buy animals', land: 'Buy land', merc: 'Fencing, outfits & the farm shop', diner: 'Order something to eat' }[kind];
   inter.push({ x: 0, z: cz + 1.15, r: 1.2, label: open ? label : (isSunday(F) ? 'Closed on Sundays' : 'Closed · opens at 6 AM'), act: open ? 'counter' : 'closed', shop: kind, icon: S.icon });
   const keeper = { key: S.keeper, x: 0, z: cz - 0.85, yaw: 0, walk: 0, phase: 0, act: 'idle', actT: 0, tool: 'hand', look: 0 };
   // the shopkeeper can be talked to as well as bought from (1.5.6): step to the end of the counter
@@ -23020,6 +23277,32 @@ function buildShopRoom(kind, F) {
     mb.cyl(3.0, 0, 1.2, 0.03, 0.03, 1.6, 5, [80, 80, 86]); mb.cyl(4.0, 0, 1.2, 0.03, 0.03, 1.6, 5, [80, 80, 86]); mb.box(3.5, 1.6, 1.2, 1.1, 0.04, 0.04, [80, 80, 86]);
     [[242, 196, 66], [176, 150, 214], [226, 126, 52], [120, 180, 226]].forEach((c, i) => mb.box(3.1 + i * 0.27, 0.85, 1.2, 0.22, 0.7, 0.36, c));
     col.rect(3.5, 1.2, 0.7, 0.3, 0, 0, 0, false);
+  } else if (kind === 'library') {
+    // tall shelves of books all along the back wall and down both sides, a reading chair and lamp by the window, a long table
+    lightW(-3.1, 1.3, z0 + 0.02, 1.0, 1.1);
+    const Rb = rng(5150), spines = [[150, 52, 48], [60, 90, 140], [70, 120, 80], [200, 170, 90], [120, 70, 110], [220, 214, 196], [90, 60, 40], [40, 100, 110]];
+    const shelf = (cx, cz, w, rot) => {
+      const c = Math.cos(rot), sn = Math.sin(rot), P = (lx, lz) => [cx + c * lx + sn * lz, cz - sn * lx + c * lz];
+      mb.mat = MAT.boards; { const [a, b] = P(0, 0); mb.push(M4.trs(a, 0, b, rot, 0, 0)); mb.box(0, 0, 0, w, 2.5, 0.42, [110, 76, 50]); mb.pop(); } mb.mat = 0;
+      for (let row = 0; row < 5; row++) { let x = -w / 2 + 0.08; while (x < w / 2 - 0.12) { const bw = 0.05 + Rb() * 0.05, bh = 0.26 + Rb() * 0.12; const [a, b] = P(x + bw / 2, 0.2); mb.push(M4.trs(a, 0.12 + row * 0.48, b, rot, 0, Rb() < 0.08 ? 0.25 : 0)); mb.box(0, 0, 0, bw, bh, 0.3, spines[Math.floor(Rb() * spines.length)], { sharp: true }); mb.pop(); x += bw + 0.008; } }
+    };
+    shelf(-1.6, z0 + 0.25, 2.6, 0); shelf(1.6, z0 + 0.25, 2.6, 0);
+    shelf(x0 + 0.25, -0.4, 2.2, Math.PI / 2); shelf(x1 - 0.25, -0.4, 2.2, -Math.PI / 2);
+    col.rect(0, z0 + 0.25, W / 2, 0.3, 0, 0, 0, false); col.rect(x0 + 0.25, -0.4, 0.3, 1.1, 0, 0, 0, false); col.rect(x1 - 0.25, -0.4, 0.3, 1.1, 0, 0, 0, false);
+    inter.push({ x: x1 - 0.95, z: -0.4, r: 1.0, label: 'Browse the shelves', act: 'library', icon: '📚' });
+    inter.push({ x: x0 + 0.95, z: -0.4, r: 1.0, label: 'Browse the shelves', act: 'library', icon: '📚' });
+    // the reading chair: a deep armchair, a side table with a green lamp, a rug
+    const ax = -3.2, az = 1.6;
+    mb.box(ax, 0.002, az, 1.8, 0.01, 1.4, [150, 60, 54]);
+    mb.box(ax, 0, az, 0.8, 0.42, 0.75, [110, 60, 46]); mb.box(ax, 0.42, az - 0.32, 0.8, 0.55, 0.14, [110, 60, 46]); for (const sx of [-0.36, 0.36]) mb.box(ax + sx, 0.42, az, 0.1, 0.22, 0.7, [100, 54, 42]);
+    mb.box(ax + 0.75, 0, az - 0.1, 0.4, 0.55, 0.4, [120, 84, 56]); mb.cyl(ax + 0.75, 0.55, az - 0.1, 0.03, 0.03, 0.35, 6, [180, 160, 90]);
+    { const L = new MB(); L.cyl(ax + 0.75, 0.88, az - 0.1, 0.18, 0.1, 0.14, 10, [90, 190, 120]); for (let i = 0; i < L.d.length; i += STRIDE) L.d[i + 9] = 2; mb.add(L); }
+    col.rect(ax, az, 0.5, 0.45, 0, 0, 0, false);
+    inter.push({ x: ax + 0.4, z: az + 0.75, r: 0.9, label: 'Sit and read', act: 'libread', icon: '📖' });
+    // a long reading table with a couple of open books
+    mb.mat = MAT.boards; mb.box(2.6, 0.72, 1.4, 2.0, 0.06, 0.9, [150, 104, 70]); for (const [lx, lz] of [[-0.9, -0.38], [0.9, -0.38], [-0.9, 0.38], [0.9, 0.38]]) mb.box(2.6 + lx, 0, 1.4 + lz, 0.07, 0.72, 0.07, [120, 84, 56]); mb.mat = 0;
+    mb.box(2.3, 0.78, 1.4, 0.42, 0.02, 0.3, [246, 240, 224]); mb.box(2.9, 0.78, 1.3, 0.3, 0.06, 0.22, [60, 90, 140]);
+    col.rect(2.6, 1.4, 1.0, 0.45, 0, 0, 0, false);
   } else if (kind === 'diner') {
     lightW(-2.8, 1.3, z0 + 0.02, 1.4, 0.8); lightW(2.8, 1.3, z0 + 0.02, 1.4, 0.8);
     for (let i = 0; i < 4; i++) { mb.cyl(-1.2 + i * 0.8, 0, cz + 0.75, 0.04, 0.04, 0.65, 6, [180, 184, 190]); mb.cyl(-1.2 + i * 0.8, 0.65, cz + 0.75, 0.2, 0.2, 0.08, 10, [200, 60, 60], { capCol: [210, 70, 70] }); }
@@ -25440,7 +25723,11 @@ function roomAction(it) {
     case 'exit': exitRoom(); break;
     case 'shop': if (shopOpen(F)) enterShop(it.shop); else UI.toast(closedText(F, 'The shops'), true); break;
     case 'market': if (shopOpen(F)) UI.town('market', { single: true }); else UI.toast(isSunday(F) ? 'No market on Sundays. The stalls are packed up until Monday morning.' : 'The market stalls are packed up for the night.', true); break;
+    case 'library': LIBRARY.open(); break;
+    case 'libread': { const L = LIBRARY.st(G.F); if (L.out && !LIBRARY.read(G.F, L.out)) LIBRARY.reader(L.out, 'library'); else LIBRARY.open(); break; }
+    case 'libhome': { const L = LIBRARY.st(G.F); if (L.out) LIBRARY.reader(L.out, 'home'); break; }
     case 'counter': {
+      if (it.shop === 'library') { if (G.room && G.room.keeper) FRIENDS.meet(G.F, 'ida'); LIBRARY.open(); break; }
       const F = G.F, met = (F.metShop || {})[it.shop] || (it.shop === 'stock' && (F.hankMet || F.barnFirst !== undefined));
       const kp = G.room && G.room.keeper; if (kp && kp.key && TOWNFOLK[kp.key]) FRIENDS.meet(F, kp.key);   // buying from someone means you've met them
       const go = () => (it.shop === 'diner' ? UI.town('diner', { single: true }) : UI.town(it.shop, { single: true }));

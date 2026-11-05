@@ -8,6 +8,21 @@ Publishing: copy `index.html` and `sw.js` into the GitHub repo `silverton777/far
 
 ---
 
+## 1.5.20: the Hollow Creek library
+
+**Why:** "what do you think of a library in the town that you can go in a read books on the different farming techniques that can unlock recipes, etc. Add reading books and stuff to the goal list as well." Also: "dont make them higher levels necessarily to accomodate existing players put them where they seem fit."
+
+- A stone library stands at the west end of Main Street, past the Home signpost. Inside: tall shelves of books, a long reading table, and a red armchair with a green lamp. It's open the same hours as the shops.
+- Ida, the town librarian, is a new townsperson behind the counter. She has her own conversations, gift likes, a birthday (April 23) and stories, and she'll take a kitten.
+- 14 books, each about one real farming technique in four short pages: compost, no-dig gardening, worms, cover crops, rotational grazing, slowing water with swales and ponds, hens behind the herd, the backyard orchard, preserving, cheesemaking, beekeeping, maple sugaring, the three sisters and seed saving.
+- Finishing a book teaches you something:
+  - 15 new recipes in all, for example apple crisp, dilly beans, pickled beets, fruit leather, ricotta, aged cheddar, maple cream, honey-roasted nuts, shepherd's pie, garden quiche and three sisters stew.
+  - Or a lasting knack: compost goes half as far again, mulch lasts six months, the worm farm works a quarter faster, and Mabel leaves you saved seed each spring.
+  - You also get 10 Golden Acorns. Reading is restful: you get a little energy back.
+- Read at the library (Ida likes the company, so it counts toward her friendship), or borrow one book at a time and read it by the stove at home. Bring it back and borrow the next.
+- The kitchen shows which locked recipes are in which library book.
+- New "Learning" goals: read a book (then 3, 6, 10, all 14), learn recipes from books, cook something you learned from a book, read every book on soil, and read the whole library. They sit at the levels that suit them.
+
 ## 1.5.19: a look under the soil
 
 **Why:** the soil view from the owner's list ("how would you do the soil view?"): a cutaway of the soil itself.
