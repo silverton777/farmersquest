@@ -8,6 +8,14 @@ Publishing: copy `index.html` and `sw.js` into the GitHub repo `silverton777/far
 
 ---
 
+## 1.5.13: a pond tells you why it is or isn't filling; "Own all 25 homestead lots" at level 5
+
+**Why:** "in my current game why is pond 2 not getting full" and "own a 25 homesteads needs to be level 5".
+
+- Tap a pond: a new Water section shows how much of the land round it drains into it, any swales above it (they soak up runoff before it gets there), the last two weeks of water in (runoff, rain on the water) and out (evaporation and seepage), and, when it isn't rising, why.
+- How ponds fill (unchanged): runoff from higher ground within about 75 m, plus rain falling on the water, minus evaporation and seepage, which grow in the heat. A pond with little ground above it, swales above it, or healthy, spongy soil round it (more rain soaks in, less runs off) fills slowly, and in dry or hot months it drops.
+- "Own all 25 homestead lots" is a level 5 goal (it was level 3).
+
 ## 1.5.12: "Build 6 swales on contour" is a level 3 goal
 
 **Why:** "make build 6 swales on contour level 3".

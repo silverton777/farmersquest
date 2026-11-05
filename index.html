@@ -10,6 +10,14 @@ Publishing: copy `index.html` and `sw.js` into the GitHub repo `silverton777/far
 
 ==========
 
+## 1.5.13: a pond tells you why it is or isn't filling; "Own all 25 homestead lots" at level 5
+
+**Why:** "in my current game why is pond 2 not getting full" and "own a 25 homesteads needs to be level 5".
+
+- Tap a pond: a new Water section shows how much of the land round it drains into it, any swales above it (they soak up runoff before it gets there), the last two weeks of water in (runoff, rain on the water) and out (evaporation and seepage), and, when it isn't rising, why.
+- How ponds fill (unchanged): runoff from higher ground within about 75 m, plus rain falling on the water, minus evaporation and seepage, which grow in the heat. A pond with little ground above it, swales above it, or healthy, spongy soil round it (more rain soaks in, less runs off) fills slowly, and in dry or hot months it drops.
+- "Own all 25 homestead lots" is a level 5 goal (it was level 3).
+
 ## 1.5.12: "Build 6 swales on contour" is a level 3 goal
 
 **Why:** "make build 6 swales on contour level 3".
@@ -10293,12 +10301,28 @@ const FISHING = {
     }
   },
   // ---------------------------------------------------------------- the pond card (tap a pond with your hands)
+  // where a pond's water comes from and where it goes (1.5.12): how much land drains into it, swales above it that soak up that
+  // runoff first, and the last two weeks of water in and out
+  waterRows(F, p) {
+    const T = F.terrain; let up = 0, all = 0;
+    T.eachCell(p.x - 15, p.z - 15, p.x + 15, p.z + 15, (x, z) => { if (Math.hypot(x - p.x, z - p.z) < 15) { all++; if (T.at(x, z) > p.level - 0.2) up++; } });
+    const share = all ? up / all : 0, word = share > 0.55 ? 'Lots of' : share > 0.3 ? 'Some' : 'Very little';
+    const sw = (F.swales || []).filter((s) => s.pts.some((q) => Math.hypot(q[0] - p.x, q[1] - p.z) < 15 && T.at(q[0], q[1]) > p.level));
+    const wk = p.wk || [], sum = (i) => wk.reduce((a, d) => a + d[i], 0), pct = (v) => `${v >= 0 ? '+' : '−'}${Math.abs(v * 100).toFixed(v && Math.abs(v) < 0.01 ? 1 : 0)}%`;
+    const rows = [{ icon: '⛰️', text: `${word} land drains into it`, small: share > 0.3 ? `About ${Math.round(share * 100)}% of the ground round it is higher, so rain running off it ends up here` : `It sits high: only ${Math.round(share * 100)}% of the ground round it is above the water. Ponds fill fastest in a low spot with a slope above them` }];
+    if (sw.length) rows.push({ icon: '〰️', text: `${sw.length === 1 ? 'A swale' : sw.length + ' swales'} above it`, small: 'Swales soak up most of the runoff that crosses them, so less of it reaches the pond. Good for the trees on the berm, slower for the pond' });
+    if (wk.length) rows.push({ icon: '📈', text: `Last ${wk.length} day${wk.length > 1 ? 's' : ''}: ${pct(sum(3))}`, small: `In: ${pct(sum(0))} runoff, ${pct(sum(1))} rain on the water · Out: ${pct(-sum(2))} to evaporation and seepage` });
+    if (p.vol >= 0.99) rows.push({ icon: '✅', text: 'Full to the brim', small: 'Any more rain just spills over' });
+    else if (wk.length >= 3 && sum(3) <= 0) rows.push({ icon: '💡', text: 'Why it isn\'t rising', small: share <= 0.3 ? 'Not enough ground drains into it. A pond in a lower spot, or fewer swales above it, would fill faster.' : 'Dry or hot weather: evaporation is taking more than the rain brings. It will rise again in the wetter months.' });
+    return '<div class="grp">Water</div>' + UI.rows(rows);
+  },
   menu(p) {
     const F = G.F, self = this;
     const fish = this.fishOf(p), n = this.total(p), cap = this.capacity(p);
     const D = UI.open({ title: 'Pond', sub: `${Math.round(p.vol * 100)}% full · ${n} fish (room for about ${cap})`, icon: '💧' });
     const have = FISH.filter((f) => fish[f.key]);
     let html = `<p class="note">${p.vol < 0.25 ? 'The water is too low for fish to thrive. Let it fill with rain and runoff.' : 'Fish breed in spring and summer if the pond stays full. Fish with a rod from the bank.'}</p>`;
+    html += this.waterRows(F, p);
     html += have.length ? '<div class="grp">In the water</div>' + UI.rows(have.map((f) => ({ icon: f.icon, text: f.name, right: String(fish[f.key]) }))) : '<p class="note">No fish yet.</p>';
     if (p.vol >= 0.25) {
       html += `<div class="grp">Order fingerlings (ten at a time)</div>` + UI.rows(this.species(F).filter((f) => f.stock).map((f) => ({ id: f.key, tap: true, icon: f.icon, text: f.name, small: f.note, right: F.kid ? 'Free' : money(f.stock * 10) })));
@@ -16850,8 +16874,11 @@ function simDay(F, auto, rep) {
     T.eachCell(p.x - 15, p.z - 15, p.x + 15, p.z + 15, (x, z, k) => { if (Math.hypot(x - p.x, z - p.z) < 15 && T.at(x, z) > p.level - 0.2) inflow += runoff[k] * 0.025; });
     const area = Math.PI * p.rx * p.rz * 25, cap = area * 2.2 * 0.5;   // ~2.2 m deep bowl
     const evap = (Math.max(0, t) * 0.25 + 1) * 0.001 * area + 0.001 * area;
+    const v0 = p.vol;
     p.vol = clamp(p.vol + (inflow + w.rain * 0.001 * area - evap) / cap, 0, 1.15);
     if (p.vol > 1) { p.vol = 1; if (rep) rep.pondSpill = true; }
+    // the last fortnight of water in and out, for the pond's own card (1.5.12)
+    p.wk = (p.wk || []).concat([[Math.round((inflow / cap) * 1e4) / 1e4, Math.round((w.rain * 0.001 * area / cap) * 1e4) / 1e4, Math.round((evap / cap) * 1e4) / 1e4, Math.round((p.vol - v0) * 1e4) / 1e4]]).slice(-14);
     if (rep) rep.pondVol = p.vol;
   }
   if (F.weather) F.weather.creek = clamp(F.weather.creek * 0.93 + w.rain / 60, 0, 1);
@@ -17292,7 +17319,7 @@ const GOALS = [
   { id: 'coopup', cat: 'Buildings', icon: '⬆️', name: 'Upgrade a chicken coop', reward: 700, lv: 2, after: BUILD_MORE, prog: (F) => (F.objs.some((o) => o.t === 'coop' && (o.upg || 0) >= 1) ? 1 : 0) },
   { id: 'paint', cat: 'Buildings', icon: '🎨', name: 'Paint or remodel a building', reward: 500, lv: 2, after: BUILD_MORE, prog: (F) => (F.objs.some((o) => o.paint || o.hstyle || (o.sc && o.sc !== 1)) ? 1 : 0) },
   { id: 'eggmobile', cat: 'Buildings', icon: '🚚', name: 'Build an eggmobile to follow the herd', reward: 1500, lv: 3, after: BUILD_MORE, prog: (F) => (F.objs.some((o) => o.t === 'eggmobile') ? 1 : 0) },
-  { id: 'land25', cat: 'Business', icon: '🗺️', name: 'Own all 25 homestead lots', reward: 40000, lv: 3, prog: (F) => homeCount(F) / NHOME },
+  { id: 'land25', cat: 'Business', icon: '🗺️', name: 'Own all 25 homestead lots', reward: 40000, lv: 5, prog: (F) => homeCount(F) / NHOME },
   { id: 'hand1', cat: 'Business', icon: '🧑‍🌾', name: 'Hire a farmhand', reward: 300, prog: (F) => (F.hand || tallied(F, 'hired') ? 1 : 0) },
   { id: 'ribbon', cat: 'Community', icon: '🥇', name: 'Win a blue ribbon at the County Fair', reward: 1500, lv: 3, prog: (F) => (tallied(F, 'blueRibbons') ? 1 : 0) },
   { id: 'bff', cat: 'Community', icon: '💞', name: 'Reach 10 hearts with someone', reward: 2500, lv: 4, prog: (F) => FRIENDS.count(F, 10) },
@@ -18326,7 +18353,7 @@ function interiorFrame(F0, room) {
 
 'use strict';
 // ============================================================================ profiles + saves (each profile has its own farm save)
-const FQ_VERSION = '1.5.12';
+const FQ_VERSION = '1.5.13';
 const LOOKS = [
   { shirt: [214, 74, 64], hair: [120, 76, 40] }, { shirt: [70, 130, 200], hair: [236, 206, 120] }, { shirt: [240, 170, 60], hair: [80, 50, 30] },
   { shirt: [120, 170, 90], hair: [40, 30, 28] }, { shirt: [170, 100, 190], hair: [200, 110, 60] }, { shirt: [60, 160, 160], hair: [150, 100, 60] },
