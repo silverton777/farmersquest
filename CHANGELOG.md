@@ -8,6 +8,16 @@ Publishing: copy `index.html` and `sw.js` into the GitHub repo `silverton777/far
 
 ---
 
+## 1.5.17: night life: stargazing, fireflies, owls and full-moon walks
+
+**Why:** the owner picked "night life" from the list of new ideas: "fireflies, stargazing from the porch, owls, and a full-moon walk in the woods to find rare night animals".
+
+- The moon goes through its phases, a 29½-day cycle.
+- Stargazing: at night, stand in front of the farmhouse (a few steps out from the door) and tap "Stargaze from the porch". You see the season's sky (the Big Dipper and Leo in spring, the Summer Triangle in summer, Pegasus and the Andromeda galaxy in autumn, Orion in winter), tonight's moon and a sky fact. On clear nights there's sometimes a shooting star to wish on (+15 energy), and nearly always during the Perseids (August 11–13) and the Geminids (December 13–15). Cloudy nights only show a star or two.
+- Fireflies: on summer evenings, out in the open away from buildings, "Catch fireflies in a jar": you watch them glow for a while and let them go.
+- Owls call from the trees at night when you're near them.
+- Full moon: the farm and the woods are brighter at night, and the woods have twice the night animals about, the rare ones included.
+
 ## 1.5.16: maple sugaring on the farm, a cider press, and a worm farm
 
 **Why:** the owner picked "tapping maple trees and pressing cider" from the list of new ideas, and asked "can we add worm farms in somehow and using that to feed soil?"

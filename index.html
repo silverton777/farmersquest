@@ -10,6 +10,16 @@ Publishing: copy `index.html` and `sw.js` into the GitHub repo `silverton777/far
 
 ==========
 
+## 1.5.17: night life: stargazing, fireflies, owls and full-moon walks
+
+**Why:** the owner picked "night life" from the list of new ideas: "fireflies, stargazing from the porch, owls, and a full-moon walk in the woods to find rare night animals".
+
+- The moon goes through its phases, a 29½-day cycle.
+- Stargazing: at night, stand in front of the farmhouse (a few steps out from the door) and tap "Stargaze from the porch". You see the season's sky (the Big Dipper and Leo in spring, the Summer Triangle in summer, Pegasus and the Andromeda galaxy in autumn, Orion in winter), tonight's moon and a sky fact. On clear nights there's sometimes a shooting star to wish on (+15 energy), and nearly always during the Perseids (August 11–13) and the Geminids (December 13–15). Cloudy nights only show a star or two.
+- Fireflies: on summer evenings, out in the open away from buildings, "Catch fireflies in a jar": you watch them glow for a while and let them go.
+- Owls call from the trees at night when you're near them.
+- Full moon: the farm and the woods are brighter at night, and the woods have twice the night animals about, the rare ones included.
+
 ## 1.5.16: maple sugaring on the farm, a cider press, and a worm farm
 
 **Why:** the owner picked "tapping maple trees and pressing cider" from the list of new ideas, and asked "can we add worm farms in somehow and using that to feed soil?"
@@ -13204,6 +13214,7 @@ const CRIT = {
       if (w.kind === 'storm' || w.kind === 'hurricane') n *= 0.4;
       if (CHIBER[en.k] && season === 3) n = 0;
       if (w.t >= 36 && en.when === 'day' && sp.k !== 'soar') n *= 0.5;
+      if (en.when === 'night' && a > 0.4 && typeof MOON !== 'undefined' && MOON.full(F)) { n *= 2; if (en.ch < 1) n = 1; }   // full-moon walk (1.5.17)
       out.push([en, en.ch < 1 ? Math.round(n) : Math.round(n * 1.8 + (n > 0 && n < 0.6 ? 0.4 : 0))]);   // a bigger woods holds more of everything
     }
     return out;
@@ -18512,7 +18523,7 @@ function interiorFrame(F0, room) {
 
 'use strict';
 // ============================================================================ profiles + saves (each profile has its own farm save)
-const FQ_VERSION = '1.5.16';
+const FQ_VERSION = '1.5.17';
 const LOOKS = [
   { shirt: [214, 74, 64], hair: [120, 76, 40] }, { shirt: [70, 130, 200], hair: [236, 206, 120] }, { shirt: [240, 170, 60], hair: [80, 50, 30] },
   { shirt: [120, 170, 90], hair: [40, 30, 28] }, { shirt: [170, 100, 190], hair: [200, 110, 60] }, { shirt: [60, 160, 160], hair: [150, 100, 60] },
@@ -21174,6 +21185,63 @@ const SHOP = {
   },
 };
 
+// ---------------------------------------------------------------- night life (1.5.17)
+// The moon goes through its phases (a 29½-day cycle), a clear night is for stargazing from the porch (with the season's
+// constellation, the moon, a sky fact, and now and then a shooting star to wish on: most of all in the August and December meteor
+// showers), fireflies over the grass on summer evenings can be caught in a jar and let go, owls call from the trees at night, and
+// under a full moon the woods are bright enough to walk, with twice the night animals about.
+const MOON = {
+  ICON: ['🌑', '🌒', '🌓', '🌔', '🌕', '🌖', '🌗', '🌘'], NAME: ['New moon', 'Waxing crescent', 'First quarter', 'Waxing gibbous', 'Full moon', 'Waning gibbous', 'Last quarter', 'Waning crescent'],
+  phase(F) { const d = FRIENDS.dayN(F) + (F.hour || 0) / 24 + 7; return ((d / 29.53) % 1 + 1) % 1; },
+  idx(F) { return Math.round(this.phase(F) * 8) % 8; },
+  full(F) { return Math.abs(this.phase(F) - 0.5) < 0.05; },
+  text(F) { const i = this.idx(F); return `${this.ICON[i]} ${this.NAME[i]}`; },
+};
+const NIGHT = {
+  dark(F) { return F.hour >= 20.5 || F.hour < 4.5; },
+  clear(F) { const w = todayW(F); return w.kind === 'sun' || (w.kind === 'cloud' && Math.random() < 0.4); },
+  fireflies(F) { const w = todayW(F); return seasonOf(F.month) === 1 && F.hour >= 20.5 && F.hour < 23.5 && w.kind !== 'rain' && w.kind !== 'storm' && F.region !== 'sonoran'; },
+  // what's up there this season (the northern sky in the evening)
+  SKY: [
+    ['Leo and the Big Dipper', 'The Big Dipper stands high in the north. Follow the curve of its handle to bright Arcturus. The backwards question mark low in the south is Leo the lion.'],
+    ['the Summer Triangle', 'Three bright stars make a big triangle overhead: Vega, Deneb and Altair. The Milky Way runs right through it, faint and milky, if the night is dark enough.'],
+    ['the Great Square of Pegasus', 'A big square of four stars climbs in the east, and the little smudge near it is the Andromeda galaxy: the farthest thing you can see with your own eyes.'],
+    ['Orion the hunter', 'Orion\'s three-star belt points down to Sirius, the brightest star in the night sky, twinkling low and blue-white. Red Betelgeuse is his shoulder.'],
+  ],
+  FACTS: ['The light from some of those stars left them before anyone ever farmed this land.', 'A farmer\'s almanac says to plant root crops as the moon wanes and leafy crops as it waxes. Nobody\'s quite proved it either way.', 'On a dark night out here you can see about two thousand stars at once. In a city, maybe fifty.', 'The moon is slowly drifting away from the earth, about an inch and a half a year.', 'The "falling stars" in a meteor shower are bits of comet dust no bigger than a grain of sand.', 'Owls can turn their heads about three-quarters of the way round.', 'Fireflies flash in patterns: each kind has its own signal, like Morse code.', 'Moonlight is just sunlight bounced off the moon.', 'Cows lie down to sleep but often doze standing up.', 'The North Star hardly moves all night: everything else wheels round it.'],
+  showers(F) { return (F.month === 7 && F.day >= 11 && F.day <= 13) ? 'the Perseid meteor shower' : (F.month === 11 && F.day >= 13 && F.day <= 15) ? 'the Geminid meteor shower' : null; },
+  gaze() {
+    const F = G.F, w = todayW(F), cloudy = ['rain', 'storm', 'hurricane', 'snow', 'fog'].includes(w.kind) || w.kind === 'cloud';
+    act('look', 3.2, 30, 0, () => {
+      const sky = this.SKY[seasonOf(F.month)], sh = this.showers(F), lucky = !cloudy && Math.random() < (sh ? 0.85 : 0.22);
+      tally(F, 'stargaze'); if (MOON.full(F)) tally(F, 'fullmoon');
+      const P = UI.open({ title: 'Stargazing from the porch', sub: `${MOON.text(F)}${sh ? ` · ${sh}` : ''}`, icon: '🌌', foot: true });
+      P.body.innerHTML = cloudy ? `<p class="note">Clouds tonight: just the odd star through the gaps, and the ${MOON.NAME[MOON.idx(F)].toLowerCase()} glowing behind them. ${Math.random() < 0.5 ? 'An owl calls from the trees.' : 'The frogs are loud by the water.'} Try again on a clear night.</p>`
+        : `<p class="note speech" style="font-size:15.5px">Overhead: <b>${sky[0]}</b>. ${sky[1]}</p><p class="note">${MOON.text(F)} tonight. ${this.FACTS[Math.floor(Math.random() * this.FACTS.length)]}</p>`
+          + (lucky ? `<p class="note speech fresh" style="font-size:15.5px">✨ A shooting star streaks across the sky!</p>` : '') + (this.fireflies(F) ? '<p class="note">Fireflies blink over the grass below the porch.</p>' : '');
+      P.foot.innerHTML = lucky ? '<button class="btn go" id="sgWish">🌠 Make a wish</button>' : '<button class="btn go" id="sgOk">Good night</button>';
+      if (lucky) $('sgWish').onclick = () => { tally(F, 'wishes'); if (!F.kid) F.energy = Math.min(100, F.energy + 15); UI.closeAll(); UI.toast(`You made a wish. You're not telling anyone what it was.${F.kid ? '' : ' ⚡ +15'}`); UI.hudTick(0, true); };
+      else $('sgOk').onclick = () => UI.closeAll();
+      if (Math.random() < 0.6) this.hoot();
+    });
+  },
+  catchFlies() {
+    const F = G.F;
+    act('pick', 2.4, 15, 1, () => {
+      const n = 6 + Math.floor(Math.random() * 14); tally(F, 'fireflies');
+      UI.toast(`✨ You caught ${n} fireflies in a jar, watched them glow for a while, and let them go again.`);
+      if (G.view) for (let i = 0; i < 10; i++) G.view.puffs.push({ twinkle: true, x: G.Fm.x + (Math.random() - 0.5) * 2, y: groundAt(F, G.Fm.x, G.Fm.z) + 0.6 + Math.random(), z: G.Fm.z + (Math.random() - 0.5) * 2, t: 0 });
+    });
+  },
+  // an owl: two soft low notes and a trailing third (who-cooks-for-you, roughly)
+  hoot() { try { AUDIO.tone(392, 0.32, 'sine', 0.05, -8, 0); AUDIO.tone(370, 0.34, 'sine', 0.05, -8, 0.42); AUDIO.tone(330, 0.6, 'sine', 0.045, -14, 0.95); } catch (e) { /* no sound is fine */ } },
+  // a now-and-then owl call at night on the farm, louder near trees
+  update(dt) {
+    const F = G.F; if (!F || G.mode !== 'play' || !this.dark(F)) return;
+    this.t = (this.t || 20) - dt;
+    if (this.t < 0) { this.t = 25 + Math.random() * 50; if (F.objs.some((o) => o.t === 'tree' && Math.hypot(o.x - G.Fm.x, o.z - G.Fm.z) < 25)) this.hoot(); }
+  },
+};
 // ---------------------------------------------------------------- maple sugaring, cider pressing and the worm farm (1.5.16)
 defItem('castings', { name: 'Worm castings', unit: 'bags', price: 18, icon: '🪱', kind: 'misc' });
 // Maples big enough to tap (on your own land, wild or planted) can be tapped in late winter: a bucket hangs on the trunk and fills
@@ -23558,6 +23626,7 @@ function updateGame(dt) {
   // snow on the ground builds on snowy days and melts when warm
   if (!inRoom) G.snowDepth = clamp(G.snowDepth + (w.kind === 'snow' ? dt * 0.01 : w.t > 2 ? -dt * 0.004 : 0), 0, 1);
   WHISTLE.update(dt);
+  try { NIGHT.update(dt); } catch (e) { /* the night can wait */ }
   if (!inRoom) G.view.update(dt, Fm, G.t);
   // indoors, the windows go dark at dusk and light up at dawn
   if (inRoom && G.room && !G.room.outdoor) { const nn = F.hour >= 20 || F.hour < 6; if (G.room._night !== undefined && G.room._night !== nn) { rebuildRoom(); } if (G.room) G.room._night = nn; }
@@ -23756,6 +23825,7 @@ function renderGame(dt) {
   G.fx.update(dt, fa, fxc.width, fxc.height); G.flash = fa.flash;
   let Fr = computeFrame(fa, glc.width, glc.height);
   applyFog(Fr, fa.S.weather.fog, G.focus); lampFrame(Fr);
+  if (Fr.night > 0.3 && MOON.full(F) && (fa.S.weather.cloud || 0) < 0.6) Fr.exposure = (Fr.exposure || 1) * (1 + 0.35 * Fr.night);   // a full moon lights the farm (1.5.17)
   if (G.lowDetail) Fr.shadowOn = false;
   if (G.contours3D) Fr.contour = 0.4;
   const draws = G.view.draws(G.focus, G.Fm, G.t);
@@ -23871,6 +23941,7 @@ function findTarget() {
       else if ((F.inv.maplesap || 0) >= 4) push(0.45, { label: `Boil the sap down (${Math.floor(F.inv.maplesap / 4)} pint${Math.floor(F.inv.maplesap / 4) > 1 ? 's' : ''} of syrup)`, icon: '🍁', ring: ringM, fn: () => MAPLE.boil(F) });
       else if (MAPLE.tapped(F, o)) push(2.5, { label: 'Sap bucket: filling', icon: '🪣', ring: ringM, fn: () => UI.toast('The sap runs on freeze-thaw days: frosty nights, days above freezing. Check back in a day or two.') });
     }
+    if (o.t === 'house' && tool === 'hand' && NIGHT.dark(F) && !G.drive) { const dw2 = doorWorld(o), dd2 = dw2 ? Math.hypot(dw2[0] - Fm.x, dw2[1] - Fm.z) : 99; if (dd2 > 1.25 && dd2 < 4) push(0.2, { label: `Stargaze from the porch ${MOON.ICON[MOON.idx(F)]}`, icon: '🌌', fn: () => NIGHT.gaze() }); }
     if (o.t === 'press' && near(o.x, o.z, 2.0) && tool === 'hand') { const n = Math.floor(PRESS.fruit(F) / 6); push(n ? 0.5 : 2.5, n ? { label: `Press ${n} jug${n > 1 ? 's' : ''} of cider`, icon: '🍎', ring: [o.x, o.z, 1.2], fn: () => PRESS.press(F) } : { label: 'Cider press', icon: '🍎', ring: [o.x, o.z, 1.2], fn: () => UI.toast('Six pounds of apples or pears press into a jug of cider. Pick some fruit and come back.') }); }
     if (o.t === 'wormbin' && near(o.x, o.z, 2.0) && tool === 'hand') push(0.6, { label: `Worm farm${(o.cast || 0) >= 1 ? ` · ${Math.floor(o.cast)} bag${Math.floor(o.cast) > 1 ? 's' : ''} ready` : ''}`, icon: '🪱', ring: [o.x, o.z, 1.2], fn: () => WORMS.card(o) });
     if (o.t === 'woodpile' && near(o.x, o.z, 2.0) && tool === 'hand' && (F.inv.maplesap || 0) >= 4) push(1.0, { label: `Boil maple sap down to syrup (${Math.floor(F.inv.maplesap / 4)} pints)`, icon: '🍁', fn: () => MAPLE.boil(F) });
@@ -23884,6 +23955,8 @@ function findTarget() {
       else if (tool === 'hand' && o.t === 'tree' && !o.wild && TR) push(3, { label: `${TR.name}${TR.unit ? ' · ' + TREELIFE.statusText(o, F, TR, F.terrain.region) : ''}`, icon: '🌳', ring, fn: () => UI.treeCard(o) });
     }
   }
+  // summer evenings: fireflies over the grass (out in the open, away from buildings)
+  if (tool === 'hand' && NIGHT.fireflies(F) && !G.drive && !F.objs.some((o) => solidOf(o) && Math.hypot(o.x - Fm.x, o.z - Fm.z) < 4)) push(2.2, { label: 'Catch fireflies in a jar ✨', icon: '✨', fn: () => NIGHT.catchFlies() });
   // pets
   const pet = PETS.near(V, Fm);
   if (pet && pet.kind === 'kitten' && tool === 'hand') push(0.35, { label: `${pet.kit.name} the kitten 🐱`, icon: '🐾', fn: () => KITTENS.card() });
@@ -25027,6 +25100,7 @@ function renderTown(dt) {
     const tc = WOODS.prof(G.F).dry ? [1.06, 0.95, 0.78] : [0.8, 1.04, 0.78];
     Fr.fog = [Fr.fog[0] * 1.2 + 8, Fr.fog[1] * 1.3 + 22]; Fr.fogCol = mixc(Fr.fogCol, Fr.fogCol.map((v, i) => v * tc[i]), 0.65);
   }
+  if (Fr.night > 0.3 && MOON.full(G.F)) Fr.exposure = (Fr.exposure || 1) * (1 + 0.4 * Fr.night);   // full-moon walks (1.5.17)
   // the bent horizon is applied at each vertex, so a ground slab hundreds of metres across would sink out of sight: no bend on a neighbor's farm
   Fr.curve = G.room.type === 'neighbor' || G.room.type === 'woods' ? 0 : 0.004;
   if (G.lowDetail) Fr.shadowOn = false;
