@@ -10,6 +10,15 @@ Publishing: copy `index.html` and `sw.js` into the GitHub repo `silverton777/far
 
 ==========
 
+## 1.5.19: a look under the soil
+
+**Why:** the soil view from the owner's list ("how would you do the soil view?"): a cutaway of the soil itself.
+
+- Dig a soil pit (free, about 15 minutes) from the shovel's Earthworks menu, or tap "Look under the soil" on any garden bed's card, or "Look at the soil where you're standing" in the journal's Land & soil tab.
+- You see a slice of the ground about two feet deep, drawn from that spot's real numbers: how deep the dark topsoil goes (from its organic matter), roots reaching down (deeper under rested grass and trees), earthworms wriggling (more in damp, loose, well-fed, mulched soil), white fungus threads (under trees, mulch and undug ground), how wet it is, and a packed layer where hooves or wheels have squashed it hard. Grass, a crop, mulch or a tree shows on top.
+- Under it, a card gives a soil health score out of 100 and says in plain words what each layer means and what would help, with a button to the soil tips.
+- Fixed: the canvases inside panels (the pig race, apple bobbing and the fishing line) covered the whole screen instead of sitting in their panel. They now fit inside it, and are sized so the whole picture shows on a phone held sideways.
+
 ## 1.5.18: festivals you can play, soil tips, pond and worm farm fixes
 
 **Why:** "Yes add festivals you can play - all those things."
@@ -315,6 +324,7 @@ FQ-CHANGELOG-END -->
   .photoGrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 8px; margin-top: 6px; }
   .photoGrid button { border: 0; padding: 0; border-radius: 8px; overflow: hidden; background: #000; aspect-ratio: 16 / 9; cursor: pointer; } .photoGrid img { width: 100%; height: 100%; object-fit: cover; display: block; }
   canvas { position: fixed; inset: 0; display: block; touch-action: none; -webkit-user-select: none; user-select: none; -webkit-tap-highlight-color: transparent; }
+  .panel canvas { position: static; inset: auto; touch-action: manipulation; }   /* (1.5.19) a canvas drawn inside a panel (games, the soil view) sits in the page, not over the whole screen */
   #fx, #iris { pointer-events: none; }
   #iris { z-index: 30; }
   button { font: inherit; color: inherit; -webkit-tap-highlight-color: transparent; }
@@ -18541,7 +18551,7 @@ function interiorFrame(F0, room) {
 
 'use strict';
 // ============================================================================ profiles + saves (each profile has its own farm save)
-const FQ_VERSION = '1.5.18';
+const FQ_VERSION = '1.5.19';
 const LOOKS = [
   { shirt: [214, 74, 64], hair: [120, 76, 40] }, { shirt: [70, 130, 200], hair: [236, 206, 120] }, { shirt: [240, 170, 60], hair: [80, 50, 30] },
   { shirt: [120, 170, 90], hair: [40, 30, 28] }, { shirt: [170, 100, 190], hair: [200, 110, 60] }, { shirt: [60, 160, 160], hair: [150, 100, 60] },
@@ -19093,6 +19103,7 @@ const UI = {
   earthworks() {
     const P = this.open({ title: 'Earthworks', sub: 'Shape the land to catch water', icon: ICO.shovel });
     const items = [
+      { id: 'soilpit', icon: '🔍', text: 'Dig a soil pit here', small: 'Free. See a slice of the soil under your feet: topsoil, roots, worms, water and any packed layer' },
       { id: 'pond_s', icon: '💧', text: 'Small pond', small: 'Catches runoff for animals and ducks', right: '$3,000' },
       { id: 'pond_m', icon: '💧', text: 'Medium pond', small: 'A real water reserve for dry months', right: '$6,500' },
       { id: 'pond_l', icon: '🌊', text: 'Large pond', small: 'Big catchment needed uphill', right: '$12,000' },
@@ -19105,6 +19116,7 @@ const UI = {
     P.body.querySelectorAll('.row').forEach((r) => {
       r.onclick = () => {
         const id = r.dataset.id;
+        if (id === 'soilpit') { this.closeAll(); SOILVIEW.dig(); return; }
         if (id === 'fill') { if (!here) { UI.toast('Walk onto the pond bank or the swale first, then choose Fill in.'); return; } this.closeAll(); if (F.ponds.includes(here)) fillPond(here); else fillSwale(here); return; }
         if (id.startsWith('pond')) { const s = { pond_s: [2.8, 2.1, 3000, 'Small'], pond_m: [3.8, 2.8, 6500, 'Medium'], pond_l: [5.0, 3.6, 12000, 'Large'] }[id]; if (!ownsTool(F, 'shovel')) { toolLocked('shovel'); return; } askPlace({ kind: 'pond', rx: s[0], rz: s[1], price: s[2], label: s[3] }, { dig: 'pond', size: id }); }
         else if (id === 'swale') { if (!ownsTool(F, 'shovel')) { toolLocked('shovel'); return; } askPlace({ kind: 'swale' }, { dig: 'swale' }); }
@@ -19168,8 +19180,9 @@ const UI = {
           `<div class="stat">Soil organic matter<b>${om.toFixed(2)}%</b></div><div class="stat">Change since start<b style="color:${dOM >= 0 ? 'var(--leaf2)' : 'var(--warn)'}">${dOM >= 0 ? '+' : ''}${dOM.toFixed(2)}%</b></div><div class="stat">Soil moisture<b>${Math.round(moist / n * 100)}%</b></div><div class="stat">Pasture cover<b>${Math.round(bio / n * 100)}%</b></div>`) +
           `<div class="stat">Land owned<b>${Math.round(ownedAcres(F)).toLocaleString()} acres (${plots} parcel${plots === 1 ? '' : 's'})</b></div><div class="stat">Ponds<b>${F.ponds.length}</b></div><div class="stat">Swales<b>${F.swales.length}</b></div><div class="stat">Trees planted<b>${F.stats.treesPlanted}</b></div><div class="stat">Paddocks<b>${F.paddocks.length}</b></div>` +
           (F.kid ? '' : `<div class="stat">Sales this year<b>${money(F.stats.yearIncome)}</b></div><div class="stat">All-time sales<b>${money(F.stats.income)}</b></div><div class="stat">Hay made<b>${fmt1(F.stats.bales)} bales</b></div>`) +
-          `<p class="note">Soil organic matter is the heart of the farm: every 1% more lets the soil hold far more water. Living roots, rested pasture, manure from moving herds and mulch all build it. Bare soil loses it.</p><button class="btn" id="soilTips" style="width:100%">💡 How to build better soil</button>`;
+          `<p class="note">Soil organic matter is the heart of the farm: every 1% more lets the soil hold far more water. Living roots, rested pasture, manure from moving herds and mulch all build it. Bare soil loses it.</p><button class="btn" id="soilLook" style="width:100%;margin-bottom:8px">🔍 Look at the soil where you're standing</button><button class="btn" id="soilTips" style="width:100%">💡 How to build better soil</button>`;
         if ($('soilTips')) $('soilTips').onclick = () => SOILTIPS.open(() => self.journal && self.journal('stats'));
+        if ($('soilLook')) $('soilLook').onclick = () => SOILVIEW.here(() => self.journal('stats'));
       } else if (t === 'animals') {
         self.animalTable(b);
       } else {
@@ -19409,12 +19422,14 @@ const UI = {
     acts.push({ id: 'compost', tap: (F.inv.compost || 0) >= 1, icon: '🟤', text: 'Spread a load of compost', small: (F.inv.compost || 0) >= 1 ? `You have ${fmt1(F.inv.compost)} loads · harvest goes up about ${Math.round(Math.min(0.6, 2 - (o.fert || 0)) * 18)}%` : 'No compost. Buy it at the feed store or muck out the barn stalls.', cls: (F.inv.compost || 0) >= 1 ? '' : 'dim' });
     if (!o.mulch || o.mulchD !== undefined) acts.push({ id: 'mulch', tap: BEDSOIL.canMulch(F), icon: '🍂', text: o.mulch ? 'Top up the mulch' : 'Mulch it with straw', small: BEDSOIL.canMulch(F) ? `Uses ${(F.inv.sqbale || 0) >= 1 ? 'a square bale' : 'a tenth of a round bale'} · holds water, +8% harvest, builds soil` : 'You need hay. Square bales are at the feed store.', cls: BEDSOIL.canMulch(F) ? '' : 'dim' });
     if (!o.crop) acts.push({ id: 'seeds', tap: true, icon: '🌱', text: 'Plant something', small: 'Switch to your seeds' });
+    acts.push({ id: 'look', tap: true, icon: '🔍', text: 'Look under the soil', small: 'Roots, worms, how deep the good soil goes' });
     acts.push({ id: 'tips', tap: true, icon: '💡', text: 'How to build better soil', small: 'Simple things that make any soil richer' });
     P.body.innerHTML = this.rows(rows) + '<div class="grp">Work the bed</div>' + this.rows(acts);
     P.body.querySelectorAll('.row.tap').forEach((r) => {
       r.onclick = () => {
         const id = r.dataset.id;
         if (id === 'tips') return SOILTIPS.open(() => this.bedCare(o));
+        if (id === 'look') return SOILVIEW.open(o.x, o.z, o, () => this.bedCare(o));
         this.closeAll();
         if (id === 'seeds') return setTool('seeds');
         if (id === 'castings') act('plant', 1.4, 15, 2, () => { F.inv.castings -= 1; o.fert = Math.min(2.4, (o.fert || 0) + 1.0); const T = F.terrain; BEDSOIL.cells(F, o, (k) => { T.om[k] = Math.min(12, T.om[k] + 0.5); T.moist[k] = Math.min(1, T.moist[k] + 0.05); }); tally(F, 'castingsSpread'); G.view.dirtyAt(o.x, o.z); UI.toast(`🪱 Worm castings spread. This bed should now give about ${Math.round(BEDSOIL.yieldMult(F, o) * 100)}% of a normal harvest.`); });
@@ -21314,7 +21329,7 @@ const FESTGAME = {
   race(f, field, mine) {
     const F = G.F, self = this;
     const D = UI.open({ title: 'The pig race', sub: `Go, ${field[mine][0]}!`, icon: '🐖', foot: true });
-    D.body.innerHTML = '<canvas id="fgCv" width="520" height="250" style="width:100%;border-radius:12px;background:#9cc46a"></canvas>';
+    D.body.innerHTML = '<canvas id="fgCv" width="520" height="250" style="display:block;margin:0 auto;max-width:100%;max-height:calc(100vh - 220px);width:auto;height:auto;border-radius:12px;background:#9cc46a"></canvas>';
     D.foot.innerHTML = '<button class="btn go" id="fgCheer" style="flex:1;font-size:18px;padding:14px">📣 Cheer!</button>';
     const cv = $('fgCv'), g = cv.getContext('2d'), pigs = field.map(([n, c], i) => ({ n, c, x: 30, v: 38 + Math.random() * 8, look: 0, nextLook: 1 + Math.random() * 2, boost: 0 }));
     const me = pigs[mine]; FESTGAME._pigs = pigs; let t = 0, last = performance.now(), over = false;
@@ -21346,7 +21361,7 @@ const FESTGAME = {
   bob(f) {
     const F = G.F, self = this;
     const D = UI.open({ title: 'Apple bobbing', sub: 'Harvest Supper · 20 seconds', icon: '🍎', foot: true });
-    D.body.innerHTML = '<p class="note">Apples bob in the tub. Tap Dunk when the 👇 is right over one to grab it with your teeth. Miss and you come up spluttering, so wait for a good one.</p><canvas id="fgCv" width="520" height="220" style="width:100%;border-radius:12px;background:#5a7fa6"></canvas>';
+    D.body.innerHTML = '<p class="note">Apples bob in the tub. Tap Dunk when the 👇 is right over one to grab it with your teeth. Miss and you come up spluttering, so wait for a good one.</p><canvas id="fgCv" width="520" height="220" style="display:block;margin:0 auto;max-width:100%;max-height:calc(100vh - 220px);width:auto;height:auto;border-radius:12px;background:#5a7fa6"></canvas>';
     D.foot.innerHTML = '<button class="btn go" id="fgDunk" style="flex:1;font-size:18px;padding:14px">💦 Dunk!</button>';
     const cv = $('fgCv'), g = cv.getContext('2d'); let t = 0, last = performance.now(), caught = 0, over = false, mx = 260, splash = 0, wait = 0;
     const apples = Array.from({ length: 6 }, (_, i) => ({ x: 60 + i * 80, ph: Math.random() * 6, sp: 0.6 + Math.random() * 0.8, c: Math.random() < 0.5 ? '🍎' : '🍏' }));
@@ -21476,6 +21491,102 @@ const MAPLE = {
     const sap = Math.floor(F.inv.maplesap || 0), pints = Math.floor(sap / 4); if (!pints) return;
     act('collect', 3.0, 90, 6, () => { F.inv.maplesap -= pints * 4; F.inv.syrup = (F.inv.syrup || 0) + pints; tally(F, 'syrup', pints); AUDIO.ding(); UI.toast(`🍁 ${pints} pint${pints > 1 ? 's' : ''} of maple syrup, boiled down from ${pints * 4} gallons of sap. The whole farm smells of it.`); });
   },
+};
+// ---------------------------------------------------------------- the soil view (1.5.19): dig a little pit and look at a slice of the soil
+// A cutaway drawn from the ground's real numbers: how deep the dark topsoil goes (organic matter), how far the roots reach (what's
+// growing), worms (organic matter, damp, loose soil, mulch), fungus threads (trees, mulch, undug ground), how wet it is, and any packed
+// layer the roots can't get through (compaction). The card under it says what each one means and what helps.
+const SOILVIEW = {
+  read(F, x, z, bed) {
+    const T = F.terrain; let n = 0, om = 0, mo = 0, cp = 0, bio = 0, rip = 0; const cov = {};
+    T.eachCell(x - 1.2, z - 1.2, x + 1.2, z + 1.2, (cx, cz, k) => { if (Math.hypot(cx - x, cz - z) > 1.3) return; n++; om += T.om[k]; mo += T.moist[k]; cp += T.comp[k]; bio += T.bio[k]; rip += T.rip[k] ? 1 : 0; cov[T.cover[k]] = (cov[T.cover[k]] || 0) + 1; });
+    if (!n) return null;
+    om /= n; mo /= n; cp /= n; bio /= n;
+    const c0 = +Object.keys(cov).sort((a, b) => cov[b] - cov[a])[0];
+    const treeNear = F.objs.some((o) => (o.t === 'tree' || o.t === 'brush') && Math.hypot(o.x - x, o.z - z) < 4);
+    const mulch = !!(bed && bed.mulch), fert = bed ? (bed.fert || 0) : 0, crop = bed && bed.crop;
+    const kind = bed ? 'bed' : c0 === COVER.forest || treeNear ? 'trees' : c0 === COVER.bare || c0 === COVER.path ? 'bare' : 'grass';
+    const top = clamp(2 + om * 1.6 + fert * 1.2 + (mulch ? 0.8 : 0), 1.5, 15);                     // inches of dark topsoil
+    const roots = kind === 'trees' ? 20 : kind === 'bed' ? (crop ? 7 + om * 0.8 : 2) : kind === 'bare' ? 1 : clamp(3 + bio * 15 + om * 0.6, 3, 22);
+    const worms = (mo < 0.08 || kind === 'bare' && om < 1) ? 0 : Math.round(clamp(om * 2.2 * (0.35 + mo) * (1 - cp * 0.7) + (mulch ? 3 : 0) + fert * 1.5 + (kind === 'trees' ? 2 : 0), 0, 30));
+    const fungi = clamp(0.1 + (kind === 'trees' ? 0.55 : 0) + om * 0.05 + (mulch ? 0.2 : 0) + (kind === 'grass' ? bio * 0.15 : 0) - cp * 0.25 - (rip / n) * 0.1, 0, 1);
+    const pan = cp > 0.3 ? clamp((cp - 0.3) * 10, 1, 6) : 0;                                          // inches of packed layer
+    const score = Math.round(clamp(om / 6, 0, 1) * 35 + clamp(worms / 15, 0, 1) * 20 + clamp(1 - cp, 0, 1) * 15 + clamp(mo / 0.6, 0, 1) * 10 + clamp(roots / 14, 0, 1) * 10 + fungi * 10);
+    return { om, mo, cp, bio, top, roots, worms, fungi, pan, kind, mulch, crop, score, soil: regionByKey(F.region).soil };
+  },
+  open(x, z, bed, back) {
+    const F = G.F, S = this.read(F, x, z, bed);
+    if (!S) return UI.toast('You can only look at the soil on the farm.', true);
+    const grade = S.score >= 75 ? ['Thriving', '🌟'] : S.score >= 55 ? ['Healthy', '👍'] : S.score >= 35 ? ['Getting there', '🌱'] : ['Tired', '😟'];
+    const P = UI.open({ title: 'A look under the soil', sub: `${S.soil.name} · soil health ${S.score}/100, ${grade[0]}`, icon: '🔍', foot: true });
+    const w = (v, a) => a.find((q) => v >= q[0])[1];
+    const rows = [
+      { icon: '🟫', text: `Topsoil: ${Math.round(S.top)} inches of dark crumbly soil`, small: `${S.om.toFixed(1)}% organic matter. ${w(S.om, [[5, 'Rich and dark: this soil holds water like a sponge.'], [3, 'Good. Each 1% more holds a lot more water.'], [1.5, 'Thin. Compost, mulch and living roots will darken it year by year.'], [0, 'Very thin and pale. It needs feeding: compost, mulch, cover crops.']])}` },
+      { icon: '🌿', text: `Roots reach about ${Math.round(S.roots)} inch${Math.round(S.roots) === 1 ? '' : 'es'} down`, small: w(S.roots, [[14, 'Deep roots pull water and minerals up from far below and leave channels for rain.'], [7, S.kind === 'bed' ? 'A fair depth for a garden crop. Loose, rich soil lets them go further.' : 'A fair depth. Rested grass and trees root deeper.'], [0, S.kind === 'bare' ? 'Nothing is growing here, so nothing feeds the soil. Plant something or let the grass back in.' : 'Shallow. Plants here dry out fast. Rest the grass, or keep something growing.']]) },
+      { icon: '🪱', text: S.worms ? `${S.worms} earthworm${S.worms === 1 ? '' : 's'} in a spadeful` : 'No earthworms in a spadeful', small: w(S.worms, [[10, 'Lots of worms: they dig tunnels for air and water and leave rich castings behind.'], [4, 'Some worms. Mulch and compost bring more.'], [0, 'Worms want damp, loose soil with plenty to eat. Mulch it and add compost or worm castings.']]) },
+      { icon: '🍄', text: `Fungus threads: ${S.fungi > 0.6 ? 'lots' : S.fungi > 0.3 ? 'some' : 'very few'}`, small: S.fungi > 0.6 ? 'Fine white threads link the roots and trade water and nutrients with them. Trees and undug ground grow them.' : 'Fungus threads grow where the soil isn\'t dug up: under trees, mulch and long-rested grass.' },
+      { icon: '💧', text: `Moisture: ${S.mo > 0.65 ? 'wet' : S.mo > 0.4 ? 'nicely damp' : S.mo > 0.2 ? 'dry' : 'very dry'}`, small: S.mo > 0.65 ? 'Soggy soil squeezes the air out. Animals on it in the wet will pack it down.' : S.mo > 0.4 ? 'Just right for roots and worms.' : 'Mulch keeps the water in. Swales and ponds uphill help rain soak in instead of running off.' },
+      { icon: '🧱', text: S.pan ? `A packed layer ${Math.round(S.pan)} inch${Math.round(S.pan) === 1 ? '' : 'es'} thick` : 'Loose all the way down', small: S.pan ? 'Hooves in the wet and heavy wheels pack the soil hard. Roots and rain can\'t get through. Keyline ripping (in Earthworks) breaks it up; deep roots and worms slowly open it again.' : 'Roots and rain go straight down. Keep animals off it when it\'s soaking wet to keep it that way.' },
+    ];
+    P.body.innerHTML = '<canvas id="svCv" width="560" height="330" style="display:block;margin:0 auto;max-width:100%;max-height:calc(100vh - 220px);width:auto;height:auto;border-radius:12px"></canvas>' + `<div class="grp">${grade[1]} ${grade[0]}</div>` + UI.rows(rows);
+    P.foot.innerHTML = (back ? '<button class="btn" id="svBack">Back</button>' : '') + '<button class="btn go" id="svTips">💡 How to improve it</button>';
+    if (back) $('svBack').onclick = back;
+    $('svTips').onclick = () => SOILTIPS.open(() => this.open(x, z, bed, back));
+    this.draw($('svCv'), S);
+    tally(F, 'soilLooks');
+  },
+  draw(cv, S) {
+    const g = cv.getContext('2d'), W = cv.width, H = cv.height, sky = 70, IN = (H - sky - 6) / 24;   // 24 inches shown
+    const R = mulberry(Math.round(S.om * 100) + Math.round(S.mo * 1000)), col = (c) => `rgb(${c.map((v) => Math.round(v)).join(',')})`;
+    const sub = S.soil.color, topC = mixc(sub, [52, 36, 24], clamp(0.35 + S.om / 7, 0, 0.9));
+    const worms = Array.from({ length: Math.min(S.worms, 18) }, () => ({ x: 70 + R() * (W - 90), y: sky + 8 + R() * S.top * IN * 1.1, a: R() * 6.28, l: 14 + R() * 10 }));
+    const roots = [];
+    const branch = (x, y, ang, len, d) => { if (d > 4 || len < 4) return; const x2 = x + Math.sin(ang) * len, y2 = Math.min(sky + S.roots * IN, y + Math.cos(ang) * len); roots.push([x, y, x2, y2, Math.max(0.6, 2.6 - d * 0.5)]); const k = 2 + (R() < 0.5 ? 1 : 0); for (let i = 0; i < k; i++) branch(x2, y2, ang + (R() - 0.5) * 1.2, len * (0.55 + R() * 0.25), d + 1); };
+    const nPl = S.kind === 'bare' ? 0 : S.kind === 'trees' ? 2 : S.kind === 'bed' ? (S.crop ? 4 : 0) : 9;
+    for (let i = 0; i < nPl; i++) branch(60 + (i + 0.5) * (W - 70) / nPl, sky, (R() - 0.5) * 0.3, S.roots * IN * 0.45, 0);
+    const threads = Array.from({ length: Math.round(S.fungi * 40) }, () => { const x = 60 + R() * (W - 70), y = sky + 6 + R() * Math.min(S.top + 4, 20) * IN; return [x, y, x + (R() - 0.5) * 50, y + (R() - 0.5) * 24, x + (R() - 0.5) * 70, y + (R() - 0.5) * 30]; });
+    const stones = Array.from({ length: 14 }, () => [60 + R() * (W - 70), sky + (S.top + 3) * IN + R() * (24 - S.top - 3) * IN, 3 + R() * 7]);
+    let t0 = performance.now();
+    const frame = (now) => {
+      if (!cv.isConnected) return;
+      const t = (now - t0) / 1000;
+      // sky and the surface
+      const sg = g.createLinearGradient(0, 0, 0, sky); sg.addColorStop(0, '#bfe0f2'); sg.addColorStop(1, '#e9f3e0'); g.fillStyle = sg; g.fillRect(0, 0, W, sky);
+      // subsoil, topsoil, packed layer
+      g.fillStyle = col(sub); g.fillRect(0, sky, W, H - sky);
+      const tg = g.createLinearGradient(0, sky, 0, sky + S.top * IN * 1.25); tg.addColorStop(0, col(topC)); tg.addColorStop(0.8, col(topC)); tg.addColorStop(1, col(sub)); g.fillStyle = tg; g.fillRect(0, sky, W, S.top * IN * 1.25);
+      // the water held in the soil: a blue tint, deeper when wetter
+      g.fillStyle = `rgba(60,110,190,${clamp(S.mo * 0.35, 0, 0.3)})`; const wy = sky + (1 - clamp(S.mo, 0, 1)) * 18 * IN; g.fillRect(0, wy, W, H - wy);
+      if (S.pan) { const py = sky + (S.top + 1) * IN; g.fillStyle = 'rgba(90,80,75,.55)'; g.fillRect(0, py, W, S.pan * IN); g.strokeStyle = 'rgba(40,35,30,.45)'; g.lineWidth = 1; for (let x = -20; x < W; x += 9) { g.beginPath(); g.moveTo(x, py); g.lineTo(x + 8, py + S.pan * IN); g.stroke(); } }
+      g.fillStyle = 'rgba(120,110,100,.8)'; for (const [x, y, r] of stones) { g.beginPath(); g.ellipse(x, y, r, r * 0.7, 0, 0, 6.28); g.fill(); }
+      // fungus threads
+      g.strokeStyle = 'rgba(250,248,235,.75)'; g.lineWidth = 0.8; for (const [a, b, c, d, e, f] of threads) { g.beginPath(); g.moveTo(a, b); g.quadraticCurveTo(c, d, e, f); g.stroke(); }
+      // roots
+      g.strokeStyle = '#e8d7b0'; for (const [a, b, c, d, lw] of roots) { g.lineWidth = lw; g.beginPath(); g.moveTo(a, b); g.lineTo(c, d); g.stroke(); }
+      // worms, wriggling
+      g.strokeStyle = '#e48a8a'; g.lineWidth = 3.4; g.lineCap = 'round';
+      for (const wm of worms) { g.beginPath(); for (let i = 0; i <= 8; i++) { const u = i / 8, px = wm.x + Math.cos(wm.a) * (u - 0.5) * wm.l, py = wm.y + Math.sin(wm.a) * (u - 0.5) * wm.l + Math.sin(u * 9 + t * 4 + wm.a) * 2.2; if (i) g.lineTo(px, py); else g.moveTo(px, py); } g.stroke(); }
+      // what's on top: grass, a crop, mulch, or bare ground
+      const gy = sky;
+      if (S.mulch) { g.fillStyle = '#d8b862'; g.fillRect(0, gy - 6, W, 7); }
+      if (S.kind === 'grass') { g.strokeStyle = '#5f9a3c'; g.lineWidth = 2; for (let x = 0; x < W; x += 6) { const h = 8 + S.bio * 26 + Math.sin(x * 1.7) * 4; g.beginPath(); g.moveTo(x, gy); g.quadraticCurveTo(x + 2 + Math.sin(t + x) * 2, gy - h * 0.6, x + 3 + Math.sin(t * 1.3 + x) * 3, gy - h); g.stroke(); } }
+      else if (S.kind === 'trees') { g.fillStyle = '#6b4a30'; g.fillRect(W * 0.3 - 9, gy - 60, 18, 60); g.fillStyle = '#4f8a3a'; g.beginPath(); g.arc(W * 0.3, gy - 62, 30, 0, 6.28); g.fill(); g.fillStyle = '#b8873c'; for (let x = 0; x < W; x += 11) g.fillRect(x, gy - 3, 7, 3); }
+      else if (S.kind === 'bed' && S.crop) { g.fillStyle = '#4f9a3a'; for (let i = 0; i < 4; i++) { const x = 60 + (i + 0.5) * (W - 70) / 4; g.beginPath(); g.ellipse(x - 8, gy - 12, 10, 5, -0.5, 0, 6.28); g.ellipse(x + 8, gy - 14, 10, 5, 0.5, 0, 6.28); g.fill(); } }
+      g.fillStyle = col(shade(topC, 0.85)); g.fillRect(0, gy - 1, W, 3);
+      // the depth ruler
+      g.fillStyle = 'rgba(255,255,255,.85)'; g.fillRect(0, sky, 44, H - sky); g.fillStyle = '#3d2d1c'; g.font = '700 11px sans-serif';
+      for (let i = 0; i <= 24; i += 6) { const y = sky + i * IN; g.fillRect(30, y, 14, 1.5); g.fillText(`${i}″`, 6, Math.min(H - 4, y + 4)); }
+      // labels
+      g.font = '700 12px sans-serif'; const lab = (txt, x, y) => { const m = g.measureText(txt).width; g.fillStyle = 'rgba(255,250,235,.88)'; g.fillRect(x - 4, y - 12, m + 8, 17); g.fillStyle = '#3d2d1c'; g.fillText(txt, x, y); };
+      lab('Topsoil', W - 90, sky + S.top * IN * 0.5);
+      lab('Subsoil', W - 90, sky + Math.min(22, S.top + (S.pan || 0) + 5) * IN);
+      if (S.pan) lab('Packed layer', W - 130, sky + (S.top + 1 + S.pan / 2) * IN + 5);
+      requestAnimationFrame(frame);
+    };
+    requestAnimationFrame(frame);
+  },
+  here(back) { const F = G.F, Fm = G.Fm; if (G.mode !== 'play') return UI.toast('Go out on the farm to look at the soil.', true); if (!ownedAt(F, Fm.x, Fm.z)) return UI.toast('This isn\'t your land.', true); const bed = F.objs.find((o) => o.t === 'bed' && Math.hypot(o.x - Fm.x, o.z - Fm.z) < 1.6); this.open(Fm.x, Fm.z, bed, back); },
+  dig() { act('dig', 1.2, 15, 1, () => this.here()); },
 };
 // ---------------------------------------------------------------- how to build better soil (1.5.18)
 // Plain-language tips, each with what it means in this game. Opened from a garden bed's card and the journal's Land & soil tab; one tip shows

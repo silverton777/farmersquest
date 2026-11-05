@@ -8,6 +8,15 @@ Publishing: copy `index.html` and `sw.js` into the GitHub repo `silverton777/far
 
 ---
 
+## 1.5.19: a look under the soil
+
+**Why:** the soil view from the owner's list ("how would you do the soil view?"): a cutaway of the soil itself.
+
+- Dig a soil pit (free, about 15 minutes) from the shovel's Earthworks menu, or tap "Look under the soil" on any garden bed's card, or "Look at the soil where you're standing" in the journal's Land & soil tab.
+- You see a slice of the ground about two feet deep, drawn from that spot's real numbers: how deep the dark topsoil goes (from its organic matter), roots reaching down (deeper under rested grass and trees), earthworms wriggling (more in damp, loose, well-fed, mulched soil), white fungus threads (under trees, mulch and undug ground), how wet it is, and a packed layer where hooves or wheels have squashed it hard. Grass, a crop, mulch or a tree shows on top.
+- Under it, a card gives a soil health score out of 100 and says in plain words what each layer means and what would help, with a button to the soil tips.
+- Fixed: the canvases inside panels (the pig race, apple bobbing and the fishing line) covered the whole screen instead of sitting in their panel. They now fit inside it, and are sized so the whole picture shows on a phone held sideways.
+
 ## 1.5.18: festivals you can play, soil tips, pond and worm farm fixes
 
 **Why:** "Yes add festivals you can play - all those things."
