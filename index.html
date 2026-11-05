@@ -10,6 +10,15 @@ Publishing: copy `index.html` and `sw.js` into the GitHub repo `silverton777/far
 
 ==========
 
+## 1.5.14: easy horse riding: drag to ride, tap to go there
+
+**Why:** "its too hard to ride the horse. simplify riding so maybe its just your finger dragging around the screen and the horse goes there", then "1 and 2 together with option 3 available after more acreage".
+
+- Drag to ride: put a finger down anywhere and drag the way you want to go. The horse turns that way; drag further for a trot, further still for a gallop. Let go and it eases to a halt. No throttle, no gears, no left-and-right thumbs.
+- Tap to go: tap a spot on the ground and the horse takes you there and stops (a ring marks the spot). Round the farmstead it plans a way round buildings and fences; further out it steers round things as it goes. If there's no way through (a fence with no gate on the way, or the edge of your land) it stops and says so. Dragging takes the reins back at any time.
+- Ride to… on the map: once you own 100 acres or more, a 🗺️ Ride to… button in the riding bar opens the farm map; tap where you want to go.
+- Tractors, trucks and other vehicles drive as before.
+
 ## 1.5.13: a pond tells you why it is or isn't filling; "Own all 25 homestead lots" at level 5
 
 **Why:** "in my current game why is pond 2 not getting full" and "own a 25 homesteads needs to be level 5".
@@ -689,7 +698,7 @@ FQ-CHANGELOG-END -->
   <div id="steerUI" hidden><i></i></div>
   <div id="thrUI"><b id="thrFill"></b><i id="thrKnob">⛽</i><span>GAS</span></div>
   <div id="driveHint">Left thumb: steer · Right thumb: slide up for gas</div>
-  <div id="driveBtns"><button class="sq" id="dGear" aria-label="Forward or reverse">D</button><button class="sq" id="dCam" aria-label="Camera view">🎥</button><button class="sq" id="dHorn" aria-label="Horn">📯</button><button class="sq" id="dExit" aria-label="Get off">⏏ Get off</button></div>
+  <div id="driveBtns"><button class="sq" id="dGear" aria-label="Forward or reverse">D</button><button class="sq" id="dCam" aria-label="Camera view">🎥</button><button class="sq" id="dHorn" aria-label="Horn">📯</button><button class="sq" id="dRide" aria-label="Ride to a place on the map" hidden>🗺️ Ride to…</button><button class="sq" id="dExit" aria-label="Get off">⏏ Get off</button></div>
 </div>
 <svg width="0" height="0" style="position:absolute" aria-hidden="true"><filter id="pfilt" color-interpolation-filters="sRGB"><feColorMatrix id="pfm" type="matrix" values="1 0 0 0 0 0 1 0 0 0 0 0 1 0 0 0 0 0 1 0"/></filter></svg>
 <div id="photoFrame"><span id="photoCaption"></span></div>
@@ -7902,6 +7911,7 @@ function groundAt(F, x, z) {
 // missing, so riding or driving threw an error every frame and the ride stuttered)
 function wheelSpots(def) { const x = (def.track || 1) / 2, z = (def.wb || 2) / 2; return [[x, z], [-x, z], [x, -z], [-x, -z]]; }
 // ---------------------------------------------------------------- driving
+const RIDE_MAP_ACRES = 100;   // past this much land, riding to a spot picked on the farm map makes sense (1.5.14)
 const DRIVE = {
   on: false,
   start(o, defOver) {
@@ -7918,11 +7928,15 @@ const DRIVE = {
     G.view.vehicles = [D];
     G.Fm.walk = 0; G.Fm.act = null; G.Fm.ride = def.animal ? 'horse' : def.straddle ? 'straddle' : 'seat';
     $('thrUI').lastElementChild.textContent = def.animal ? 'GO' : 'GAS'; $('thrKnob').textContent = def.animal ? '🐎' : '⛽'; $('dHorn').textContent = def.animal ? '🗣️' : '📯';
+    // riding (1.5.14): no throttle or gears. Drag anywhere to ride that way, or tap a spot to be taken there
+    $('thrUI').hidden = !!def.animal; $('dGear').hidden = !!def.animal; D.dest = null; this.inp = { steer: null, thr: null, rein: null };
+    $('driveHint').textContent = def.animal ? 'Drag anywhere to ride that way (further = faster) · tap a spot to ride there' : 'Left thumb: steer · Right thumb: slide up for gas';
+    $('dRide').hidden = !(def.animal && ownedAcres(F) >= RIDE_MAP_ACRES);
     this.place();
     $('driveHud').hidden = false; $('actWrap').hidden = true; $('moveHint').hidden = true; $('actLabel').hidden = true;
     this.hud();
     AUDIO.door();
-    if (!store.get('fq_drive_tip', false)) { store.set('fq_drive_tip', true); UI.toast('Right thumb: push the throttle up to go. Left thumb: steer. Let go to coast to a stop.'); }
+    if (!def.animal && !store.get('fq_drive_tip', false)) { store.set('fq_drive_tip', true); UI.toast('Right thumb: push the throttle up to go. Left thumb: steer. Let go to coast to a stop.'); }
   },
   // climb into the saddle (needs tack from the Mercantile)
   mountHorse(a) {
@@ -7933,7 +7947,7 @@ const DRIVE = {
     this.horse = a; a.ridden = true; a.flee = null; a.state = 'idle'; tally(F, 'ride');
     this.start({ id: 'horse' + a.rec.id, t: 'horse', x: a.x, z: a.z, r: a.yaw }, def);
     AUDIO.animal('horse');
-    UI.toast(`${a.rec.name} is ready. Slide up to walk on, higher to trot and gallop.`);
+    UI.toast(`${a.rec.name} is ready. Drag your finger the way you want to go (further for a trot or a gallop), or tap a spot and ${a.rec.name} takes you there.`);
   },
   // can the driver step off here? (beside the seat, then the other side, behind, in front)
   stop() {
@@ -7961,12 +7975,16 @@ const DRIVE = {
     G.view.rebuildColliders();
     $('driveHud').hidden = true; $('actWrap').hidden = false;
     AUDIO.engine(null);
-    this.inp = { steer: null, thr: null };
+    this.inp = { steer: null, thr: null, rein: null }; this.dest = null; $('steerUI').hidden = true; $('thrUI').hidden = false; $('dGear').hidden = false; $('dRide').hidden = true;
   },
   inp: { steer: null, thr: null },
   // ---------------- input (touch: left half steers, right half is the throttle)
   pointerDown(e) {
     const I = this.inp, w = window.innerWidth;
+    if (this.horse) {   // one finger anywhere: the reins
+      if (!I.rein) { I.rein = { id: e.pointerId, x0: e.clientX, y0: e.clientY, dx: 0, dy: 0, t: performance.now(), moved: false }; const sU = $('steerUI'); sU.style.left = e.clientX + 'px'; sU.style.top = e.clientY + 'px'; sU.hidden = true; sU.firstElementChild.style.transform = ''; glc.setPointerCapture(e.pointerId); }
+      return;
+    }
     if (FPV.leftOnly()) {   // one stick does it all: left/right steers, up is the throttle
       if (e.clientX < w * 0.5 && !I.steer) { I.steer = { id: e.pointerId, x0: e.clientX, y0: e.clientY, v: 0, both: true }; I.thr = { id: e.pointerId, y0: e.clientY, v: 0 }; const s = $('steerUI'); s.style.left = e.clientX + 'px'; s.style.top = e.clientY + 'px'; s.hidden = false; s.firstElementChild.style.transform = ''; glc.setPointerCapture(e.pointerId); }
       return;
@@ -7977,16 +7995,92 @@ const DRIVE = {
   },
   pointerMove(e) {
     const I = this.inp;
+    if (I.rein && I.rein.id === e.pointerId) {
+      const R = I.rein; R.dx = e.clientX - R.x0; R.dy = e.clientY - R.y0; const m = Math.hypot(R.dx, R.dy);
+      if (m > 10) { R.moved = true; this.dest = null; const sU = $('steerUI'); sU.hidden = false; const k = Math.min(1, 60 / m); sU.firstElementChild.style.transform = `translate(${R.dx * k}px, ${R.dy * k}px)`; }
+      return;
+    }
     if (I.steer && I.steer.id === e.pointerId) { const dx = clamp(e.clientX - I.steer.x0, -70, 70); I.steer.v = Math.abs(dx) < 4 ? 0 : dx / 70; $('steerUI').firstElementChild.style.transform = `translateX(${dx}px)`; }
     if (I.thr && I.thr.id === e.pointerId) { I.thr.v = clamp((I.thr.y0 - e.clientY) / (I.steer && I.steer.both ? 90 : 130), 0, 1); }
   },
   pointerUp(e) {
     const I = this.inp;
+    if (I.rein && I.rein.id === e.pointerId) {
+      const R = I.rein; I.rein = null; $('steerUI').hidden = true;
+      if (e.type === 'pointerup' && !R.moved && performance.now() - R.t < 450) { const w = this.groundAt(e.clientX, e.clientY); if (w) this.rideTo(w[0], w[1]); }
+      return;
+    }
     if (I.steer && I.steer.id === e.pointerId) { I.steer = null; $('steerUI').hidden = true; }
     if (I.thr && I.thr.id === e.pointerId) I.thr = null;
   },
+  // the spot on the ground under a point on the screen (found by nudging a guess until it projects onto the finger)
+  groundAt(cx, cy) {
+    const Fr = G.lastFrame, F = G.F; if (!Fr) return null;
+    const k = glc.width / Math.max(1, window.innerWidth), tx = cx * k, ty = cy * k;
+    let x = this.x + Math.sin(this.yaw) * 4, z = this.z + Math.cos(this.yaw) * 4;
+    const P = (px, pz) => projectPt(Fr, [px, groundAt(F, px, pz), pz], glc.width, glc.height);
+    for (let it = 0; it < 14; it++) {
+      const p0 = P(x, z), px = P(x + 0.5, z), pz = P(x, z + 0.5); if (!p0 || !px || !pz) return null;
+      const a = (px[0] - p0[0]) / 0.5, b = (pz[0] - p0[0]) / 0.5, c = (px[1] - p0[1]) / 0.5, d = (pz[1] - p0[1]) / 0.5, det = a * d - b * c; if (Math.abs(det) < 1e-6) return null;
+      const ex = tx - p0[0], ey = ty - p0[1]; let sx = (d * ex - b * ey) / det, sz = (-c * ex + a * ey) / det; const l = Math.hypot(sx, sz); if (l > 25) { sx *= 25 / l; sz *= 25 / l; }
+      x += sx; z += sz;
+      if (Math.hypot(ex, ey) < 2) break;
+    }
+    const pf = P(x, z); if (!pf || Math.hypot(pf[0] - tx, pf[1] - ty) > 14 * k) return null;
+    return [x, z];
+  },
+  // the way a drag on the screen points, as a heading on the ground
+  dragHeading(dx, dy) {
+    const Fr = G.lastFrame, F = G.F; if (!Fr) return this.yaw;
+    const P = (px, pz) => projectPt(Fr, [px, groundAt(F, px, pz) + 0.5, pz], glc.width, glc.height);
+    const p0 = P(this.x, this.z), px = P(this.x + 1, this.z), pz = P(this.x, this.z + 1);
+    if (!p0 || !px || !pz) return this.yaw;
+    const a = px[0] - p0[0], b = pz[0] - p0[0], c = px[1] - p0[1], d = pz[1] - p0[1], det = a * d - b * c; if (Math.abs(det) < 1e-9) return this.yaw;
+    const wx = (d * dx - b * dy) / det, wz = (-c * dx + a * dy) / det;
+    return Math.atan2(wx, wz);
+  },
+  rideTo(x, z) {
+    const F = G.F;
+    if (Math.hypot(x - this.x, z - this.z) < 1.2) return;
+    if (G.view.col.blocked(x, z, 0.5, {})) { UI.toast('There\'s something in the way there. Tap open ground.', true); return; }
+    this.dest = [x, z]; this.destBest = Math.hypot(x - this.x, z - this.z); this.destT = 0; this.steerSide = 0;
+    // near the farmstead the collision grid can plan a way round buildings and fences (waypoints); further out it steers as it goes
+    const inGrid = (px, pz) => Math.abs(px) < CGH - 1 && Math.abs(pz) < CGH - 1;
+    this.route = null; this.ri = 0;
+    try { if (inGrid(this.x, this.z) && inGrid(x, z) && G.view.col.grid) { const r = G.view.col.path(this.x, this.z, x, z); if (r && r.length > 1) this.route = r; } } catch (e) { this.route = null; }
+    if (G.view) G.view.puffs.push({ twinkle: true, x, y: groundAt(F, x, z) + 0.3, z, t: 0 });
+  },
+  // what the reins (or a destination) ask of the horse this frame: a heading and a gait
+  rein(dt) {
+    const D = this, I = this.inp, F = G.F, col = G.view.col;
+    let head = null, thr = 0;
+    if (I.rein && I.rein.moved) {
+      const m = Math.hypot(I.rein.dx, I.rein.dy);
+      if (m > 12) { head = this.dragHeading(I.rein.dx, I.rein.dy); thr = clamp((m - 12) / 120, 0.2, 1); }
+    } else if (D.dest) {
+      const dist = Math.hypot(D.dest[0] - D.x, D.dest[1] - D.z);
+      if (dist < 1.0) { D.dest = null; D.route = null; return { head: null, thr: 0 }; }
+      // the next waypoint on the planned way (if there is one), else straight for the spot
+      while (D.route && D.ri < D.route.length - 1 && Math.hypot(D.route[D.ri][0] - D.x, D.route[D.ri][1] - D.z) < 1.4) D.ri++;
+      const wp = D.route ? D.route[D.ri] : D.dest, dx = wp[0] - D.x, dz = wp[1] - D.z;
+      // head for it, going round anything solid on the way (fences, buildings, ponds): keep to one side once a way round is chosen
+      const want = Math.atan2(dx, dz), L = Math.min(2.6, dist), free = (h) => !col.blocked(D.x + Math.sin(h) * L, D.z + Math.cos(h) * L, 0.55, {}) && !col.blocked(D.x + Math.sin(h) * L * 0.5, D.z + Math.cos(h) * L * 0.5, 0.55, {});
+      let offs = [0, 0.35, -0.35, 0.7, -0.7, 1.05, -1.05, 1.4, -1.4, 1.8, -1.8];
+      if (D.steerSide) offs.sort((p, q) => (Math.sign(q) === D.steerSide ? 1 : 0) - (Math.sign(p) === D.steerSide ? 1 : 0) || Math.abs(p) - Math.abs(q));
+      head = want; for (const o of offs) if (free(want + o)) { head = want + o; if (o) D.steerSide = Math.sign(o); else D.steerSide = 0; break; }
+      thr = dist > 14 ? 1 : dist > 5 ? 0.5 : clamp(dist / 10, 0.2, 0.5);
+      // no headway for a while: there's no way through from here
+      D.destT += dt; if (dist < D.destBest - 0.4) { D.destBest = dist; D.destT = 0; }
+      if (D.destT > 3.5) { D.dest = null; D.route = null; UI.toast(`${D.horse ? D.horse.rec.name : 'Your horse'} can't find a way through to there. Ride round, or through a gate.`, true); return { head: null, thr: 0 }; }
+    }
+    if (head === null) return { head: null, thr: 0 };
+    let diff = head - D.yaw; while (diff > Math.PI) diff -= Math.PI * 2; while (diff < -Math.PI) diff += Math.PI * 2;
+    if (Math.abs(diff) > 1.2) thr = Math.min(thr, 0.3);      // a sharp turn: slow to a walk to come round
+    return { head, thr, steer: clamp(-diff * 2.2, -1, 1) };
+  },
   readInput(dt) {
     const k = IN.keys, I = this.inp, D = this;
+    if (D.horse && !(k.a || k.d || k.w || k.s || k.arrowleft || k.arrowright || k.arrowup || k.arrowdown)) { const r = this.rein(dt); D.steerIn = r.head === null ? 0 : r.steer; D.thr = r.thr; D.gear = 1; return; }
     let st = I.steer ? I.steer.v : 0, thr = I.thr ? I.thr.v : -1;
     const kL = k.a || k.arrowleft, kR = k.d || k.arrowright, kU = k.w || k.arrowup, kD = k.s || k.arrowdown;
     if (kL || kR) st = (kR ? 1 : 0) - (kL ? 1 : 0);
@@ -8172,6 +8266,7 @@ const DRIVE = {
       const F = G.F, key = 'saddle:' + (F.tack || 'western') + ':' + (F.blanket || 'red');
       if (!VEH_MESH[key]) { const m = new MB(); addSaddle(m, F.tack || 'western', BLANKETS[F.blanket] || BLANKETS.red); VEH_MESH[key] = G.R.mesh(m); }
       out.push({ mesh: VEH_MESH[key], model: M4.mul(D.M, M4.trans(0, D.def.seatY - 0.02, D.def.seatZ)) });
+      if (D.dest) out.push(ringDraw([D.dest[0], D.dest[1], 1.3]));
     }
   },
   // ---------------- cameras: behind (3rd person), from the seat (1st person), or the usual top view
@@ -18353,7 +18448,7 @@ function interiorFrame(F0, room) {
 
 'use strict';
 // ============================================================================ profiles + saves (each profile has its own farm save)
-const FQ_VERSION = '1.5.13';
+const FQ_VERSION = '1.5.14';
 const LOOKS = [
   { shirt: [214, 74, 64], hair: [120, 76, 40] }, { shirt: [70, 130, 200], hair: [236, 206, 120] }, { shirt: [240, 170, 60], hair: [80, 50, 30] },
   { shirt: [120, 170, 90], hair: [40, 30, 28] }, { shirt: [170, 100, 190], hair: [200, 110, 60] }, { shirt: [60, 160, 160], hair: [150, 100, 60] },
@@ -19942,6 +20037,8 @@ const MAP = {
     clearTimeout(this.contT); this.contT = setTimeout(() => { if (!this.on) return; try { this.buildContours(); this.contFor = FF; } catch (e) { console.error(e); this.cont = []; } this.dirty = true; }, 40);
     this.fit();
     this.mode = 'view'; this.draft = null; this.selId = null; this.tip = null;
+    this.rideMode = !!(opt.ride && G.drive && G.drive.horse);
+    if (this.rideMode) UI.toast('Tap the map where you want to ride.');
     if (opt.edit) this.select(opt.edit);
     else if (opt.build) this.startNewBuild(opt.build);
     else if (opt.dig) { this.startDig(opt.dig); if (opt.size && this.dig) this.dig.size = opt.size; }
@@ -20406,6 +20503,7 @@ const MAP = {
   },
   tap(w) {
     const F = G.F;
+    if (this.rideMode && G.drive && G.drive.horse) { this.rideMode = false; this.close(); G.drive.rideTo(w[0], w[1]); UI.toast(`Off you go to that spot. Drag to take the reins back any time.`); return; }
     if (this.mode === 'edit' || this.mode === 'obj') return;   // keep editing until saved or cancelled
     // an open fence line is picked by tapping near it; a paddock by tapping inside it
     const line = (F.fences || []).map((q) => ({ q, d: distToEdges(q, w[0], w[1]) * this.s })).filter((o) => o.d < 18).sort((a, b) => a.d - b.d)[0];
@@ -23145,7 +23243,7 @@ function initInput() {
   $('whistleBtn').addEventListener('click', () => WHISTLE.start());
   $('bChores').onclick = () => UI.chores(); $('bBag').onclick = () => UI.bag(); $('bGoals').onclick = () => UI.journal('goals'); $('bMap').onclick = () => MAP.open(); $('bMenu').onclick = () => UI.menu();
   $('placeCancel').onclick = () => cancelPlace();
-  $('dGear').onclick = () => DRIVE.setGear(-DRIVE.gear); $('dCam').onclick = () => DRIVE.cycleCam(); $('dHorn').onclick = () => DRIVE.horn(); $('dExit').onclick = () => DRIVE.stop();
+  $('dGear').onclick = () => DRIVE.setGear(-DRIVE.gear); $('dCam').onclick = () => DRIVE.cycleCam(); $('dHorn').onclick = () => DRIVE.horn(); $('dExit').onclick = () => DRIVE.stop(); $('dRide').onclick = () => MAP.open({ ride: true });
   $('placeRot').onclick = () => { if (G.place) { G.place.rot = ((G.place.rot || 0) + (G.place.kind === 'vines' ? Math.PI / 4 : Math.PI / 2)) % (Math.PI * 2); G.place.ghost = null; G.place.ghostKey = null; } };
   $('placeMinus').onclick = () => { const P = G.place; if (P && P.kind === 'vines') { P.n = Math.max(1, P.n - 1); P.ghostKey = null; } };
   $('placePlus').onclick = () => { const P = G.place; if (P && P.kind === 'vines') { P.n = Math.min(P.max, P.n + 1); P.ghostKey = null; if (P.n === P.max) UI.toast(`That's all ${P.max} of the vines you have. Buy more at the feed store.`); } };

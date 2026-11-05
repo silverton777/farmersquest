@@ -8,6 +8,15 @@ Publishing: copy `index.html` and `sw.js` into the GitHub repo `silverton777/far
 
 ---
 
+## 1.5.14: easy horse riding: drag to ride, tap to go there
+
+**Why:** "its too hard to ride the horse. simplify riding so maybe its just your finger dragging around the screen and the horse goes there", then "1 and 2 together with option 3 available after more acreage".
+
+- Drag to ride: put a finger down anywhere and drag the way you want to go. The horse turns that way; drag further for a trot, further still for a gallop. Let go and it eases to a halt. No throttle, no gears, no left-and-right thumbs.
+- Tap to go: tap a spot on the ground and the horse takes you there and stops (a ring marks the spot). Round the farmstead it plans a way round buildings and fences; further out it steers round things as it goes. If there's no way through (a fence with no gate on the way, or the edge of your land) it stops and says so. Dragging takes the reins back at any time.
+- Ride to… on the map: once you own 100 acres or more, a 🗺️ Ride to… button in the riding bar opens the farm map; tap where you want to go.
+- Tractors, trucks and other vehicles drive as before.
+
 ## 1.5.13: a pond tells you why it is or isn't filling; "Own all 25 homestead lots" at level 5
 
 **Why:** "in my current game why is pond 2 not getting full" and "own a 25 homesteads needs to be level 5".
