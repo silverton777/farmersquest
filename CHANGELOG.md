@@ -8,6 +8,16 @@ Publishing: copy `index.html` and `sw.js` into the GitHub repo `silverton777/far
 
 ---
 
+## 1.5.16: maple sugaring on the farm, a cider press, and a worm farm
+
+**Why:** the owner picked "tapping maple trees and pressing cider" from the list of new ideas, and asked "can we add worm farms in somehow and using that to feed soil?"
+
+- Maple sugaring: in February and March, walk up to a big maple on your land (wild, or one you planted) and tap it. A sap bucket hangs on the trunk and fills on freeze-thaw days (frosty nights, days above freezing). Collect the sap, then boil it down right there by the tree, or at the woodshed: four gallons make a pint of maple syrup. The buckets come in for the year in April. (Tapping in the woods, for regions with sugar maples, works as before.)
+- Sugar maple saplings at the nursery ($18), for farms with no maples of their own; they can be tapped once they're grown.
+- Cider press ($450, in Build): walk up to it with apples or pears in your stores and it presses all you have, 6 lbs to a jug of fresh cider, in one go.
+- Worm farm ($250, in Build): feed it spare vegetables and fruit (up to 20 lbs at a time, taken from whatever you have most of). The worms eat about 2½ lbs a day and every 10 lbs becomes a bag of worm castings. On a garden bed's card, "Spread a bag of worm castings" feeds the bed more than a load of compost does and builds the soil's organic matter.
+- The farm stand can sell maple syrup and cider too, keeping one of each back for you unless you change it.
+
 ## 1.5.15: barn cat kittens
 
 **Why:** the owner picked "barn cat kittens" from the list of new ideas: "your barn cat has a litter now and then, and you can find homes for the kittens with townsfolk".

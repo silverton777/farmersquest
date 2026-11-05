@@ -10,6 +10,16 @@ Publishing: copy `index.html` and `sw.js` into the GitHub repo `silverton777/far
 
 ==========
 
+## 1.5.16: maple sugaring on the farm, a cider press, and a worm farm
+
+**Why:** the owner picked "tapping maple trees and pressing cider" from the list of new ideas, and asked "can we add worm farms in somehow and using that to feed soil?"
+
+- Maple sugaring: in February and March, walk up to a big maple on your land (wild, or one you planted) and tap it. A sap bucket hangs on the trunk and fills on freeze-thaw days (frosty nights, days above freezing). Collect the sap, then boil it down right there by the tree, or at the woodshed: four gallons make a pint of maple syrup. The buckets come in for the year in April. (Tapping in the woods, for regions with sugar maples, works as before.)
+- Sugar maple saplings at the nursery ($18), for farms with no maples of their own; they can be tapped once they're grown.
+- Cider press ($450, in Build): walk up to it with apples or pears in your stores and it presses all you have, 6 lbs to a jug of fresh cider, in one go.
+- Worm farm ($250, in Build): feed it spare vegetables and fruit (up to 20 lbs at a time, taken from whatever you have most of). The worms eat about 2½ lbs a day and every 10 lbs becomes a bag of worm castings. On a garden bed's card, "Spread a bag of worm castings" feeds the bed more than a load of compost does and builds the soil's organic matter.
+- The farm stand can sell maple syrup and cider too, keeping one of each back for you unless you change it.
+
 ## 1.5.15: barn cat kittens
 
 **Why:** the owner picked "barn cat kittens" from the list of new ideas: "your barn cat has a litter now and then, and you can find homes for the kittens with townsfolk".
@@ -1014,6 +1024,7 @@ const TREES = [
   { key: 'poplar', name: 'Hybrid poplar (fodder)', kind: 'fodder', bear: 0, price: 6, chill: 0, zone: [3, 9], hay: 1.3 },
   { key: 'mesquite', name: 'Velvet mesquite (N-fixer, pods)', kind: 'fodder', bear: 48, price: 15, chill: 0, zone: [7, 11], nfix: true, hay: 0.5, pods: true, dry: true, unit: 'lbs mesquite flour', yield: 40, sell: 8 },
   { key: 'goumi', name: 'Goumi (N-fixer berry)', kind: 'berry', bear: 18, price: 15, chill: 500, zone: [4, 8], nfix: true, fruit: [200, 40, 30], unit: 'lbs goumi', yield: 10, sell: 6, shrub: true },
+  { key: 'maple', name: 'Sugar maple (tap for syrup)', kind: 'support', bear: 0, price: 18, chill: 0, zone: [3, 8], sap: true },
   { key: 'comfrey', name: 'Comfrey (chop & drop)', kind: 'support', bear: 0, price: 3, chill: 0, zone: [3, 9], shrub: true, mulch: true },
 ];
 
@@ -3803,6 +3814,44 @@ function addGreenhouse(mb, x, y, z, ry) {
   mb.box(0, 1.5, zf + 0.005, 0.5, 0.18, 0.04, fr);
   mb.pop();
 }
+// a cider press (1.5.16): a slatted oak tub under a big iron screw, on a sturdy bench, with a crank wheel and a jug at the spout
+function addCiderPress(mb, x, y, z, ry) {
+  mb.push(M4.trs(x, y, z, ry || 0, 0, 0));
+  const oak = [150, 106, 66], dk = [104, 72, 46], iron = [70, 72, 78];
+  mb.mat = MAT.boards;
+  mb.box(0, 0.55, 0, 1.2, 0.08, 0.9, oak);                                              // bench top
+  for (const sx of [-0.52, 0.52]) for (const sz of [-0.36, 0.36]) mb.box(sx, 0, sz, 0.1, 0.55, 0.1, dk);
+  mb.box(0, 0.62, 0, 0.9, 0.04, 0.7, [176, 132, 86]);                                    // the tray
+  for (let i = 0; i < 14; i++) { const a = i / 14 * Math.PI * 2; mb.box(Math.cos(a) * 0.27, 0.64, Math.sin(a) * 0.27, 0.07, 0.42, 0.04, i % 2 ? oak : [168, 120, 76]); }   // tub staves
+  for (const h of [0.72, 0.98]) mb.cyl(0, h, 0, 0.3, 0.3, 0.03, 16, iron);              // hoops
+  for (const sx of [-0.45, 0.45]) mb.box(sx, 0.62, 0, 0.1, 0.95, 0.12, dk);              // uprights
+  mb.box(0, 1.55, 0, 1.0, 0.12, 0.14, dk);                                               // crossbeam
+  mb.mat = 0;
+  mb.cyl(0, 1.05, 0, 0.05, 0.05, 0.62, 6, iron);                                         // the screw
+  mb.cyl(0, 1.0, 0, 0.24, 0.24, 0.06, 12, [130, 96, 60]);                                // pressing plate
+  mb.cyl(0, 1.72, 0, 0.18, 0.18, 0.04, 10, iron);                                        // crank wheel
+  for (let i = 0; i < 4; i++) { const a = i * Math.PI / 2; mb.box(Math.cos(a) * 0.17, 1.74, Math.sin(a) * 0.17, 0.2, 0.03, 0.03, iron); }
+  mb.box(0.36, 0.6, 0.33, 0.06, 0.04, 0.16, [176, 132, 86]);                             // spout
+  mb.cyl(0.36, 0, 0.5, 0.11, 0.09, 0.3, 10, [196, 150, 80], { capCol: [210, 160, 70] }); // a jug of cider under it
+  mb.cyl(0.36, 0.3, 0.5, 0.04, 0.04, 0.08, 6, [196, 150, 80]);
+  for (let i = 0; i < 5; i++) mb.ell(-0.62 + (i % 3) * 0.13, 0.1 + Math.floor(i / 3) * 0.12, -0.5 + (i % 2) * 0.08, 0.07, 0.07, 0.07, i % 2 ? [200, 50, 40] : [190, 170, 60], { lat: 3, lon: 6 });   // apples on the ground
+  mb.pop();
+}
+// a worm farm (1.5.16): a low wooden bin with a hinged lid, dark castings inside (fuller as you feed it), and a watering can beside it
+function addWormBin(mb, x, y, z, ry, full) {
+  mb.push(M4.trs(x, y, z, ry || 0, 0, 0));
+  const wood = [140, 104, 70], dk = [104, 76, 50];
+  mb.mat = MAT.boards;
+  mb.box(0, 0, 0, 1.4, 0.55, 0.8, wood);
+  for (const sx of [-0.69, 0.69]) mb.box(sx, 0, 0, 0.06, 0.6, 0.84, dk);
+  mb.box(0, 0.62, -0.42, 1.4, 0.04, 0.1, dk);
+  mb.push(M4.trs(0, 0.62, -0.42, 0, -1.1, 0)); mb.box(0, 0, 0.4, 1.36, 0.04, 0.8, [156, 118, 80]); mb.pop();   // lid propped open
+  mb.mat = 0;
+  mb.box(0, 0.2 + 0.3 * clamp(full, 0, 1), 0, 1.3, 0.04, 0.7, [62, 44, 30]);            // castings
+  for (let i = 0; i < 5; i++) mb.ell(-0.4 + i * 0.2, 0.24 + 0.3 * clamp(full, 0, 1), -0.1 + (i % 2) * 0.2, 0.05, 0.02, 0.05, [[120, 160, 70], [200, 120, 60], [220, 190, 80]][i % 3], { lat: 2, lon: 5 });   // scraps on top
+  mb.cyl(0.95, 0, 0.1, 0.12, 0.1, 0.24, 8, [96, 140, 110]);
+  mb.pop();
+}
 function addStall(mb, x, y, z, ry, opt) {
   // farmers market stall with awning
   opt = opt || {};
@@ -6248,6 +6297,8 @@ const BUILD_LIST = [
   { key: 'tank', name: 'Rain tank', price: 1200, hw: 0.75, hd: 0.75, note: 'Catches roof water for the garden. Put it next to a building.' },
   { key: 'stand', name: 'Farm stand', price: 1200, hw: 1.2, hd: 0.6, note: 'Sells a little of your eggs and produce every night. Walk up to it to choose what it sells and what it keeps for you.' },
   { key: 'woodpile', name: 'Woodshed', price: 600, hw: 1.0, hd: 0.55, note: 'Stores firewood. Shows how much you have stacked.' },
+  { key: 'press', name: 'Cider press', price: 450, hw: 0.65, hd: 0.55, note: 'Press apples and pears into jugs of fresh cider, a whole basket at a time.' },
+  { key: 'wormbin', name: 'Worm farm', price: 250, hw: 0.75, hd: 0.45, note: 'Feed the worms your spare vegetables and fruit; they turn it into worm castings, the richest food there is for soil.' },
 ];
 
 // item catalogue: key -> { name, unit, price (sell), buy (store price), icon, kind }
@@ -15817,7 +15868,7 @@ function solidOf(o) {
 const OBJ_SOLID = { // collider half-extents (rect) or radius
   house: { hw: 2.75, hd: 2.25, porch: true }, barn: { hw: 3.15, hd: 2.65, hay: true }, coop: { hw: 1.12, hd: 1.34 }, eggmobile: { hw: 1.15, hd: 1.4 },
   greenhouse: { hw: 1.7, hd: 3.1 }, hive: { r: 0.36 }, trough: { hw: 1.22, hd: 0.44, low: true }, tank: { r: 0.75 }, stand: { hw: 1.25, hd: 0.6 },
-  woodpile: { hw: 1.05, hd: 0.6 }, dgate: { hw: 1.7, hd: 0.2 }, mailbox: { r: 0.18 },
+  woodpile: { hw: 1.05, hd: 0.6 }, dgate: { hw: 1.7, hd: 0.2 }, mailbox: { r: 0.18 }, press: { hw: 0.65, hd: 0.55 }, wormbin: { hw: 0.75, hd: 0.45, low: true },
 };
 function treeVisual(o) {
   // native or catalogue tree -> builder kind + options
@@ -15827,7 +15878,7 @@ function treeVisual(o) {
   if (T.vine) return { kind: 'grapevine', T, fruitTree: true, vine: true };
   if (T.palm) return { kind: 'palm', T };
   if (shrub) return { kind: 'berry', T, shrub: true };
-  const leafKind = T.key.startsWith('apple') || ['pear', 'peach', 'plum', 'cherry', 'persimmon', 'pawpaw', 'pomegranate', 'jujube', 'fig'].includes(T.key.split('_')[0]) ? 'apple' : T.key === 'citrus' ? 'magnolia' : T.key === 'willow' || T.key === 'poplar' ? 'poplar' : T.key === 'mesquite' ? 'mesquite' : T.key === 'walnut' ? 'walnut' : 'oak';
+  const leafKind = T.key.startsWith('apple') || ['pear', 'peach', 'plum', 'cherry', 'persimmon', 'pawpaw', 'pomegranate', 'jujube', 'fig'].includes(T.key.split('_')[0]) ? 'apple' : T.key === 'citrus' ? 'magnolia' : T.key === 'willow' || T.key === 'poplar' ? 'poplar' : T.key === 'mesquite' ? 'mesquite' : T.key === 'walnut' ? 'walnut' : T.key === 'maple' ? 'maple' : 'oak';
   return { kind: leafKind, T, fruitTree: T.kind === 'fruit' };
 }
 function treeScale(o) {
@@ -16031,6 +16082,8 @@ class FarmView {
       case 'planter': case 'picnic': case 'scarecrow': case 'windmill': addDecor(mb, o.t, o.x, y, o.z, o.r); break;
       case 'eggmobile': addCoop(mb, o.x, y - 0.05, o.z, o.r, true); break;
       case 'greenhouse': addGreenhouse(mb, o.x, y, o.z, o.r); break;
+      case 'press': addCiderPress(mb, o.x, y, o.z, o.r || 0); break;
+      case 'wormbin': addWormBin(mb, o.x, y, o.z, o.r || 0, (o.food || 0) / WORMS.CAP); break;
       case 'hive': addHive(mb, o.x, y, o.z); break;
       case 'trough': addTrough(mb, o.x, y, o.z, o.r); break;
       case 'tank': addTank(mb, o.x, y, o.z); break;
@@ -16055,6 +16108,7 @@ class FarmView {
         tr.look = TREELIFE.look(o, F, R0); tr.stamp = this.treeStamp(o);
         if (this.popIds && this.popIds[o.id]) { tr.pop = 0; delete this.popIds[o.id]; }
         this.trees.push(tr);
+        if (o.sap && o.sap.y === F.year) { const bx = o.x, bz = o.z + 0.22 * s + 0.12; mb.mat = MAT.metal; mb.cyl(bx, y + 0.7, bz, 0.11, 0.09, 0.24, 10, [176, 182, 188], { capCol: [150, 120, 70] }); mb.box(bx, y + 0.98, bz - 0.02, 0.24, 0.02, 0.24, [150, 156, 162]); mb.mat = 0; mb.cyl(bx, y + 0.97, bz - 0.12, 0.012, 0.012, 0.05, 4, [120, 120, 126]); }   // a sap bucket on the trunk
         const rm = V.T ? rootMods(o, V.T, R0) : null;
         if (!o.wild && (o.age < 120 || (rm && rm.stake))) { mb.mat = MAT.boards; mb.cyl(o.x + 0.25 * s + 0.1, y - 0.1, o.z, 0.03, 0.03, 1.1 + (rm && rm.stake ? 0.5 : 0), 5, C.wood); mb.mat = 0; } // stake for young trees, and for life on a dwarfing rootstock
         break;
@@ -17110,6 +17164,7 @@ function simDay(F, auto, rep) {
   if (F.objs.some((o) => o.t === 'stand')) STAND.sellDay(F, rep);
   if (auto) collectEggs(F, rep);
   try { KITTENS.daily(F, rep); } catch (e) { console.warn('kittens', e); }
+  try { MAPLE.daily(F, rep); WORMS.daily(F); } catch (e) { console.warn('maple/worms', e); }
   BARN.nightly(F);
   // paddock rest counters
   for (const p of F.paddocks) p.rest = (p.rest || 0) + 1;
@@ -17119,11 +17174,11 @@ function simDay(F, auto, rep) {
 // goes out, and how much it always leaves you: F.stand = { off: { key: true }, keep: { key: n } }. Out of the box it leaves you a
 // dozen of each kind of egg, a gallon of milk and a pound of honey.
 const STAND = {
-  KEYS() { return ['eggs', 'blueeggs', 'duckeggs', 'honey', 'milk', ...CROPS.filter((c) => !c.cover && ITEMS[c.key]).map((c) => c.key)]; },
-  DEF_KEEP: { eggs: 1, blueeggs: 1, duckeggs: 1, milk: 1, honey: 1 },
+  KEYS() { return ['eggs', 'blueeggs', 'duckeggs', 'honey', 'milk', 'syrup', 'dish_cider', ...CROPS.filter((c) => !c.cover && ITEMS[c.key]).map((c) => c.key)]; },
+  DEF_KEEP: { eggs: 1, blueeggs: 1, duckeggs: 1, milk: 1, honey: 1, syrup: 1, dish_cider: 1 },
   st(F) { F.stand = F.stand || { off: {}, keep: Object.assign({}, this.DEF_KEEP) }; F.stand.off = F.stand.off || {}; F.stand.keep = F.stand.keep || {}; return F.stand; },
   on(F, k) { return !this.st(F).off[k]; },
-  keep(F, k) { const v = this.st(F).keep[k]; return v === undefined ? 0 : v; },
+  keep(F, k) { const v = this.st(F).keep[k]; return v === undefined ? (this.DEF_KEEP[k] || 0) : v; },
   perDay(k) { return k === 'eggs' || k === 'blueeggs' || k === 'duckeggs' ? 2 : 1; },
   sellDay(F, rep) {
     for (const key of this.KEYS()) {
@@ -18457,7 +18512,7 @@ function interiorFrame(F0, room) {
 
 'use strict';
 // ============================================================================ profiles + saves (each profile has its own farm save)
-const FQ_VERSION = '1.5.15';
+const FQ_VERSION = '1.5.16';
 const LOOKS = [
   { shirt: [214, 74, 64], hair: [120, 76, 40] }, { shirt: [70, 130, 200], hair: [236, 206, 120] }, { shirt: [240, 170, 60], hair: [80, 50, 30] },
   { shirt: [120, 170, 90], hair: [40, 30, 28] }, { shirt: [170, 100, 190], hair: [200, 110, 60] }, { shirt: [60, 160, 160], hair: [150, 100, 60] },
@@ -19040,7 +19095,7 @@ const UI = {
   buildMenu() {
     const F = G.F, P = this.open({ title: 'Build', icon: '🔨' });
     const decor = COSMETICS.decor;
-    P.body.innerHTML = `<div class="grid">${BUILD_LIST.map((b) => `<button class="card${F.money < b.price ? ' bad' : ''}" data-k="${b.key}"><span class="ic">${{ barn: '🏚️', coop: '🐔', eggmobile: '🚚', greenhouse: '🏡', hive: '🐝', trough: '🛁', tank: '🛢️', stand: '🏪', woodpile: '🪵' }[b.key]}</span><b>${b.name}</b><small>${b.note}</small><span class="pr">${money(b.price)}</span></button>`).join('')}</div>
+    P.body.innerHTML = `<div class="grid">${BUILD_LIST.map((b) => `<button class="card${F.money < b.price ? ' bad' : ''}" data-k="${b.key}"><span class="ic">${{ barn: '🏚️', coop: '🐔', eggmobile: '🚚', greenhouse: '🏡', hive: '🐝', trough: '🛁', tank: '🛢️', stand: '🏪', woodpile: '🪵', press: '🍎', wormbin: '🪱' }[b.key]}</span><b>${b.name}</b><small>${b.note}</small><span class="pr">${money(b.price)}</span></button>`).join('')}</div>
       <div class="grp">Decorations</div><div class="grid">${decor.map((d) => { const own = SHOP.owned('decor', d.key); return `<button class="card${own ? '' : ' bad'}" data-d="${d.key}"><span class="ic">${{ planter: '🌷', picnic: '🧺', scarecrow: '🎃', windmill: '🌬️' }[d.key]}</span><b>${d.name}</b><small>${own ? d.desc : 'Unlock in the Farm shop'}</small><span class="pr">${own ? money(d.cash) : d.cost + ' 🌰'}</span></button>`; }).join('')}</div>
       <p class="note">Tip: walk up to a building with the hammer to move it.</p>`;
     P.body.querySelectorAll('[data-k]').forEach((c) => { c.onclick = () => { const def = BUILD_LIST.find((b) => b.key === c.dataset.k); if (F.money < def.price) return UI.toast(`You need ${money(def.price)}.`, true); askPlace({ kind: 'build', def }, { build: def }); }; });
@@ -19320,6 +19375,7 @@ const UI = {
     rows.push({ icon: '🍂', text: o.mulch ? (o.mulchD !== undefined ? `Mulched: about ${Math.ceil(o.mulchD / 30)} months left` : 'Mulched (no-till)') : 'No mulch', small: o.mulch ? 'Holding water in and feeding the soil as it breaks down' : 'Bare soil dries out and loses organic matter' });
     rows.push({ icon: '🧺', text: `Expected harvest: ${Math.round(mult * 100)}% of normal`, small: 'Better soil, bigger harvests' });
     const acts = [];
+    if ((F.inv.castings || 0) >= 1) acts.push({ id: 'castings', tap: true, icon: '🪱', text: 'Spread a bag of worm castings', small: `You have ${fmt1(F.inv.castings)} bags · richer than compost: it feeds the soil life too` });
     acts.push({ id: 'compost', tap: (F.inv.compost || 0) >= 1, icon: '🟤', text: 'Spread a load of compost', small: (F.inv.compost || 0) >= 1 ? `You have ${fmt1(F.inv.compost)} loads · harvest goes up about ${Math.round(Math.min(0.6, 2 - (o.fert || 0)) * 18)}%` : 'No compost. Buy it at the feed store or muck out the barn stalls.', cls: (F.inv.compost || 0) >= 1 ? '' : 'dim' });
     if (!o.mulch || o.mulchD !== undefined) acts.push({ id: 'mulch', tap: BEDSOIL.canMulch(F), icon: '🍂', text: o.mulch ? 'Top up the mulch' : 'Mulch it with straw', small: BEDSOIL.canMulch(F) ? `Uses ${(F.inv.sqbale || 0) >= 1 ? 'a square bale' : 'a tenth of a round bale'} · holds water, +8% harvest, builds soil` : 'You need hay. Square bales are at the feed store.', cls: BEDSOIL.canMulch(F) ? '' : 'dim' });
     if (!o.crop) acts.push({ id: 'seeds', tap: true, icon: '🌱', text: 'Plant something', small: 'Switch to your seeds' });
@@ -19328,6 +19384,7 @@ const UI = {
       r.onclick = () => {
         const id = r.dataset.id; this.closeAll();
         if (id === 'seeds') return setTool('seeds');
+        if (id === 'castings') act('plant', 1.4, 15, 2, () => { F.inv.castings -= 1; o.fert = Math.min(2.4, (o.fert || 0) + 1.0); const T = F.terrain; BEDSOIL.cells(F, o, (k) => { T.om[k] = Math.min(12, T.om[k] + 0.5); T.moist[k] = Math.min(1, T.moist[k] + 0.05); }); tally(F, 'castingsSpread'); G.view.dirtyAt(o.x, o.z); UI.toast(`🪱 Worm castings spread. This bed should now give about ${Math.round(BEDSOIL.yieldMult(F, o) * 100)}% of a normal harvest.`); });
         if (id === 'compost') act('plant', 1.6, 20, 4, () => { BEDSOIL.compost(F, o); G.view.dirtyAt(o.x, o.z); UI.toast(`🟤 Compost spread. This bed should now give about ${Math.round(BEDSOIL.yieldMult(F, o) * 100)}% of a normal harvest.`); });
         if (id === 'mulch') act('plant', 1.6, 20, 3, () => { BEDSOIL.mulch(F, o); G.view.dirtyAt(o.x, o.z); UI.toast('🍂 Mulched. It will hold the water in and feed the soil for about four months.'); });
       };
@@ -20246,8 +20303,8 @@ const MAP = {
     g.strokeStyle = '#6b4a2b'; g.lineWidth = Math.max(0.18, 3 * px); g.lineCap = 'butt';
     for (const sg of G.view.boundarySegs()) { g.beginPath(); g.moveTo(sg[0], sg[1]); g.lineTo(sg[2], sg[3]); g.stroke(); }
     // objects
-    const emoji = { mailbox: '📬', house: '🏠', barn: '🏚️', coop: '🐔', eggmobile: '🚚', greenhouse: '🌱', hive: '🐝', trough: '💧', tank: '🛢️', stand: '🏪', woodpile: '🪵', truck: '🛻' };
-    const fill = { mailbox: '#4a6e96', house: '#efe2c4', barn: '#b8432f', coop: '#d0794a', eggmobile: '#d9a04b', greenhouse: '#d8eef2', hive: '#f2c14e', trough: '#7fa9b8', tank: '#9fb3bf', stand: '#c9a46a', woodpile: '#8b6a4a', truck: '#4a6e96' };
+    const emoji = { mailbox: '📬', house: '🏠', barn: '🏚️', coop: '🐔', eggmobile: '🚚', greenhouse: '🌱', hive: '🐝', trough: '💧', tank: '🛢️', stand: '🏪', woodpile: '🪵', truck: '🛻', press: '🍎', wormbin: '🪱' };
+    const fill = { mailbox: '#4a6e96', house: '#efe2c4', barn: '#b8432f', coop: '#d0794a', eggmobile: '#d9a04b', greenhouse: '#d8eef2', hive: '#f2c14e', trough: '#7fa9b8', tank: '#9fb3bf', stand: '#c9a46a', woodpile: '#8b6a4a', truck: '#4a6e96', press: '#9a6a44', wormbin: '#6f5a3c' };
     for (const o of F.objs) {
       if ((o.wild || o.t === 'brush' || o.t === 'rock' || o.t === 'cactus') && !this.wild) continue;
       if (o.t === 'tree') {
@@ -21117,6 +21174,68 @@ const SHOP = {
   },
 };
 
+// ---------------------------------------------------------------- maple sugaring, cider pressing and the worm farm (1.5.16)
+defItem('castings', { name: 'Worm castings', unit: 'bags', price: 18, icon: '🪱', kind: 'misc' });
+// Maples big enough to tap (on your own land, wild or planted) can be tapped in late winter: a bucket hangs on the trunk and fills
+// on freeze-thaw days (frosty nights, days above freezing). Collect the sap and boil it down by the tree (or at the woodshed): four
+// gallons of sap make a pint of syrup. The buckets come down in April.   o.sap = { y: year tapped, g: gallons in the bucket }
+const MAPLE = {
+  ok(o) { return o.t === 'tree' && o.kind === 'maple' && !o.cut && treeScale(o) >= 0.55; },
+  season(F) { return F.month === 1 || F.month === 2; },
+  tapped(F, o) { return !!(o.sap && o.sap.y === F.year); },
+  daily(F, rep) {
+    const w = todayW(F); let n = 0;
+    for (const o of F.objs) {
+      if (!o.sap) continue;
+      if (!this.season(F) && F.month > 2) { o.sap = null; n++; continue; }   // buckets come in for the year
+      if (o.sap.y === F.year && this.season(F) && w.t > -4 && w.t < 11) o.sap.g = Math.min(4, (o.sap.g || 0) + 0.4 + Math.random() * 0.8);
+    }
+    if (n && G.view) G.view.dirtyAll();
+  },
+  boil(F) {
+    const sap = Math.floor(F.inv.maplesap || 0), pints = Math.floor(sap / 4); if (!pints) return;
+    act('collect', 3.0, 90, 6, () => { F.inv.maplesap -= pints * 4; F.inv.syrup = (F.inv.syrup || 0) + pints; tally(F, 'syrup', pints); AUDIO.ding(); UI.toast(`🍁 ${pints} pint${pints > 1 ? 's' : ''} of maple syrup, boiled down from ${pints * 4} gallons of sap. The whole farm smells of it.`); });
+  },
+};
+// the cider press: six pounds of apples or pears make a jug of fresh cider, as many jugs as you've fruit for, at one go
+const PRESS = {
+  fruitKeys(F) { return COOK.keys(F, '@apple').concat(Object.keys(F.inv).filter((k) => k.startsWith('fruit_pear') && ITEMS[k])).filter((k) => (F.inv[k] || 0) > 0.01); },
+  fruit(F) { return this.fruitKeys(F).reduce((a, k) => a + F.inv[k], 0); },
+  press(F) {
+    const n = Math.floor(this.fruit(F) / 6); if (!n) return;
+    act('collect', 2.6, 20 + 8 * n, Math.min(12, 2 + n), () => {
+      let need = n * 6; for (const k of this.fruitKeys(F).sort((a, b) => F.inv[b] - F.inv[a])) { const u = Math.min(need, F.inv[k]); F.inv[k] -= u; need -= u; if (need <= 1e-9) break; }
+      F.inv.dish_cider = (F.inv.dish_cider || 0) + n; tally(F, 'ciderPressed', n); AUDIO.ding();
+      UI.toast(`🧃 ${n} jug${n > 1 ? 's' : ''} of fresh cider. Sell it at the stand or the market, or give it to a friend.`);
+    });
+  },
+};
+// the worm farm: feed it spare vegetables and fruit (up to 20 lbs at a time); the worms eat a couple of pounds a day and every
+// 10 lbs becomes a bag of castings. A bag on a garden bed feeds it better than a load of compost.   o.food (lbs), o.cast (bags)
+const WORMS = {
+  CAP: 20,
+  scraps(F) { return COOK.keys(F, '@veg').concat(COOK.keys(F, '@fruit'), COOK.keys(F, '@wildfruit')).filter((k, i, A) => A.indexOf(k) === i && (F.inv[k] || 0) > 0.01); },
+  daily(F) { for (const o of F.objs) if (o.t === 'wormbin') { const eat = Math.min(o.food || 0, 2.5); o.food = (o.food || 0) - eat; o.cast = Math.min(8, (o.cast || 0) + eat * 0.1); } },
+  card(o) {
+    const F = G.F, self = this;
+    const P = UI.open({ title: 'Worm farm', sub: 'Red wigglers turning scraps into soil food', icon: '🪱', foot: true });
+    const draw = () => {
+      const have = this.scraps(F).reduce((a, k) => a + F.inv[k], 0), room = Math.max(0, this.CAP - (o.food || 0)), feed = Math.min(room, have), bags = Math.floor(o.cast || 0);
+      P.body.innerHTML = `<p class="note">The worms eat about 2½ lbs a day, and every 10 lbs of scraps becomes a bag of castings. Spread a bag on a garden bed (from the bed's own card): it feeds the soil better than a load of compost.</p>` + UI.rows([
+        { icon: '🥬', text: `Food in the bin: ${fmt1(o.food || 0)} of ${this.CAP} lbs`, small: (o.food || 0) > 0.1 ? `Enough for about ${Math.ceil((o.food || 0) / 2.5)} days` : 'The worms are hungry' },
+        { id: 'feed', tap: feed >= 1, cls: feed >= 1 ? '' : 'dim', icon: '🍎', text: feed >= 1 ? `Feed them ${fmt1(feed)} lbs of spare vegetables and fruit` : 'Feed them', small: have < 1 ? 'No vegetables or fruit in your stores' : room < 1 ? 'The bin is full' : 'Takes from whatever you have most of' },
+        { id: 'take', tap: bags >= 1, cls: bags >= 1 ? '' : 'dim', icon: '🪱', text: bags >= 1 ? `Collect ${bags} bag${bags > 1 ? 's' : ''} of castings` : 'Castings', small: bags >= 1 ? `You have ${fmt1(F.inv.castings || 0)} bags` : `${Math.round((o.cast || 0) % 1 * 100)}% of the next bag · you have ${fmt1(F.inv.castings || 0)} bags` },
+      ]);
+      P.body.querySelectorAll('.row.tap').forEach((r) => { r.onclick = () => {
+        if (r.dataset.id === 'feed') { let need = feed; for (const k of self.scraps(F).sort((a, b) => F.inv[b] - F.inv[a])) { const u = Math.min(need, F.inv[k]); F.inv[k] -= u; need -= u; if (need <= 1e-9) break; } o.food = (o.food || 0) + feed; G.view.dirtyAt(o.x, o.z, 1); AUDIO.ding(); }
+        if (r.dataset.id === 'take') { o.cast -= bags; F.inv.castings = (F.inv.castings || 0) + bags; tally(F, 'castings', bags); AUDIO.ding(); }
+        draw();
+      }; });
+    };
+    draw();
+    P.foot.innerHTML = '<button class="btn go" id="wmOk">Done</button>'; $('wmOk').onclick = () => UI.closeAll();
+  },
+};
 // ---------------------------------------------------------------- barn cat kittens (1.5.15)
 // Now and then in spring the barn cat has a litter. The kittens tumble about after her; from eight weeks old they can go to a good
 // home with someone in the county (which they'll be thrilled about: a whole heart of friendship) or you can keep a couple as barn
@@ -23745,6 +23864,16 @@ function findTarget() {
       else if (tool === 'hand' && !o.crop) push(3, { label: 'Empty bed: compost, mulch or plant', icon: '🪴', ring, fn: () => UI.bedCare(o) });
       else if (tool === 'hand' && o.crop) push(3, { label: `${cr.name}: ${Math.round(clamp(o.days / (cr.months * 30), 0, 1) * 100)}% grown · tend the soil`, icon: '🌿', ring, fn: () => UI.bedCare(o) });
     }
+    if (o.t === 'tree' && d < 1.7 && tool === 'hand' && MAPLE.ok(o)) {
+      const ringM = [o.x, o.z, 1];
+      if (MAPLE.season(F) && !MAPLE.tapped(F, o)) push(0.42, { label: 'Tap this maple for sap', icon: '🍁', ring: ringM, fn: () => act('collect', 1.4, 15, 2, () => { o.sap = { y: F.year, g: 0 }; G.view.dirtyAt(o.x, o.z, 1); AUDIO.ding(); UI.toast('🪣 Tapped. The bucket fills on frosty nights and thawing days. Come back in a few days.'); }) });
+      else if (MAPLE.tapped(F, o) && (o.sap.g || 0) >= 0.5) push(0.4, { label: `Collect ${fmt1(o.sap.g)} gallons of maple sap`, icon: '🪣', ring: ringM, fn: () => act('collect', 1.2, 8, 1, () => { const g = Math.round(o.sap.g * 10) / 10; o.sap.g = 0; F.inv.maplesap = (F.inv.maplesap || 0) + g; tally(F, 'sap'); AUDIO.ding(); UI.toast(`+${fmt1(g)} gallons of sap. Four gallons boil down to a pint of syrup.`); }) });
+      else if ((F.inv.maplesap || 0) >= 4) push(0.45, { label: `Boil the sap down (${Math.floor(F.inv.maplesap / 4)} pint${Math.floor(F.inv.maplesap / 4) > 1 ? 's' : ''} of syrup)`, icon: '🍁', ring: ringM, fn: () => MAPLE.boil(F) });
+      else if (MAPLE.tapped(F, o)) push(2.5, { label: 'Sap bucket: filling', icon: '🪣', ring: ringM, fn: () => UI.toast('The sap runs on freeze-thaw days: frosty nights, days above freezing. Check back in a day or two.') });
+    }
+    if (o.t === 'press' && near(o.x, o.z, 2.0) && tool === 'hand') { const n = Math.floor(PRESS.fruit(F) / 6); push(n ? 0.5 : 2.5, n ? { label: `Press ${n} jug${n > 1 ? 's' : ''} of cider`, icon: '🍎', ring: [o.x, o.z, 1.2], fn: () => PRESS.press(F) } : { label: 'Cider press', icon: '🍎', ring: [o.x, o.z, 1.2], fn: () => UI.toast('Six pounds of apples or pears press into a jug of cider. Pick some fruit and come back.') }); }
+    if (o.t === 'wormbin' && near(o.x, o.z, 2.0) && tool === 'hand') push(0.6, { label: `Worm farm${(o.cast || 0) >= 1 ? ` · ${Math.floor(o.cast)} bag${Math.floor(o.cast) > 1 ? 's' : ''} ready` : ''}`, icon: '🪱', ring: [o.x, o.z, 1.2], fn: () => WORMS.card(o) });
+    if (o.t === 'woodpile' && near(o.x, o.z, 2.0) && tool === 'hand' && (F.inv.maplesap || 0) >= 4) push(1.0, { label: `Boil maple sap down to syrup (${Math.floor(F.inv.maplesap / 4)} pints)`, icon: '🍁', fn: () => MAPLE.boil(F) });
     if ((o.t === 'tree' || o.t === 'brush' || o.t === 'cactus') && d < 1.7) {
       const ring = [o.x, o.z, 1];
       const TR = TREES.find((q) => q.key === o.kind);
@@ -24134,7 +24263,7 @@ function moveProblem(o, x, z, rot) {
   { const rp = reachProblem(F, o.t, x, z, hw, hd, rot, o.id); if (rp) return rp; }
   return null;
 }
-const MOVE_MINUTES = { house: 600, barn: 300, greenhouse: 180, coop: 90, woodpile: 60, stand: 60, tank: 60, bed: 40, eggmobile: 30, trough: 20, hive: 25, windmill: 120 };
+const MOVE_MINUTES = { press: 40, wormbin: 30, house: 600, barn: 300, greenhouse: 180, coop: 90, woodpile: 60, stand: 60, tank: 60, bed: 40, eggmobile: 30, trough: 20, hive: 25, windmill: 120 };
 function bedRot() { return Math.round(G.Fm.yaw / (Math.PI / 2)) * (Math.PI / 2) + Math.PI / 2; }
 // a garden bed is 3 × 1: check both ends, not just the middle
 function bedSpotProblem(x, z, r, ignore) {
@@ -24145,7 +24274,7 @@ function bedSpotProblem(x, z, r, ignore) {
   }
   return null;
 }
-const MOVABLE = { house: 1, coop: 1, eggmobile: 1, greenhouse: 1, hive: 1, trough: 1, tank: 1, stand: 1, woodpile: 1, barn: 1, bed: 1, planter: 1, picnic: 1, scarecrow: 1, windmill: 1 };
+const MOVABLE = { press: 1, wormbin: 1, house: 1, coop: 1, eggmobile: 1, greenhouse: 1, hive: 1, trough: 1, tank: 1, stand: 1, woodpile: 1, barn: 1, bed: 1, planter: 1, picnic: 1, scarecrow: 1, windmill: 1 };
 function objName(o) { if (o.t === 'bed') return 'garden bed'; if (o.t === 'house') return 'farmhouse'; const dc = COSMETICS.decor.find((c) => c.key === o.t); if (dc) return dc.name.toLowerCase(); if (o.t === 'coop' || o.t === 'eggmobile') return coopName(G.F, o.id).toLowerCase(); const B = BUILD_LIST.find((b) => b.key === o.t); return B ? B.name.toLowerCase() : o.t; }
 function plantLabel() { const k = G.selSeed; if (!k || !(G.F.inv[k] > 0)) return 'Choose seeds'; return `Plant ${ITEMS[k].name.replace(' seed', '').toLowerCase()}`; }
 function plantBed(o) {
@@ -24468,6 +24597,7 @@ function buildGhost(mb, key) {
   if (key === 'barn') addBarn(mb, 0, 0, 0, 0, { hay: false }); else if (key === 'coop') addCoop(mb, 0, 0, 0, 0); else if (key === 'eggmobile') addCoop(mb, 0, 0, 0, 0, true);
   else if (key === 'greenhouse') addGreenhouse(mb, 0, 0, 0, 0); else if (key === 'hive') addHive(mb, 0, 0, 0); else if (key === 'trough') addTrough(mb, 0, 0, 0);
   else if (key === 'tank') addTank(mb, 0, 0, 0); else if (key === 'stand') addStall(mb, 0, 0, 0, 0); else if (key === 'woodpile') addWoodshed(mb, 0, 0, 0, 0, 1);
+  else if (key === 'press') addCiderPress(mb, 0, 0, 0, 0); else if (key === 'wormbin') addWormBin(mb, 0, 0, 0, 0, 0.5);
   else addDecor(mb, key, 0, 0, 0, 0);
 }
 // a pond or swale laid out on the map is dug straight away (a day's work, paid in time and energy) without walking the farmer over
