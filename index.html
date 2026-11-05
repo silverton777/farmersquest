@@ -10,6 +10,15 @@ Publishing: copy `index.html` and `sw.js` into the GitHub repo `silverton777/far
 
 ==========
 
+## 1.5.9: paddocks always numbered 1, 2, 3... and keep their animals
+
+**Why:** "when farmers rework fences the paddocks get messed up. there are now 2 paddock 5's, a paddock not named and no paddock 1, 2 or 3 ... if i take down the fence for paddock 1 then paddock 2 becomes paddock 1 and so on and if i build the new one that becomes the latest numbered paddock."
+
+- Paddocks are numbered in the order they were put up, with no gaps and no repeats. Take Paddock 1 down and Paddock 2 becomes Paddock 1, Paddock 3 becomes Paddock 2 and so on; take Paddock 3 down and Paddock 4 becomes Paddock 3. A new paddock (drawn, or closed in by fence lines) takes the next number. Open fence lines are numbered the same way.
+- Animals stay with their paddock through all of it: renumbering, reshaping a paddock, or turning a fence line into a paddock. (A paddock taken down still sends its animals to the barnyard, and one turned back into an open line does too, since a line can't hold them.)
+- Farms whose numbers had got out of step (two Paddock 5s, one with no name, missing numbers) are tidied the next time they load.
+- Before, a new paddock was named from how many there were, so taking one down and putting another up reused a number that was still in use.
+
 ## 1.5.8: a woman farmer, Rosa at her stalls, harvest without the animation, dogs that don't get stuck, windmills clear of roofs
 
 **Why:** "remove the animation of harvesting animals from the game. you can harvest but its purely turning a cow into money", "glitching dogs ... they seem to hit a spot where they get stuck and vibrate back and forth", "windmils are going through house roofs. can we get the animations to stop intersecting each other", "cannot meet rosa still" and "you can also be a female character. male and female only".
@@ -18256,7 +18265,7 @@ function interiorFrame(F0, room) {
 
 'use strict';
 // ============================================================================ profiles + saves (each profile has its own farm save)
-const FQ_VERSION = '1.5.8';
+const FQ_VERSION = '1.5.9';
 const LOOKS = [
   { shirt: [214, 74, 64], hair: [120, 76, 40] }, { shirt: [70, 130, 200], hair: [236, 206, 120] }, { shirt: [240, 170, 60], hair: [80, 50, 30] },
   { shirt: [120, 170, 90], hair: [40, 30, 28] }, { shirt: [170, 100, 190], hair: [200, 110, 60] }, { shirt: [60, 160, 160], hair: [150, 100, 60] },
@@ -19677,6 +19686,13 @@ function billText(F, from, to, b) {
   return (parts.length ? parts.join(' · ') : 'no new materials') + (b.work ? ` · about ${t.trim()} of work` : '');
 }
 // carry out a fence change (from/to as in fenceBill). Returns false if it can't be afforded.
+// paddocks and fence lines are numbered in the order they were first put up, with no gaps (1.5.9): take Paddock 1 down and
+// Paddock 2 becomes Paddock 1 and so on; a new one takes the next number. Animals belong to a paddock by its id, so a renumbered
+// or reshaped paddock keeps its herd.
+function renumberFences(F) {
+  F.paddocks = (F.paddocks || []).filter(Boolean).sort((a, b) => a.id - b.id); F.paddocks.forEach((p, i) => { p.name = `Paddock ${i + 1}`; });
+  F.fences = (F.fences || []).filter(Boolean).sort((a, b) => a.id - b.id); F.fences.forEach((p, i) => { p.name = `Fence line ${i + 1}`; });
+}
 function applyFence(F, from, to, opt) {
   opt = opt || {};
   if (to) padSync(to);
@@ -19692,16 +19708,18 @@ function applyFence(F, from, to, opt) {
   F.fences = F.fences || [];
   if (from && to && !!from.open === !!to.open) { Object.assign(from, geo); if (!to.open) delete from.open; padSync(from); msg = `${from.name} updated.`; }
   else if (to) {
+    const keepId = from ? from.id : null, keepRest = from && from.rest;
     if (from) { F.paddocks = F.paddocks.filter((q) => q !== from); F.fences = F.fences.filter((q) => q !== from); }
     if (to.open) {
-      const name = opt.name || `Fence line ${F.fences.length + 1}`;
-      F.fences.push(padSync(Object.assign({ id: F.nextId++, name }, geo)));
+      if (keepId !== null) for (const a of F.animals) if (a.pad === keepId) a.pad = null;   // an open line can't hold animals
+      const ln = padSync(Object.assign({ id: keepId !== null ? keepId : F.nextId++, name: '' }, geo));
+      F.fences.push(ln); renumberFences(F);
+      const name = ln.name;
       msg = `${name} put up.${to.gates.length ? '' : ' Add a gate any time from the map.'}`;
     } else {
-      const n = F.paddocks.length + 1, name = opt.name || `Paddock ${n}`;
-      const p = padSync(Object.assign({ id: F.nextId++, name, rest: 30 }, geo));
-      F.paddocks.push(p);
-      msg = `${name} fenced. Walk up to a gate to move animals in.`;
+      const p = padSync(Object.assign({ id: keepId !== null ? keepId : F.nextId++, name: '', rest: keepRest || 30 }, geo));
+      F.paddocks.push(p); renumberFences(F);
+      msg = `${p.name} fenced. Walk up to a gate to move animals in.`;
     }
   } else {
     F.paddocks = F.paddocks.filter((q) => q !== from); F.fences = F.fences.filter((q) => q !== from);
@@ -19710,6 +19728,7 @@ function applyFence(F, from, to, opt) {
     msg = `${from.name} taken down. ${meters(b.returned)} m of fencing and ${nGates(from)} gate${nGates(from) > 1 ? 's' : ''} are stacked in the barn for next time.${out.length ? ` ${out.length} animals went to the barnyard.` : ''}`;
   }
   if (b.work) spendTime(b.work, b.energy);
+  renumberFences(F);
   try { const made = ENCLOSE.update(F); if (made.length) msg += ` That closes off ${made.length === 1 ? 'a new paddock' : made.length + ' new paddocks'}: ${made.join(', ')}.`; } catch (e) { console.warn('enclose', e); }
   if (G.view) { G.view.dirtyAll(); G.view.rebuildColliders(); G.view.syncActors(true); }
   F.chores = makeGameChores(F); UI.choresBadge();
@@ -19798,13 +19817,14 @@ const ENCLOSE = {
       // an existing paddock of this kind that sits in this piece keeps its name, herd and rest days
       const old = virt.find((p) => { if (used.has(p)) return false; const [px, pz] = padCentroid(p); return cellAt(px, pz) === id || inPoly(pts, px, pz); });
       if (old) { used.add(old); old.pts = pts; padSync(old); continue; }
-      const p = padSync({ id: F.nextId++, name: `Paddock ${F.paddocks.length + 1}`, rest: 30, pts, gates: [], kind: 'poly', virtual: true });
+      const p = padSync({ id: F.nextId++, name: '', rest: 30, pts, gates: [], kind: 'poly', virtual: true });
       if (padArea(p) < 6) continue;
-      F.paddocks.push(p); made.push(p.name);
+      F.paddocks.push(p); made.push(p);
     }
     // closed-in ground that's been opened up again stops being a paddock; its animals go back to the yard
     for (const p of virt) if (!used.has(p)) { F.paddocks = F.paddocks.filter((q) => q !== p); for (const a of F.animals) if (a.pad === p.id) a.pad = null; }
-    return made;
+    renumberFences(F);
+    return made.map((p) => p.name);
   },
 };
 
@@ -22934,6 +22954,7 @@ function startFarm(F, profile) {
   for (const o of F.objs) if (o.taken) delete o.taken;
   if (!F.weedsInit) { F.weedsInit = true; for (let i = 0; i < 14; i++) WEEDS.spawn(F); if (G.view) G.view.dirtyAll(); }
   try { fixReach(F); } catch (e) { /* never stop a farm from loading over a windmill */ }
+  renumberFences(F);   // (1.5.9) tidies farms whose paddock numbers got out of step: duplicates, gaps, a paddock with no name
   F.chores = makeGameChores(F);
   G.mode = 'play';
   G.actionsToday = F.actionsToday || 0;

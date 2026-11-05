@@ -8,6 +8,15 @@ Publishing: copy `index.html` and `sw.js` into the GitHub repo `silverton777/far
 
 ---
 
+## 1.5.9: paddocks always numbered 1, 2, 3... and keep their animals
+
+**Why:** "when farmers rework fences the paddocks get messed up. there are now 2 paddock 5's, a paddock not named and no paddock 1, 2 or 3 ... if i take down the fence for paddock 1 then paddock 2 becomes paddock 1 and so on and if i build the new one that becomes the latest numbered paddock."
+
+- Paddocks are numbered in the order they were put up, with no gaps and no repeats. Take Paddock 1 down and Paddock 2 becomes Paddock 1, Paddock 3 becomes Paddock 2 and so on; take Paddock 3 down and Paddock 4 becomes Paddock 3. A new paddock (drawn, or closed in by fence lines) takes the next number. Open fence lines are numbered the same way.
+- Animals stay with their paddock through all of it: renumbering, reshaping a paddock, or turning a fence line into a paddock. (A paddock taken down still sends its animals to the barnyard, and one turned back into an open line does too, since a line can't hold them.)
+- Farms whose numbers had got out of step (two Paddock 5s, one with no name, missing numbers) are tidied the next time they load.
+- Before, a new paddock was named from how many there were, so taking one down and putting another up reused a number that was still in use.
+
 ## 1.5.8: a woman farmer, Rosa at her stalls, harvest without the animation, dogs that don't get stuck, windmills clear of roofs
 
 **Why:** "remove the animation of harvesting animals from the game. you can harvest but its purely turning a cow into money", "glitching dogs ... they seem to hit a spot where they get stuck and vibrate back and forth", "windmils are going through house roofs. can we get the animations to stop intersecting each other", "cannot meet rosa still" and "you can also be a female character. male and female only".
