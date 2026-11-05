@@ -10,6 +10,16 @@ Publishing: copy `index.html` and `sw.js` into the GitHub repo `silverton777/far
 
 ==========
 
+## 1.5.8: a woman farmer, Rosa at her stalls, harvest without the animation, dogs that don't get stuck, windmills clear of roofs
+
+**Why:** "remove the animation of harvesting animals from the game. you can harvest but its purely turning a cow into money", "glitching dogs ... they seem to hit a spot where they get stuck and vibrate back and forth", "windmils are going through house roofs. can we get the animations to stop intersecting each other", "cannot meet rosa still" and "you can also be a female character. male and female only".
+
+- Harvest: the animal card's button now says Harvest. Confirming sends the animal to the meat processor in town and its meat goes straight into your stores (the card shows about how much, and what it's worth at the market). There is no rifle, shot, falling animal or any other animation any more, and it works anywhere, the barn included.
+- Dogs: no more rocking back and forth in one spot. A dog keeps going round an obstacle the way it started instead of flipping left and right, fences never push it back (it jumps them and is carried right over), and a dog that makes no headway waits until you move on instead of shoving against the same spot. A dog left far behind for a while catches up with you.
+- Windmills: a windmill can't be built or moved within reach of a house, barn, greenhouse, coop or other building (its sails, tail vane and tank reach about 2.7 units round the tower), and no building can go up that close to a windmill. A windmill already too close on an older farm is moved a little way into the clear the first time the farm loads (it says so).
+- Rosa: her farmers market is open-air, with no room to walk into, so she was never anywhere you could talk to her. She now stands at her stalls in town whenever the market is open, buying or selling at the market counts as meeting her, and the market panel has a "Talk to Rosa" button.
+- A woman farmer: "Who is farming?" asks Man or Woman (with pictures of each look), and Shop → Outfit lets an existing farm switch. The woman farmer has long hair or a bun (depending on the look), a slimmer build through the shoulders and lashes; outfits, hats and everything else work the same.
+
 ## 1.5.7: easier to talk to people, and about twenty times more to say
 
 **Why:** "make it easier to talk to people in town. i have to be in the exact right spot" and "20x the conversations that go into the game between you and characters. theyre repetetive."
@@ -2664,7 +2674,8 @@ function buildFarmer(R, look) {
   m.mat = MAT.denim;
   m.sel(0, 0.0, 0, 0.26, 0.17, 0.205, 2.2, pants, { lat: 8, lon: 18, colFn: (q) => mixc(pants, pantsDk, smooth(0.0, -0.9, q[1]) * 0.5) });
   m.mat = (look.shirt && shirt[0] + shirt[1] + shirt[2] > 600) || look.plain ? MAT.plain : MAT.cloth;
-  m.sel(0, 0.28, 0, 0.275, 0.31, 0.215, 2.3, shirt, {
+  const fem = !!look.fem;   // (1.5.8) a woman farmer: a little narrower through the shoulders, longer hair, lashes
+  m.sel(0, 0.28, 0, fem ? 0.255 : 0.275, 0.31, fem ? 0.205 : 0.215, 2.3, shirt, {
     lat: 12, lon: 22,
     shape: (q) => [q[0] * (0.88 + 0.12 * smooth(-0.8, 0.8, q[1])), q[1], q[2] * (0.93 + 0.07 * smooth(-0.8, 0.4, q[1])) + 0.025 * (1 - Math.abs(q[1]))],
     colFn: (q) => mixc(shade(shirt, 0.92), shirt, smooth(-0.8, 0.6, q[1])),
@@ -2688,11 +2699,12 @@ function buildFarmer(R, look) {
     shape: (q) => [q[0] * (0.9 + 0.1 * smooth(-0.9, 0.2, q[1])), q[1], q[2] * (0.96 + 0.04 * smooth(-0.9, 0.0, q[1]))],
     colFn: (q) => mixc(skin2, skin, smooth(-0.8, 0.3, q[1])),
   });
-  const hs = look.hairStyle || 'short';
+  const hs = look.hairStyle || (look.fem ? 'long' : 'short');
   if (hs !== 'bald') {
   m.sel(0, 0.455, -0.045, 0.45, 0.335, 0.405, 2.3, hair, { lat: 12, lon: 22, colFn: (q) => mixc(shade(hair, 0.82), shade(hair, 1.12), smooth(-0.4, 0.9, q[1])), shape: (q) => [q[0], q[1] - 0.12 * Math.max(0, q[2]) * (q[1] < 0.3 ? 1 : 0), q[2]] });
     for (let i = 0; i < 6; i++) { const a = -0.62 + i * 0.25; m.ell(Math.sin(a) * 0.34, 0.6 - Math.abs(a) * 0.08, 0.255 + Math.cos(a) * 0.05, 0.085, 0.055, 0.06, shade(hair, 1.0 + (i % 2) * 0.12), { lat: 4, lon: 8 }); }  // fringe locks
-    for (const sx of [-1, 1]) m.ell(sx * 0.4, 0.43, 0.06, 0.06, 0.11, 0.09, shade(hair, 0.9), { lat: 5, lon: 8 });                                       // sideburns
+    if (!look.fem) for (const sx of [-1, 1]) m.ell(sx * 0.4, 0.43, 0.06, 0.06, 0.11, 0.09, shade(hair, 0.9), { lat: 5, lon: 8 });                       // sideburns
+    else for (const sx of [-1, 1]) m.ell(sx * 0.33, 0.5, 0.22, 0.1, 0.13, 0.09, shade(hair, 1.0), { lat: 5, lon: 8 });                                   // hair framing the face
     m.ell(0.04, 0.84, -0.05, 0.07, 0.09, 0.06, shade(hair, 1.1), { lat: 4, lon: 8 });                                                                     // cowlick
   }
   if (hs === 'long') {   // hair that falls past the shoulders
@@ -2790,6 +2802,7 @@ function buildFarmer(R, look) {
     m.ell(sx * 0.14, 0.36, 0.345, 0.058, 0.082, 0.032, C.black, { lat: 6, lon: 10 });
     m.ell(sx * 0.125, 0.39, 0.372, 0.02, 0.026, 0.01, C.white, { lat: 4, lon: 6 });
     m.ell(sx * 0.155, 0.33, 0.37, 0.011, 0.012, 0.008, [200, 220, 255], { lat: 3, lon: 6 });
+    if (look.fem) m.ell(sx * 0.19, 0.425, 0.352, 0.03, 0.009, 0.012, C.black, { lat: 3, lon: 6 });   // lashes at the outer corner
   }
   parts.eyes = m;
   // ---- upper arm (pivot at the shoulder, hangs along -y; elbow at -0.2)
@@ -13385,7 +13398,9 @@ const WHERE = {
     return { kind };
   },
   ofKind(F, test) { return this.all(F).filter((id) => { const a = this.at(F, id); return test(a, id); }); },
-  inTown(F) { return this.ofKind(F, (a) => a.kind === 'town'); },
+  // (1.5.8) Rosa's market is out on the street, with no room to walk into, so while it's open she's in town at her stalls
+  inTown(F) { return this.ofKind(F, (a) => a.kind === 'town' || (a.keeper && a.shop === 'market')); },
+  marketSpots() { const S = TOWN_SHOPS.find((q) => q.key === 'market'); return [[S.x - 1.3, TOWN_FRONT - 1.5], [S.x + 1.3, TOWN_FRONT - 1.6], [S.x, TOWN_FRONT - 1.1]]; },
   inWoods(F) { return this.ofKind(F, (a) => a.kind === 'woods'); },
   inShop(F, shop) { return this.ofKind(F, (a) => a.kind === 'shop' && a.shop === shop && !a.keeper); },
   atNb(F, key) { return this.ofKind(F, (a) => a.kind === 'nbfarm' && a.nb === key); },
@@ -13431,6 +13446,7 @@ const WHERE = {
       const n = this.makeNpc(F, id, entry[0], entry[1]);
       if (room.type === 'woods') { const L = WOODS.layout(F), p = L.patches.filter((q) => q.item && WOODS.alive(F, q))[Math.floor(Math.random() * 6)]; n.spots = [p ? [p.x + 0.9, p.z + 0.7] : [WOODS_FIRE[0] + 2.4, WOODS_FIRE[1]]]; n.tx = n.spots[0][0]; n.tz = n.spots[0][1]; }
       else if (room.type === 'shop') { const sp = WH_SHOP_SPOTS[room.shop] || WH_SHOP_SPOTS.feed; n.spots = sp; const s = sp[room.npcs.length % sp.length]; n.tx = s[0]; n.tz = s[1]; }
+      else if (id === 'rosa' && this.at(F, id).keeper) { n.spots = this.marketSpots(); n.tx = n.spots[0][0]; n.tz = n.spots[0][1]; }
       else { const p = TOWN_PATHS[Math.floor(Math.random() * TOWN_PATHS.length)]; n.tx = p[0]; n.tz = p[1]; }
       room.npcs.push(n);
     }
@@ -18240,7 +18256,7 @@ function interiorFrame(F0, room) {
 
 'use strict';
 // ============================================================================ profiles + saves (each profile has its own farm save)
-const FQ_VERSION = '1.5.7';
+const FQ_VERSION = '1.5.8';
 const LOOKS = [
   { shirt: [214, 74, 64], hair: [120, 76, 40] }, { shirt: [70, 130, 200], hair: [236, 206, 120] }, { shirt: [240, 170, 60], hair: [80, 50, 30] },
   { shirt: [120, 170, 90], hair: [40, 30, 28] }, { shirt: [170, 100, 190], hair: [200, 110, 60] }, { shirt: [60, 160, 160], hair: [150, 100, 60] },
@@ -18897,7 +18913,10 @@ const UI = {
     const S = TOWN_SHOPS.find((q) => q.key === tab);
     const P = opts.single ? this.open({ title: S.name, sub: tab === 'market' && marketDay ? 'Saturday: market day, shoppers pay 15% more' : (TOWNFOLK[S.keeper] ? `${TOWNFOLK[S.keeper].name}, ${TOWNFOLK[S.keeper].role}` : ''), icon: S.icon, foot: true })
       : this.open({ title: 'Town', sub: marketDay ? 'Saturday: farmers market is open (+15%)' : 'Feed store · Livestock auction · Market · Land office', icon: '🏘️', tabs: [{ key: 'feed', name: '🛒 Feed store' }, { key: 'stock', name: '🐄 Livestock' }, { key: 'market', name: '🏪 Market' }, { key: 'land', name: '🗺️ Land' }, { key: 'merc', name: '🛍️ Mercantile' }], tab: tab || 'feed', onTab: (t, b) => fill(t, b), foot: true });
-    P.foot.innerHTML = `<span class="note" style="flex:1;margin:0;align-self:center" id="townCash"></span><button class="btn go" id="townDone">${opts.single ? 'Done' : 'Back to the farm'}</button>`;
+    const kp = opts.single && S && S.keeper && TOWNFOLK[S.keeper] ? S.keeper : null;
+    if (kp) FRIENDS.meet(F, kp);   // being served at the stall counts as meeting the person who runs it
+    P.foot.innerHTML = `<span class="note" style="flex:1;margin:0;align-self:center" id="townCash"></span>${kp ? `<button class="btn" id="townTalk">💬 Talk to ${esc(TOWNFOLK[kp].name)}</button>` : ''}<button class="btn go" id="townDone">${opts.single ? 'Done' : 'Back to the farm'}</button>`;
+    if (kp) $('townTalk').onclick = () => { const n = (G.room && G.room.npcs || []).find((q) => q.key === kp) || WHERE.makeNpc(F, kp, G.Fm.x, G.Fm.z - 1); self.closeAll(); npcTalk(n); };
     // purchases are confirmed down here in the footer (and with a tick on the card), never with a pop-up over the list
     const cash = () => { const el = $('townCash'); if (el) { const lb = self.lastBuy && performance.now() - self.lastBuy.t < 6000 ? self.lastBuy.msg : ''; el.innerHTML = (lb ? `<b style="color:var(--leaf2)">✓ ${esc(lb)}</b>${F.kid ? '' : '<br>'}` : '') + (F.kid ? '' : `Cash: ${money(F.money)}`); } UI.hudTick(0, true); };
     const bought = (msg, key) => { self.lastBuy = { msg, t: performance.now(), key }; cash(); };
@@ -19160,7 +19179,7 @@ const UI = {
     else if (rec.sp === 'chicken' && F.objs.filter((o) => o.t === 'coop' || o.t === 'eggmobile').length > 1) btns.push(['coop', '🏠 Other coop']);
     btns.push(['sell', `💵 Sell${F.kid ? '' : ' ' + money(value * 0.9)}`]);
     if (rec.sp === 'horse' && rec.ageD > 720 && !F.kid) btns.push(['ride', F.inv.saddle ? '🐎 Ride' : '🐎 Ride (needs a saddle)']);
-    if (!F.kid && !SPECIES[rec.sp].noMeat) btns.push(['harvest', '🥩 Slaughter']);
+    if (!F.kid && !SPECIES[rec.sp].noMeat) btns.push(['harvest', '🥩 Harvest']);
     P.foot.innerHTML = btns.map(([k, l]) => `<button class="btn${k === 'harvest' ? ' bad' : ''}" data-a="${k}">${l}</button>`).join('');
     P.foot.querySelectorAll('[data-a]').forEach((b) => {
       b.onclick = () => {
@@ -19191,9 +19210,8 @@ const UI = {
         if (a === 'coop') { const coops = F.objs.filter((o) => (o.t === 'coop' || o.t === 'eggmobile') && o.id !== rec.home && coopLoad(F, o) < coopCap(o)); if (!coops.length) return UI.toast('The other coops are full.', true); const Q = this.open({ title: `Move ${rec.name} to…`, icon: '🐔' }); Q.body.innerHTML = this.rows(coops.map((o) => ({ id: o.id, tap: true, icon: o.t === 'coop' ? '🐔' : '🚚', text: coopName(F, o.id), small: `${coopLoad(F, o)} of ${coopCap(o)} hens` }))); Q.body.querySelectorAll('.row').forEach((r) => { r.onclick = () => { rec.home = +r.dataset.id; G.view.syncActors(false); const ac = G.view.actors.get(rec.id); if (ac) { ac.x = ac.home.x; ac.z = ac.home.z; } F.chores = makeGameChores(F); this.closeAll(); UI.toast(`${rec.name} moved to ${coopName(F, rec.home)}.`); }; }); }
         if (a === 'sell') this.confirm(`Sell ${rec.name}?`, `The livestock auction pays about ${money(value * 0.9)}.`, () => { F.animals = F.animals.filter((q) => q.id !== rec.id); F.money += value * 0.9; F.stats.income += value * 0.9; F.stats.yearIncome += value * 0.9; G.view.syncActors(false); F.chores = makeGameChores(F); AUDIO.cash(); UI.toast(`Sold ${rec.name} for ${money(value * 0.9)}`); });
         if (a === 'harvest') {
-          if (rec.barn) return UI.toast(`Take ${rec.name} out to the pasture first. Nobody fires a rifle in the barn.`, true);
-          const meat = Math.round(rec.lb * SX.dress);
-          this.confirm(`Slaughter ${rec.name}?`, `This harvests ${rec.name} for about ${meat} lbs of ${ITEMS[meatOf(rec.sp, rec.breed)].name.toLowerCase()}. The farmer fetches the rifle from the house, does it quickly and humanely, and puts it away again.`, () => slaughter(rec), { danger: true, yes: 'Confirm', icon: '🥩' });
+          const meat = Math.round(rec.lb * SX.dress), key = meatOf(rec.sp, rec.breed), worth = Math.round(meat * ((ITEMS[key] && ITEMS[key].price) || 0));
+          this.confirm(`Harvest ${rec.name}?`, `${rec.name} goes to the meat processor in town and comes back as about ${meat} lbs of ${ITEMS[key].name.toLowerCase()}${worth ? ` (worth about ${money(worth)} at the market)` : ''}, ready in your stores.`, () => slaughter(rec), { danger: true, yes: 'Harvest', icon: '🥩' });
         }
       };
     });
@@ -20743,7 +20761,9 @@ function farmerPic(L, size, big) {
     + `<rect x="27" y="28" width="6" height="5" fill="${c(skin)}"/>`;
   const head = `<circle cx="30" cy="20" r="10.2" fill="${c(skin)}"/><path d="M19.8 19 q0 -10 10.2 -10.2 q10.2 .2 10.2 10.2 q-3 -5 -10.2 -5.5 q-7.2 .5 -10.2 5.5z" fill="${c(hair)}"/><circle cx="26.2" cy="21" r="1.25" fill="#2a1d14"/><circle cx="33.8" cy="21" r="1.25" fill="#2a1d14"/><path d="M26.5 25.2 q3.5 2.6 7 0" fill="none" stroke="#9a3e38" stroke-width="1.1" stroke-linecap="round"/><circle cx="23.6" cy="24" r="1.6" fill="#f2a8a0" opacity=".7"/><circle cx="36.4" cy="24" r="1.6" fill="#f2a8a0" opacity=".7"/>`;
   const vb = big ? '4 0 52 46' : '0 0 60 80', h = big ? Math.round(size * 46 / 52) : Math.round(size * 80 / 60);
-  return `<svg class="pic" viewBox="${vb}" width="${big ? size : Math.round(size * 0.75)}" height="${big ? h : size}" aria-hidden="true">${defs}${body}${head}${hatSvg(L.hat, L.hatCol)}</svg>`;
+  const long = L.fem ? (L.hairStyle === 'bun' ? `<circle cx="30" cy="9.5" r="4.6" fill="${c(hair)}"/>` : `<path d="M19.4 17 q-1.6 11 -.6 17.5 q4.6 2.4 8 -.6 l-.4 -12z M40.6 17 q1.6 11 .6 17.5 q-4.6 2.4 -8 -.6 l.4 -12z" fill="${c(hair)}"/>`) : '';
+  const lash = L.fem ? `<path d="M24.6 19.6 l-1.4 -1.1 M35.4 19.6 l1.4 -1.1" stroke="#2a1d14" stroke-width=".8" stroke-linecap="round"/>` : '';
+  return `<svg class="pic" viewBox="${vb}" width="${big ? size : Math.round(size * 0.75)}" height="${big ? h : size}" aria-hidden="true">${defs}${body}${long}${head}${lash}${hatSvg(L.hat, L.hatCol)}</svg>`;
 }
 function umbrellaPic(key, size) {
   const U = UMBRELLAS[key] || UMBRELLAS.classic, c = (v) => `rgb(${v.join(',')})`, n = 8; let g = '';
@@ -20772,7 +20792,8 @@ const SHOP = {
   // what the farmer looks like on this farm
   look(F) {
     const L = LOOKS[(F.look || 0) % LOOKS.length], st = this.style(F), o = COSMETICS.outfit.find((c) => c.key === st.outfit);
-    return { shirt: o && o.shirt ? o.shirt : L.shirt, pants: o && o.pants ? o.pants : undefined, hair: L.hair, hat: st.hat || 'straw', umbrella: st.umbrella || 'classic' };
+    const fem = F.sex === 'f';
+    return { shirt: o && o.shirt ? o.shirt : L.shirt, pants: o && o.pants ? o.pants : undefined, hair: L.hair, hat: st.hat || 'straw', umbrella: st.umbrella || 'classic', fem, hairStyle: fem ? ((F.look || 0) % 2 ? 'bun' : 'long') : undefined };
   },
   paint(F, kind) { const st = this.style(F), c = COSMETICS[kind].find((q) => q.key === st[kind]); return c && c.wall ? { wall: c.wall, roof: c.roof } : null; },
   refresh() { if (G.view && G.F) { G.view.setLook(G.F.look); G.view.dirtyAll(); PETS.sync(G.view); } },
@@ -20857,10 +20878,11 @@ const SHOP = {
       } else if (t === 'outfit') {
         const L = F ? LOOKS[(F.look || 0) % LOOKS.length] : LOOKS[0];
         const st = F ? self.style(F) : {}, hatNow = st.hat || 'straw';
-        b.innerHTML = `<p class="note">Each picture shows your farmer wearing it.</p><div class="grid">${COSMETICS.outfit.map((it) => card('outfit', it, farmerPic({ shirt: it.shirt || L.shirt, pants: it.pants || [70, 96, 150], hair: L.hair, hat: hatNow, pattern: it.pattern, vest: it.vest }, 84))).join('')}</div>`;
+        const fm = F ? self.look(F) : {};
+        b.innerHTML = (F ? `<div class="grp">Your farmer</div><div class="chips" style="gap:8px;margin-bottom:8px"><button class="chip${F.sex !== 'f' ? ' on' : ''}" data-sx="m" style="padding:8px 16px">👨‍🌾 Man</button><button class="chip${F.sex === 'f' ? ' on' : ''}" data-sx="f" style="padding:8px 16px">👩‍🌾 Woman</button></div>` : '') + `<p class="note">Each picture shows your farmer wearing it.</p><div class="grid">${COSMETICS.outfit.map((it) => card('outfit', it, farmerPic({ shirt: it.shirt || L.shirt, pants: it.pants || [70, 96, 150], hair: L.hair, hat: hatNow, pattern: it.pattern, vest: it.vest, fem: fm.fem, hairStyle: fm.hairStyle }, 84))).join('')}</div>`;
       } else if (t === 'hat') {
         const sh = F ? self.look(F) : { shirt: LOOKS[0].shirt, hair: LOOKS[0].hair };
-        b.innerHTML = `<div class="grid">${COSMETICS.hat.map((it) => card('hat', it, farmerPic({ shirt: sh.shirt, pants: sh.pants || [70, 96, 150], hair: sh.hair, hat: it.key, pattern: sh.pattern, vest: sh.vest }, 84, true))).join('')}</div>`;
+        b.innerHTML = `<div class="grid">${COSMETICS.hat.map((it) => card('hat', it, farmerPic({ shirt: sh.shirt, pants: sh.pants || [70, 96, 150], hair: sh.hair, hat: it.key, pattern: sh.pattern, vest: sh.vest, fem: sh.fem, hairStyle: sh.hairStyle }, 84, true))).join('')}</div>`;
       } else if (t === 'umbrella') {
         b.innerHTML = `<p class="note">Your farmer opens it whenever it rains and your hands are free.</p><div class="grid">${COSMETICS.umbrella.map((it) => card('umbrella', it, umbrellaPic(it.key, 76))).join('')}</div>`;
       } else if (t === 'paint') {
@@ -20870,6 +20892,8 @@ const SHOP = {
       } else {
         b.innerHTML = `<div class="grid">${COSMETICS.decor.map((it) => card('decor', it, { planter: '🌷', picnic: '🧺', scarecrow: '🎃', windmill: '🌬️' }[it.key])).join('')}</div><p class="note">Unlock a decoration once, then place as many as you like with the Build tool (a small materials cost each time).</p>`;
       }
+      // man or woman (1.5.8): the farmer on this farm and the profile both change, so new farms remember it
+      b.querySelectorAll('[data-sx]').forEach((c) => { c.onclick = () => { if (!F) return; F.sex = c.dataset.sx === 'f' ? 'f' : 'm'; try { const PR = loadProfiles(), me = PR.find((q) => q.name === F.farmer); if (me) { me.sex = F.sex; saveProfiles(PR); } } catch (e) { /* the farm keeps it anyway */ } self.refresh(); fill(t, b); }; });
       b.querySelectorAll('[data-cat]').forEach((c) => { c.onclick = () => { const cat = c.dataset.cat === 'barn' || c.dataset.cat === 'house' ? c.dataset.cat : c.dataset.cat; self.buy(cat, COSMETICS[cat].find((q) => q.key === c.dataset.k)); }; });
     }
     fill(this.tab, P.body);
@@ -20933,21 +20957,48 @@ const PETS = {
       }
       if (tx !== undefined) {
         const dx = tx - p.x, dz = tz - p.z, d = Math.hypot(dx, dz), s = Math.min(d, speed * dt);
-        // dogs (1.5.6): steer round buildings, trees and other animals instead of running through them; at a fence they jump it in a little arc
+        // dogs (1.5.6): steer round buildings, trees and other animals instead of running through them; at a fence they jump it in a little arc.
+        // 1.5.8: no more jittering in place. A dog keeps going round an obstacle the way it started (instead of flipping left and right
+        // every frame), fences never push it back (it jumps them, carried right over), and a dog that makes no headway for a moment
+        // sits down and waits until you move on, instead of shoving against the same spot.
         let ang = Math.atan2(dx, dz), go = null;
         const solid = (x, z) => V.col.blocked(x, z, p.rad, { noFence: true }) || (V.actors && [...V.actors.values()].some((a) => !a.dead && !a.inside && Math.abs(a.x - x) < 2 && Math.abs(a.z - z) < 2 && Math.hypot(a.x - x, a.z - z) < (a.rad || 0.4) * 0.8 + p.rad));
-        if (p.hopT > 0) go = 0;
-        else for (const off of [0, 0.5, -0.5, 1.0, -1.0, 1.6, -1.6, 2.3, -2.3]) { const L = s + p.rad; if (!solid(p.x + Math.sin(ang + off) * L, p.z + Math.cos(ang + off) * L)) { go = off; break; } }
-        if (go === null) { p.state = 'idle'; }
-        else {
-          ang += go;
-          const nx = p.x + Math.sin(ang) * s, nz = p.z + Math.cos(ang) * s;
-          if (!(p.hopT > 0) && V.col.blocked(nx, nz, p.rad * 0.7, {}) && !V.col.blocked(nx, nz, p.rad * 0.7, { noFence: true })) p.hopT = 0.5;   // a fence in the way: jump it
-          p.x = nx; p.z = nz; p.walkPh += s * (p.kind === 'farmdog' ? 4.6 / Math.max(0.5, p.size) : p.kind === 'dog' ? 5 : 7); p.state = 'walk';
-          let dd = ang - p.yaw; while (dd > Math.PI) dd -= Math.PI * 2; while (dd < -Math.PI) dd += Math.PI * 2; p.yaw += dd * (1 - Math.exp(-dt * 8));
+        // stuck: no headway towards the target for 1.2 s. Wait (sitting) until the target has moved on a good bit, then try again.
+        if (p.waitAt) { if (Math.hypot(tx - p.waitAt[0], tz - p.waitAt[1]) > 1.8 || d < 1.2) p.waitAt = null; }
+        // (stuck = it wants to go somewhere but has hardly moved in the last second and a bit, i.e. it's shoving or rocking in place)
+        if (!(p.hopT > 0) && !p.waitAt && d > 0.6) {
+          if (!p.chk) p.chk = { x: p.x, z: p.z, t: 0 };
+          p.chk.t += dt;
+          if (p.chk.t > 1.2) { const moved = Math.hypot(p.x - p.chk.x, p.z - p.chk.z); if (moved < Math.min(0.5, speed * 1.2 * 0.25)) { p.waitAt = [tx, tz]; p.steerT = 0; } p.chk = null; }
+        } else p.chk = null;
+        if (p.waitAt) {
+          p.state = 'idle';
+          // far behind and out of sight for a long while: catch up with you (as dogs somehow always do)
+          p.waitT = (p.waitT || 0) + dt;
+          if (p.waitT > 8 && (p.kind === 'dog' || p.kind === 'farmdog') && Math.hypot(Fm.x - p.x, Fm.z - p.z) > 12) { const bx = Fm.x - Math.sin(Fm.yaw) * 2.2, bz = Fm.z - Math.cos(Fm.yaw) * 2.2; if (!solid(bx, bz)) { p.x = bx; p.z = bz; p.waitAt = null; p.waitT = 0; } }
+        } else {
+          p.waitT = 0;
+          if (p.hopT > 0) go = 0;
+          else {
+            const offs = [0, 0.5, -0.5, 1.0, -1.0, 1.6, -1.6, 2.3, -2.3];
+            if (p.steerT > 0 && p.steer) offs.sort((a, b) => (Math.sign(b) === Math.sign(p.steer) ? 1 : 0) - (Math.sign(a) === Math.sign(p.steer) ? 1 : 0) || Math.abs(a) - Math.abs(b));
+            const L = s + p.rad;
+            for (const off of offs) { if (!solid(p.x + Math.sin(ang + off) * L, p.z + Math.cos(ang + off) * L)) { go = off; break; } }
+            if (go) { p.steer = go; p.steerT = 0.6; } else if (go === 0) p.steerT = Math.max(0, (p.steerT || 0) - dt * 2);
+          }
+          if (p.steerT > 0) p.steerT -= dt;
+          if (go === null) { p.state = 'idle'; }
+          else {
+            if (p.hopT > 0) ang = p.hopDir; else ang += go;
+            const step = p.hopT > 0 ? Math.max(s, (p.hopV || 3) * dt) : s;
+            const nx = p.x + Math.sin(ang) * step, nz = p.z + Math.cos(ang) * step;
+            if (!(p.hopT > 0) && V.col.blocked(nx, nz, p.rad * 0.9, {}) && !V.col.blocked(nx, nz, p.rad * 0.9, { noFence: true })) { p.hopT = 0.5; p.hopDir = ang; p.hopV = Math.max(speed, (p.rad * 2 + 0.5) / 0.5); }   // a fence in the way: jump it, carried right over
+            p.x = nx; p.z = nz; p.walkPh += step * (p.kind === 'farmdog' ? 4.6 / Math.max(0.5, p.size) : p.kind === 'dog' ? 5 : 7); p.state = 'walk';
+            let dd = ang - p.yaw; while (dd > Math.PI) dd -= Math.PI * 2; while (dd < -Math.PI) dd += Math.PI * 2; p.yaw += dd * (1 - Math.exp(-dt * 8));
+          }
         }
-        if (p.hopT > 0) { p.hopT -= dt; const k = 1 - Math.max(0, p.hopT) / 0.5; p.hopY = Math.sin(k * Math.PI) * 0.75 * Math.min(1.3, p.size || 1); if (p.hopT <= 0) p.hopY = 0; }
-        else V.col.resolve(p, p.rad, {});
+        if (p.hopT > 0) { p.hopT -= dt; const k = 1 - Math.max(0, p.hopT) / 0.5; p.hopY = Math.sin(k * Math.PI) * 0.75 * Math.min(1.3, p.size || 1); if (p.hopT <= 0) { p.hopY = 0; p.chk = null; } }
+        else V.col.resolve(p, p.rad, { noFence: true });   // buildings and trees push back; fences are jumped, never pushed against
       } else p.state = 'idle';
       if (p.kind !== 'farmdog') p.head = lerp(p.head, p.kind === 'cat' && p.state === 'idle' && (F.hour >= 13 && F.hour < 16) ? 0.5 : 0, dt * 2);
     }
@@ -22119,7 +22170,10 @@ const TOWN_PATHS = (() => {
 })();
 function townNPCs(F) {
   const R = rng(F.day * 31 + F.month * 7 + F.year);
-  return WHERE.inTown(F).map((id) => { const p = TOWN_PATHS[Math.floor(R() * TOWN_PATHS.length)], n = WHERE.makeNpc(F, id, p[0], p[1]); n.wait = R() * 3; return n; });
+  return WHERE.inTown(F).map((id) => {
+    if (id === 'rosa' && WHERE.at(F, id).keeper) { const sp = WHERE.marketSpots(), n = WHERE.makeNpc(F, id, sp[0][0], sp[0][1]); n.spots = sp; n.wait = R() * 3; return n; }
+    const p = TOWN_PATHS[Math.floor(R() * TOWN_PATHS.length)], n = WHERE.makeNpc(F, id, p[0], p[1]); n.wait = R() * 3; return n;
+  });
 }
 function updateTownNPCs(dt) {
   const room = G.room; if (!room || !room.npcs) return;
@@ -22457,15 +22511,16 @@ function manageProfile(p) {
 }
 // ---------------------------------------------------------------- new farm wizard
 function wizard(profile) {
-  const W = { step: profile ? 1 : 0, name: profile ? profile.name : '', look: profile ? profile.look : 0, kid: profile ? !!profile.kid : false, farm: '', region: null, listing: null };
+  const W = { step: profile ? 1 : 0, name: profile ? profile.name : '', look: profile ? profile.look : 0, sex: profile && profile.sex === 'f' ? 'f' : 'm', kid: profile ? !!profile.kid : false, farm: '', region: null, listing: null };
   $('wizard').hidden = false;
   $('wizClose').onclick = () => { $('wizard').hidden = true; };
   const body = $('wizBody'), foot = $('wizFoot'), title = $('wizTitle');
   function draw() {
     if (W.step === 0) {
       title.textContent = 'Who is farming?';
-      body.innerHTML = `<label class="note" for="wn">Farmer name</label><input type="text" id="wn" maxlength="24" placeholder="Your name" value="${esc(W.name)}"><div class="grp">Look</div><div class="chips" style="gap:10px">${LOOKS.map((L, i) => `<button class="prof${W.look === i ? ' on' : ''}" data-l="${i}" style="--shirt:rgb(${L.shirt});--hair:rgb(${L.hair});width:76px"><span class="face"></span></button>`).join('')}</div><label class="switch" style="margin-top:10px"><input type="checkbox" id="wk" ${W.kid ? 'checked' : ''}> Kid mode: no money math or energy, simpler chores</label>`;
+      body.innerHTML = `<label class="note" for="wn">Farmer name</label><input type="text" id="wn" maxlength="24" placeholder="Your name" value="${esc(W.name)}"><div class="grp">Farmer</div><div class="chips" style="gap:8px"><button class="chip${W.sex === 'm' ? ' on' : ''}" data-sx="m" style="padding:8px 16px">👨‍🌾 Man</button><button class="chip${W.sex === 'f' ? ' on' : ''}" data-sx="f" style="padding:8px 16px">👩‍🌾 Woman</button></div><div class="grp">Look</div><div class="chips" style="gap:10px">${LOOKS.map((L, i) => `<button class="prof${W.look === i ? ' on' : ''}" data-l="${i}" style="padding:2px;width:76px;background:none">${farmerPic({ shirt: L.shirt, hair: L.hair, hat: 'none', fem: W.sex === 'f', hairStyle: W.sex === 'f' ? (i % 2 ? 'bun' : 'long') : undefined }, 70, true)}</button>`).join('')}</div><label class="switch" style="margin-top:10px"><input type="checkbox" id="wk" ${W.kid ? 'checked' : ''}> Kid mode: no money math or energy, simpler chores</label>`;
       body.querySelectorAll('[data-l]').forEach((b) => { b.onclick = () => { W.name = $('wn').value; W.look = +b.dataset.l; draw(); }; });
+      body.querySelectorAll('[data-sx]').forEach((b) => { b.onclick = () => { W.name = $('wn').value; W.sex = b.dataset.sx; draw(); }; });
       foot.innerHTML = '<button class="btn go" id="wNext">Next: pick a region →</button>';
       $('wNext').onclick = () => { W.name = $("wn").value.trim().slice(0, 24); W.kid = $('wk').checked; if (!W.name) return UI.toast('Type a name first.', true); W.step = 1; draw(); };
     } else if (W.step === 1) {
@@ -22518,8 +22573,8 @@ function wizard(profile) {
         const dwhy = driveProblem(F, drivePts(F));
         if (dwhy) return UI.toast('The driveway can\'t get to that spot (' + dwhy.toLowerCase() + '). Tap another spot for the house.', true);
         let P = loadProfiles(), prof = profile;
-        if (!prof) { prof = { id: 'p' + Date.now().toString(36), name: W.name, look: W.look, kid: W.kid }; P.push(prof); saveProfiles(P); }
-        F.farmer = prof.name; F.look = prof.look; F.kid = W.kid || prof.kid;
+        if (!prof) { prof = { id: 'p' + Date.now().toString(36), name: W.name, look: W.look, sex: W.sex, kid: W.kid }; P.push(prof); saveProfiles(P); }
+        F.farmer = prof.name; F.look = prof.look; F.sex = prof.sex === 'f' ? 'f' : 'm'; F.kid = W.kid || prof.kid;
         if (!W.unlocked) F.money -= costOf(drivePts(F));
         if (W.unlocked) applyUnlocked(F);
         saveFarm(prof.id, F);
@@ -22878,6 +22933,7 @@ function startFarm(F, profile) {
   G.snowDepth = F.snowDepth || 0;
   for (const o of F.objs) if (o.taken) delete o.taken;
   if (!F.weedsInit) { F.weedsInit = true; for (let i = 0; i < 14; i++) WEEDS.spawn(F); if (G.view) G.view.dirtyAll(); }
+  try { fixReach(F); } catch (e) { /* never stop a farm from loading over a windmill */ }
   F.chores = makeGameChores(F);
   G.mode = 'play';
   G.actionsToday = F.actionsToday || 0;
@@ -23696,6 +23752,37 @@ function relocateObj(o, x, z, r, msg) {
 }
 const HOUSE_MOVE_COST = 6000;
 // can object o sit at (x, z) turned by rot? (used by walk-and-place and by dragging on the map)
+// things that reach out past their own footprint high up (1.5.8): a windmill's sails, tail vane and tank reach about 2.7 units round its
+// tower, so no building may stand inside that circle (they used to go straight through house roofs)
+const REACH = { windmill: 2.7 };
+const REACH_TALL = new Set(['house', 'barn', 'greenhouse', 'coop', 'woodpile', 'stand', 'tank', 'eggmobile']);
+function rectGap(cx, cz, hw, hd, rot, px, pz) { const c = Math.cos(rot || 0), s = Math.sin(rot || 0), dx = px - cx, dz = pz - cz, lx = c * dx - s * dz, lz = s * dx + c * dz; return Math.hypot(Math.max(0, Math.abs(lx) - hw), Math.max(0, Math.abs(lz) - hd)); }
+function reachProblem(F, t, x, z, hw, hd, rot, ignoreId) {
+  if (REACH[t]) for (const o of F.objs) {
+    if (o.id === ignoreId || !REACH_TALL.has(o.t)) continue;
+    const sd = solidOf(o) || { hw: 1, hd: 1 }, ohw = sd.hw || sd.r, ohd = sd.hd || sd.r;
+    if (rectGap(o.x, o.z, ohw, ohd, o.r || 0, x, z) < REACH[t]) return `Too close to the ${objName(o)}: the windmill's sails would hit it`;
+  }
+  if (REACH_TALL.has(t)) for (const o of F.objs) {
+    if (o.id === ignoreId || !REACH[o.t]) continue;
+    if (rectGap(x, z, hw, hd, rot, o.x, o.z) < REACH[o.t]) return 'Too close to the windmill: its sails would hit the roof';
+  }
+  return null;
+}
+// farms from before 1.5.8: a windmill standing too close to a building is moved out into the clear, once
+function fixReach(F) {
+  if (F.reachFixed || !G.view || !G.view.col) return;
+  F.reachFixed = true; let moved = 0;
+  for (const o of F.objs) {
+    if (!REACH[o.t] || !reachProblem(F, o.t, o.x, o.z, 1, 1, o.r || 0, o.id)) continue;
+    let done = false;
+    for (let r = 1; r <= 8 && !done; r += 0.5) for (let a = 0; a < 6.28 && !done; a += 0.4) {
+      const x = o.x + Math.cos(a) * r, z = o.z + Math.sin(a) * r;
+      if (!moveProblem(o, x, z, o.r || 0)) { o.x = Math.round(x * 10) / 10; o.z = Math.round(z * 10) / 10; done = true; moved++; }
+    }
+  }
+  if (moved) { G.view.rebuildColliders(); G.view.dirtyAll(); UI.toast(moved > 1 ? 'Your windmills were moved a little, clear of the roofs.' : 'Your windmill was moved a little, clear of the roof.'); }
+}
 function moveProblem(o, x, z, rot) {
   const F = G.F, T = F.terrain;
   if (o.t === 'bed') return bedSpotProblem(x, z, rot, o.id);
@@ -23707,6 +23794,7 @@ function moveProblem(o, x, z, rot) {
   for (const q of corners.concat([[x, z]])) { const rp = roadProblem(F, q[0], q[1], 0.2); if (rp && !(o.t === 'house' && /driveway/.test(rp))) return rp; }
   if (o.t === 'house') { const why = homesiteProblem(F, x, z); if (why && !/barn/.test(why)) return why; }
   for (const q of corners.concat([[x, z]])) if (G.view.col.blocked(q[0], q[1], 0.3, { ignore: o.id, noFence: o.t === 'trough' || o.t === 'eggmobile' ? false : false })) return 'Something is in the way';
+  { const rp = reachProblem(F, o.t, x, z, hw, hd, rot, o.id); if (rp) return rp; }
   return null;
 }
 const MOVE_MINUTES = { house: 600, barn: 300, greenhouse: 180, coop: 90, woodpile: 60, stand: 60, tank: 60, bed: 40, eggmobile: 30, trough: 20, hive: 25, windmill: 120 };
@@ -23908,6 +23996,7 @@ function validatePlace(P, noSnap) {
     for (const q of corners.concat([[x, z]])) { const rp = roadProblem(F, q[0], q[1], 0.2); if (rp) return { err: rp, cost: d.price }; }
     if (T.slope(x, z) > 0.3) return { err: 'Too steep. Pick flatter ground.', cost: d.price };
     for (const q of corners.concat([[x, z]])) if (G.view.col.blocked(q[0], q[1], 0.35)) return { err: 'Something is in the way', cost: d.price };
+    { const rp = reachProblem(F, d.key, x, z, d.hw, d.hd, P.rot); if (rp) return { err: rp, cost: d.price }; }
     for (const q of corners) { const k = T.idx(q[0], q[1]); if (k < 0 || T.cover[k] === COVER.water) return { err: 'That\'s water', cost: d.price }; }
     if (F.money < d.price) return { err: `Need $${d.price.toLocaleString()}`, cost: d.price };
     return { text: `${d.name}: $${d.price.toLocaleString()}. Walk to move, ⟳ to turn.`, cost: d.price };
@@ -24690,23 +24779,18 @@ function passOut() {
 function wxWord(w) { return { sun: `Sunny, ${toF(w.t)}°F`, cloud: `Cloudy, ${toF(w.t)}°F`, fog: 'Foggy morning', rain: `Rain, ${toF(w.t)}°F`, storm: 'Thunderstorms!', snow: `Snow, ${toF(w.t)}°F`, hurricane: 'HURRICANE!' }[w.kind]; }
 const toF = (c) => Math.round(c * 9 / 5 + 32);
 
-// ---------------------------------------------------------------- slaughter (only from an animal's card: select, Slaughter, Confirm)
+// ---------------------------------------------------------------- harvest (only from an animal's card: Harvest, Confirm)
+// 1.5.7+ (owner's call): no animation at all. The animal leaves the farm for the processor and its meat lands in your stores.
 function slaughter(rec) {
-  const F = G.F, a = G.view.actors.get(rec.id), Fm = G.Fm;
-  if (!a) return;
-  const meat = Math.round(rec.lb * SPECIES_EXTRA[rec.sp].dress);
-  a.state = 'idle'; a.st = 99;
-  act('aim', 1.6, 30, 4, () => {
-    a.dead = true; a.deadT = 0;
-    F.animals = F.animals.filter((q) => q.id !== rec.id);
-    const key = meatOf(rec.sp, rec.breed);
-    F.inv[key] = (F.inv[key] || 0) + meat; tally(F, key, 1);
-    UI.toast(`${rec.name} was harvested humanely: +${meat} lbs ${ITEMS[key].name.toLowerCase()}`);
-    F.chores = makeGameChores(F);
-  }, {
-    face: a,
-    tick: (dt, t) => { if (t > 1.1 && !G.shot) { G.shot = true; AUDIO.shot(); if (Fm.muzzle) G.view.puffs.push({ flash: true, x: Fm.muzzle[0], y: Fm.muzzle[1], z: Fm.muzzle[2], t: 0 }); } if (t < 0.1) G.shot = false; },
-  });
+  const F = G.F;
+  if (!F.animals.includes(rec)) return;
+  const meat = Math.round(rec.lb * SPECIES_EXTRA[rec.sp].dress), key = meatOf(rec.sp, rec.breed);
+  F.animals = F.animals.filter((q) => q.id !== rec.id);
+  G.view.actors.delete(rec.id); G.view.syncActors(false);
+  F.inv[key] = (F.inv[key] || 0) + meat; tally(F, key, 1);
+  F.chores = makeGameChores(F); UI.choresBadge && UI.choresBadge();
+  AUDIO.cash(); UI.hudTick && UI.hudTick(0, true);
+  UI.toast(`${rec.name} went to the processor: +${meat} lbs ${ITEMS[key].name.toLowerCase()} in your stores`);
 }
 // herd moves through the gate into a new paddock
 function moveAnimals(list, pad) {

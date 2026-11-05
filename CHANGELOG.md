@@ -8,6 +8,16 @@ Publishing: copy `index.html` and `sw.js` into the GitHub repo `silverton777/far
 
 ---
 
+## 1.5.8: a woman farmer, Rosa at her stalls, harvest without the animation, dogs that don't get stuck, windmills clear of roofs
+
+**Why:** "remove the animation of harvesting animals from the game. you can harvest but its purely turning a cow into money", "glitching dogs ... they seem to hit a spot where they get stuck and vibrate back and forth", "windmils are going through house roofs. can we get the animations to stop intersecting each other", "cannot meet rosa still" and "you can also be a female character. male and female only".
+
+- Harvest: the animal card's button now says Harvest. Confirming sends the animal to the meat processor in town and its meat goes straight into your stores (the card shows about how much, and what it's worth at the market). There is no rifle, shot, falling animal or any other animation any more, and it works anywhere, the barn included.
+- Dogs: no more rocking back and forth in one spot. A dog keeps going round an obstacle the way it started instead of flipping left and right, fences never push it back (it jumps them and is carried right over), and a dog that makes no headway waits until you move on instead of shoving against the same spot. A dog left far behind for a while catches up with you.
+- Windmills: a windmill can't be built or moved within reach of a house, barn, greenhouse, coop or other building (its sails, tail vane and tank reach about 2.7 units round the tower), and no building can go up that close to a windmill. A windmill already too close on an older farm is moved a little way into the clear the first time the farm loads (it says so).
+- Rosa: her farmers market is open-air, with no room to walk into, so she was never anywhere you could talk to her. She now stands at her stalls in town whenever the market is open, buying or selling at the market counts as meeting her, and the market panel has a "Talk to Rosa" button.
+- A woman farmer: "Who is farming?" asks Man or Woman (with pictures of each look), and Shop → Outfit lets an existing farm switch. The woman farmer has long hair or a bun (depending on the look), a slimmer build through the shoulders and lashes; outfits, hats and everything else work the same.
+
 ## 1.5.7: easier to talk to people, and about twenty times more to say
 
 **Why:** "make it easier to talk to people in town. i have to be in the exact right spot" and "20x the conversations that go into the game between you and characters. theyre repetetive."
