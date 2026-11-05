@@ -8,6 +8,12 @@ Publishing: copy `index.html` and `sw.js` into the GitHub repo `silverton777/far
 
 ---
 
+## 1.5.12: "Build 6 swales on contour" is a level 3 goal
+
+**Why:** "make build 6 swales on contour level 3".
+
+- The swale goal now starts at level 2: building 3 swales is a level 2 goal, 6 swales level 3, 12 swales level 4, and so on up. (Before, 3 swales was level 1 and 6 was level 2.) Building the first swales no longer holds back level 1.
+
 ## 1.5.11: Scout roams on his own until you whistle
 
 **Why:** "scout the dog keeps following me everywhere just let him roam unless i call hime over".

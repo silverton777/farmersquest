@@ -10,6 +10,12 @@ Publishing: copy `index.html` and `sw.js` into the GitHub repo `silverton777/far
 
 ==========
 
+## 1.5.12: "Build 6 swales on contour" is a level 3 goal
+
+**Why:** "make build 6 swales on contour level 3".
+
+- The swale goal now starts at level 2: building 3 swales is a level 2 goal, 6 swales level 3, 12 swales level 4, and so on up. (Before, 3 swales was level 1 and 6 was level 2.) Building the first swales no longer holds back level 1.
+
 ## 1.5.11: Scout roams on his own until you whistle
 
 **Why:** "scout the dog keeps following me everywhere just let him roam unless i call hime over".
@@ -17301,7 +17307,7 @@ const plural = (n, one, many) => `${n.toLocaleString()} ${n === 1 ? one : (many 
 // base: first target (later targets follow LADDER_MULT) or steps: an explicit list (extended by x1.5 after the last);
 // reward: the first rung's prize; max: a natural ceiling; old: earlier one-off goals -> how many rungs they already cover
 const LADDERS = [
-  { id: 'swales', cat: 'Water', icon: '〰️', base: 3, reward: 800, of: (F) => F.swales.length, name: (n) => `Build ${plural(n, 'swale')} on contour`, old: { swale3: 1 } },
+  { id: 'swales', cat: 'Water', icon: '〰️', base: 3, reward: 800, lv: 2, of: (F) => F.swales.length, name: (n) => `Build ${plural(n, 'swale')} on contour`, old: { swale3: 1 } },
   { id: 'ponds', cat: 'Water', icon: '💧', steps: [2, 3, 4, 6, 8, 10, 15, 20], reward: 900, lv: 2, after: WATER_MORE, of: (F) => F.ponds.length, name: (n) => `Dig ${plural(n, 'pond')}` },
   { id: 'fullponds', cat: 'Water', icon: '🌊', steps: [2, 3, 5, 8, 12], reward: 1200, lv: 3, after: WATER_MORE, of: (F) => F.ponds.filter((p) => p.vol >= 0.95).length, name: (n) => `Have ${n} ponds full at once` },
   { id: 'swaletrees', cat: 'Water', icon: '🌱', steps: [5, 15, 30, 60, 100, 150, 200, 300], reward: 600, lv: 2, after: WATER_MORE, of: (F) => treesOnSwales(F), name: (n) => `Plant ${plural(n, 'tree')} along your swales` },
@@ -18320,7 +18326,7 @@ function interiorFrame(F0, room) {
 
 'use strict';
 // ============================================================================ profiles + saves (each profile has its own farm save)
-const FQ_VERSION = '1.5.11';
+const FQ_VERSION = '1.5.12';
 const LOOKS = [
   { shirt: [214, 74, 64], hair: [120, 76, 40] }, { shirt: [70, 130, 200], hair: [236, 206, 120] }, { shirt: [240, 170, 60], hair: [80, 50, 30] },
   { shirt: [120, 170, 90], hair: [40, 30, 28] }, { shirt: [170, 100, 190], hair: [200, 110, 60] }, { shirt: [60, 160, 160], hair: [150, 100, 60] },
