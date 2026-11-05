@@ -8,6 +8,18 @@ Publishing: copy `index.html` and `sw.js` into the GitHub repo `silverton777/far
 
 ---
 
+## 1.5.7: easier to talk to people, and about twenty times more to say
+
+**Why:** "make it easier to talk to people in town. i have to be in the exact right spot" and "20x the conversations that go into the game between you and characters. theyre repetetive."
+
+- Talking: people stop and turn to you from a few steps away (about twice as far as before), the "Talk to" button reaches that far and wins over a shelf or a door unless that is much closer, and tapping anyone you can see on screen walks you up to them and starts the conversation. Works in town, in the shops, on the neighbours' farms, in the woods, and with visitors and neighbours on your own farm. A person who was talking to you always walks on again when the panel is closed (before, closing it any way but "Bye!" left them frozen).
+- Conversations: the 22 townsfolk and neighbours went from 3 or 4 lines each (76 in all) to about 68 each (1,495 in all): everyday lines in their own voice, lines for each season, warmer lines once you are friends, and news about the other people in the county. On top of that come 80 remarks about your own farm that are said only when true (your pond, swales, paddocks, each kind of animal, bees, garden, trees, dog, a big farm, the festival that month and so on), 53 short openers for the time of day and the weather, and 20 warm lines for friends.
+- Nobody repeats themselves: each person remembers what they last said to you (kept in the save) and works through most of their lines before any comes round again.
+- New questions for townsfolk ("What's new with you?" and "Got any advice?") and for neighbours ("What's new with you?"), which can be asked as often as you like.
+- Proper chats: 151 topics instead of 12 (95 new shared ones plus two of each person's own), and a topic you have already talked through with someone isn't picked again for a good while. Reactions went from 9 to 36.
+- Visitors at your farm: 58 questions instead of 12 (not repeated until most have been asked), 39 ways to say hello instead of 4, and more reactions. Hired hands on the neighbours' farms have 51 things to say instead of 4, and people met in town, in the shops, on farms and in the woods have 70 lines for the place instead of 13.
+- Fixed: a neighbour visiting another neighbour's farm answered as if they were a hired hand there.
+
 ## 1.5.6: horse riding fixed, shopkeepers to talk to, dogs that go round things, fences round ponds and breaks in swales, all controls on the left thumb, bonus goals, $60,000 to start
 
 **Why:** the owner's list: "in one account i bought up a bunch of [land] and anytime i try to open the map the game freezes", "glitches when trying to get on and ride horse", "it says you havent met workers at town shops but there isnt an opportunity to talk with them, fix that", "back to $60000 starting money", "fix dogs being able to run through buildings and fences and animals", "ponds and swales cannot be build on fences and vice versa. give an option to fence around the pond or put a break in the swale", "hard time feeding pigs when in paddock. option wouldnt show up unless in barnyard", "tips like unroll bale here get in the way of the view and make it so you cannot use the right area of the screen", "add in unlocked mode a setting that changes ALL movement and panning controls on the left thumb", "the soil organic matter being raised by 0.5% needs to be at least level 6", "the aesthetic changes/animation upgrades ... have not taken place in the neighbors farms" and "i want some bonus goals that are separate from the others".
