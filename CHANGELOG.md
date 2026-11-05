@@ -8,6 +8,14 @@ Publishing: copy `index.html` and `sw.js` into the GitHub repo `silverton777/far
 
 ---
 
+## 1.5.11: Scout roams on his own until you whistle
+
+**Why:** "scout the dog keeps following me everywhere just let him roam unless i call hime over".
+
+- The pet dog (Scout, or whatever you've named him) no longer follows you everywhere. He roams the yard round the house on his own: trotting or ambling off to sniff somewhere, lazing about, and looking up at you when you stop nearby. If he ends up far from home he heads back.
+- Whistle to call him: he hears it from anywhere on the farm, comes running and keeps you company for about a minute and a quarter, then goes back to his own business. The whistle button now shows whenever you have him, even with no other animals out.
+- Farm dogs bought at the livestock barn keep their own jobs (follow, guard, herd and so on), as before.
+
 ## 1.5.10: choose what the farm stand sells
 
 **Why:** "What goes to my farm stand? I never have eggs in my backpack. can i control what goes to the farm stand and stays with me?"

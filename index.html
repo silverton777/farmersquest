@@ -10,6 +10,14 @@ Publishing: copy `index.html` and `sw.js` into the GitHub repo `silverton777/far
 
 ==========
 
+## 1.5.11: Scout roams on his own until you whistle
+
+**Why:** "scout the dog keeps following me everywhere just let him roam unless i call hime over".
+
+- The pet dog (Scout, or whatever you've named him) no longer follows you everywhere. He roams the yard round the house on his own: trotting or ambling off to sniff somewhere, lazing about, and looking up at you when you stop nearby. If he ends up far from home he heads back.
+- Whistle to call him: he hears it from anywhere on the farm, comes running and keeps you company for about a minute and a quarter, then goes back to his own business. The whistle button now shows whenever you have him, even with no other animals out.
+- Farm dogs bought at the livestock barn keep their own jobs (follow, guard, herd and so on), as before.
+
 ## 1.5.10: choose what the farm stand sells
 
 **Why:** "What goes to my farm stand? I never have eggs in my backpack. can i control what goes to the farm stand and stays with me?"
@@ -7787,7 +7795,7 @@ const WHISTLE = {
   // the button shows on the farm whenever something is out and about (not driving, in the photo mode, or indoors)
   available() {
     const F = G.F;
-    return !!(F && G.mode === 'play' && G.view && !G.drive && !G.photo && !G.place && F.animals.some((r) => !r.barn));
+    return !!(F && G.mode === 'play' && G.view && !G.drive && !G.photo && !G.place && (F.animals.some((r) => !r.barn) || (G.view.pets || []).some((p) => p.kind === 'dog')));
   },
   sync() {
     const b = $('whistleBtn'); if (!b) return;
@@ -7821,7 +7829,11 @@ const WHISTLE = {
   },
   call(S) {
     const F = G.F, Fm = G.Fm, list = S.list.filter((a) => !a.dead && !a.inside && !a.rec.barn);
-    if (!list.length) { UI.toast(S.pad ? `Nobody in ${S.pad.name} to call.` : 'No loose animals in the barnyard to call.', true); return; }
+    // the pet dog hears the whistle from anywhere on the farm and comes to keep you company for a while (1.5.11)
+    const pet = (G.view.pets || []).find((p) => p.kind === 'dog');
+    if (pet) { pet.callT = 75; pet.goal = null; pet.waitAt = null; pet.st = 0; }
+    if (!list.length) { UI.toast(pet ? `${PETS.name(F, 'dog')} comes running! 🐕` : S.pad ? `Nobody in ${S.pad.name} to call.` : 'No loose animals in the barnyard to call.', !pet); return; }
+    if (pet) UI.toast(`${PETS.name(F, 'dog')} comes running too! 🐕`);
     // the near ones first, so they take the front of the ring
     list.sort((p, q) => Math.hypot(p.x - Fm.x, p.z - Fm.z) - Math.hypot(q.x - Fm.x, q.z - Fm.z));
     const rnd = Math.random, dog = DOGS.gather(list), quick = dog ? 0.45 : 1;   // a herding dog runs out round them, and they come in at a trot
@@ -18308,7 +18320,7 @@ function interiorFrame(F0, room) {
 
 'use strict';
 // ============================================================================ profiles + saves (each profile has its own farm save)
-const FQ_VERSION = '1.5.10';
+const FQ_VERSION = '1.5.11';
 const LOOKS = [
   { shirt: [214, 74, 64], hair: [120, 76, 40] }, { shirt: [70, 130, 200], hair: [236, 206, 120] }, { shirt: [240, 170, 60], hair: [80, 50, 30] },
   { shirt: [120, 170, 90], hair: [40, 30, 28] }, { shirt: [170, 100, 190], hair: [200, 110, 60] }, { shirt: [60, 160, 160], hair: [150, 100, 60] },
@@ -21005,12 +21017,32 @@ const PETS = {
         p.lastDF = dF;
         p.pant = lerp(p.pant || 0, p.pantT > 0 ? 1 : 0, 1 - Math.exp(-dt * 5));
         p.lie = lerp(p.lie || 0, tx !== undefined ? 0 : p.wantLie || 0, 1 - Math.exp(-dt * (p.wantLie ? 1.6 : 5)));
+      } else if (p.kind === 'dog' && !(p.callT > 0)) {
+        // (1.5.11) the pet dog roams the yard round the house on his own: trotting off to sniff somewhere, then lazing about.
+        // He only comes to you, and keeps you company for a while, when you whistle for him.
+        const hx = house.x, hz = house.z + 4.5, R0 = 10;
+        if (p.st < 0) {
+          p.st = 3 + Math.random() * 9;
+          const r = Math.random();
+          if (r < 0.6) { for (let k = 0; k < 8; k++) { const a = Math.random() * 6.283, d = 2 + Math.random() * R0, gx = hx + Math.cos(a) * d, gz = hz + Math.sin(a) * d; if (ownedAt(F, gx, gz) && !V.col.blocked(gx, gz, 0.5, { noFence: false })) { p.goal = [gx, gz]; p.trot = Math.random() < 0.3; break; } } }
+          else p.goal = null;
+          p.sniff = Math.random() < 0.35 ? [p.x + (Math.random() - 0.5) * 2, p.z + (Math.random() - 0.5) * 2] : null;
+        }
+        if (Math.hypot(p.x - hx, p.z - hz) > R0 * 2.2 && !p.goal) p.goal = [hx, hz];   // wandered (or been left) far off: head home
+        if (p.goal && Math.hypot(p.goal[0] - p.x, p.goal[1] - p.z) > 0.3) { tx = p.goal[0]; tz = p.goal[1]; speed = p.trot ? 2.8 : 1.3; }
+        else if (p.goal) p.goal = null;
+        if (tx === undefined && p.sniff) { tx = p.sniff[0]; tz = p.sniff[1]; speed = 1.0; if (Math.hypot(tx - p.x, tz - p.z) < 0.2) p.sniff = null; }
+        // when you're close and standing still, he looks up at you
+        if (tx === undefined && Math.hypot(Fm.x - p.x, Fm.z - p.z) < 3 && Fm.walk < 0.2) { let dd = Math.atan2(Fm.x - p.x, Fm.z - p.z) - p.yaw; while (dd > Math.PI) dd -= Math.PI * 2; while (dd < -Math.PI) dd += Math.PI * 2; p.yaw += dd * Math.min(1, dt * 2); }
       } else if (p.kind === 'dog') {
+        // called: he comes running and stays by you for a while (a minute or so), then goes back to his own business
+        p.callT -= dt;
         const bx = Fm.x - Math.sin(Fm.yaw) * 1.2 + Math.cos(Fm.yaw) * 0.9, bz = Fm.z - Math.cos(Fm.yaw) * 1.2 - Math.sin(Fm.yaw) * 0.9;
         const d = Math.hypot(bx - p.x, bz - p.z);
         if (d > 1.0) { tx = bx; tz = bz; speed = clamp(d * 1.6, 1.4, 4.6); }
         else if (p.st < 0) { p.st = 2 + Math.random() * 3; p.sniff = Math.random() < 0.4 ? [p.x + (Math.random() - 0.5) * 2, p.z + (Math.random() - 0.5) * 2] : null; }
         if (!tx && p.sniff) { tx = p.sniff[0]; tz = p.sniff[1]; speed = 1.2; if (Math.hypot(tx - p.x, tz - p.z) < 0.2) p.sniff = null; }
+        if (p.callT <= 0) { p.goal = null; p.st = 2 + Math.random() * 4; }
       } else {
         const night = F.hour >= 20 || F.hour < 6, hx = house.x - 1.4, hz = house.z + 3.3;
         if (p.st < 0) { p.st = 4 + Math.random() * 6; const r = night ? 0.6 : 3.5, a = Math.random() * 6.28; p.goal = Math.random() < 0.5 ? [hx, hz] : [hx + Math.cos(a) * r, hz + Math.sin(a) * r]; }
