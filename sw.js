@@ -1,7 +1,7 @@
 // Farmers Quest service worker: stores every file on the device so the game runs offline.
 // The game page itself is always fetched fresh when there's a connection (so a new upload shows up on the next
 // open), and the saved copy is used when offline or when the network is too slow to answer within a few seconds.
-const CACHE = 'farmersquest-v64';
+const CACHE = 'farmersquest-v65';
 const FILES = ['./', './index.html', './manifest.webmanifest', './icon-192.png', './icon-512.png', './apple-touch-icon.png'];
 const PAGE_WAIT_MS = 4000;
 async function tell(msg) { const cs = await self.clients.matchAll({ includeUncontrolled: true }); for (const c of cs) c.postMessage(msg); }

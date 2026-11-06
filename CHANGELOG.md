@@ -8,6 +8,20 @@ Publishing: copy `index.html` and `sw.js` into the GitHub repo `silverton777/far
 
 ---
 
+## 1.5.23: simple fishing, and tapping maples in winter
+
+**Why:** "simplify fishing. its changed 3 times and keeps getting more complicated. how do you tap the maple in the winter? it only say chop down"
+
+- Fishing is now one simple loop: tap Cast, watch the bobber, and when it's pulled right under (a "!" and a buzz), tap Reel in. You get about two and a half seconds (three in kid mode).
+  - Little bobs are just nibbles. Tapping early does no harm: it only says to wait.
+  - Miss the bite and it got away; cast again.
+  - The cast-power meter, setting the hook, line tension, slack and the reeling fight are all gone. Bigger fish are just luck, a bit likelier early and late in the day.
+- Maple tapping:
+  - The season is now December through March, on the farm and in the woods. A tree tapped in December counts for the coming year's run.
+  - In the woods, every grown maple can be tapped (before, only a few already had buckets). Walk up to the trunk: "Tap this maple for sap" comes first, then "Collect maple sap" each day after. Before, "Chop down" was always closer and won.
+  - On the farm you can tap with any tool except the axe.
+  - Out of season the tree tells you: "Sugar maple: tap it for syrup December to March". A young planted maple says it needs a few more years.
+
 ## 1.5.22: help choosing where a pond goes
 
 **Why:** "dont have the water truck option to fill up pond. When placing ponds give suggestions on placements like if they have it on a high area - allow them to place it their if they want but say why it might be harder to fill and suggest where."

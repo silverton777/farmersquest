@@ -10,6 +10,20 @@ Publishing: copy `index.html` and `sw.js` into the GitHub repo `silverton777/far
 
 ==========
 
+## 1.5.23: simple fishing, and tapping maples in winter
+
+**Why:** "simplify fishing. its changed 3 times and keeps getting more complicated. how do you tap the maple in the winter? it only say chop down"
+
+- Fishing is now one simple loop: tap Cast, watch the bobber, and when it's pulled right under (a "!" and a buzz), tap Reel in. You get about two and a half seconds (three in kid mode).
+  - Little bobs are just nibbles. Tapping early does no harm: it only says to wait.
+  - Miss the bite and it got away; cast again.
+  - The cast-power meter, setting the hook, line tension, slack and the reeling fight are all gone. Bigger fish are just luck, a bit likelier early and late in the day.
+- Maple tapping:
+  - The season is now December through March, on the farm and in the woods. A tree tapped in December counts for the coming year's run.
+  - In the woods, every grown maple can be tapped (before, only a few already had buckets). Walk up to the trunk: "Tap this maple for sap" comes first, then "Collect maple sap" each day after. Before, "Chop down" was always closer and won.
+  - On the farm you can tap with any tool except the axe.
+  - Out of season the tree tells you: "Sugar maple: tap it for syrup December to March". A young planted maple says it needs a few more years.
+
 ## 1.5.22: help choosing where a pond goes
 
 **Why:** "dont have the water truck option to fill up pond. When placing ponds give suggestions on placements like if they have it on a high area - allow them to place it their if they want but say why it might be harder to fill and suggest where."
@@ -10511,7 +10525,7 @@ const COOK = {
 // ============================================================================ fishing and stocking ponds
 // Buy a rod at the Mercantile, then fish a pond (or the creek where there is one). Ponds start empty: order fingerlings from the
 // hatchery (tap the pond with your hands), keep the water full, and the fish breed. Bass eat the little fish. The catch is a
-// rod-and-line game: cast, set the hook when the line runs, then play the fish on the line tension. Fish go in your bag: sell them at the
+// simple rod-and-bobber game (1.5.23): cast, and tap Reel in when the bobber goes under. Fish go in your bag: sell them at the
 // market, cook them (the kitchen knows pan-fried fish), give them as gifts or enter the biggest at the County Fair.
 //   F.ponds[i].fish   { species: count }
 //   F.fishLog         { species: { n, best } } what you have caught
@@ -10609,9 +10623,9 @@ const FISHING = {
     let r = Math.random() * tot; for (const [f, w] of pool) { r -= w; if (r <= 0) return f; }
     return pool[0] ? pool[0][0] : null;
   },
-  // Fishing, the way it feels on a real rod: cast (a longer cast reaches deeper water and bigger fish), watch the rod tip and
-  // the line, and only set the hook when the line starts to run (little nibbles just steal bait). Then play the fish: hold
-  // Reel to win back line, ease off when it runs so the line doesn't snap, but never let it go slack or it throws the hook.
+  // Fishing (1.5.23, made simple): tap Cast, watch the bobber, and when it's pulled right under, tap Reel in. That's all. Little
+  // nibbles just bob it; tapping too early only tells you to wait. A fish that's hooked comes in: bigger ones are luck (and a
+  // little more likely early and late in the day).
   cast(src) {
     const F = G.F, self = this;
     if (!F.kid && F.energy < 6) return UI.toast('You are too tired to fish. Get some rest.', true);
@@ -10619,83 +10633,64 @@ const FISHING = {
     if (!this.pool(F, src).length) return UI.toast(src.p ? 'Nothing is biting: the pond has no fish yet. Tap it with your hands to order fingerlings.' : 'Nothing is biting in the creek today.', true);
     const w = todayW(F), prime = (F.hour >= 5 && F.hour < 9) || (F.hour >= 17 && F.hour < 20), wet = w.kind === 'rain' || w.kind === 'storm' || w.kind === 'cloud';
     const D = UI.open({ title: 'Fishing', sub: src.p ? 'The pond' : src.woods ? WOODS.waterName(F, src.pond) : 'The creek', icon: '🎣', foot: true, side: true });
-    const bar = (id, col) => `<div style="position:relative;height:22px;border-radius:11px;background:#e4eef4;margin:6px 8px;overflow:hidden"><div id="${id}" style="position:absolute;left:0;top:0;bottom:0;width:0;background:${col};border-radius:11px"></div></div>`;
-    D.body.innerHTML = `<div style="text-align:center"><div id="fsMsg" style="font-size:18px;font-weight:800;margin:6px 0 2px">Ready to cast</div><div id="fsSub" class="note" style="margin:0 0 6px">${prime ? 'Early and late are the best times to fish.' : wet ? 'Fish bite well under cloud.' : 'Midday is slow. Be patient.'}</div>`
-      + `<canvas id="fsCv" width="300" height="110" style="width:100%;max-width:340px;height:110px;border-radius:12px;background:linear-gradient(#cfe6f2,#9cc6dc)"></canvas>`
-      + `<div id="fsBars" style="display:none;text-align:left;font-size:12px;font-weight:800;color:#3d4a55"><div style="margin:4px 10px 0">Line tension</div>${bar('fsTen', 'linear-gradient(90deg,#7bc96f 0,#7bc96f 60%,#f0b84a 75%,#d9534f 100%)')}<div id="fsDistL" style="margin:4px 10px 0">Line out</div>${bar('fsDist', '#5a86b0')}</div></div>`;
-    D.foot.innerHTML = '<button class="btn" id="fsCancel">Wind in</button><button class="btn go" id="fsAct">Cast</button>';
-    const $m = $('fsMsg'), $s = $('fsSub'), cv = $('fsCv'), g2 = cv.getContext('2d'), $a = $('fsAct'), $ten = $('fsTen'), $dist = $('fsDist'), $dl = $('fsDistL');
+    D.body.innerHTML = `<div style="text-align:center"><div id="fsMsg" style="font-size:18px;font-weight:800;margin:6px 0 2px">Ready to cast</div><div id="fsSub" class="note" style="margin:0 0 6px">${prime ? 'Early and late are the best times to fish.' : wet ? 'Fish bite well on a grey day.' : 'Tap Cast, then watch the bobber.'}</div>`
+      + `<canvas id="fsCv" width="300" height="110" style="width:100%;max-width:340px;height:110px;border-radius:12px;background:linear-gradient(#cfe6f2,#9cc6dc)"></canvas></div>`;
+    D.foot.innerHTML = '<button class="btn" id="fsCancel">Wind in</button><button class="btn go" id="fsAct" style="flex:1;font-size:17px">🎣 Cast</button>';
+    const $m = $('fsMsg'), $s = $('fsSub'), cv = $('fsCv'), g2 = cv.getContext('2d'), $a = $('fsAct');
     const alive = () => $('fsMsg') === $m;
     G.Fm.act = 'fish'; G.Fm.actT = 0;
     const pose = setInterval(() => { if (!alive() && !$('fsMsg')) { clearInterval(pose); if (G.Fm.act === 'fish') G.Fm.act = null; } else G.Fm.actT += 0.3; }, 300);
-    const skill = Math.min(3, Math.floor(tallied(F, 'fish') / 12));
-    let state = 'aim', raf = 0, last = performance.now(), t = 0, power = 0, castD = 0.5, fish = null, lb = 0;
-    let tip = 0, nib = 0, nextNib = 0, takeAt = 0, takeT = 0, slack = 0, ten = 0, dist = 0, dist0 = 1, stam = 1, run = 0, runT = 0, reeling = false;
-    const finish = (spend) => { cancelAnimationFrame(raf); if (spend) spendTime(20, 1.5); };
-    $('fsCancel').onclick = () => { finish(state !== 'aim'); UI.closeAll(); };
+    const window_ = F.kid ? 3.2 : 2.4;   // seconds you have to tap once it's pulled under
+    let state = 'ready', raf = 0, last = performance.now(), t = 0, biteAt = 0, biteT = 0, nib = 0, nextNib = 0, fish = null, lb = 0, reelT = 0;
+    const finish = (spend) => { cancelAnimationFrame(raf); if (spend) spendTime(15, 1.2); };
+    $('fsCancel').onclick = () => { finish(state !== 'ready'); UI.closeAll(); };
     const say = (m, sub) => { $m.textContent = m; if (sub !== undefined) $s.textContent = sub; };
-    // the little picture: a rod tip at the left, the line out over the water, the float of the line where it enters
     function draw() {
       const W = cv.width, H = cv.height; g2.clearRect(0, 0, W, H);
       g2.fillStyle = '#7fb0cb'; g2.fillRect(0, 34, W, H - 34);
       g2.strokeStyle = 'rgba(255,255,255,0.35)'; g2.lineWidth = 1; for (let i = 0; i < 6; i++) { const y = 44 + i * 12, o = (t * 18 + i * 37) % W; g2.beginPath(); g2.moveTo(o, y); g2.lineTo(o + 24, y); g2.stroke(); }
-      const bend = state === 'fight' ? ten / 100 : tip, rx = 30, ry = 26, tx = rx + 46 * Math.cos(bend * 0.9), ty = ry - 22 + 34 * Math.sin(bend * 0.9);
+      const bend = state === 'bite' ? 0.9 : state === 'reel' ? 0.7 : nib * 0.2, rx = 30, ry = 26, tx = rx + 46 * Math.cos(bend * 0.9), ty = ry - 22 + 34 * Math.sin(bend * 0.9);
       g2.strokeStyle = '#5a3a14'; g2.lineWidth = 4; g2.beginPath(); g2.moveTo(4, H - 6); g2.quadraticCurveTo(rx, ry, tx, ty); g2.stroke();
-      if (state === 'aim') { g2.fillStyle = 'rgba(255,255,255,0.85)'; g2.fillRect(70, 12, 210, 10); g2.fillStyle = '#f0b84a'; g2.fillRect(70, 12, 210 * power, 10); g2.fillStyle = '#3d2d1c'; g2.font = '700 10px system-ui'; g2.fillText('cast distance', 72, 32); return; }
-      const ex = 80 + (state === 'fight' ? 210 * dist / Math.max(1, dist0) : 210 * castD) + (run && state === 'fight' ? Math.sin(t * 9) * 6 : 0), ey = 40 + (state === 'take' ? 6 : 0) + nib * 3;
-      g2.strokeStyle = 'rgba(250,250,250,0.9)'; g2.lineWidth = 1.2; g2.beginPath(); g2.moveTo(tx, ty); g2.quadraticCurveTo((tx + ex) / 2, Math.max(ty, ey) + (state === 'fight' ? 10 * (1 - ten / 100) : 14), ex, ey); g2.stroke();
-      // rings where the line cuts the water: bigger when something is pulling
-      g2.strokeStyle = 'rgba(255,255,255,0.8)'; for (let i = 0; i < 2; i++) { const r = 4 + ((t * 2 + i * 0.5) % 1) * (state === 'take' || run ? 14 : 6); g2.globalAlpha = 1 - ((t * 2 + i * 0.5) % 1); g2.beginPath(); g2.ellipse(ex, ey + 2, r, r * 0.35, 0, 0, 6.3); g2.stroke(); }
+      if (state === 'ready') { draw.done = true; return; }
+      // the bobber: floats, bobs at a nibble, goes right under at a bite, comes in as you reel
+      const bx = state === 'reel' ? lerp(210, 70, clamp(reelT / 1.2, 0, 1)) : 210, under = state === 'bite' ? 9 + Math.sin(t * 18) * 2 : 0;
+      const by = 41 + Math.sin(t * 2.2) * 1.2 + nib * 4 + under;
+      g2.strokeStyle = 'rgba(250,250,250,0.9)'; g2.lineWidth = 1.2; g2.beginPath(); g2.moveTo(tx, ty); g2.quadraticCurveTo((tx + bx) / 2, Math.max(ty, by) + 12, bx, by - 4); g2.stroke();
+      g2.strokeStyle = 'rgba(255,255,255,0.8)'; for (let i = 0; i < 2; i++) { const ph = (t * 1.6 + i * 0.5) % 1, r = 5 + ph * (state === 'bite' ? 22 : nib ? 10 : 6); g2.globalAlpha = 1 - ph; g2.beginPath(); g2.ellipse(bx, 42, r, r * 0.35, 0, 0, 6.3); g2.stroke(); }
       g2.globalAlpha = 1;
+      if (state !== 'bite') { g2.fillStyle = '#d9483b'; g2.beginPath(); g2.arc(bx, by - 3, 5, Math.PI, 0); g2.fill(); g2.fillStyle = '#fff'; g2.beginPath(); g2.arc(bx, by - 3, 5, 0, Math.PI); g2.fill(); }
+      if (state === 'bite') { g2.fillStyle = '#3d2d1c'; g2.font = '900 26px system-ui'; g2.fillText('!', bx - 4, 26); }
+      if (state === 'reel' && fish) { g2.font = '22px system-ui'; g2.fillText(fish.icon, bx - 10, by + 14); }
     }
     function loop() {
       if (!alive()) { finish(false); return; }
-      const now = performance.now(), dt = Math.min(0.05, (now - last) / 1000); last = now; t += dt;
-      if (state === 'aim') power = 0.5 + 0.5 * Math.sin(t * 2.6 - Math.PI / 2);
-      if (state === 'wait' || state === 'take') {
-        // nibbles twitch the tip a little; a real take pulls it right over and the line starts moving off
-        if (state === 'wait' && t > nextNib) { nib = 1; nextNib = t + 0.7 + Math.random() * 1.6; AUDIO.tone(900, 0.03, 'triangle', 0.03); }
-        nib = Math.max(0, nib - dt * 5);
-        if (state === 'wait' && t > takeAt) { state = 'take'; takeT = 0; say('The line is running!', 'Set the hook now.'); AUDIO.tone(620, 0.16, 'triangle', 0.1); try { if (navigator.vibrate) navigator.vibrate([30, 40, 80]); } catch (e) { /* no haptics */ } }
-        if (state === 'take') { takeT += dt; if (takeT > 1.4 - skill * 0.1) { state = 'again'; finish(true); say('It dropped the bait and swam off.', 'Strike while the line is running.'); $a.textContent = 'Cast again'; } }
-        tip = state === 'take' ? 0.9 : nib * 0.25;
+      const now = performance.now(), dt = Math.min(0.05, Math.max(0, (now - last) / 1000)); last = now; t += dt;
+      if (state === 'wait') {
+        if (t > nextNib) { nib = 1; nextNib = t + 0.8 + Math.random() * 1.8; AUDIO.tone(900, 0.03, 'triangle', 0.03); }
+        if (t > biteAt) { state = 'bite'; biteT = 0; say('It\'s pulled under!', 'Tap Reel in now!'); $a.textContent = '🐟 Reel in!'; AUDIO.tone(620, 0.16, 'triangle', 0.1); try { if (navigator.vibrate) navigator.vibrate([30, 40, 80]); } catch (e) { /* no haptics */ } }
       }
-      if (state === 'fight') {
-        // the fish: runs now and then (stronger and longer for a big, hard fish), tiring as it pulls against the drag
-        runT -= dt;
-        if (runT <= 0) { run = run ? 0 : (Math.random() < 0.55 + fish.diff * 0.3 ? 1 : 0); runT = run ? 0.8 + Math.random() * (0.6 + fish.diff * 1.4) : 0.8 + Math.random() * 1.6; if (run) { say('It\'s running! Ease off.'); try { if (navigator.vibrate) navigator.vibrate(40); } catch (e) { /* no haptics */ } } else say('Reel it in.'); }
-        const pull = (run ? 55 + fish.diff * 60 + lb * 4 : 8 + lb) * (0.35 + 0.65 * stam);
-        ten = clamp(ten + ((reeling ? 34 : -42) + pull - 18) * dt, 0, 100);
-        dist = Math.max(0, dist + (run ? (reeling ? 0.6 : 2.4) * stam : 0) * dt - (reeling ? (2.6 - (run ? 2.0 : 0)) : 0) * dt);
-        stam = Math.max(0.15, stam - (ten / 100) * dt * (0.09 + 0.05 / (1 + fish.diff)) * (1 + skill * 0.15));
-        slack = ten < 6 ? slack + dt : 0;
-        $ten.style.width = ten + '%'; $dist.style.width = clamp(dist / dist0 * 100, 0, 100) + '%'; $dl.textContent = `Line out: ${Math.round(dist * 5)} m`;
-        if (ten >= 100 - skill * 2) return lose('The line snapped. It got away.');
-        if (slack > 1.6) return lose('The line went slack and it threw the hook.');
-        if (dist <= 0.05) return land();
-      }
+      nib = Math.max(0, nib - dt * 4);
+      if (state === 'bite') { biteT += dt; if (biteT > window_) { state = 'missed'; finish(true); say('It got away.', 'Tap Reel in as soon as the bobber goes under.'); $a.textContent = '🎣 Cast again'; } }
+      if (state === 'reel') { reelT += dt; if (reelT >= 1.3) return land(); }
       draw();
-      raf = requestAnimationFrame(loop);
+      if (state === 'wait' || state === 'bite' || state === 'reel') raf = requestAnimationFrame(loop);
     }
     function doCast() {
-      castD = clamp(power, 0.12, 1); state = 'wait'; t = 0; nextNib = 0.6;
-      // a longer cast reaches deeper water: a little longer to wait, but better odds of a big one
-      takeAt = ((prime ? 2.2 : wet ? 3 : 4.2) + Math.random() * 4) * (0.85 + castD * 0.3);
-      say(castD > 0.75 ? 'A long cast, out over the deep water.' : castD < 0.35 ? 'A short cast, in close.' : 'A nice easy cast.', 'Watch the rod tip. Nibbles just twitch it; wait for the line to run.');
-      $a.textContent = 'Set the hook';
+      state = 'wait'; t = 0; nextNib = 0.7; last = performance.now();
+      biteAt = (prime ? 2 : wet ? 2.8 : 3.6) + Math.random() * 3.5;
+      say('Plop! Now watch the bobber.', 'Little bobs are just nibbles. Wait until it goes right under.');
+      $a.textContent = '⏳ Waiting…';
+      raf = requestAnimationFrame(loop);
     }
     function hook() {
       fish = self.pickFish(F, src);
-      if (!fish) { say('Nothing there.'); state = 'again'; $a.textContent = 'Cast again'; return; }
-      const big = Math.pow(Math.random(), 1.6 - castD * 0.7);
+      if (!fish) { state = 'missed'; finish(true); say('Nothing there after all.'); $a.textContent = '🎣 Cast again'; return; }
+      const big = Math.pow(Math.random(), prime ? 1.2 : 1.6);
       lb = fish.lb[0] + (fish.lb[1] - fish.lb[0]) * big;
-      dist0 = dist = 2 + castD * 8; stam = 1; ten = 30; slack = 0; run = 1; runT = 0.6;
-      state = 'fight'; $('fsBars').style.display = 'block'; $a.textContent = 'Hold to reel';
-      say('Fish on!', 'Hold Reel to bring it in. Let go when it runs. Keep the tension out of the red, but never let the line go slack.');
+      state = 'reel'; reelT = 0; say('Got one!', 'Reeling it in…'); $a.textContent = '🐟 Reeling…'; AUDIO.tone(760, 0.08, 'square', 0.04);
     }
-    function lose(msg) { state = 'again'; reeling = false; finish(true); $('fsBars').style.display = 'none'; say(msg, 'Ease off when it runs; keep a little pressure on always.'); $a.textContent = 'Cast again'; draw(); }
     function land() {
-      state = 'landed'; reeling = false; finish(true); $('fsBars').style.display = 'none';
+      state = 'landed'; finish(true); draw();
       const fl = F.fishLog = F.fishLog || {}, e = fl[fish.key] = fl[fish.key] || { n: 0, best: 0 };
       const first = e.n === 0, record = lb > e.best + 0.001; e.n++; if (record) e.best = Math.round(lb * 10) / 10;
       tally(F, 'fish'); if (src.woods) tally(F, 'creekfish');
@@ -10710,18 +10705,14 @@ const FISHING = {
       };
       AUDIO.fanfare();
     }
-    // one button does everything: cast, set the hook, and (held down) reel
-    $a.onpointerdown = (e) => {
-      e.preventDefault();
-      if (state === 'aim') return doCast();
-      if (state === 'wait') { state = 'again'; finish(true); say('Too soon! That was only a nibble, and you pulled the bait away.', 'Wait for the line to run.'); $a.textContent = 'Cast again'; return; }
-      if (state === 'take') return hook();
-      if (state === 'fight') { reeling = true; return; }
-      if (state === 'again') { finish(false); self.cast(src); }
+    // one button: Cast, then Reel in when it goes under
+    $a.onclick = () => {
+      if (state === 'ready') return doCast();
+      if (state === 'wait') { say('Not yet…', 'That was just a nibble. Wait until the bobber goes right under.'); return; }
+      if (state === 'bite') return hook();
+      if (state === 'missed') { finish(false); self.cast(src); }
     };
-    const stop = () => { reeling = false; };
-    $a.onpointerup = stop; $a.onpointerleave = stop; $a.onpointercancel = stop;
-    raf = requestAnimationFrame(loop);
+    draw();
   },
 };
 
@@ -13036,9 +13027,12 @@ const WOODS = {
       room.props.push({ x: t.x, z: t.z, yaw: t.yaw, tree: t,
         draw: () => { const g = stage(); ce[2] = g === 'full' ? 0.4 * t.s : 0.01; return g === 'stump' ? { mesh: this.stumpMesh(), s: 1 } : g === 'sapling' ? { mesh: this.treeMesh(t.kind, t.v, seas), s: 0.28 + (Math.max(0.3, t.s) - 0.28) * clamp((this.dayN(G.F) - (G.F.woods.cut[t.id] || 0) - WOODS_REGROW[0]) / (WOODS_REGROW[1] - WOODS_REGROW[0]), 0, 1) } : { mesh: this.treeMesh(t.kind, t.v, seas), s: t.s, model: treeModel(t.x, 0, t.z, t.yaw, t.s, t.fx.ph, t.fx.shake, this.windNow, G.t) }; },
         extra: (out) => { const f = t.fx.fall; if (f) { const fd = fellFade(f.t); out.push(Object.assign({ mesh: this.treeMesh(t.kind, t.v, seas), model: fellModel(t.x, 0, t.z, t.s, f.dir, f.t) }, fd === undefined ? {} : { fade: Math.max(0.005, fd), noShadow: true })); } } });
-      if (t.sapTree) room.props.push({ x: t.x + 0.45, z: t.z + 0.3, yaw: 0, noShadow: true, draw: () => (this.sapOpen(G.F) && stage() === 'full' ? { mesh: this.bucketMesh(), s: 1 } : null) });
-      inter.push({ x: t.x, z: t.z, r: 1.35 + 0.2 * t.s, get label() { return ownsTool(G.F, 'axe') ? `Chop down the ${kindName}` : `A ${kindName}: you'd need an axe`; }, icon: '🪓', act: 'woods', kind: 'tree', slot: t, off: () => stage() !== 'full' });
-      if (t.sapTree) inter.push({ x: t.x + 0.7, z: t.z + 0.5, r: 1.0, label: 'Collect maple sap', icon: '🪣', act: 'woods', kind: 'sap', slot: t, off: () => !(this.sapOpen(G.F) && stage() === 'full' && this.sapReady(G.F, t)) });
+      if (t.kind === 'maple') {
+        room.props.push({ x: t.x + 0.45, z: t.z + 0.3, yaw: 0, noShadow: true, draw: () => (this.sapOpen(G.F) && stage() === 'full' && this.sapTapped(G.F, t) ? { mesh: this.bucketMesh(), s: 1 } : null) });
+        // first in the list, at the trunk itself, so in season tapping and collecting come before "Chop down"
+        inter.push({ x: t.x, z: t.z, r: 1.35 + 0.2 * t.s, get label() { return this.slot && WOODS.sapTapped(G.F, this.slot) ? 'Collect maple sap' : 'Tap this maple for sap'; }, get icon() { return this.slot && WOODS.sapTapped(G.F, this.slot) ? '🪣' : '🍁'; }, act: 'woods', kind: 'sap', slot: t, off: () => !(this.sapOpen(G.F) && stage() === 'full' && (!this.sapTapped(G.F, t) || this.sapReady(G.F, t))) });
+      }
+      inter.push({ x: t.x, z: t.z, r: 1.35 + 0.2 * t.s, get label() { return t.kind === 'maple' && WOODS.sapOpen(G.F) && WOODS.sapTapped(G.F, t) && !ownsTool(G.F, 'axe') ? 'Maple: the sap bucket is filling. Come back tomorrow' : t.kind === 'maple' && !WOODS.sapOpen(G.F) ? (ownsTool(G.F, 'axe') ? 'Chop down the maple (or tap it for sap, December to March)' : 'A maple: tap it for sap December to March') : ownsTool(G.F, 'axe') ? `Chop down the ${kindName}` : `A ${kindName}: you'd need an axe`; }, icon: '🪓', act: 'woods', kind: 'tree', slot: t, off: () => stage() !== 'full' });
     }
     // ---- patches of things to pick
     for (const p of L.patches) {
@@ -13073,7 +13067,8 @@ const WOODS = {
     }
     return out;
   },
-  sapOpen(F) { return !!this.prof(F).sap && F.month <= 2; },
+  sapOpen(F) { return F.month === 11 || F.month <= 2; },   // (1.5.23) December to March, in any woods with maples
+  sapTapped(F, t) { const s = this.st(F); return !!(t.sapTree && this.prof(F).sap) || (s.tapped || {})[t.id] === MAPLE.sy(F); },
   sapReady(F, t) { const k = 's' + t.id, ta = this.st(F).taken[k]; return ta === undefined || this.dayN(F) > ta; },
   // ---------------------------------------------------------------- friends who are out here
   npcs(F, room) {
@@ -13282,6 +13277,9 @@ const WOODS = {
   },
   sap(t) {
     const F = G.F, self = this;
+    if (!this.sapTapped(F, t)) {
+      return act('collect', 1.4, 15, 2, () => { const s = self.st(F); s.tapped = s.tapped || {}; s.tapped[t.id] = MAPLE.sy(F); s.taken['s' + t.id] = self.dayN(F); AUDIO.ding(); UI.toast('🍁 You tap the maple and hang a bucket. The sap runs on frosty nights and thawing days: come back tomorrow to collect it.'); }, { face: t });
+    }
     act('collect', 1.2, 8, 1, () => { self.st(F).taken['s' + t.id] = self.dayN(F); self.add(F, 'maplesap', 1); tally(F, 'sap'); AUDIO.ding(); UI.toast('+1 gallon of maple sap 🪣. Boil it down at the campfire.'); UI.hudTick(0, true); PURSUE.check(F); }, { face: t });
   },
   dig(s) {
@@ -16564,7 +16562,7 @@ class FarmView {
         tr.look = TREELIFE.look(o, F, R0); tr.stamp = this.treeStamp(o);
         if (this.popIds && this.popIds[o.id]) { tr.pop = 0; delete this.popIds[o.id]; }
         this.trees.push(tr);
-        if (o.sap && o.sap.y === F.year) { const bx = o.x, bz = o.z + 0.22 * s + 0.12; mb.mat = MAT.metal; mb.cyl(bx, y + 0.7, bz, 0.11, 0.09, 0.24, 10, [176, 182, 188], { capCol: [150, 120, 70] }); mb.box(bx, y + 0.98, bz - 0.02, 0.24, 0.02, 0.24, [150, 156, 162]); mb.mat = 0; mb.cyl(bx, y + 0.97, bz - 0.12, 0.012, 0.012, 0.05, 4, [120, 120, 126]); }   // a sap bucket on the trunk
+        if (MAPLE.tapped(F, o)) { const bx = o.x, bz = o.z + 0.22 * s + 0.12; mb.mat = MAT.metal; mb.cyl(bx, y + 0.7, bz, 0.11, 0.09, 0.24, 10, [176, 182, 188], { capCol: [150, 120, 70] }); mb.box(bx, y + 0.98, bz - 0.02, 0.24, 0.02, 0.24, [150, 156, 162]); mb.mat = 0; mb.cyl(bx, y + 0.97, bz - 0.12, 0.012, 0.012, 0.05, 4, [120, 120, 126]); }   // a sap bucket on the trunk
         const rm = V.T ? rootMods(o, V.T, R0) : null;
         if (!o.wild && (o.age < 120 || (rm && rm.stake))) { mb.mat = MAT.boards; mb.cyl(o.x + 0.25 * s + 0.1, y - 0.1, o.z, 0.03, 0.03, 1.1 + (rm && rm.stake ? 0.5 : 0), 5, C.wood); mb.mat = 0; } // stake for young trees, and for life on a dwarfing rootstock
         break;
@@ -18996,7 +18994,7 @@ function interiorFrame(F0, room) {
 
 'use strict';
 // ============================================================================ profiles + saves (each profile has its own farm save)
-const FQ_VERSION = '1.5.22';
+const FQ_VERSION = '1.5.23';
 const LOOKS = [
   { shirt: [214, 74, 64], hair: [120, 76, 40] }, { shirt: [70, 130, 200], hair: [236, 206, 120] }, { shirt: [240, 170, 60], hair: [80, 50, 30] },
   { shirt: [120, 170, 90], hair: [40, 30, 28] }, { shirt: [170, 100, 190], hair: [200, 110, 60] }, { shirt: [60, 160, 160], hair: [150, 100, 60] },
@@ -21929,14 +21927,17 @@ defItem('castings', { name: 'Worm castings', unit: 'bags', price: 18, icon: '�
 // gallons of sap make a pint of syrup. The buckets come down in April.   o.sap = { y: year tapped, g: gallons in the bucket }
 const MAPLE = {
   ok(o) { return o.t === 'tree' && o.kind === 'maple' && !o.cut && treeScale(o) >= 0.55; },
-  season(F) { return F.month === 1 || F.month === 2; },
-  tapped(F, o) { return !!(o.sap && o.sap.y === F.year); },
+  // (1.5.23) tapping season is December through March; a tree tapped in December counts for the coming year's run
+  season(F) { return F.month === 11 || F.month <= 2; },
+  sy(F) { return F.month === 11 ? F.year + 1 : F.year; },
+  tapped(F, o) { return !!(o.sap && o.sap.y === this.sy(F)); },
+  young(o) { return o.t === 'tree' && o.kind === 'maple' && !o.cut && treeScale(o) < 0.55; },
   daily(F, rep) {
     const w = todayW(F); let n = 0;
     for (const o of F.objs) {
       if (!o.sap) continue;
       if (!this.season(F) && F.month > 2) { o.sap = null; n++; continue; }   // buckets come in for the year
-      if (o.sap.y === F.year && this.season(F) && w.t > -4 && w.t < 11) o.sap.g = Math.min(4, (o.sap.g || 0) + 0.4 + Math.random() * 0.8);
+      if (o.sap.y === this.sy(F) && this.season(F) && w.t > -4 && w.t < 11) o.sap.g = Math.min(4, (o.sap.g || 0) + 0.4 + Math.random() * 0.8);
     }
     if (n && G.view) G.view.dirtyAll();
   },
@@ -24931,9 +24932,12 @@ function findTarget() {
       else if (tool === 'hand' && !o.crop) push(3, { label: 'Empty bed: compost, mulch or plant', icon: '🪴', ring, fn: () => UI.bedCare(o) });
       else if (tool === 'hand' && o.crop) push(3, { label: `${cr.name}: ${Math.round(clamp(o.days / (cr.months * 30), 0, 1) * 100)}% grown · tend the soil`, icon: '🌿', ring, fn: () => UI.bedCare(o) });
     }
-    if (o.t === 'tree' && d < 1.7 && tool === 'hand' && MAPLE.ok(o)) {
+    // (1.5.23) any tool but the axe, December to March; out of season, or too young, the tree says when
+    if (o.t === 'tree' && d < 1.7 && tool !== 'axe' && MAPLE.young(o)) push(3, { label: 'Young sugar maple: big enough to tap in a few years', icon: '🍁', ring: [o.x, o.z, 1], fn: () => UI.toast('A maple wants to be about a foot across before you tap it. Give it a few more years.') });
+    if (o.t === 'tree' && d < 1.7 && tool !== 'axe' && MAPLE.ok(o) && !MAPLE.season(F) && !MAPLE.tapped(F, o) && (F.inv.maplesap || 0) < 4) push(3, { label: 'Sugar maple: tap it for syrup December to March', icon: '🍁', ring: [o.x, o.z, 1], fn: () => UI.toast('🍁 Maple sap runs in late winter, on frosty nights and thawing days. Come back between December and March and tap it.') });
+    if (o.t === 'tree' && d < 1.7 && tool !== 'axe' && MAPLE.ok(o)) {
       const ringM = [o.x, o.z, 1];
-      if (MAPLE.season(F) && !MAPLE.tapped(F, o)) push(0.42, { label: 'Tap this maple for sap', icon: '🍁', ring: ringM, fn: () => act('collect', 1.4, 15, 2, () => { o.sap = { y: F.year, g: 0 }; G.view.dirtyAt(o.x, o.z, 1); AUDIO.ding(); UI.toast('🪣 Tapped. The bucket fills on frosty nights and thawing days. Come back in a few days.'); }) });
+      if (MAPLE.season(F) && !MAPLE.tapped(F, o)) push(0.42, { label: 'Tap this maple for sap', icon: '🍁', ring: ringM, fn: () => act('collect', 1.4, 15, 2, () => { o.sap = { y: MAPLE.sy(F), g: 0 }; G.view.dirtyAt(o.x, o.z, 1); AUDIO.ding(); UI.toast('🪣 Tapped. The bucket fills on frosty nights and thawing days. Come back in a few days.'); }) });
       else if (MAPLE.tapped(F, o) && (o.sap.g || 0) >= 0.5) push(0.4, { label: `Collect ${fmt1(o.sap.g)} gallons of maple sap`, icon: '🪣', ring: ringM, fn: () => act('collect', 1.2, 8, 1, () => { const g = Math.round(o.sap.g * 10) / 10; o.sap.g = 0; F.inv.maplesap = (F.inv.maplesap || 0) + g; tally(F, 'sap'); AUDIO.ding(); UI.toast(`+${fmt1(g)} gallons of sap. Four gallons boil down to a pint of syrup.`); }) });
       else if ((F.inv.maplesap || 0) >= 4) push(0.45, { label: `Boil the sap down (${Math.floor(F.inv.maplesap / 4)} pint${Math.floor(F.inv.maplesap / 4) > 1 ? 's' : ''} of syrup)`, icon: '🍁', ring: ringM, fn: () => MAPLE.boil(F) });
       else if (MAPLE.tapped(F, o)) push(2.5, { label: 'Sap bucket: filling', icon: '🪣', ring: ringM, fn: () => UI.toast('The sap runs on freeze-thaw days: frosty nights, days above freezing. Check back in a day or two.') });
