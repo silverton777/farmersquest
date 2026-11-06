@@ -8,6 +8,15 @@ Publishing: copy `index.html` and `sw.js` into the GitHub repo `silverton777/far
 
 ---
 
+## 1.5.24: 50 acres at level 5, and maple goals
+
+**Why:** "make own 50 acres level 5 or 6" and "add tapping for maple on the goals list"
+
+- The "Own … acres" goal has new steps at 15, 20 and 30 acres, so it climbs more gently: 10 acres is level 1, 15 level 2, 20 level 3, 30 level 4, 50 acres level 5 and 100 acres level 6. 50 acres was level 3 and 100 acres level 4. Farms already partway up keep the steps they've earned and aren't paid twice.
+- New maple goals in the Trees group, shown wherever sugar maples grow on the farm or stand in the woods (not in the desert or the Gulf):
+  - "Tap a maple tree for sap" (level 2), on the farm or in the woods.
+  - "Boil your first pint of maple syrup", then 5, 10, 25, 50 and 100 pints (from level 3).
+
 ## 1.5.23: simple fishing, and tapping maples in winter
 
 **Why:** "simplify fishing. its changed 3 times and keeps getting more complicated. how do you tap the maple in the winter? it only say chop down"

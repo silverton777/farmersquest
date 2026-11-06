@@ -10,6 +10,15 @@ Publishing: copy `index.html` and `sw.js` into the GitHub repo `silverton777/far
 
 ==========
 
+## 1.5.24: 50 acres at level 5, and maple goals
+
+**Why:** "make own 50 acres level 5 or 6" and "add tapping for maple on the goals list"
+
+- The "Own … acres" goal has new steps at 15, 20 and 30 acres, so it climbs more gently: 10 acres is level 1, 15 level 2, 20 level 3, 30 level 4, 50 acres level 5 and 100 acres level 6. 50 acres was level 3 and 100 acres level 4. Farms already partway up keep the steps they've earned and aren't paid twice.
+- New maple goals in the Trees group, shown wherever sugar maples grow on the farm or stand in the woods (not in the desert or the Gulf):
+  - "Tap a maple tree for sap" (level 2), on the farm or in the woods.
+  - "Boil your first pint of maple syrup", then 5, 10, 25, 50 and 100 pints (from level 3).
+
 ## 1.5.23: simple fishing, and tapping maples in winter
 
 **Why:** "simplify fishing. its changed 3 times and keeps getting more complicated. how do you tap the maple in the winter? it only say chop down"
@@ -13278,7 +13287,7 @@ const WOODS = {
   sap(t) {
     const F = G.F, self = this;
     if (!this.sapTapped(F, t)) {
-      return act('collect', 1.4, 15, 2, () => { const s = self.st(F); s.tapped = s.tapped || {}; s.tapped[t.id] = MAPLE.sy(F); s.taken['s' + t.id] = self.dayN(F); AUDIO.ding(); UI.toast('🍁 You tap the maple and hang a bucket. The sap runs on frosty nights and thawing days: come back tomorrow to collect it.'); }, { face: t });
+      return act('collect', 1.4, 15, 2, () => { const s = self.st(F); s.tapped = s.tapped || {}; s.tapped[t.id] = MAPLE.sy(F); s.taken['s' + t.id] = self.dayN(F); tally(F, 'mapleTap'); checkGoalsToast(); AUDIO.ding(); UI.toast('🍁 You tap the maple and hang a bucket. The sap runs on frosty nights and thawing days: come back tomorrow to collect it.'); }, { face: t });
     }
     act('collect', 1.2, 8, 1, () => { self.st(F).taken['s' + t.id] = self.dayN(F); self.add(F, 'maplesap', 1); tally(F, 'sap'); AUDIO.ding(); UI.toast('+1 gallon of maple sap 🪣. Boil it down at the campfire.'); UI.hudTick(0, true); PURSUE.check(F); }, { face: t });
   },
@@ -17960,6 +17969,8 @@ const GOALS = [
   { id: 'fest1', cat: 'Community', icon: '🎉', name: 'Join in at a festival', reward: 300, lv: 2, prog: (F) => tallied(F, 'fests') },
   { id: 'fest4', cat: 'Community', icon: '🕯️', name: 'Take part in all four festivals', reward: 1500, lv: 4, prog: (F) => Object.keys(F.festLog || {}).length / 4 },
   { id: 'local', cat: 'Community', icon: '🏅', name: 'Become a Local in town', reward: 1200, lv: 2, prog: (F) => STANDING.score(F) / 90 },
+  // maple sugaring (1.5.24): only where sugar maples grow on the farm or stand in the woods
+  { id: 'maple1', cat: 'Trees', icon: '🍁', name: 'Tap a maple tree for sap', reward: 250, lv: 2, after: (F) => MAPLE.where(F), prog: (F) => (tallied(F, 'mapleTap') ? 1 : 0) },
   // the library (1.5.20)
   { id: 'cookbook', cat: 'Learning', icon: '📖', name: 'Cook something you learned from a book', reward: 300, lv: 2, prog: (F) => (RECIPES.some((r) => r.book && (F.cooked || {})[r.id]) ? 1 : 0) },
   { id: 'soilshelf', cat: 'Learning', icon: '🪱', name: 'Read every book on soil', reward: 800, lv: 3, prog: (F) => BOOKS.filter((b) => b.topic === 'Soil' && LIBRARY.read(F, b.key)).length / BOOKS.filter((b) => b.topic === 'Soil').length },
@@ -17971,6 +17982,15 @@ const LADDER_MULT = [1, 2, 4, 7, 10, 15, 20, 30, 40, 60, 80, 100, 150, 200, 300,
 const plural = (n, one, many) => `${n.toLocaleString()} ${n === 1 ? one : (many || one + 's')}`;
 // base: first target (later targets follow LADDER_MULT) or steps: an explicit list (extended by x1.5 after the last);
 // reward: the first rung's prize; max: a natural ceiling; old: earlier one-off goals -> how many rungs they already cover
+const ACRE_STEPS = [10, 15, 20, 30, 50, 100], ACRE_STEPS_OLD = [10, 25, 50, 100, 250, 500, 1000, 2500, 5000, 10000, 25000, 50000, 100000, 250000, 500000, 1000000];
+// a farm that climbed the old acres ladder keeps what it earned: its rung is re-counted on the new steps (no paying twice)
+function fixAcreLadder(F) {
+  if (F.acreSteps2) return; F.acreSteps2 = true;
+  LADDER.init(F);   // a very old farm builds its ladder (in old-step rungs) first
+  const n = F.ladder && F.ladder.acres; if (!n) return;
+  const done = ACRE_STEPS_OLD[Math.min(n, ACRE_STEPS_OLD.length) - 1], L = LADDERS.find((q) => q.id === 'acres');
+  F.ladder.acres = L.steps.filter((v) => v <= done).length;
+}
 const LADDERS = [
   { id: 'swales', cat: 'Water', icon: '〰️', base: 3, reward: 800, lv: 2, of: (F) => F.swales.length, name: (n) => `Build ${plural(n, 'swale')} on contour`, old: { swale3: 1 } },
   { id: 'ponds', cat: 'Water', icon: '💧', steps: [2, 3, 4, 6, 8, 10, 15, 20], reward: 900, lv: 2, after: WATER_MORE, of: (F) => F.ponds.length, name: (n) => `Dig ${plural(n, 'pond')}` },
@@ -17988,7 +18008,8 @@ const LADDERS = [
   { id: 'market', cat: 'Business', icon: '🏪', base: 5, reward: 600, of: (F) => F.stats.marketVisits || 0, name: (n) => `Sell at ${n} farmers markets`, old: { market: 2 } },
   { id: 'income', cat: 'Business', icon: '💵', base: 25000, reward: 3000, of: (F) => F.stats.income || 0, name: (n) => `Earn $${n.toLocaleString()} from farm sales`, old: { income: 1 } },
   { id: 'lots', cat: 'Business', icon: '🏡', steps: [2, 3, 4, 5, 6, 8, 10, 13, 16, 20, 25, 30, 37, 49, 61, 73, 85, 97, 109], reward: 1500, of: (F) => ownedCount(F), max: (F) => (F && HOLD.acres(F) >= MAX_ACRES - 1 ? ownedCount(F) : NPLOTS), name: (n) => `Own ${n} parcels of land`, old: { land: 7 } },
-  { id: 'acres', cat: 'Business', icon: '🏞️', steps: [10, 25, 50, 100, 250, 500, 1000, 2500, 5000, 10000, 25000, 50000, 100000, 250000, 500000, 1000000], reward: 1000, of: (F) => { const a = HOLD.acres(F); return a >= MAX_ACRES - 1 ? MAX_ACRES : a; }, max: () => MAX_ACRES, name: (n) => `Own ${n.toLocaleString()} acres`, old: { acres100: 4, acres1000: 7, acres10000: 10 } },
+  // (1.5.24) rungs at 15, 20 and 30 acres added so 50 acres is a level 5 goal and 100 acres level 6 (it was level 3 and 4)
+  { id: 'acres', cat: 'Business', icon: '🏞️', steps: ACRE_STEPS.concat([250, 500, 1000, 2500, 5000, 10000, 25000, 50000, 100000, 250000, 500000, 1000000]), reward: 1000, of: (F) => { const a = HOLD.acres(F); return a >= MAX_ACRES - 1 ? MAX_ACRES : a; }, max: () => MAX_ACRES, name: (n) => `Own ${n.toLocaleString()} acres`, old: { acres100: 4, acres1000: 7, acres10000: 10 } },
   { id: 'meet', cat: 'Community', icon: '👋', steps: [3, 6, 10, 15, 20, 30], reward: 300, of: (F) => FRIENDS.people(F).filter((p) => FRIENDS.met(F, p.id)).length, max: (F) => FRIENDS.people(F).length, name: (n) => `Meet ${n} people around the county`, old: { meet6: 2 } },
   { id: 'gifts', cat: 'Community', icon: '🎁', base: 10, reward: 400, of: (F) => tallied(F, 'gifts'), name: (n) => `Give ${plural(n, 'gift')}`, old: { gift10: 1 } },
   { id: 'jobs', cat: 'Community', icon: '📌', base: 5, reward: 600, of: (F) => tallied(F, 'jobs'), name: (n) => `Finish ${plural(n, 'job')} from the job board`, old: { jobs5: 1 } },
@@ -18003,6 +18024,7 @@ const LADDERS = [
   { id: 'wildlife', cat: 'The woods', icon: '🦌', steps: [3, 5, 8, 12, 16, 20, 25, 30], reward: 400, of: (F) => Object.keys((F.woods || {}).wild || {}).length, max: (F) => WOODS.prof(F).wild.length, name: (n) => `Spot ${n} kinds of wildlife`, old: { wild5: 2 } },
   { id: 'finds', cat: 'The woods', icon: '✨', base: 5, reward: 400, of: (F) => tallied(F, 'finds'), name: (n) => `Dig up ${plural(n, 'odd find')}`, old: { finds5: 1 }, lv: 3 },
   { id: 'bouquets', cat: 'The woods', icon: '💐', base: 1, reward: 150, of: (F) => tallied(F, 'bouquets'), name: (n) => (n === 1 ? 'Tie a wild bouquet' : `Tie ${n} wild bouquets`), old: { bouquet1: 1 } },
+  { id: 'syrup', cat: 'Trees', icon: '🍯', steps: [1, 5, 10, 25, 50, 100], reward: 300, lv: 3, after: (F) => MAPLE.where(F), of: (F) => tallied(F, 'syrup'), name: (n) => (n === 1 ? 'Boil your first pint of maple syrup' : `Boil ${n} pints of maple syrup`) },
   { id: 'books', cat: 'Learning', icon: '📚', steps: [1, 3, 6, 10, 14], reward: 300, lv: 1, of: (F) => LIBRARY.count(F), max: () => BOOKS.length, name: (n) => (n === 1 ? 'Read a book at the library' : `Read ${n} books from the library`) },
   { id: 'bookrecipes', cat: 'Learning', icon: '🥘', steps: [2, 5, 10, 15], reward: 400, lv: 2, of: (F) => LIBRARY.bookRecipes(F), max: () => RECIPES.filter((r) => r.book).length, name: (n) => `Learn ${n} recipes from library books` },
   { id: 'cooked', cat: 'Kitchen', icon: '🍳', steps: [1, 10, 25, 50, 100, 200, 350, 500, 750, 1000], reward: 200, of: (F) => tallied(F, 'cooked'), name: (n) => (n === 1 ? 'Cook your first dish' : `Cook ${n} dishes`), old: { cook1: 1, cook25: 3 } },
@@ -18994,7 +19016,7 @@ function interiorFrame(F0, room) {
 
 'use strict';
 // ============================================================================ profiles + saves (each profile has its own farm save)
-const FQ_VERSION = '1.5.23';
+const FQ_VERSION = '1.5.24';
 const LOOKS = [
   { shirt: [214, 74, 64], hair: [120, 76, 40] }, { shirt: [70, 130, 200], hair: [236, 206, 120] }, { shirt: [240, 170, 60], hair: [80, 50, 30] },
   { shirt: [120, 170, 90], hair: [40, 30, 28] }, { shirt: [170, 100, 190], hair: [200, 110, 60] }, { shirt: [60, 160, 160], hair: [150, 100, 60] },
@@ -21931,6 +21953,7 @@ const MAPLE = {
   season(F) { return F.month === 11 || F.month <= 2; },
   sy(F) { return F.month === 11 ? F.year + 1 : F.year; },
   tapped(F, o) { return !!(o.sap && o.sap.y === this.sy(F)); },
+  where(F) { try { const R = regionByKey(F.region), mt = TREES.find((t) => t.key === 'maple'); const z = hardinessZone(R); return (mt && z >= mt.zone[0] && z <= mt.zone[1]) || !!(WOODS_REG[F.region] && (WOODS_REG[F.region].canopy || []).some((c) => c[0] === 'maple')); } catch (e) { return false; } },
   young(o) { return o.t === 'tree' && o.kind === 'maple' && !o.cut && treeScale(o) < 0.55; },
   daily(F, rep) {
     const w = todayW(F); let n = 0;
@@ -24449,6 +24472,7 @@ function startFarm(F, profile) {
   if (!F.weedsInit) { F.weedsInit = true; for (let i = 0; i < 14; i++) WEEDS.spawn(F); if (G.view) G.view.dirtyAll(); }
   try { fixReach(F); } catch (e) { /* never stop a farm from loading over a windmill */ }
   try { fixOrphanWater(F); } catch (e) { /* the ground can wait */ }
+  try { fixAcreLadder(F); } catch (e) { /* the goal list can wait */ }
   renumberFences(F);   // (1.5.9) tidies farms whose paddock numbers got out of step: duplicates, gaps, a paddock with no name
   F.chores = makeGameChores(F);
   G.mode = 'play';
@@ -24937,7 +24961,7 @@ function findTarget() {
     if (o.t === 'tree' && d < 1.7 && tool !== 'axe' && MAPLE.ok(o) && !MAPLE.season(F) && !MAPLE.tapped(F, o) && (F.inv.maplesap || 0) < 4) push(3, { label: 'Sugar maple: tap it for syrup December to March', icon: '🍁', ring: [o.x, o.z, 1], fn: () => UI.toast('🍁 Maple sap runs in late winter, on frosty nights and thawing days. Come back between December and March and tap it.') });
     if (o.t === 'tree' && d < 1.7 && tool !== 'axe' && MAPLE.ok(o)) {
       const ringM = [o.x, o.z, 1];
-      if (MAPLE.season(F) && !MAPLE.tapped(F, o)) push(0.42, { label: 'Tap this maple for sap', icon: '🍁', ring: ringM, fn: () => act('collect', 1.4, 15, 2, () => { o.sap = { y: MAPLE.sy(F), g: 0 }; G.view.dirtyAt(o.x, o.z, 1); AUDIO.ding(); UI.toast('🪣 Tapped. The bucket fills on frosty nights and thawing days. Come back in a few days.'); }) });
+      if (MAPLE.season(F) && !MAPLE.tapped(F, o)) push(0.42, { label: 'Tap this maple for sap', icon: '🍁', ring: ringM, fn: () => act('collect', 1.4, 15, 2, () => { o.sap = { y: MAPLE.sy(F), g: 0 }; tally(F, 'mapleTap'); checkGoalsToast(); G.view.dirtyAt(o.x, o.z, 1); AUDIO.ding(); UI.toast('🪣 Tapped. The bucket fills on frosty nights and thawing days. Come back in a few days.'); }) });
       else if (MAPLE.tapped(F, o) && (o.sap.g || 0) >= 0.5) push(0.4, { label: `Collect ${fmt1(o.sap.g)} gallons of maple sap`, icon: '🪣', ring: ringM, fn: () => act('collect', 1.2, 8, 1, () => { const g = Math.round(o.sap.g * 10) / 10; o.sap.g = 0; F.inv.maplesap = (F.inv.maplesap || 0) + g; tally(F, 'sap'); AUDIO.ding(); UI.toast(`+${fmt1(g)} gallons of sap. Four gallons boil down to a pint of syrup.`); }) });
       else if ((F.inv.maplesap || 0) >= 4) push(0.45, { label: `Boil the sap down (${Math.floor(F.inv.maplesap / 4)} pint${Math.floor(F.inv.maplesap / 4) > 1 ? 's' : ''} of syrup)`, icon: '🍁', ring: ringM, fn: () => MAPLE.boil(F) });
       else if (MAPLE.tapped(F, o)) push(2.5, { label: 'Sap bucket: filling', icon: '🪣', ring: ringM, fn: () => UI.toast('The sap runs on freeze-thaw days: frosty nights, days above freezing. Check back in a day or two.') });
