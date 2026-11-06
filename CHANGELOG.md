@@ -8,6 +8,13 @@ Publishing: copy `index.html` and `sw.js` into the GitHub repo `silverton777/far
 
 ---
 
+## 1.5.25: maple goals a level later
+
+**Why:** "make tap a maple tree for sap level 3 and boil level 4."
+
+- "Tap a maple tree for sap" is now a level 3 goal (was level 2).
+- "Boil your first pint of maple syrup" is now level 4 (was level 3), and the later syrup steps (5, 10, 25, 50 and 100 pints) follow on from there.
+
 ## 1.5.24: 50 acres at level 5, and maple goals
 
 **Why:** "make own 50 acres level 5 or 6" and "add tapping for maple on the goals list"
