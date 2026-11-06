@@ -10,6 +10,29 @@ Publishing: copy `index.html` and `sw.js` into the GitHub repo `silverton777/far
 
 ==========
 
+## 1.5.21: ponds that fill, woods that regrow, mineral & kelp, and a farmhand you can see
+
+**Why:** "make it easier to fill ponds some ponds are filling and others arent. Make sure trees in the woods grow bac quicker then normal trees. what is kelp and minerals for. there is no option to use them. make it so you actually see your farm hand doing work and you can talk to them"
+
+- Ponds fill more easily:
+  - A swale with a pond below it now spills into the pond: part of the rain it catches runs along the ditch to the pond, and more once the swale is full. Swales above a pond used to starve it.
+  - Ponds collect runoff from a wider area (22 steps out, was 15), and a little more of it reaches the water.
+  - A new pond leaks less once its bottom seals: after about a month and a half, and again after four months.
+  - "Have a water truck top it up" on the pond card: about a fifth of a pond for $60 (free in kid mode), once a day.
+  - The pond card explains all of this.
+- Trees in the woods grow back much faster than trees you plant. A cut tree sprouts in about a week and is full grown again in about six weeks (it was five months).
+- Mineral & kelp now does something:
+  - Put a bag in the mineral tub in a paddock, from its gate or the paddock card, or in the barn by the feed bags. A blue tub shows by the gate.
+  - Cattle, horses, sheep and goats lick it down over the following days. A bag lasts one cow about 50 days.
+  - With mineral out they keep a little healthier, grow and milk about 10% better, and settle in calf more easily.
+  - After three weeks without it they slowly fall behind, and the morning report and the chore list say so.
+  - A barn hand tops the tubs up from your bags.
+- Your farmhand is out on the farm:
+  - They walk in from the gate in the morning and work where you can see them until about half past five.
+  - A barn hand puts hay out for each herd, checks the troughs, milks the cows, gathers eggs and works in the barn. A garden hand waters the beds, checks the fruit trees and hoes empty beds.
+  - Every hand pulls weeds (really pulling them up) and tightens loose fence.
+  - Walk up to them, or tap them, to talk. You can ask what they're working on, how the morning round went, or how the farm is looking (they tell you what they've noticed: short grass, low hay, empty beds, low ponds, weeds, empty mineral tubs), ask for advice, or thank them. Wages and work are there too.
+
 ## 1.5.20: the Hollow Creek library
 
 **Why:** "what do you think of a library in the town that you can go in a read books on the different farming techniques that can unlock recipes, etc. Add reading books and stuff to the goal list as well." Also: "dont make them higher levels necessarily to accomodate existing players put them where they seem fit."
@@ -6375,7 +6398,7 @@ defItem('treehay', { name: 'Tree hay', unit: 'bundles', price: 15, icon: '🌿',
 defItem('firewood', { name: 'Firewood', unit: 'loads', price: 90, buy: 160, icon: '🪵', kind: 'fuel' });
 defItem('feed_layer', { name: 'Layer feed', unit: 'bags', price: 0, buy: 19, icon: '🛍️', kind: 'feed' });
 defItem('feed_pig', { name: 'Hog feed', unit: 'bags', price: 0, buy: 18, icon: '🛍️', kind: 'feed' });
-defItem('mineral', { name: 'Mineral & kelp', unit: 'bags', price: 0, buy: 32, icon: '🧂', kind: 'feed' });
+defItem('mineral', { name: 'Mineral & kelp', unit: 'bags', price: 0, buy: 32, icon: '🧂', kind: 'feed', note: 'Free-choice salt, minerals and kelp for cattle, sheep, goats and horses. Put a bag in the tub in their paddock (at the gate, or from the paddock card) or in the barn. A bag lasts one cow about 50 days.' });
 defItem('compost', { name: 'Compost', unit: 'loads', price: 0, buy: 45, icon: '🟤', kind: 'soil' });
 defItem('stone', { name: 'Fieldstone', unit: 'stones', price: 2, icon: '🪨', kind: 'material' });
 defItem('fence_poly', { name: 'Polywire & step-in posts', unit: 'm', price: 0, icon: '⚡', kind: 'fencing' });
@@ -10527,15 +10550,16 @@ const FISHING = {
   // runoff first, and the last two weeks of water in and out
   waterRows(F, p) {
     const T = F.terrain; let up = 0, all = 0;
-    T.eachCell(p.x - 15, p.z - 15, p.x + 15, p.z + 15, (x, z) => { if (Math.hypot(x - p.x, z - p.z) < 15) { all++; if (T.at(x, z) > p.level - 0.2) up++; } });
+    T.eachCell(p.x - POND_CATCH, p.z - POND_CATCH, p.x + POND_CATCH, p.z + POND_CATCH, (x, z) => { if (Math.hypot(x - p.x, z - p.z) < POND_CATCH) { all++; if (T.at(x, z) > p.level - 0.2) up++; } });
     const share = all ? up / all : 0, word = share > 0.55 ? 'Lots of' : share > 0.3 ? 'Some' : 'Very little';
-    const sw = (F.swales || []).filter((s) => s.pts.some((q) => Math.hypot(q[0] - p.x, q[1] - p.z) < 15 && T.at(q[0], q[1]) > p.level));
+    const sw = (F.swales || []).filter((s) => s.pts.some((q) => Math.hypot(q[0] - p.x, q[1] - p.z) < Math.max(p.rx, p.rz) * 5 + 14) && Math.min(...s.pts.map((q) => T.at(q[0], q[1]))) + 0.3 > p.level);
     const wk = p.wk || [], sum = (i) => wk.reduce((a, d) => a + d[i], 0), pct = (v) => `${v >= 0 ? '+' : '−'}${Math.abs(v * 100).toFixed(v && Math.abs(v) < 0.01 ? 1 : 0)}%`;
     const rows = [{ icon: '⛰️', text: `${word} land drains into it`, small: share > 0.3 ? `About ${Math.round(share * 100)}% of the ground round it is higher, so rain running off it ends up here` : `It sits high: only ${Math.round(share * 100)}% of the ground round it is above the water. Ponds fill fastest in a low spot with a slope above them` }];
-    if (sw.length) rows.push({ icon: '〰️', text: `${sw.length === 1 ? 'A swale' : sw.length + ' swales'} above it`, small: 'Swales soak up most of the runoff that crosses them, so less of it reaches the pond. Good for the trees on the berm, slower for the pond' });
+    if (sw.length) rows.push({ icon: '〰️', text: `${sw.length === 1 ? 'A swale' : sw.length + ' swales'} above it`, small: 'When they fill up, they spill along the ditch into this pond, so they help fill it as well as watering the trees on the berm' });
     if (wk.length) rows.push({ icon: '📈', text: `Last ${wk.length} day${wk.length > 1 ? 's' : ''}: ${pct(sum(3))}`, small: `In: ${pct(sum(0))} runoff, ${pct(sum(1))} rain on the water · Out: ${pct(-sum(2))} to evaporation and seepage` });
     if (p.vol >= 0.99) rows.push({ icon: '✅', text: 'Full to the brim', small: 'Any more rain just spills over' });
-    else if (wk.length >= 3 && sum(3) <= 0) rows.push({ icon: '💡', text: 'Why it isn\'t rising', small: share <= 0.3 ? 'Not enough ground drains into it. A pond in a lower spot, or fewer swales above it, would fill faster.' : 'Dry or hot weather: evaporation is taking more than the rain brings. It will rise again in the wetter months.' });
+    else if (wk.length >= 3 && sum(3) <= 0) rows.push({ icon: '💡', text: 'Why it isn\'t rising', small: share <= 0.3 ? 'Not enough ground drains into it. A swale on the slope above it will catch rain and spill it in, or have a water truck top it up below.' : 'Dry or hot weather: evaporation is taking more than the rain brings. It will rise again in the wetter months, or have a water truck top it up below.' });
+    if (p.vol < 0.97) rows.push({ id: 'truck', tap: true, icon: '🚚', text: 'Have a water truck top it up', small: `Adds about a fifth of a pond, once a day${(p.age || 0) < 120 ? '. New ponds also leak less after a few months, as the bottom seals' : ''}`, right: F.kid ? 'Free' : money(POND_TRUCK) });
     return '<div class="grp">Water</div>' + UI.rows(rows);
   },
   menu(p) {
@@ -10552,6 +10576,16 @@ const FISHING = {
     D.body.innerHTML = html;
     D.body.querySelectorAll('.row.tap').forEach((r) => {
       r.onclick = () => {
+        if (r.dataset.id === 'truck') {
+          const td = F.today = F.today || {};
+          if (td['truck_' + p.id]) return UI.toast('The truck has already been today. It comes back tomorrow.', true);
+          if (!F.kid && !F.unlocked && F.money < POND_TRUCK) return UI.toast('Not enough money.', true);
+          if (!F.kid && !F.unlocked) { F.money -= POND_TRUCK; F.stats.spent += POND_TRUCK; }
+          td['truck_' + p.id] = true; p.vol = Math.min(1, p.vol + 0.2); tally(F, 'pondTruck');
+          try { G.view.rebuildWater(); } catch (e) { /* the water redraws on the next frame anyway */ }
+          AUDIO.ding(); UI.hudTick(0, true); UI.toast(`🚚 The water truck backs up to the bank and runs its hose. The pond is ${Math.round(p.vol * 100)}% full.`);
+          return self.menu(p);
+        }
         const f = FISH.find((q) => q.key === r.dataset.id), cost = f.stock * 10;
         if (!F.kid && !F.unlocked && F.money < cost) return UI.toast('Not enough money.', true);
         if (self.total(p) + 10 > cap + 6) return UI.toast('The pond is already crowded.', true);
@@ -12118,7 +12152,7 @@ const HAND = {
       return;
     }
     const L = this.candidates(F);
-    D.body.innerHTML = '<p class="note">Looking for steady work. They start the morning after you hire them and do their round before you are up.</p>'
+    D.body.innerHTML = '<p class="note">Looking for steady work. They start the morning after you hire them: the morning round is done before you are up, and then they\'re out working on the farm until about half past five. Walk up to them any time for a chat.</p>'
       + UI.rows(L.map((c, i) => ({ id: String(i), tap: true, icon: HAND_KINDS[c.kind].icon, html: `${esc(c.name)}: ${esc(HAND_KINDS[c.kind].title.toLowerCase())}<small>${esc(HAND_KINDS[c.kind].line)}</small>`, right: F.kid ? '' : `${money(c.wage)}/day` })));
     D.body.querySelectorAll('.row.tap').forEach((r) => {
       r.onclick = () => {
@@ -12128,6 +12162,229 @@ const HAND = {
     });
   },
   chores(F) { return F.hand && F.hand.last ? [{ icon: '🧑‍🌾', text: F.hand.last }] : []; },
+};
+// ---------------------------------------------------------------- mineral & kelp (1.5.21)
+// A bag of free-choice mineral and kelp goes into a tub in a paddock (or the barn). The grazers lick it down a little each day: cattle
+// and horses most, sheep and goats less. With mineral out they keep healthier, grow and milk a little better and settle in calf more
+// readily; three weeks or more without it and they slowly fall behind. A hired barn hand tops the tubs up from your stock.
+//   p.min (bags in a paddock's tub) · F.minTubs[groupKey] (the barn and the yard) · a.minD (days since this animal last had mineral)
+const MINERALS = {
+  RATE: { cattle: 0.02, horse: 0.015, sheep: 0.006, goat: 0.007 },   // bags a head eats a day: a bag lasts one cow 50 days
+  need(list) { return list.reduce((a, x) => a + (this.RATE[x.sp] || 0), 0); },
+  get(F, key) { if (key.startsWith('p')) { const p = F.paddocks.find((q) => 'p' + q.id === key); return p ? p.min || 0 : 0; } return ((F.minTubs || {})[key]) || 0; },
+  set(F, key, v) { if (key.startsWith('p')) { const p = F.paddocks.find((q) => 'p' + q.id === key); if (p) p.min = v; return; } F.minTubs = F.minTubs || {}; F.minTubs[key] = v; },
+  // put a bag out: from the gate, the paddock card or the barn
+  fill(F, key, quiet) {
+    if ((F.inv.mineral || 0) < 1) { if (!quiet) UI.toast('You have no mineral & kelp. The Feed & Seed sells it by the bag.', true); return false; }
+    F.inv.mineral -= 1; this.set(F, key, this.get(F, key) + 1); tally(F, 'mineralOut');
+    if (!quiet) { const g = animalGroups(F).find((q) => q.key === key), d = g ? this.need(g.list) : 0; UI.toast(`🧂 A bag of mineral & kelp in the tub.${d ? ` It will last about ${Math.max(1, Math.round(this.get(F, key) / d))} days.` : ''}`); F.chores = makeGameChores(F); UI.choresBadge && UI.choresBadge(); }
+    return true;
+  },
+  // each night, for one herd: do they have mineral today? (null when nothing in the group eats it)
+  daily(F, g, auto, rep) {
+    const d = this.need(g.list); if (!d) return null;
+    let have = this.get(F, g.key);
+    if (have < d && (auto || HAND.covers(F, 'barn')) && (F.inv.mineral || 0) >= 1) { F.inv.mineral -= 1; have += 1; if (rep) rep.handMineral = true; }
+    if (have >= d) { this.set(F, g.key, have - d); return true; }
+    this.set(F, g.key, 0); return false;
+  },
+  days(F, key) { const g = animalGroups(F).find((q) => q.key === key), d = g ? this.need(g.list) : 0; return d ? Math.floor(this.get(F, key) / d) : Infinity; },
+  // a blue tub just inside each paddock gate while there's mineral in it
+  M: null,
+  draws(out) {
+    const F = G.F; if (!F || G.mode !== 'play') return;
+    if (!this.M) { const m = new MB(); m.cyl(0, 0, 0, 0.32, 0.28, 0.3, 12, [58, 100, 170]); m.cyl(0, 0.28, 0, 0.27, 0.27, 0.03, 12, [196, 186, 160]); m.cyl(0, 0.3, 0, 0.12, 0.14, 0.05, 10, [150, 120, 90]); this.M = G.R.mesh(m); }
+    for (const p of F.paddocks) {
+      if (!(p.min > 0.01)) continue;
+      const g = gatesOf(p)[0], [cx, cz] = padCentroid(p), gx = g ? g.cx : cx, gz = g ? g.cz : cz;
+      const x = lerp(gx, cx, 0.22) + 0.9, z = lerp(gz, cz, 0.22);
+      if (!inPad(p, x, z)) continue;
+      out.push({ mesh: this.M, model: M4.trs(x, groundAt(F, x, z), z, 0, 0, 0) });
+    }
+  },
+};
+
+// ---------------------------------------------------------------- your farmhand, out on the farm (1.5.21)
+// Once hired, the hand walks in from the gate each morning and is out working where you can see them until about half past five:
+// a barn hand goes from herd to herd with hay, waters at the troughs, milks and gathers eggs; a garden hand waters the beds and picks
+// the fruit; an all-rounder does both. Between jobs they mend a fence or hoe a bed. Walk up to them (or tap them) to talk.
+const HAND_LOOKS = {
+  Dale: { shirt: [150, 60, 50], pants: [60, 70, 90], hair: [110, 80, 50], hat: 'cap' }, Rue: { fem: true, shirt: [90, 130, 90], pants: [70, 64, 60], hair: [150, 80, 40], hat: 'straw' },
+  Wes: { shirt: [80, 110, 160], pants: [64, 60, 56], hair: [40, 32, 28], hat: 'straw' }, Ines: { fem: true, shirt: [200, 150, 70], pants: [60, 70, 90], hair: [36, 28, 24], hat: 'none' },
+  Cal: { shirt: [120, 120, 124], pants: [70, 80, 100], hair: [190, 160, 110], hat: 'cap' }, Maya: { fem: true, shirt: [170, 70, 90], pants: [64, 60, 70], hair: [60, 40, 30], hat: 'straw' },
+  Tobias: { shirt: [70, 100, 70], pants: [90, 80, 64], hair: [80, 56, 36], hat: 'none' }, Nell: { fem: true, shirt: [110, 150, 190], pants: [70, 64, 56], hair: [200, 170, 120], hat: 'straw' },
+  Orrin: { shirt: [160, 110, 60], pants: [60, 66, 80], hair: [130, 130, 130], hat: 'cap' }, Pia: { fem: true, shirt: [220, 200, 150], pants: [70, 80, 100], hair: [120, 60, 30], hat: 'none' },
+};
+const HAND_HELLO = [
+  'Morning, boss. Or afternoon. I lose track out here.', 'Hey there. Just about done with this one.', 'Oh, hi! Didn\'t hear you come up.',
+  'Good to see you out and about.', 'Beautiful day to be working outside, isn\'t it?', 'Hey, boss. Need something?', 'Hello! Come to check up on me?',
+  'Hi there. The animals are in a good mood today.', 'Morning! The coffee\'s wearing off but the work isn\'t.', 'Hey. You picked a good time: I was about to take a breather.',
+];
+const HAND_TIPS = [
+  'Move the herd before the grass gets short, not after. It grows back twice as fast that way.', 'Put the mineral tub near the water. They\'ll find it quicker.',
+  'Water the beds early in the morning. Less of it goes up in steam.', 'A paddock wants about a month of rest after the cattle have been in it.',
+  'Mulch, mulch, mulch. Saves you hours with the hose.', 'Keep a few bales more hay than you think you\'ll need. Winters run long.',
+  'Hens lay better with a little light and a lot of calm. Keep the dog near them.', 'Pick fruit as soon as it\'s ripe, or the birds will pick it for you.',
+  'Never let the animals on a paddock when it\'s soaking wet. They pack the soil down like concrete.', 'A swale on the slope above a pond will keep it topped up.',
+  'Clean water every day. An animal that isn\'t drinking isn\'t eating.', 'If the cows are licking the fence posts, they want minerals.',
+  'Spread compost thin and often. Better than a big pile once a year.', 'Plant a cover crop in any bed you\'re not using. Bare soil goes dead.',
+  'Check the fences after a storm. Branches come down on the wire.', 'Read the Hollow Creek library\'s book on grazing. Changed how I work.',
+  'Talk to your animals. Sounds daft, but calm animals are healthy animals.', 'Weed when they\'re small. Ten minutes now saves an afternoon later.',
+];
+const HAND_THANKS = [
+  'Ah, it\'s nothing. I like the work.', 'Thanks, boss. That means a lot, honestly.', 'You\'re welcome. Best job I\'ve had in years.',
+  'Just doing what needs doing. But thank you.', 'Appreciate that. Not every boss says so.', 'Any time. This place is starting to feel like home.',
+];
+const HANDNPC = {
+  ent: null, parts: {},
+  on(F) { const H = F.hand; return !!H && FRIENDS.dayN(F) > H.since && F.hour >= 6.5 && F.hour < 17.5 && !['storm', 'hurricane'].includes(todayW(F).kind); },
+  look(H) { return Object.assign({ hairStyle: undefined }, HAND_LOOKS[H.name] || { shirt: [150, 60, 50], pants: [60, 70, 90], hair: [110, 80, 50], hat: 'cap' }); },
+  partsOf(H) {
+    if (this.parts[H.name]) return this.parts[H.name];
+    const fp = buildFarmer(rng(H.name.length * 131 + H.name.charCodeAt(0)), this.look(H)), P = {};
+    for (const k in fp) P[k] = G.R.mesh(fp[k]);
+    const tl = gameTools(); for (const k in tl) if (tl[k] && !P[k]) P[k] = G.R.mesh(tl[k]);
+    return (this.parts[H.name] = P);
+  },
+  // the round of work for the rest of the day, nearest job first
+  jobs(F) {
+    const H = F.hand, L = [], V = G.view;
+    if (HAND.covers(F, 'barn')) {
+      for (const p of F.paddocks) {
+        const here = F.animals.filter((a) => a.pad === p.id && !a.barn); if (!here.length) continue;
+        const g = gatesOf(p)[0], [cx, cz] = padCentroid(p), gx = g ? g.cx : cx, gz = g ? g.cz : cz;
+        if (here.some((a) => GRAZERS.has(a.sp))) L.push({ x: lerp(gx, cx, 0.15), z: lerp(gz, cz, 0.15), act: 'feed', secs: 5, what: `putting hay out for the herd in ${p.name}` });
+        if (here.some((a) => a.sp === 'pig')) L.push({ x: lerp(gx, cx, 0.2), z: lerp(gz, cz, 0.2), act: 'feed', secs: 4, what: `feeding the pigs in ${p.name}` });
+      }
+      for (const o of F.objs) {
+        if (o.t === 'trough') L.push({ x: o.x + 0.9, z: o.z, act: 'water', tool: 'can', secs: 4, what: 'checking the water troughs' });
+        if ((o.t === 'coop' || o.t === 'eggmobile') && F.animals.some((a) => a.home === o.id)) L.push({ x: o.x + 1.4, z: o.z + 0.6, act: 'collect', secs: 5, what: 'gathering the eggs and feeding the hens' });
+        if (o.t === 'barn') L.push({ x: o.x + 2, z: o.z + 4.2, act: 'feed', secs: 4, what: 'mucking out and filling the hay rack in the barn' });
+      }
+      for (const a of F.animals) if (a.lact > 0 && MILK[a.breed]) { const ac = V && V.actors && V.actors.get(a.id); if (ac && !ac.inside) L.push({ actor: a.id, x: ac.x, z: ac.z, act: 'milk', secs: 6, what: `milking ${a.name}` }); }
+    }
+    if (HAND.covers(F, 'garden')) {
+      for (const o of F.objs) {
+        if (o.t === 'bed' && o.crop && !o.dead) L.push({ x: o.x + 1.0, z: o.z + 0.6, act: 'water', tool: 'can', secs: 3, what: 'watering the beds' });
+        if (o.t === 'tree' && !o.wild && (TREES.find((q) => q.key === o.kind) || {}).kind === 'fruit') L.push({ x: o.x + 1.0, z: o.z + 0.4, act: 'collect', secs: 4, what: 'looking over the fruit trees' });
+        if (o.t === 'bed' && !o.crop) L.push({ x: o.x + 1.0, z: o.z + 0.6, act: 'hoe', tool: 'hoe', secs: 5, what: 'hoeing an empty bed ready for planting' });
+      }
+    }
+    // weeds: the hand really pulls them (a few each time round)
+    const wl = F.objs.filter((o) => o.t === 'weed').sort(() => Math.random() - 0.5).slice(0, HAND.covers(F, 'garden') ? 6 : 4);
+    for (const o of wl) L.push({ weed: o.id, x: o.x + 0.55, z: o.z, act: 'plant', secs: 2.5, what: `pulling ${WEEDS.kinds[o.kind] ? WEEDS.kinds[o.kind].toLowerCase() : 'weed'}s` });
+    // odd jobs: a bit of fence to mend
+    const fl = allFences(F).map((f) => padPts(f)).filter((P) => P && P.length > 1);
+    for (let i = 0; i < 2 && fl.length; i++) { const P = fl[Math.floor(Math.random() * fl.length)], q = P[Math.floor(Math.random() * P.length)]; L.push({ x: q[0] + 0.7, z: q[1] + 0.7, act: 'hammer', tool: 'fence', secs: 6, what: 'tightening a loose bit of fence' }); }
+    // the farm is only so big: drop anything off your land, then go in the order that's quickest to walk
+    const ok = L.filter((j) => Math.abs(j.x) < THALF - 2 && Math.abs(j.z) < THALF - 2 && ownedAt(F, j.x, j.z));
+    const out = []; let px = this.ent ? this.ent.x : 0, pz = this.ent ? this.ent.z : 0;
+    const pool = ok.sort(() => Math.random() - 0.5).slice(0, 14);
+    while (pool.length) { let bi = 0, bd = 1e9; pool.forEach((j, i) => { const d = Math.hypot(j.x - px, j.z - pz); if (d < bd) { bd = d; bi = i; } }); const j = pool.splice(bi, 1)[0]; out.push(j); px = j.x; pz = j.z; }
+    void H; return out;
+  },
+  update(V, dt, Fm) {
+    const F = V.F, H = F.hand;
+    if (!H || !this.on(F)) {
+      if (this.ent && !this.ent.leaving) { const g = VISIT.gate(F); Object.assign(this.ent, { leaving: true, job: null, tx: g[0], tz: g[1], talking: false, act: null, tool: 'hand' }); }
+      if (this.ent && (!H || this.ent.name !== (H && H.name)) && !this.ent.leaving) this.ent = null;
+    } else if (!this.ent || this.ent.name !== H.name) {
+      const g = VISIT.gate(F);
+      this.ent = { name: H.name, x: g[0], z: g[1], yaw: Math.PI, walk: 0, phase: 0, act: null, actT: 0, tool: 'hand', look: 0, tx: g[0], tz: g[1] - 3, wait: 0, queue: [], job: null, hand: true };
+    }
+    const n = this.ent; if (!n) return;
+    const dP = Math.hypot(Fm.x - n.x, Fm.z - n.z);
+    // stop and turn to you when you come up to talk (or while you are talking)
+    if (!n.leaving && (n.talking || (dP < TALK_STOP && !n.job))) {
+      n.walk = Math.max(0, n.walk - dt * 5); if (!n.job) n.act = 'idle';
+      let d = Math.atan2(Fm.x - n.x, Fm.z - n.z) - n.yaw; while (d > Math.PI) d -= Math.PI * 2; while (d < -Math.PI) d += Math.PI * 2; n.yaw += d * (1 - Math.exp(-dt * 6));
+      if (n.talking) { n.act = 'idle'; return; }
+    }
+    // working at a job
+    if (n.job && n.job.t > 0) {
+      n.job.t -= dt; n.actT += dt; n.walk = Math.max(0, n.walk - dt * 5);
+      if (n.job.act === 'feed' && n.actT > 1.4) n.actT = 0;   // armful after armful
+      if (n.job.t <= 0) {
+        if (n.job.weed) { const w = F.objs.find((o) => o.id === n.job.weed); if (w) { F.objs = F.objs.filter((o) => o !== w); G.view.dirtyAt(w.x, w.z, 1.5); tally(F, 'handWeeds'); } }
+        n.job = null; n.act = null; n.tool = 'hand'; n.wait = 0.6 + Math.random() * 1.5;
+      }
+      return;
+    }
+    if (!n.leaving && !n.job && (n.wait -= dt) > 0) { n.act = 'idle'; n.walk = Math.max(0, n.walk - dt * 5); return; }
+    // pick the next job
+    if (!n.leaving && !n.next) {
+      if (!n.queue.length) n.queue = this.jobs(F);
+      if (!n.queue.length) n.queue = [{ x: 3 + Math.random() * 4, z: 6 + Math.random() * 3, act: 'idle', secs: 6, what: 'taking a breather in the shade' }];
+      n.next = n.queue.shift();
+      if (n.next.actor) { const ac = V.actors && V.actors.get(n.next.actor); if (ac) { n.next.x = ac.x + 0.7; n.next.z = ac.z; } }
+      n.tx = n.next.x; n.tz = n.next.z; n.doing = n.next.what;
+    }
+    const dx = n.tx - n.x, dz = n.tz - n.z, d = Math.hypot(dx, dz);
+    if (d < 0.35 || (n.stuck || 0) > 4) {
+      n.stuck = 0;
+      if (n.leaving) { this.ent = null; return; }
+      if (n.next) {
+        n.job = Object.assign({}, n.next, { t: n.next.secs }); n.act = n.job.act === 'idle' ? 'idle' : n.job.act; n.tool = n.job.tool || 'hand'; n.actT = 0; n.next = null;
+        if (n.job.actor) { const ac = V.actors.get(n.job.actor); if (ac) n.yaw = Math.atan2(ac.x - n.x, ac.z - n.z); }
+        if (n.job.weed) { const w = F.objs.find((o) => o.id === n.job.weed); if (w) n.yaw = Math.atan2(w.x - n.x, w.z - n.z); else n.job.t = 0.1; }
+      }
+      return;
+    }
+    const s = Math.min(d, 1.3 * dt), ox = n.x, oz = n.z;
+    n.x += dx / d * s; n.z += dz / d * s; n.phase += s * 3.1; n.walk = Math.min(1, n.walk + dt * 5); n.act = null; n.tool = n.next && n.next.tool === 'can' ? 'can' : 'hand';
+    let a = Math.atan2(dx, dz) - n.yaw; while (a > Math.PI) a -= Math.PI * 2; while (a < -Math.PI) a += Math.PI * 2; n.yaw += a * (1 - Math.exp(-dt * 8));
+    if (V.col) V.col.resolve(n, 0.3, { noFence: true });
+    if (Math.hypot(n.x - ox, n.z - oz) < s * 0.3) n.stuck = (n.stuck || 0) + dt; else n.stuck = 0;   // walked into something: give up on that spot
+  },
+  draws(V, out) { const n = this.ent, H = G.F.hand; if (!n || !H) return; drawFarmer(out, n, this.partsOf(H), V.T, G.t); },
+  near(Fm) { const n = this.ent; return n && !n.leaving && Math.hypot(n.x - Fm.x, n.z - Fm.z) < TALK_REACH + 0.5 ? n : null; },
+  // what the hand has noticed about the farm
+  notice(F) {
+    const out = [];
+    for (const g of animalGroups(F)) {
+      const gr = g.list.filter((a) => GRAZERS.has(a.sp)); if (!gr.length) continue;
+      if (g.pad && grassIn(F, g.pad) < demandOf(gr) * 5) out.push(`The grass in ${g.pad.name} is getting short. I'd move them on in the next day or two.`);
+      if (MINERALS.days(F, g.key) < 3 && (F.inv.mineral || 0) < 1) out.push(`The mineral tub for ${groupName(F, g)} is nearly empty and we're out of bags. The Feed & Seed has them.`);
+    }
+    if (F.animals.some((a) => GRAZERS.has(a.sp)) && F.month >= 8 && (F.inv.hay || 0) < 10) out.push(`We've only got ${Math.floor(F.inv.hay || 0)} bales of hay put by. Winter will eat through that fast.`);
+    const empty = F.objs.filter((o) => o.t === 'bed' && !o.crop).length; if (empty >= 2) out.push(`There are ${empty} empty beds. Could plant something, or sow a cover crop to keep the soil alive.`);
+    const ready = F.objs.filter((o) => o.t === 'bed' && o.ready).length; if (ready && !HAND.covers(F, 'garden')) out.push(`${ready} bed${ready > 1 ? 's are' : ' is'} ready to harvest.`);
+    const weeds = F.objs.filter((o) => o.t === 'weed').length; if (weeds > 12) out.push(`The weeds are getting ahead of us. I counted ${weeds}.`);
+    for (const p of F.ponds) if (p.vol < 0.35) { out.push('One of the ponds is getting low. A swale above it would help, or the water truck.'); break; }
+    if (F.paddocks.some((p) => !F.animals.some((a) => a.pad === p.id) && p.rest > 40)) out.push('One of the empty paddocks has had a good long rest. The grass is ready for the herd.');
+    return out.length ? out.slice(0, 3) : ['Everything\'s in good shape, honestly. You\'ve got a nice place here.'];
+  },
+  talk() {
+    const F = G.F, H = F.hand, n = this.ent, self = this; if (!H || !n) return;
+    n.talking = true; H.talks = (H.talks || 0) + 1; tally(F, 'handTalks');
+    let said = CHAT.pick ? CHAT.pick(F, 'handhello', HAND_HELLO.map((t) => [t, 1])) : HAND_HELLO[0];
+    const draw = () => {
+      const D = UI.open({ title: H.name, sub: `Your ${HAND_KINDS[H.kind].title.toLowerCase()} · ${H.days} day${H.days === 1 ? '' : 's'} on the farm`, icon: HAND_KINDS[H.kind].icon, foot: true });
+      const thanked = F.today && F.today.handThanks;
+      D.body.innerHTML = `<p class="note speech" style="font-size:16px">“${esc(said)}”</p>` + UI.rows([
+        { id: 'now', tap: true, icon: '🔨', text: 'What are you working on?' },
+        { id: 'done', tap: true, icon: '📋', text: 'How did the morning round go?' },
+        { id: 'farm', tap: true, icon: '👀', text: 'How\'s the farm looking?', small: 'What they\'ve noticed' },
+        { id: 'tip', tap: true, icon: '💡', text: 'Got any advice?' },
+        { id: 'thanks', tap: !thanked, cls: thanked ? 'dim' : '', icon: '🙏', text: 'Thanks for all your hard work', small: thanked ? 'You said so today already' : '' },
+        { id: 'manage', tap: true, icon: '💼', text: 'Wages and work', small: 'What they do, their pay, or let them go' },
+      ]);
+      D.foot.innerHTML = '<button class="btn go" id="hnBye">See you later</button>';
+      $('hnBye').onclick = () => { n.talking = false; UI.closeAll(); };
+      UI.onClose = () => { n.talking = false; };
+      D.body.querySelectorAll('.row.tap').forEach((r) => { r.onclick = () => {
+        const id = r.dataset.id;
+        if (id === 'now') said = n.job ? `Just ${n.job.what}. Won't be long.` : n.doing ? `Next I'm ${n.doing}. Then whatever needs doing after that.` : 'Catching my breath. Then on to the next thing.';
+        else if (id === 'done') said = H.last ? H.last.replace(new RegExp('^' + H.name + ' '), 'I ') : 'Quiet morning. Nothing much needed doing.';
+        else if (id === 'farm') said = self.notice(F).join(' ');
+        else if (id === 'tip') said = CHAT.pick ? CHAT.pick(F, 'handtip', HAND_TIPS.map((t) => [t, 1])) : HAND_TIPS[Math.floor(Math.random() * HAND_TIPS.length)];
+        else if (id === 'thanks') { F.today = F.today || {}; F.today.handThanks = true; H.thanks = (H.thanks || 0) + 1; said = HAND_THANKS[Math.min(HAND_THANKS.length - 1, Math.floor(Math.random() * 3) + (H.thanks > 10 ? 3 : 0))]; }
+        else if (id === 'manage') { UI.onClose = null; return HAND.panel(() => draw()); }
+        draw();
+      }; });
+    };
+    draw();
+  },
 };
 
 'use strict';
@@ -12340,6 +12597,9 @@ FISH.push({ key: 'chub', name: 'Creek chub', icon: '🐟', price: 3, lb: [0.2, 0
 FISH.push({ key: 'crawdad', name: 'Crayfish', icon: '🦞', price: 5, lb: [0.1, 0.5], regions: 'creek', fry: 0, stock: 0, diff: 0.35, note: 'Turn over a rock and there it is.' });
 for (const f of FISH.slice(-2)) defItem('fish_' + f.key, { name: f.name, unit: 'fish', price: f.price, icon: f.icon, kind: 'produce', fish: true });
 
+const POND_TRUCK = 60;   // a water truck: about a fifth of a pond for $60, once a day
+const POND_CATCH = 22;   // how far out (in steps) a pond collects runoff from higher ground (1.5.21; was 15)
+const WOODS_REGROW = [7, 45];   // days as a stump, days until it's a full tree again
 const WOODS = {
   mc: {},          // prop meshes made so far
   windNow: 0.1,
@@ -12354,7 +12614,9 @@ const WOODS = {
   skillName(F) { return ['Beginner forager', 'Forager', 'Seasoned forager', 'Master forager'][this.skill(F)]; },
   cost(F, e) { const w = todayW(F); return Math.ceil(e * (this.prof(F).heat && w.t >= 33 ? 1.5 : 1)); },
   alive(F, s) { const t = this.st(F).taken[s.id]; if (s.day !== undefined) return t === undefined; return t === undefined || this.dayN(F) - t >= s.rg; },
-  treeStage(F, s) { const c = this.st(F).cut[s.id]; if (c === undefined) return 'full'; const age = this.dayN(F) - c; return age < 35 ? 'stump' : age < 150 ? 'sapling' : 'full'; },
+  // (1.5.21) wild woods regrow much faster than trees you plant: a stump sprouts in about a week and is a full tree again in about six
+  // weeks (it was five months). Old roots and an open canopy do the work.
+  treeStage(F, s) { const c = this.st(F).cut[s.id]; if (c === undefined) return 'full'; const age = this.dayN(F) - c; return age < WOODS_REGROW[0] ? 'stump' : age < WOODS_REGROW[1] ? 'sapling' : 'full'; },
   // ---------------------------------------------------------------- what is in season
   list(F, type) { const L = this.prof(F).forage[type]; return (L && L[this.season(F)]) || []; },
   inSeason(F) {
@@ -12701,7 +12963,7 @@ const WOODS = {
       if (this.treeStage(F, t) !== 'full') ce[2] = 0.01;
       t.fx = { shake: 0, fall: null, ph: R() * 6 };
       room.props.push({ x: t.x, z: t.z, yaw: t.yaw, tree: t,
-        draw: () => { const g = stage(); ce[2] = g === 'full' ? 0.4 * t.s : 0.01; return g === 'stump' ? { mesh: this.stumpMesh(), s: 1 } : g === 'sapling' ? { mesh: this.treeMesh(t.kind, t.v, seas), s: 0.28 + 0.45 * ((this.dayN(G.F) - (G.F.woods.cut[t.id] || 0) - 35) / 115) } : { mesh: this.treeMesh(t.kind, t.v, seas), s: t.s, model: treeModel(t.x, 0, t.z, t.yaw, t.s, t.fx.ph, t.fx.shake, this.windNow, G.t) }; },
+        draw: () => { const g = stage(); ce[2] = g === 'full' ? 0.4 * t.s : 0.01; return g === 'stump' ? { mesh: this.stumpMesh(), s: 1 } : g === 'sapling' ? { mesh: this.treeMesh(t.kind, t.v, seas), s: 0.28 + (Math.max(0.3, t.s) - 0.28) * clamp((this.dayN(G.F) - (G.F.woods.cut[t.id] || 0) - WOODS_REGROW[0]) / (WOODS_REGROW[1] - WOODS_REGROW[0]), 0, 1) } : { mesh: this.treeMesh(t.kind, t.v, seas), s: t.s, model: treeModel(t.x, 0, t.z, t.yaw, t.s, t.fx.ph, t.fx.shake, this.windNow, G.t) }; },
         extra: (out) => { const f = t.fx.fall; if (f) { const fd = fellFade(f.t); out.push(Object.assign({ mesh: this.treeMesh(t.kind, t.v, seas), model: fellModel(t.x, 0, t.z, t.s, f.dir, f.t) }, fd === undefined ? {} : { fade: Math.max(0.005, fd), noShadow: true })); } } });
       if (t.sapTree) room.props.push({ x: t.x + 0.45, z: t.z + 0.3, yaw: 0, noShadow: true, draw: () => (this.sapOpen(G.F) && stage() === 'full' ? { mesh: this.bucketMesh(), s: 1 } : null) });
       inter.push({ x: t.x, z: t.z, r: 1.35 + 0.2 * t.s, get label() { return ownsTool(G.F, 'axe') ? `Chop down the ${kindName}` : `A ${kindName}: you'd need an axe`; }, icon: '🪓', act: 'woods', kind: 'tree', slot: t, off: () => stage() !== 'full' });
@@ -12923,7 +13185,7 @@ const WOODS = {
       if (t.fx) t.fx.fall = { t: 0, dir: Math.atan2(t.x - G.Fm.x, t.z - G.Fm.z), thump: false };     // it leans and comes down, away from you
       const wood = Math.round((1.4 + Math.random() * 1.2 + (t.s - 0.9) * 1.5) * 10) / 10;
       F.inv.firewood = (F.inv.firewood || 0) + wood; tally(F, 'chopped');
-      let msg = `+${fmt1(wood)} loads of firewood 🪵. It will grow back from a sapling.`;
+      let msg = `+${fmt1(wood)} loads of firewood 🪵. It will sprout again in about a week and be a full tree in about six weeks.`;
       if (Math.random() < 0.16) { const k = self.list(F, 'nut')[0] || null; if (k) { self.add(F, k, 1); msg += ` A squirrel's cache fell out: ${ITEMS[k].name.toLowerCase()} ${ITEMS[k].icon}`; } }
       AUDIO.chop(); UI.toast(msg); UI.hudTick(0, true); PURSUE.check(F); checkGoalsToast();
     }, { face: t, tick: (dt, tt) => {
@@ -16454,6 +16716,7 @@ class FarmView {
     separateBodies(A.filter((a) => !a.dead && !a.herd && !a.inside && !a.goingIn && !a.ridden), G.drive ? { x: 1e5, z: 1e5, yaw: 0 } : Fm, this.col, { noFence: false });
     PETS.update(this, dt, Fm);
     VISIT.update(this, dt, Fm);
+    try { HANDNPC.update(this, dt, Fm); } catch (e) { console.warn('hand', e); HANDNPC.ent = null; }
     NEIGHBORS.update(dt, Fm);
     for (const a of A) if (a.dead && a.deadT > 2.2) this.actors.delete(a.rec.id);
     // trees: wind, shaking, falling leaves and petals, a glint on ripe fruit, and the ones being felled
@@ -16583,6 +16846,7 @@ class FarmView {
     if (!Fm.hidden) drawFarmer(out, Fm, this.parts, this.T, t);
     PETS.draws(this, out);
     VISIT.draws(this, out);
+    HANDNPC.draws(this, out);
     for (const a of this.actors.values()) {
       if (a.inside) continue;
       if (!vis(a.x, a.z)) continue;
@@ -17140,20 +17404,31 @@ function simDay(F, auto, rep) {
     else if (cov === COVER.bed) T.om[k] = Math.max(0.3, om - 0.00008);
   }
   // ---- swales catch runoff from upslope and soak it into the berm
+  // (1.5.21) and a swale with a pond below it spills into the pond: some of what it catches runs along the ditch to the pond (more when
+  // the swale is already full), so a swale above a pond now helps fill it instead of starving it
+  const swaleToPond = new Map();
   for (const s of F.swales) {
     let caught = 0;
     const xs = s.pts.map((p) => p[0]), x0 = Math.min(...xs), x1 = Math.max(...xs);
     for (const p of s.pts) { for (let dz = -7; dz <= 0; dz += 1) { const k = T.idx(p[0], p[1] + dz); if (k >= 0) { caught += runoff[k] * 0.5; runoff[k] *= 0.15; } } }
+    const lvl = Math.min(...s.pts.map((q) => T.at(q[0], q[1])));
+    const below = F.ponds.filter((p) => p.level < lvl + 0.3 && s.pts.some((q) => Math.hypot(q[0] - p.x, q[1] - p.z) < Math.max(p.rx, p.rz) * 5 + 14));
+    if (below.length) { const give = caught * (0.35 + 0.4 * clamp((s.wet || 0) - 0.6, 0, 1)); caught -= give; for (const p of below) swaleToPond.set(p, (swaleToPond.get(p) || 0) + give / below.length); }
     s.wet = clamp((s.wet || 0) * 0.9 + caught / 260, 0, 1.2);
     T.eachCell(x0 - 0.5, Math.min(...s.pts.map((p) => p[1])) - 1, x1 + 0.5, Math.max(...s.pts.map((p) => p[1])) + 6, (x, z, k) => { T.moist[k] = clamp(T.moist[k] + s.wet * 0.035, 0, 1); });
     if (rep && s.wet > 0.6 && w.rain > 15) rep.swaleFull = true;
   }
   // ---- ponds: catchment runoff in, evaporation + seepage out
   for (const p of F.ponds) {
+    // (1.5.21) a wider catchment (22 steps, was 15), a little more of the runoff reaching the water, whatever the swales above send down,
+    // and seepage that eases off as the pond bottom seals over its first few months
     let inflow = 0;
-    T.eachCell(p.x - 15, p.z - 15, p.x + 15, p.z + 15, (x, z, k) => { if (Math.hypot(x - p.x, z - p.z) < 15 && T.at(x, z) > p.level - 0.2) inflow += runoff[k] * 0.025; });
+    T.eachCell(p.x - POND_CATCH, p.z - POND_CATCH, p.x + POND_CATCH, p.z + POND_CATCH, (x, z, k) => { if (Math.hypot(x - p.x, z - p.z) < POND_CATCH && T.at(x, z) > p.level - 0.2) inflow += runoff[k] * 0.03; });
+    inflow += (swaleToPond.get(p) || 0) * 0.05;
+    p.age = (p.age || 0) + 1;
     const area = Math.PI * p.rx * p.rz * 25, cap = area * 2.2 * 0.5;   // ~2.2 m deep bowl
-    const evap = (Math.max(0, t) * 0.25 + 1) * 0.001 * area + 0.001 * area;
+    const seep = p.age > 120 ? 0.0004 : p.age > 45 ? 0.0007 : 0.001;
+    const evap = (Math.max(0, t) * 0.2 + 1) * 0.001 * area + seep * area;
     const v0 = p.vol;
     p.vol = clamp(p.vol + (inflow + w.rain * 0.001 * area - evap) / cap, 0, 1.15);
     if (p.vol > 1) { p.vol = 1; if (rep) rep.pondSpill = true; }
@@ -17165,6 +17440,7 @@ function simDay(F, auto, rep) {
   // ---- livestock
   const groups = animalGroups(F);
   for (const g of groups) {
+    const minOk = MINERALS.daily(F, g, auto, rep);   // (1.5.21) mineral & kelp: null when nobody here eats it
     const fedHay = auto || today['fed_' + g.key];
     const demand = demandOf(g.list);
     let eaten = 0;
@@ -17208,22 +17484,24 @@ function simDay(F, auto, rep) {
       if (a.sp === 'chicken' && !birdFed) fed = true; // hens forage, but lay less
       if (!water) fed = false;
       a.hunger = fed ? 0 : (a.hunger || 0) + 1;
-      if (a.hunger > 5) a.health = Math.max(0, (a.health ?? 1) - 0.02); else a.health = Math.min(1, (a.health ?? 1) + (g.pad && DOGS.guards(F, g.pad.id) ? 0.02 : 0.01));   // a guardian dog in the paddock: calmer, healthier animals
+      if (a.hunger > 5) a.health = Math.max(0, (a.health ?? 1) - 0.02); else a.health = Math.min(1, (a.health ?? 1) + (g.pad && DOGS.guards(F, g.pad.id) ? 0.02 : 0.01));
+      const minK = !GRAZERS.has(a.sp) || minOk === null ? 1 : minOk ? 1.1 : (a.minD || 0) > 21 ? 0.9 : 1;
+      if (GRAZERS.has(a.sp) && minOk !== null) { a.minD = minOk ? 0 : (a.minD || 0) + 1; if (minOk) a.health = Math.min(1, (a.health ?? 1) + 0.004); else if (a.minD > 21 && rep) rep.minShort = (rep.minShort || 0) + 1; }   // a guardian dog in the paddock: calmer, healthier animals
       if (!auto && !g.barn && t < -10 && (GRAZERS.has(a.sp) || a.sp === 'pig') && (a.ageD < 150 || a.sp === 'pig' || t < -18)) { a.health = Math.max(0, (a.health ?? 1) - 0.03); if (rep) rep.coldStress = (rep.coldStress || 0) + 1; }
       if (t >= 33 && !auto && !g.barn && (GRAZERS.has(a.sp) || a.sp === 'pig') && !(F.shield && F.shield.heat === FRIENDS.dayN(F))) { a.health = Math.max(0, (a.health ?? 1) - 0.035); if (rep) rep.heatStress = (rep.heatStress || 0) + 1; }
       if (t >= 28 && !auto && !g.barn && woolly(a) && fleeceDays(F, a) > 300) { a.health = Math.max(0, (a.health ?? 1) - 0.02); if (rep) rep.fleeceHeat = (rep.fleeceHeat || 0) + 1; }
       const maxLb = SX.adultLb * (br.small ? 0.65 : br.hump ? 1.3 : 1) * (a.sex === 'm' ? 1.15 : 1);
       const gain = { cattle: 1.5, sheep: 0.35, goat: 0.3, pig: 1.5, chicken: 0.04, duck: 0.05 }[a.sp] * (fed ? 1 : -0.6) * (br.stats ? 0.7 + br.stats.grass * 0.08 : 1);
-      a.lb = clamp(a.lb + gain * (1 - a.lb / (maxLb * 1.05)) * 1.6, SX.birthLb, maxLb);
+      a.lb = clamp(a.lb + gain * (gain > 0 ? minK : 1) * (1 - a.lb / (maxLb * 1.05)) * 1.6, SX.birthLb, maxLb);
       // pregnancy + birth
       if (a.preg > 0) { a.preg--; if (a.preg === 0) giveBirth(F, a, rep); }
       else if (a.sex === 'f' && a.ageD > SP.mature * 30 && a.health > 0.5 && !a.lact && a.sp !== 'chicken' && a.sp !== 'duck') {
         const bull = g.list.some((b) => b.sp === a.sp && b.sex === 'm' && b.ageD > SP.mature * 30) || (a.ai && a.sp === 'cattle');
         const seasonOK = a.sp === 'sheep' || a.sp === 'goat' ? seasonOf(F.month) === 2 : true;
-        if (bull && seasonOK && Math.random() < 0.03) { a.preg = SP.gest * 30; a.ai = false; }
+        if (bull && seasonOK && Math.random() < 0.03 * (minK > 1 ? 1.35 : minK < 1 ? 0.6 : 1)) { a.preg = SP.gest * 30; a.ai = false; }
       }
       // milk
-      if (a.lact > 0) { a.lact--; if (MILK[a.breed] && (auto || today['milk_' + a.id])) { const gal = MILK[a.breed] * (fed ? 1 : 0.5); F.inv.milk = (F.inv.milk || 0) + gal; if (rep) rep.milk = (rep.milk || 0) + gal; } }
+      if (a.lact > 0) { a.lact--; if (MILK[a.breed] && (auto || today['milk_' + a.id])) { const gal = MILK[a.breed] * (fed ? 1 : 0.5) * (minK > 1 ? 1.08 : minK < 1 ? 0.92 : 1); F.inv.milk = (F.inv.milk || 0) + gal; if (rep) rep.milk = (rep.milk || 0) + gal; } }
       // eggs go to the nest box
       if ((a.sp === 'chicken' || a.sp === 'duck') && a.sex === 'f' && a.ageD > 150) {
         const daylight = 0.55 + 0.45 * Math.sin(((F.month - 2) / 12) * Math.PI * 2 + 0.2);
@@ -17459,6 +17737,10 @@ function makeGameChores(F) {
         else add('should', '⚠️', `Out of hay! ${name} is short on grass. Buy hay in town or move them.`, () => false, { warn: true });
       } else if (g.pad && grassIn(F, g.pad) < demand * 6) add('should', '➡️', `Grass in ${name} is getting short. Move the herd soon.`, (F2) => !F2.animals.some((a) => a.pad === g.pad.id));
       if (!hasWater(F, g)) add('must', '💧', waterWhy(F, g, name), (F2) => F2.today['water_' + g.key], { act: 'water', gkey: g.key });
+      if (MINERALS.days(F, g.key) < 2 && !HAND.covers(F, 'barn')) {
+        if ((F.inv.mineral || 0) >= 1) add('should', '🧂', `Put out mineral & kelp for ${name}`, (F2) => MINERALS.days(F2, g.key) >= 2, { act: 'mineral', gkey: g.key });
+        else if (grazers.some((a) => (a.minD || 0) > 7)) add('should', '🧂', `${name} has no mineral & kelp. The Feed & Seed sells it by the bag.`, () => false, { warn: true });
+      }
     }
     if (g.list.some((a) => a.sp === 'pig')) {
       if ((F.inv.feed_pig || 0) > 0.2) add('must', '🐖', `Feed the pigs in ${name}`, (F2) => F2.today.fedPigs);
@@ -18573,7 +18855,7 @@ function buildRoom(type, F, obj) {
       addBagStack(mb, x1 - 0.85, bz, -Math.PI / 2, kind, n);
     });
     col.rect(x1 - 0.85, 0.35, 0.55, 1.95, 0, 0, 0, false);
-    inter.push({ x: x1 - 2.1, z: 0.35, r: 1.4, label: 'Feed bags', act: 'feedinfo', icon: '🛍️' });
+    inter.push({ x: x1 - 2.1, z: 0.35, r: 1.4, label: 'Feed bags & the mineral tub', act: 'feedinfo', icon: '🛍️' });
     // old-time implements hung along the back wall: scythe, saw, horse collar, yoke, lantern and the rest
     addBarnDecor(mb, z0, lightW);
     BARN.furnish(mb, col, inter, F, obj);
@@ -18643,7 +18925,7 @@ function interiorFrame(F0, room) {
 
 'use strict';
 // ============================================================================ profiles + saves (each profile has its own farm save)
-const FQ_VERSION = '1.5.20';
+const FQ_VERSION = '1.5.21';
 const LOOKS = [
   { shirt: [214, 74, 64], hair: [120, 76, 40] }, { shirt: [70, 130, 200], hair: [236, 206, 120] }, { shirt: [240, 170, 60], hair: [80, 50, 30] },
   { shirt: [120, 170, 90], hair: [40, 30, 28] }, { shirt: [170, 100, 190], hair: [200, 110, 60] }, { shirt: [60, 160, 160], hair: [150, 100, 60] },
@@ -19342,7 +19624,7 @@ const UI = {
         const seeds = CROPS.filter((c) => !c.region || c.region.includes(R.key));
         const trees = TREES.filter((t) => !t.heirloom || hasUnlock(F, 'heirloom')).sort((a, b2) => treeFit(R, b2).score - treeFit(R, a).score);
         const hayPrice = Math.round(ITEMS.hay.buy * (R.t[F.month] < 2 ? 1.35 : 1) * (F.weather.event === 'drought' ? 1.5 : 1));
-        b.innerHTML = `<div class="grp">Feed, hay & supplies</div><div class="grid">${[['hay', hayPrice], ['sqbale', Math.max(6, Math.round(hayPrice / 8))], ['feed_layer', ITEMS.feed_layer.buy], ['feed_pig', ITEMS.feed_pig.buy], ['mineral', ITEMS.mineral.buy], ['firewood', ITEMS.firewood.buy], ['compost', ITEMS.compost.buy]].map(([k, p]) => `<button class="card" data-buy="${k}" data-p="${p}"><span class="ic">${ITEMS[k].icon}</span><b>${ITEMS[k].name}</b><small>per ${ITEMS[k].unit.replace(/s$/, '')} · have ${fmt1(F.inv[k] || 0)}</small><span class="pr">${money(p)}</span></button>`).join('')}</div>
+        b.innerHTML = `<div class="grp">Feed, hay & supplies</div><div class="grid">${[['hay', hayPrice], ['sqbale', Math.max(6, Math.round(hayPrice / 8))], ['feed_layer', ITEMS.feed_layer.buy], ['feed_pig', ITEMS.feed_pig.buy], ['mineral', ITEMS.mineral.buy], ['firewood', ITEMS.firewood.buy], ['compost', ITEMS.compost.buy]].map(([k, p]) => `<button class="card" data-buy="${k}" data-p="${p}"><span class="ic">${ITEMS[k].icon}</span><b>${ITEMS[k].name}</b><small>${k === 'mineral' ? 'for grazers: goes in the paddock tub · ' : ''}per ${ITEMS[k].unit.replace(/s$/, '')} · have ${fmt1(F.inv[k] || 0)}</small><span class="pr">${money(p)}</span></button>`).join('')}</div>
           <div class="grp">Seeds (one packet plants a bed)</div><div class="grid">${seeds.map((c) => { const ok = cropFits(R, c, F.month); return `<button class="card${ok ? '' : ' bad'}" data-buy="seed_${c.key}" data-p="${ITEMS['seed_' + c.key].buy}"><span class="ic">${ITEMS[c.key] ? ITEMS[c.key].icon : '🌿'}</span><b>${c.name}</b><small>${ok ? 'Plant now' : 'Not this month'} · ${c.months} mo</small><span class="pr">${money(ITEMS['seed_' + c.key].buy)}</span></button>`; }).join('')}</div>
           <div class="grp">Trees & shrubs (zone ${zone}, ~${chillHours(R)} chill hours)</div><div class="grid"><label class="advrow" style="grid-column:1/-1;display:flex;gap:8px;align-items:center;font-weight:750;font-size:14px;padding:6px 4px"><input type="checkbox" id="advTrees" ${F.advTrees ? 'checked' : ''} style="width:20px;height:20px"> ⚙️ Advanced: choose each tree's rootstock<small style="font-weight:600;color:#7a6a4a;margin-left:auto">${F.advTrees ? 'tap a tree to pick its roots' : 'off: we match roots to your land'}</small></label>${trees.map((tr) => { const fit = treeFit(R, tr); return `<button class="card${fit.ok ? '' : ' bad'}" data-buy="sap_${tr.key}" data-p="${tr.price}"><span class="ic">${ITEMS['sap_' + tr.key].icon}</span><b>${esc(tr.name)}</b><small>${fit.ok ? (tr.kind === 'fodder' ? 'Fodder / tree hay' : tr.kind === 'support' ? (tr.nfix ? 'Fixes nitrogen' : 'Support plant') : `${tr.kind} · fruits ~${Math.max(1, Math.round(tr.bear / 12))} yr`) : fit.issues.join(', ')}</small><span class="pr">${money(tr.price)}</span></button>`; }).join('')}</div>
           <div class="grp">Grass seed for ${esc(R.name)} (sow it on bare or thin ground)</div><div class="grid">${grassMixes(R).map((M) => `<button class="card" data-buy="gs_${R.key}_${M.key}" data-p="${M.price}"><span class="ic">🌾</span><b>${esc(M.name)}</b><small>${M.native ? 'Native · ' : ''}${esc(M.note)}${F.inv['gs_' + R.key + '_' + M.key] > 0.05 ? ' · you have ' + Math.round(F.inv['gs_' + R.key + '_' + M.key] * 10) / 10 + ' bags' : ''}</small><span class="pr">${money(M.price)}</span></button>`).join('')}</div>`;
@@ -19644,12 +19926,15 @@ const UI = {
     const P = this.open({ title: p.name, sub: `${FENCES[p.kind].name} · ${(padArea(p) * 25 / 4047).toFixed(2)} acres · ${meters(padPerim(p))} m of fence · ${gatesOf(p).length} gate${gatesOf(p).length > 1 ? 's' : ''}`, icon: ICO.fence, foot: true });
     const groups = animalGroups(F).filter((g) => g.key !== 'p' + p.id && g.list.some((a) => a.sp !== 'chicken' && a.sp !== 'duck'));
     const W = waterSupply(F, { pad: p }), waterTxt = W.ok ? { trough: '🛁 Trough', pond: '🏞️ Pond', creek: '🌊 Creek' }[W.how] : W.how === 'frozen' ? '🥶 Frozen · carry water' : W.how === 'dry' ? `🏜️ ${W.dry === 'pond' ? 'Pond' : 'Creek'} is dry · carry water` : '💧 None · carry water daily';
-    P.body.innerHTML = `<div class="stat">Grass<b>${grassWord(F, p)}</b></div><div class="stat">Water<b>${waterTxt}</b></div><div class="stat">Animals<b>${here.length}</b></div>` +
+    const minD = MINERALS.days(F, 'p' + p.id), grz = here.some((a) => GRAZERS.has(a.sp));
+    const minTxt = !(p.min > 0.01) ? (grz ? '🧂 Empty' : '🧂 None out') : minD === Infinity ? `🧂 ${Math.round(p.min * 100) / 100} bag` : `🧂 ${minD} day${minD === 1 ? '' : 's'} left`;
+    P.body.innerHTML = `<div class="stat">Grass<b>${grassWord(F, p)}</b></div><div class="stat">Water<b>${waterTxt}</b></div><div class="stat">Animals<b>${here.length}</b></div><div class="stat">Mineral<b>${minTxt}</b></div>` +
+      (grz || p.min > 0.01 ? this.rows([{ id: 'mineral', tap: (F.inv.mineral || 0) >= 1, cls: (F.inv.mineral || 0) >= 1 ? '' : 'dim', icon: '🧂', text: 'Put a bag of mineral & kelp in the tub', small: (F.inv.mineral || 0) >= 1 ? `You have ${fmt1(F.inv.mineral)} bag${F.inv.mineral >= 2 ? 's' : ''}. Healthier animals, better growth and milk, easier breeding` : 'You have none. The Feed & Seed sells it by the bag' }]) : '') +
       (here.length ? this.rows(here.slice(0, 12).map((a) => ({ icon: SPECIES_EXTRA[a.sp].icon, text: `${a.name} (${breedOf(a.breed).name})` }))) : '') +
       (groups.length ? `<div class="grp">Bring animals here from</div>` + this.rows(groups.map((g) => ({ id: g.key, tap: true, icon: '➡️', text: groupName(F, g), small: `${g.list.filter((a) => a.sp !== 'chicken' && a.sp !== 'duck').length} animals` }))) : '') +
       (W.ok ? '' : '<p class="note">No usable water here. Put a trough in, fence in a pond or the creek, or carry water out each day with a watering can.</p>') +
       '<p class="note">Rotational grazing: let animals graze a paddock down, then move them on and give it 30+ days of rest so the grass regrows deep roots.</p>';
-    P.body.querySelectorAll('.row.tap').forEach((r) => { r.onclick = () => { const g = groups.find((q) => q.key === r.dataset.id); this.closeAll(); moveAnimals(g.list.filter((a) => a.sp !== 'chicken' && a.sp !== 'duck'), p); }; });
+    P.body.querySelectorAll('.row.tap').forEach((r) => { r.onclick = () => { if (r.dataset.id === 'mineral') { this.closeAll(); return act('feed', 1.0, 10, 2, () => MINERALS.fill(F, 'p' + p.id)); } const g = groups.find((q) => q.key === r.dataset.id); this.closeAll(); moveAnimals(g.list.filter((a) => a.sp !== 'chicken' && a.sp !== 'duck'), p); }; });
     const [px0, px1, pz0, pz1] = padRect(p), troughIn = F.objs.some((o) => o.t === 'trough' && inPad(p, o.x, o.z)), troughs = F.objs.filter((o) => o.t === 'trough');
     P.foot.innerHTML = `${p.virtual ? '' : '<button class="btn bad" id="pdRemove">Take down</button><button class="btn" id="pdMap">🗺️ Resize / move gate</button>'}${!troughIn && troughs.length ? '<button class="btn" id="pdTrough">💧 Bring a trough here</button>' : ''}${here.length ? '<button class="btn" id="pdOut">Move all out…</button>' : ''}`;
     if ($('pdTrough')) $('pdTrough').onclick = () => {
@@ -19744,6 +20029,8 @@ const UI = {
     if (harvest) lines.push(['🧺', `Harvested ${harvest}`]);
     if (rep.ripe) lines.push(['🍎', `${rep.ripe} trees came ripe`]);
     if (rep.kittens) lines.push(['🐱', `${PETS.name(G.F, 'cat')} had ${rep.kittens} kittens in the barn! Walk up to them to say hello.`]);
+    if (rep.minShort) lines.push(['🧂', `${rep.minShort} of your grazing animals ${rep.minShort === 1 ? 'has' : 'have'} gone three weeks without mineral & kelp and ${rep.minShort === 1 ? 'is' : 'are'} falling behind. Put a bag in their tub.`]);
+    if (rep.handMineral && F.hand) lines.push(['🧂', `${F.hand.name} put a fresh bag of mineral & kelp in a tub.`]);
     if (rep.savedSeed) lines.push(['🌱', 'Mabel left a couple of packets of her own saved seed in your mailbox, the way the seed-saving book said she would.']);
     if (rep.soilTip) lines.push(['🌱', `Soil tip: ${rep.soilTip[1]}. ${rep.soilTip[3]}`]);
     if (rep.kitGone) lines.push(['🐈', `${rep.kitGone.join(' and ')} went to live at Ruth Carter's sanctuary, where there are always mice to catch.`]);
@@ -24465,6 +24752,7 @@ function renderGame(dt) {
   const draws = G.view.draws(G.focus, G.Fm, G.t);
   if (FPV.on && !G.drive && !G.photo) FPV.stripBody(draws);
   if (G.place && G.place.ghostDraw) draws.push(...G.place.ghostDraw);
+  try { MINERALS.draws(draws); } catch (e) { /* a missing tub is fine */ }
   if (G.target && G.target.ring && !G.place) draws.push(ringDraw(G.target.ring));
   if (G.target && G.target.cone && !G.busy && !G.place) draws.push(...coneDraws(G.target.cone));
   if (G.target && G.target.ghost && !G.busy) draws.push(bedGhostDraw(G.target.ghost));
@@ -24539,6 +24827,7 @@ function findTarget() {
   const near = (x, z, r) => Math.hypot(x - Fm.x, z - Fm.z) < r || Math.hypot(x - fx, z - fz) < r * 0.8;
   const cands = [];
   const push = (score, t) => cands.push(Object.assign({ score }, t));
+  { const hn = HANDNPC.near(Fm); if (hn) push(0.26, { label: `Talk to ${hn.name}`, icon: '💬', fn: () => HANDNPC.talk(), face: hn, ringOk: false }); }
   { const vs = VISIT.near(Fm); if (vs) push(0.25, { label: `Talk to ${vs.nb ? vs.name : TOWNFOLK[vs.key].name}`, icon: '💬', fn: () => VISIT.talk(), face: vs, ringOk: false }); }
   const nbp = NEIGHBORS.target(Fm);
   if (nbp) push(0.3, { label: `Talk to ${nbp.name}`, icon: '💬', fn: () => NEIGHBORS.talk(nbp), face: nbp, ringOk: false });
@@ -24620,6 +24909,7 @@ function findTarget() {
     const choreFeed = (F.chores || []).find((c) => c.act === 'feed' && c.gkey === key && !choreDone(F, c));
     const choreWater = (F.chores || []).find((c) => c.act === 'water' && c.gkey === key && !choreDone(F, c));
     const pigs = F.animals.some((a) => a.pad === p.id && a.sp === 'pig');
+    if (tool === 'hand' && !choreFeed && (F.inv.mineral || 0) >= 1 && F.animals.some((a) => a.pad === p.id && GRAZERS.has(a.sp)) && MINERALS.days(F, key) < 4) push(0.21, { label: `Put out mineral & kelp in ${p.name}`, icon: '🧂', fn: () => act('feed', 1.0, 10, 2, () => MINERALS.fill(F, key)), ring: [cx, cz] });
     if (tool === 'hand' && choreFeed) push(0.2, { label: `Feed hay in ${p.name}`, icon: '🌾', fn: () => act('feed', 1.2, 20, 4, () => { F.today['fed_' + key] = true; doneChore('Hay fed'); }), ring: [cx, cz] });
     else if (tool === 'can' && choreWater) push(0.2, { label: `Carry water to ${p.name}`, icon: '💧', fn: () => act('water', 1.6, 25, 6, () => { F.today['water_' + key] = true; doneChore('Water delivered'); }), ring: [cx, cz] });
     else if (tool === 'hand') push(2.5, { label: `${p.name} · ${grassWord(F, p)}`, icon: ICO.fence, fn: () => UI.paddockCard(p), ring: [cx, cz], soft: true });
@@ -25691,7 +25981,7 @@ function personTap(cx, cy) {
   if (G.busy || G.panelOpen || G.iris || !G.lastFrame || G.drive || G.place) return false;
   const k = glc.width / Math.max(1, window.innerWidth), Fm = G.Fm, list = [];
   if (G.mode === 'room' && G.room) for (const n of G.room.npcs || []) if (!n.hidden && !n.leaving) list.push(n);
-  if (G.mode === 'play') { const v = typeof VISIT !== 'undefined' && VISIT.ent; if (v && !v.leaving) list.push(v); if (typeof NEIGHBORS !== 'undefined') for (const n of NEIGHBORS.people || []) list.push(n); }
+  if (G.mode === 'play') { const v = typeof VISIT !== 'undefined' && VISIT.ent; if (v && !v.leaving) list.push(v); const hn = typeof HANDNPC !== 'undefined' && HANDNPC.ent; if (hn && !hn.leaving) list.push(hn); if (typeof NEIGHBORS !== 'undefined') for (const n of NEIGHBORS.people || []) list.push(n); }
   let best = null, bd = 60 * k;
   for (const n of list) {
     const far = Math.hypot(n.x - Fm.x, n.z - Fm.z); if (far > 16) continue;
@@ -25703,7 +25993,7 @@ function personTap(cx, cy) {
   // step up to them (to just in front, facing them) when they're more than a couple of steps away
   if (d > 1.6) { const ux = (Fm.x - n.x) / d, uz = (Fm.z - n.z) / d; Fm.x = n.x + ux * 1.3; Fm.z = n.z + uz * 1.3; }
   Fm.yaw = Math.atan2(n.x - Fm.x, n.z - Fm.z); G.targetT = 0;
-  if (G.mode === 'play') { if (n === (typeof VISIT !== 'undefined' && VISIT.ent)) VISIT.talk(); else NEIGHBORS.talk(n); }
+  if (G.mode === 'play') { if (n === (typeof VISIT !== 'undefined' && VISIT.ent)) VISIT.talk(); else if (n.hand) HANDNPC.talk(); else NEIGHBORS.talk(n); }
   else if (n.nb) NBV.talk(n); else npcTalk(n);
   return true;
 }
@@ -25756,7 +26046,13 @@ function roomAction(it) {
     case 'stall': BARN.stall(G.roomObj, it.i); break;
     case 'stallanimal': { const rec = F.animals.find((q) => q.id === it.id); if (rec) UI.animalCard(rec); break; }
     case 'hayinfo': UI.toast(`${fmt1(F.inv.hay || 0)} bales of hay and ${Math.floor(F.inv.treehay || 0)} bundles of tree hay.`); break;
-    case 'feedinfo': UI.toast(`Layer feed ${fmt1(F.inv.feed_layer || 0)} bags · Hog feed ${fmt1(F.inv.feed_pig || 0)} · Mineral ${fmt1(F.inv.mineral || 0)}`); break;
+    case 'feedinfo': {
+      // (1.5.21) the mineral tub in the barn: top it up from the bags here when grazers are inside
+      const bo = G.roomObj && (G.roomObj.t === 'loft' ? G.roomObj.barn : G.roomObj), key = bo ? 'b' + bo.id : '', inside = bo ? F.animals.filter((a) => a.barn === bo.id && GRAZERS.has(a.sp)) : [];
+      if (inside.length && (F.inv.mineral || 0) >= 1 && MINERALS.days(F, key) < 4) { act('feed', 1.0, 10, 2, () => MINERALS.fill(F, key)); break; }
+      const md = inside.length ? MINERALS.days(F, key) : null;
+      UI.toast(`Layer feed ${fmt1(F.inv.feed_layer || 0)} bags · Hog feed ${fmt1(F.inv.feed_pig || 0)} · Mineral & kelp ${fmt1(F.inv.mineral || 0)}${md !== null ? ` · the barn's mineral tub has ${md} day${md === 1 ? '' : 's'} left` : ''}`); break;
+    }
     case 'eggs': { const n = nestTotal(F); if (!n) { UI.toast('No eggs yet. Check again tomorrow.'); break; } act('collect', 1.4, 10, 1, () => { collectEggs(F, null); F.today.eggs = true; rebuildRoom(); UI.toast(`Collected ${n} eggs 🥚`); AUDIO.ding(); }); break; }
     case 'feedhens': if ((F.inv.feed_layer || 0) < 0.05) { UI.toast('The feed bin is empty. Buy layer feed in town.', true); break; } act('feed', 1.2, 10, 2, () => { F.today.fedPoultry = true; doneChore('Hens fed'); }); break;
     case 'ghbed': { const b = it.bed; if (b.ready) act('collect', 1.4, 20, 3, () => { const n = harvestBed(F, b, null); UI.toast(`+${n} harvested`); rebuildRoom(); }); else if (!b.crop) { UI.seedPicker(() => plantBed(b), true); } else act('water', 1.2, 10, 1, () => { F.today['water_' + b.id] = true; UI.toast('Watered 💧'); }); break; }

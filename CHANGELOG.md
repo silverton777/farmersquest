@@ -8,6 +8,29 @@ Publishing: copy `index.html` and `sw.js` into the GitHub repo `silverton777/far
 
 ---
 
+## 1.5.21: ponds that fill, woods that regrow, mineral & kelp, and a farmhand you can see
+
+**Why:** "make it easier to fill ponds some ponds are filling and others arent. Make sure trees in the woods grow bac quicker then normal trees. what is kelp and minerals for. there is no option to use them. make it so you actually see your farm hand doing work and you can talk to them"
+
+- Ponds fill more easily:
+  - A swale with a pond below it now spills into the pond: part of the rain it catches runs along the ditch to the pond, and more once the swale is full. Swales above a pond used to starve it.
+  - Ponds collect runoff from a wider area (22 steps out, was 15), and a little more of it reaches the water.
+  - A new pond leaks less once its bottom seals: after about a month and a half, and again after four months.
+  - "Have a water truck top it up" on the pond card: about a fifth of a pond for $60 (free in kid mode), once a day.
+  - The pond card explains all of this.
+- Trees in the woods grow back much faster than trees you plant. A cut tree sprouts in about a week and is full grown again in about six weeks (it was five months).
+- Mineral & kelp now does something:
+  - Put a bag in the mineral tub in a paddock, from its gate or the paddock card, or in the barn by the feed bags. A blue tub shows by the gate.
+  - Cattle, horses, sheep and goats lick it down over the following days. A bag lasts one cow about 50 days.
+  - With mineral out they keep a little healthier, grow and milk about 10% better, and settle in calf more easily.
+  - After three weeks without it they slowly fall behind, and the morning report and the chore list say so.
+  - A barn hand tops the tubs up from your bags.
+- Your farmhand is out on the farm:
+  - They walk in from the gate in the morning and work where you can see them until about half past five.
+  - A barn hand puts hay out for each herd, checks the troughs, milks the cows, gathers eggs and works in the barn. A garden hand waters the beds, checks the fruit trees and hoes empty beds.
+  - Every hand pulls weeds (really pulling them up) and tightens loose fence.
+  - Walk up to them, or tap them, to talk. You can ask what they're working on, how the morning round went, or how the farm is looking (they tell you what they've noticed: short grass, low hay, empty beds, low ponds, weeds, empty mineral tubs), ask for advice, or thank them. Wages and work are there too.
+
 ## 1.5.20: the Hollow Creek library
 
 **Why:** "what do you think of a library in the town that you can go in a read books on the different farming techniques that can unlock recipes, etc. Add reading books and stuff to the goal list as well." Also: "dont make them higher levels necessarily to accomodate existing players put them where they seem fit."
