@@ -8,6 +8,17 @@ Publishing: copy `index.html` and `sw.js` into the GitHub repo `silverton777/far
 
 ---
 
+## 1.5.22: help choosing where a pond goes
+
+**Why:** "dont have the water truck option to fill up pond. When placing ponds give suggestions on placements like if they have it on a high area - allow them to place it their if they want but say why it might be harder to fill and suggest where."
+
+- The water truck is gone from the pond card.
+- While you place a pond, with your farmer or on the map, the bar rates the spot (🟥 poor, 🟨 fair, 🟩 good, 💙 great) by playing out two usual years of your region's rain and warmth for that spot and pond size: how soon it would fill, and how low it would drop in the dry months.
+- On a poor or fair spot it looks round your land for a better one that fits and says where ("a great spot is about 24 steps east"). It's marked with a glowing ring on the farm, or a dashed "better spot" outline on the map.
+- You can still dig anywhere. On a poor or fair spot the button says "Place it here anyway". Tapping it explains in plain words why that spot will be slow to fill and what makes a good pond spot, with "Move the pond there" (to the better spot), "Keep looking" or "Dig it here anyway".
+- Swales above a pond now pass nearly all of their water on to it (about as much as the pond would get with no swale, and more once the swale is full). Before, they still kept about half, which is why ponds below swales lagged behind.
+- The placement bar wraps onto a few lines for ponds, so the advice can be read in full.
+
 ## 1.5.21: ponds that fill, woods that regrow, mineral & kelp, and a farmhand you can see
 
 **Why:** "make it easier to fill ponds some ponds are filling and others arent. Make sure trees in the woods grow bac quicker then normal trees. what is kelp and minerals for. there is no option to use them. make it so you actually see your farm hand doing work and you can talk to them"

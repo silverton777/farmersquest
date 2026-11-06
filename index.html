@@ -10,6 +10,17 @@ Publishing: copy `index.html` and `sw.js` into the GitHub repo `silverton777/far
 
 ==========
 
+## 1.5.22: help choosing where a pond goes
+
+**Why:** "dont have the water truck option to fill up pond. When placing ponds give suggestions on placements like if they have it on a high area - allow them to place it their if they want but say why it might be harder to fill and suggest where."
+
+- The water truck is gone from the pond card.
+- While you place a pond, with your farmer or on the map, the bar rates the spot (🟥 poor, 🟨 fair, 🟩 good, 💙 great) by playing out two usual years of your region's rain and warmth for that spot and pond size: how soon it would fill, and how low it would drop in the dry months.
+- On a poor or fair spot it looks round your land for a better one that fits and says where ("a great spot is about 24 steps east"). It's marked with a glowing ring on the farm, or a dashed "better spot" outline on the map.
+- You can still dig anywhere. On a poor or fair spot the button says "Place it here anyway". Tapping it explains in plain words why that spot will be slow to fill and what makes a good pond spot, with "Move the pond there" (to the better spot), "Keep looking" or "Dig it here anyway".
+- Swales above a pond now pass nearly all of their water on to it (about as much as the pond would get with no swale, and more once the swale is full). Before, they still kept about half, which is why ponds below swales lagged behind.
+- The placement bar wraps onto a few lines for ponds, so the advice can be read in full.
+
 ## 1.5.21: ponds that fill, woods that regrow, mineral & kelp, and a farmhand you can see
 
 **Why:** "make it easier to fill ponds some ponds are filling and others arent. Make sure trees in the woods grow bac quicker then normal trees. what is kelp and minerals for. there is no option to use them. make it so you actually see your farm hand doing work and you can talk to them"
@@ -716,6 +727,7 @@ FQ-CHANGELOG-END -->
   #placeBar { top: max(64px, calc(env(safe-area-inset-top) + 54px)); bottom: auto; padding: 5px 6px 5px 12px; gap: 6px; border-radius: 14px; max-width: min(520px, calc(100vw - 150px));
     background: #fbf1d9; border: 2px solid #7a4e2a; box-shadow: 0 3px 0 rgba(70, 42, 20, .4); }
   #placeBar span { font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; flex: 1; }
+  #placeBar.long span { white-space: normal; display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; line-height: 1.3; }   /* (1.5.22) pond-site advice wraps */
   #placeBar .btn { padding: 5px 9px; font-size: 13px; border-radius: 10px; flex: none; }
   #placeBar #placeCancel { width: 30px; height: 30px; padding: 0; border-radius: 50%; display: grid; place-items: center; font-size: 15px; }
   body.placing #toast { top: max(104px, calc(env(safe-area-inset-top) + 94px)); }
@@ -10558,8 +10570,8 @@ const FISHING = {
     if (sw.length) rows.push({ icon: '〰️', text: `${sw.length === 1 ? 'A swale' : sw.length + ' swales'} above it`, small: 'When they fill up, they spill along the ditch into this pond, so they help fill it as well as watering the trees on the berm' });
     if (wk.length) rows.push({ icon: '📈', text: `Last ${wk.length} day${wk.length > 1 ? 's' : ''}: ${pct(sum(3))}`, small: `In: ${pct(sum(0))} runoff, ${pct(sum(1))} rain on the water · Out: ${pct(-sum(2))} to evaporation and seepage` });
     if (p.vol >= 0.99) rows.push({ icon: '✅', text: 'Full to the brim', small: 'Any more rain just spills over' });
-    else if (wk.length >= 3 && sum(3) <= 0) rows.push({ icon: '💡', text: 'Why it isn\'t rising', small: share <= 0.3 ? 'Not enough ground drains into it. A swale on the slope above it will catch rain and spill it in, or have a water truck top it up below.' : 'Dry or hot weather: evaporation is taking more than the rain brings. It will rise again in the wetter months, or have a water truck top it up below.' });
-    if (p.vol < 0.97) rows.push({ id: 'truck', tap: true, icon: '🚚', text: 'Have a water truck top it up', small: `Adds about a fifth of a pond, once a day${(p.age || 0) < 120 ? '. New ponds also leak less after a few months, as the bottom seals' : ''}`, right: F.kid ? 'Free' : money(POND_TRUCK) });
+    else if (wk.length >= 3 && sum(3) <= 0) rows.push({ icon: '💡', text: 'Why it isn\'t rising', small: share <= 0.3 ? 'Not enough ground drains into it. A swale on the slope above it will catch rain and spill it in.' : 'Dry or hot weather: evaporation is taking more than the rain brings. It will rise again in the wetter months.' });
+    if (p.vol < 0.97 && (p.age || 0) < 120) rows.push({ icon: '🪨', text: 'New ponds leak a little', small: 'The bottom seals over the first few months, and then it holds water better' });
     return '<div class="grp">Water</div>' + UI.rows(rows);
   },
   menu(p) {
@@ -10576,16 +10588,6 @@ const FISHING = {
     D.body.innerHTML = html;
     D.body.querySelectorAll('.row.tap').forEach((r) => {
       r.onclick = () => {
-        if (r.dataset.id === 'truck') {
-          const td = F.today = F.today || {};
-          if (td['truck_' + p.id]) return UI.toast('The truck has already been today. It comes back tomorrow.', true);
-          if (!F.kid && !F.unlocked && F.money < POND_TRUCK) return UI.toast('Not enough money.', true);
-          if (!F.kid && !F.unlocked) { F.money -= POND_TRUCK; F.stats.spent += POND_TRUCK; }
-          td['truck_' + p.id] = true; p.vol = Math.min(1, p.vol + 0.2); tally(F, 'pondTruck');
-          try { G.view.rebuildWater(); } catch (e) { /* the water redraws on the next frame anyway */ }
-          AUDIO.ding(); UI.hudTick(0, true); UI.toast(`🚚 The water truck backs up to the bank and runs its hose. The pond is ${Math.round(p.vol * 100)}% full.`);
-          return self.menu(p);
-        }
         const f = FISH.find((q) => q.key === r.dataset.id), cost = f.stock * 10;
         if (!F.kid && !F.unlocked && F.money < cost) return UI.toast('Not enough money.', true);
         if (self.total(p) + 10 > cap + 6) return UI.toast('The pond is already crowded.', true);
@@ -12350,7 +12352,7 @@ const HANDNPC = {
     const empty = F.objs.filter((o) => o.t === 'bed' && !o.crop).length; if (empty >= 2) out.push(`There are ${empty} empty beds. Could plant something, or sow a cover crop to keep the soil alive.`);
     const ready = F.objs.filter((o) => o.t === 'bed' && o.ready).length; if (ready && !HAND.covers(F, 'garden')) out.push(`${ready} bed${ready > 1 ? 's are' : ' is'} ready to harvest.`);
     const weeds = F.objs.filter((o) => o.t === 'weed').length; if (weeds > 12) out.push(`The weeds are getting ahead of us. I counted ${weeds}.`);
-    for (const p of F.ponds) if (p.vol < 0.35) { out.push('One of the ponds is getting low. A swale above it would help, or the water truck.'); break; }
+    for (const p of F.ponds) if (p.vol < 0.35) { out.push('One of the ponds is getting low. A swale on the slope above it would help fill it.'); break; }
     if (F.paddocks.some((p) => !F.animals.some((a) => a.pad === p.id) && p.rest > 40)) out.push('One of the empty paddocks has had a good long rest. The grass is ready for the herd.');
     return out.length ? out.slice(0, 3) : ['Everything\'s in good shape, honestly. You\'ve got a nice place here.'];
   },
@@ -12597,8 +12599,77 @@ FISH.push({ key: 'chub', name: 'Creek chub', icon: '🐟', price: 3, lb: [0.2, 0
 FISH.push({ key: 'crawdad', name: 'Crayfish', icon: '🦞', price: 5, lb: [0.1, 0.5], regions: 'creek', fry: 0, stock: 0, diff: 0.35, note: 'Turn over a rock and there it is.' });
 for (const f of FISH.slice(-2)) defItem('fish_' + f.key, { name: f.name, unit: 'fish', price: f.price, icon: f.icon, kind: 'produce', fish: true });
 
-const POND_TRUCK = 60;   // a water truck: about a fifth of a pond for $60, once a day
-const POND_CATCH = 22;   // how far out (in steps) a pond collects runoff from higher ground (1.5.21; was 15)
+const POND_CATCH = 22;
+// ---------------------------------------------------------------- where a pond will fill (1.5.22)
+// While you place a pond, rate the spot by how much land drains into it (the same rule the pond fills by each rainy day: runoff from
+// higher ground within POND_CATCH steps, plus what swales above it spill), and when it's a poor spot find a better one nearby on your
+// land. You can still dig anywhere: a poor spot just asks once, and says why.
+const PONDSITE = {
+  // the same sums the pond fills by each day: every bit of higher ground within reach sheds part of the rain that falls on it (more
+  // on steep, bare or packed ground, less on flat, grassy, spongy ground), and 3% of that reaches the pond. Here: how much a good
+  // inch of rain (25 mm) would raise a pond this size, in percent.
+  share(F, x, z, rx, rz) {
+    const T = F.terrain, R = T.region, lv = T.at(x, z) - 0.2; let up = 0, all = 0, ro = 0;
+    for (let dx = -POND_CATCH; dx <= POND_CATCH; dx += 2) for (let dz = -POND_CATCH; dz <= POND_CATCH; dz += 2) {
+      if (dx * dx + dz * dz > POND_CATCH * POND_CATCH) continue; const cx = x + dx, cz = z + dz, k = T.idx(cx, cz); if (k < 0) continue;
+      all++; if (T.at(cx, cz) <= lv) continue; up++;
+      const cov = T.cover[k], cb = cov === COVER.grass ? 0.25 * T.bio[k] + 0.05 : cov === COVER.forest ? 0.35 : cov === COVER.bed ? 0.18 : cov === COVER.built ? -0.3 : -0.05;
+      const f = clamp(0.28 + 0.055 * T.om[k] - 0.35 * T.comp[k] - 1.3 * T.slope(cx, cz) + cb + (T.rip[k] ? 0.15 : 0) + R.soil.drain * 0.1, 0.04, 0.96);
+      ro += 4 * (1 - f);   // each sample stands for a 2x2 patch
+    }
+    const sw = (F.swales || []).some((s) => s.pts.some((q) => Math.hypot(q[0] - x, q[1] - z) < Math.max(rx || 3, rz || 3) * 5 + 14) && Math.min(...s.pts.map((q) => T.at(q[0], q[1]))) + 0.3 > lv + 0.2);
+    const area = Math.PI * (rx || 3) * (rz || 2.4) * 25, cap = area * 1.1;
+    const perMM = (ro * 0.03 + 0.001 * area) / cap;
+    // play out the next two years of this region's usual rain and warmth: how soon it fills, and how low it drops in the dry months
+    const Rg = T.region, rain = Rg.rain || Array(12).fill(70), temp = Rg.t || Array(12).fill(12);
+    let v = 0.05, fullAt = null, lo2 = 1, sum2 = 0;
+    for (let i = 0; i < 24; i++) {
+      const m = (F.month + i) % 12, seep = i < 2 ? 0.001 : i < 4 ? 0.0007 : 0.0004;
+      v = clamp(v + perMM * rain[m] - 30 * ((Math.max(0, temp[m]) * 0.2 + 1) * 0.001 + seep) / 1.1, 0, 1);
+      if (fullAt === null && v >= 0.9) fullAt = i + 1;
+      if (i >= 12) { lo2 = Math.min(lo2, v); sum2 += v; }
+    }
+    return { share: all ? up / all : 0, swale: sw, pct: perMM * 25 * 100, fullAt, lo: lo2, avg: sum2 / 12 };
+  },
+  grade(r) { return r.fullAt !== null && r.fullAt <= 6 && r.lo >= 0.6 ? 3 : (r.fullAt !== null && r.fullAt <= 12) || r.avg >= 0.6 ? 2 : r.avg >= 0.3 ? 1 : 0; },
+  words: ['Poor spot', 'Fair spot', 'Good spot', 'Great spot'],
+  line(F, x, z, rx, rz) {
+    const r = this.share(F, x, z, rx, rz), g = this.grade(r), mo = (n) => `${n} month${n === 1 ? '' : 's'}`;
+    const lo = Math.round(r.lo * 100), avg = Math.round(r.avg * 100);
+    const why = g === 3 ? `in a usual year it would fill in about ${mo(r.fullAt)} and ${lo >= 95 ? 'stay full' : `stay over ${Math.floor(lo / 10) * 10}% full`} even in the dry months${r.swale ? ' (the swale above passes its water on)' : ''}`
+      : g === 2 ? (r.fullAt !== null ? `it would fill in about ${mo(r.fullAt)}, but drop to about ${lo}% in the dry months` : `it would sit around ${avg}% full, lower in the dry months`)
+        : g === 1 ? `in a usual year it would only get about ${avg}% full, and drop to ${lo}% in the dry months`
+          : `${r.share < 0.3 ? 'it sits high, with little ground above it to shed rain into it' : 'not enough rain runs off the ground above it'}, so in a usual year it would stay ${avg < 8 ? 'nearly empty' : `only about ${avg}% full`}`;
+    return { g, r, text: `${['🟥', '🟨', '🟩', '💙'][g]} ${this.words[g]}: ${why}` };
+  },
+  // a quick look round for somewhere lower that would catch more, where a pond this size fits
+  fits(F, x, z, rx, rz) {
+    for (let a = 0; a < 6.28; a += 0.5) { const qx = x + Math.cos(a) * rx * 1.3, qz = z + Math.sin(a) * rz * 1.3; if (!ownedAt(F, qx, qz) || roadProblem(F, qx, qz, 0.5)) return false; const k = F.terrain.idx(qx, qz); if (k < 0 || F.terrain.cover[k] === COVER.water) return false; }
+    for (const o of F.objs) if (solidOf(o) && Math.hypot((o.x - x) / (rx + 2.5), (o.z - z) / (rz + 2.5)) < 1) return false;
+    for (const p of F.ponds) if (Math.hypot(p.x - x, p.z - z) < p.rx + rx + 2) return false;
+    const Rx = rx * 1.08 + 0.6, Rz = rz * 1.08 + 0.6;
+    if (allFences(F).some((q) => fenceSegsOf(q).some((g) => { for (let k = 0; k <= 8; k++) { const t = k / 8; if (Math.hypot((lerp(g[0], g[2], t) - x) / Rx, (lerp(g[1], g[3], t) - z) / Rz) < 1) return true; } return false; }))) return false;
+    return true;
+  },
+  better(F, x, z, rx, rz, g0) {
+    let best = null, bs = this.share(F, x, z, rx, rz).pct * 1.25 + 1;
+    for (let r = 6; r <= 60; r += 6) for (let a = 0; a < 6.28; a += 6 / r) {
+      const cx = x + Math.cos(a) * r, cz = z + Math.sin(a) * r;
+      if (!ownedAt(F, cx, cz)) continue;
+      const sh = this.share(F, cx, cz, rx, rz);
+      if (sh.pct > bs && this.grade(sh) > g0 && this.fits(F, cx, cz, rx, rz)) { bs = sh.pct; best = [cx, cz, this.grade(sh)]; }
+    }
+    return best;
+  },
+  dir(dx, dz) { const a = Math.atan2(dx, -dz) * 180 / Math.PI, n = ['north', 'north-east', 'east', 'south-east', 'south', 'south-west', 'west', 'north-west']; return n[((Math.round(a / 45) % 8) + 8) % 8]; },
+  // the suggestion (cached: only looked for again when the pond has moved a few steps)
+  suggest(P, x, z) {
+    const F = G.F, L = this.line(F, x, z, P.rx, P.rz);
+    if (L.g >= 2) { P.better = null; return L; }
+    if (!P.look || Math.hypot(P.look[0] - x, P.look[1] - z) > 3) { P.look = [x, z]; P.better = this.better(F, x, z, P.rx, P.rz, L.g); }
+    return L;
+  },
+};   // how far out (in steps) a pond collects runoff from higher ground (1.5.21; was 15)
 const WOODS_REGROW = [7, 45];   // days as a stump, days until it's a full tree again
 const WOODS = {
   mc: {},          // prop meshes made so far
@@ -17413,7 +17484,7 @@ function simDay(F, auto, rep) {
     for (const p of s.pts) { for (let dz = -7; dz <= 0; dz += 1) { const k = T.idx(p[0], p[1] + dz); if (k >= 0) { caught += runoff[k] * 0.5; runoff[k] *= 0.15; } } }
     const lvl = Math.min(...s.pts.map((q) => T.at(q[0], q[1])));
     const below = F.ponds.filter((p) => p.level < lvl + 0.3 && s.pts.some((q) => Math.hypot(q[0] - p.x, q[1] - p.z) < Math.max(p.rx, p.rz) * 5 + 14));
-    if (below.length) { const give = caught * (0.35 + 0.4 * clamp((s.wet || 0) - 0.6, 0, 1)); caught -= give; for (const p of below) swaleToPond.set(p, (swaleToPond.get(p) || 0) + give / below.length); }
+    if (below.length) { const give = caught * (0.6 + 0.35 * clamp((s.wet || 0) - 0.5, 0, 1) * 2); caught -= give * 0.6; for (const p of below) swaleToPond.set(p, (swaleToPond.get(p) || 0) + give / below.length); }
     s.wet = clamp((s.wet || 0) * 0.9 + caught / 260, 0, 1.2);
     T.eachCell(x0 - 0.5, Math.min(...s.pts.map((p) => p[1])) - 1, x1 + 0.5, Math.max(...s.pts.map((p) => p[1])) + 6, (x, z, k) => { T.moist[k] = clamp(T.moist[k] + s.wet * 0.035, 0, 1); });
     if (rep && s.wet > 0.6 && w.rain > 15) rep.swaleFull = true;
@@ -17424,7 +17495,7 @@ function simDay(F, auto, rep) {
     // and seepage that eases off as the pond bottom seals over its first few months
     let inflow = 0;
     T.eachCell(p.x - POND_CATCH, p.z - POND_CATCH, p.x + POND_CATCH, p.z + POND_CATCH, (x, z, k) => { if (Math.hypot(x - p.x, z - p.z) < POND_CATCH && T.at(x, z) > p.level - 0.2) inflow += runoff[k] * 0.03; });
-    inflow += (swaleToPond.get(p) || 0) * 0.05;
+    inflow += (swaleToPond.get(p) || 0) * 0.06;   // (1.5.22) about as much as the pond would have had with no swale, all of it once the swale is full
     p.age = (p.age || 0) + 1;
     const area = Math.PI * p.rx * p.rz * 25, cap = area * 2.2 * 0.5;   // ~2.2 m deep bowl
     const seep = p.age > 120 ? 0.0004 : p.age > 45 ? 0.0007 : 0.001;
@@ -18925,7 +18996,7 @@ function interiorFrame(F0, room) {
 
 'use strict';
 // ============================================================================ profiles + saves (each profile has its own farm save)
-const FQ_VERSION = '1.5.21';
+const FQ_VERSION = '1.5.22';
 const LOOKS = [
   { shirt: [214, 74, 64], hair: [120, 76, 40] }, { shirt: [70, 130, 200], hair: [236, 206, 120] }, { shirt: [240, 170, 60], hair: [80, 50, 30] },
   { shirt: [120, 170, 90], hair: [40, 30, 28] }, { shirt: [170, 100, 190], hair: [200, 110, 60] }, { shirt: [60, 160, 160], hair: [150, 100, 60] },
@@ -21121,12 +21192,13 @@ const MAP = {
       if (P.pts) { const SH = G.F.terrain.swaleShape(P.pts, P.level); D.line = SH.pts; D.mound = SH.pts.map((p, i) => [p[0] + SH.N[i][0] * 1.85, p[1] + SH.N[i][1] * 1.85]); } else { D.line = null; D.mound = null; }
     } else {
       if (!D.at) { D.P = null; D.v = null; return; }
-      const q = MAP_PONDS[D.size], P = { kind: 'pond', rx: q[0], rz: q[1], price: q[2], label: q[3], cur: D.at.slice(), fenceRound: !!D.fenceRound };
+      const q = MAP_PONDS[D.size], P = { kind: 'pond', rx: q[0], rz: q[1], price: q[2], label: q[3], cur: D.at.slice(), fenceRound: !!D.fenceRound, look: D.P && D.P.rx === q[0] ? D.P.look : null, better: D.P && D.P.rx === q[0] ? D.P.better : null };
       D.v = validatePlace(P); D.P = P; if (P.nudged) D.at = P.cur.slice();
     }
   },
   commitDig() {
     const D = this.dig; if (!D || !D.P || !D.v || D.v.err) return;
+    if (D.kind === 'pond' && D.v.siteG < 2 && D.askedAt !== D.at.join()) return pondSiteAsk(D.P, () => { D.askedAt = D.at.join(); this.commitDig(); }, (B) => { D.at = [B[0], B[1]]; this.validateDig(); this.bar(); this.dirty = true; });
     const P = Object.assign(D.P, { now: true, cost: D.v.cost });
     this.cancelEdit(); this.close();
     G.place = P; confirmPlace();
@@ -21147,6 +21219,7 @@ const MAP = {
       g.beginPath(); g.ellipse(D.at[0], D.at[1], q[0] * 1.05, q[1] * 1.05, 0, 0, 6.3); g.fillStyle = bad ? 'rgba(220,80,60,0.45)' : 'rgba(70,140,220,0.6)'; g.fill();
       g.setLineDash([1, 0.6]); g.strokeStyle = bad ? '#b33' : '#2a5c9a'; g.lineWidth = 0.35; g.stroke(); g.setLineDash([]);
       g.beginPath(); g.ellipse(D.at[0], D.at[1], q[0] * 1.6, q[1] * 1.6, 0, 0, 6.3); g.strokeStyle = 'rgba(120,90,50,0.6)'; g.lineWidth = 0.25; g.stroke();
+      if (D.P && D.P.better) { const B = D.P.better; g.setLineDash([0.8, 0.5]); g.beginPath(); g.ellipse(B[0], B[1], q[0] * 1.1, q[1] * 1.1, 0, 0, 6.3); g.strokeStyle = '#2a7ad0'; g.lineWidth = 0.4; g.stroke(); g.setLineDash([]); g.fillStyle = '#2a7ad0'; g.font = `700 ${Math.max(2.2, 13 * px)}px sans-serif`; g.textAlign = 'center'; g.fillText('better spot', B[0], B[1] - q[1] * 1.3); g.textAlign = 'start'; }
     }
   },
   // a shape laid out in the field: finish it on the map, where you put the gates in
@@ -24752,6 +24825,7 @@ function renderGame(dt) {
   const draws = G.view.draws(G.focus, G.Fm, G.t);
   if (FPV.on && !G.drive && !G.photo) FPV.stripBody(draws);
   if (G.place && G.place.ghostDraw) draws.push(...G.place.ghostDraw);
+  if (G.place && G.place.kind === 'pond' && G.place.better) { const B = G.place.better; draws.push(ringDraw([B[0], B[1], Math.max(G.place.rx, G.place.rz) * 2.2])); }
   try { MINERALS.draws(draws); } catch (e) { /* a missing tub is fine */ }
   if (G.target && G.target.ring && !G.place) draws.push(ringDraw(G.target.ring));
   if (G.target && G.target.cone && !G.busy && !G.place) draws.push(...coneDraws(G.target.cone));
@@ -25427,6 +25501,18 @@ function askPlace(p, mapOpt) {
   P.body.querySelectorAll('.row').forEach((r) => { r.onclick = () => { if (r.dataset.id === 'me') startPlace(p); else { UI.closeAll(); MAP.open(mapOpt); } }; });
 }
 function startPlace(p) { G.place = Object.assign({ stage: 0, rot: 0 }, p); $('placeBar').hidden = false; document.body.classList.add('placing'); $('placeRot').hidden = p.kind !== 'build' && p.kind !== 'move' && p.kind !== 'vines'; $('placeMinus').hidden = $('placePlus').hidden = p.kind !== 'vines'; UI.closeAll(); G.targetT = 0; }
+// a pond on a poor spot: say why, offer the better spot, or dig here anyway (it's your farm)
+function pondSiteAsk(P, dig, goThere) {
+  const x = P.cur[0], z = P.cur[1], L = PONDSITE.line(G.F, x, z, P.rx, P.rz), B = P.better;
+  const D = UI.open({ title: 'This pond may struggle to fill', sub: PONDSITE.words[L.g], icon: '💧', foot: true });
+  const said = L.text.replace(/^\S+\s[^:]+:\s*/, '');
+  D.body.innerHTML = `<p class="note">${esc(said.charAt(0).toUpperCase() + said.slice(1))}.</p><p class="note">A pond fills from rain running downhill into it. The best spots are low, with plenty of slope above them, like the bottom of a gentle valley or where two slopes meet. A swale along the slope above a pond slows the water down and passes it on into the pond.</p>`
+    + (B ? `<div class="grp">A better spot</div>` + UI.rows([{ id: 'go', tap: true, icon: '📍', text: `${PONDSITE.words[B[2]]}, about ${Math.round(Math.hypot(B[0] - x, B[1] - z))} steps ${PONDSITE.dir(B[0] - x, B[1] - z)}`, small: 'Move the pond there and have another look' }]) : '<p class="note">I couldn\'t find a clearly better spot nearby on your land. Here is as good as anywhere close.</p>');
+  D.foot.innerHTML = '<button class="btn" id="psBack">Keep looking</button><button class="btn" id="psDig">Dig it here anyway</button>';
+  $('psBack').onclick = () => UI.closeAll();
+  $('psDig').onclick = () => { UI.closeAll(); dig(); };
+  if (B) D.body.querySelector('[data-id="go"]').onclick = () => { UI.closeAll(); if (goThere) goThere(B); else { const d = 2 + P.rz; G.Fm.x = B[0] - Math.sin(G.Fm.yaw) * d; G.Fm.z = B[1] - Math.cos(G.Fm.yaw) * d; G.targetT = 0; } };
+}
 function cancelPlace() { G.place = null; $('placeBar').hidden = true; document.body.classList.remove('placing'); }
 function placeTarget() {
   const P = G.place, [x, z] = forward(G.Fm, P.kind === 'vines' ? 2.2 : P.kind === 'build' || P.kind === 'move' ? (P.kind === 'move' && P.obj.t === 'bed' ? 1.4 : 2.2 + (P.def ? Math.max(P.def.hw, P.def.hd) : 0)) : P.kind === 'pond' ? 2 + P.rz : 1.4);
@@ -25434,9 +25520,11 @@ function placeTarget() {
   const v = validatePlace(P);
   P.err = v.err; P.cost = v.cost;
   $('placeTxt').textContent = v.err ? '⚠️ ' + v.err : v.text;
+  $('placeBar').classList.toggle('long', P.kind === 'pond');
   if (v.err && v.fix && (P.stage !== 0 || P.kind === 'pond')) return { label: v.fix.label, icon: '🛠️', fn: () => { if (v.fix.id === 'fenceround') P.fenceRound = true; else if (v.fix.id === 'breakfence') P.breakFences = true; G.targetT = 0; } };
   if (P.kind === 'move') return { label: v.err ? 'Can\'t put it here' : 'Move it here', icon: v.err ? '🚫' : '✅', fn: () => (v.err ? UI.toast(v.err, true) : confirmPlace()) };
   if (P.kind === 'vines') return { label: v.err ? 'Can\'t plant the row here' : `Plant this row (${P.layout.ok.filter(Boolean).length} vines)`, icon: v.err ? '🚫' : '🍇', fn: () => (v.err ? UI.toast(v.err, true) : confirmPlace()) };
+  if (P.kind === 'pond' && !v.err && v.siteG < 2) return { label: `Place it here anyway ($${v.cost.toLocaleString()})`, icon: '⚠️', fn: () => pondSiteAsk(P, () => confirmPlace()) };
   if (P.kind === 'build' || P.kind === 'pond') return { label: v.err ? 'Can\'t place here' : `Place it ($${v.cost.toLocaleString()})`, icon: v.err ? '🚫' : '✅', fn: () => (v.err ? UI.toast(v.err, true) : confirmPlace()) };
   if (P.stage === 0) return { label: P.kind === 'paddock' ? 'Set the first corner' : 'Set the start', icon: '📍', fn: () => {
     // a fence corner may sit right against the boundary fence (by the road too); swales and rips keep the usual clearances
@@ -25498,8 +25586,10 @@ function validatePlace(P, noSnap) {
       }
     }
     if (F.money < cost) return { err: `Need $${cost.toLocaleString()}`, cost };
-    const catchment = (() => { let n = 0; T.eachCell(x - 15, z - 15, x + 15, z + 15, (cx, cz) => { if (T.at(cx, cz) > T.at(x, z) + 0.3 && Math.hypot(cx - x, cz - z) < 15) n++; }); return n; })();
-    return { text: `${P.label} pond: $${cost.toLocaleString()} · ${catchment > 200 ? 'great' : catchment > 90 ? 'fair' : 'small'} catchment uphill`, cost };
+    const L = PONDSITE.suggest(P, x, z), B = P.better;
+    P.siteG = L.g;
+    const tip = B ? ` A ${PONDSITE.words[B[2]].toLowerCase()} is about ${Math.round(Math.hypot(B[0] - x, B[1] - z))} steps ${PONDSITE.dir(B[0] - x, B[1] - z)}${G.place === P ? ' (the glowing ring)' : ' (marked on the map)'}.` : L.g < 2 ? ' Lower ground with slope above it fills best.' : '';
+    return { text: `${P.label} pond: $${cost.toLocaleString()}. ${L.text}.${tip}`, cost, siteG: L.g };
   }
   if (P.kind === 'vines') {
     const L = vineLayout(P); P.layout = L;
